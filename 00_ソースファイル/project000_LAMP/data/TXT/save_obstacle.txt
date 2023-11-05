@@ -1,0 +1,198 @@
+#==============================================================================
+#
+#	障害物セーブテキスト [save_obstacle.txt]
+#	Author : you
+#
+#==============================================================================
+---------->--<---------- ここから下を コピーし貼り付け ---------->--<----------
+
+#------------------------------------------------------------------------------
+#	パラメーター情報
+#------------------------------------------------------------------------------
+#	特殊状態無し		：0
+#	触れるとジャンプする：1
+#	着地できる			：2
+#------------------------------------------------------------------------------
+#	回避方法無し		：0
+#	ジャンプ回避		：1
+#	スライディング回避	：2
+#------------------------------------------------------------------------------
+STATUSSET
+
+	OBSTACLESET
+		TYPE = 0
+		SIZE = 230.00 560.00 130.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 1
+		SIZE = 230.00 560.00 130.00
+		STATE = 0
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 2
+		SIZE = 144.00 560.00 144.00
+		STATE = 1
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 3
+		SIZE = 560.00 560.00 60.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 4
+		SIZE = 560.00 560.00 112.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 5
+		SIZE = 560.00 560.00 112.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		SIZE = 560.00 560.00 264.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 7
+		SIZE = 560.00 560.00 320.00
+		STATE = 0
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 8
+		SIZE = 560.00 560.00 456.00
+		STATE = 0
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 9
+		SIZE = 406.00 560.00 216.00
+		STATE = 0
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		SIZE = 560.00 560.00 518.00
+		STATE = 0
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 11
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		SIZE = 560.00 360.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 13
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 14
+		SIZE = 560.00 360.00 282.00
+		STATE = 2
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 15
+		SIZE = 560.00 360.00 282.00
+		STATE = 2
+		DODGE = 2
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 16
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 17
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 18
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 19
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 20
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 21
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 22
+		SIZE = 560.00 360.00 282.00
+		STATE = 0
+		DODGE = 0
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 23
+		SIZE = 560.00 180.00 282.00
+		STATE = 2
+		DODGE = 1
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 24
+		SIZE = 560.00 360.00 282.00
+		STATE = 2
+		DODGE = 0
+	END_OBSTACLESET
+
+END_STATUSSET
+

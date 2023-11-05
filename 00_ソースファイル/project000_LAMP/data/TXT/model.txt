@@ -1,0 +1,24 @@
+#==============================================================================
+#
+#	モデルのセットアップ [model.txt]
+#	Author : you
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+#	モデル情報
+#------------------------------------------------------------------------------
+FILENAME = data\MODEL\PLAYER\00_waist.x		# プレイヤー：腰
+FILENAME = data\MODEL\PLAYER\01_body.x		# プレイヤー：体
+FILENAME = data\MODEL\PLAYER\02_head.x		# プレイヤー：頭
+FILENAME = data\MODEL\PLAYER\03_armUL.x		# プレイヤー：左上腕
+FILENAME = data\MODEL\PLAYER\04_armUR.x		# プレイヤー：右上腕
+FILENAME = data\MODEL\PLAYER\05_armDL.x		# プレイヤー：左下腕
+FILENAME = data\MODEL\PLAYER\06_armDR.x		# プレイヤー：右下腕
+FILENAME = data\MODEL\PLAYER\07_handL.x		# プレイヤー：左手
+FILENAME = data\MODEL\PLAYER\08_handR.x		# プレイヤー：右手
+FILENAME = data\MODEL\PLAYER\09_legUL.x		# プレイヤー：左太もも
+FILENAME = data\MODEL\PLAYER\10_legUR.x		# プレイヤー：右太もも
+FILENAME = data\MODEL\PLAYER\11_legDL.x		# プレイヤー：左脛
+FILENAME = data\MODEL\PLAYER\12_legDR.x		# プレイヤー：右脛
+FILENAME = data\MODEL\PLAYER\13_footL.x		# プレイヤー：左足
+FILENAME = data\MODEL\PLAYER\14_footR.x		# プレイヤー：右足
