@@ -388,9 +388,6 @@ HRESULT CManager::Uninit(void)
 		return E_FAIL;
 	}
 
-	// オブジェクトの全破棄
-	CObject::ReleaseAll();
-
 	// レンダラーの破棄
 	if (FAILED(CRenderer::Release(m_pRenderer)))
 	{ // 破棄に失敗した場合
@@ -399,6 +396,9 @@ HRESULT CManager::Uninit(void)
 		assert(false);
 		return E_FAIL;
 	}
+
+	// オブジェクトの全破棄
+	CObject::ReleaseAll();
 
 	// 例外処理
 	assert(CObject::GetNumAll() == 0);	// 破棄の失敗
