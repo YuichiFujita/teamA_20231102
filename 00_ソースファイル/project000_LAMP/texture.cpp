@@ -98,7 +98,57 @@ void CTexture::Unload(void)
 }
 
 //============================================================
-//	テクスチャ登録処理
+//	テクスチャ登録処理 (生成)
+//============================================================
+int CTexture::Regist(const SInfo info)
+{
+	// 変数を宣言
+	HRESULT hr;				// 異常終了の確認用
+	int nID = m_nNumAll;	// テクスチャ読込番号
+
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+
+	if (m_nNumAll >= MAX_TEXTURE)
+	{ // テクスチャオーバーの場合
+
+		// 失敗を返す
+		assert(false);
+		return NONE_IDX;
+	}
+
+	// 空のテクスチャを生成
+	hr = D3DXCreateTexture
+	( // 引数
+		pDevice,			// Direct3Dデバイス
+		info.Width,			// テクスチャ横幅
+		info.Height,		// テクスチャ縦幅
+		info.MipLevels,		// ミップマップレベル
+		info.Usage,			// 性質・確保オプション
+		info.Format,		// ピクセルフォーマット
+		info.Pool,			// 格納メモリ
+		&m_apTexture[nID]	// テクスチャへのポインタ
+	);
+	if (FAILED(hr))
+	{ // テクスチャの生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return NONE_IDX;
+	}
+
+	// テクスチャファイル名なしを保存
+	strcpy(&m_pFileName[nID][0], NONE_STRING);
+
+	// テクスチャの総数を加算
+	m_nNumAll++;
+
+	// 読み込んだテクスチャの配列番号を返す
+	return nID;
+}
+
+//============================================================
+//	テクスチャ登録処理 (パス)
 //============================================================
 int CTexture::Regist(const char *pFileName)
 {

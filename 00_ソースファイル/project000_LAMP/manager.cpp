@@ -203,6 +203,15 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		return E_FAIL;
 	}
 
+	// レンダーテクスチャーの生成
+	if (FAILED(m_pRenderer->CreateRenderTexture()))
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
 	// フェードの生成・シーンの設定
 	m_pFade = CFade::Create();
 	if (m_pFade == NULL)
@@ -382,9 +391,6 @@ HRESULT CManager::Uninit(void)
 	// オブジェクトの全破棄
 	CObject::ReleaseAll();
 
-	// 例外処理
-	assert(CObject::GetNumAll() == 0);	// 破棄の失敗
-
 	// レンダラーの破棄
 	if (FAILED(CRenderer::Release(m_pRenderer)))
 	{ // 破棄に失敗した場合
@@ -393,6 +399,9 @@ HRESULT CManager::Uninit(void)
 		assert(false);
 		return E_FAIL;
 	}
+
+	// 例外処理
+	assert(CObject::GetNumAll() == 0);	// 破棄の失敗
 
 	// 成功を返す
 	return S_OK;

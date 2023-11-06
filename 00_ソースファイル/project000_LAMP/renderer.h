@@ -38,6 +38,8 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void Draw(void);	// 描画
+
+	HRESULT CreateRenderTexture(void);			// レンダーテクスチャー生成
 	LPDIRECT3DDEVICE9 GetDevice(void) const;	// デバイス取得
 
 	// 静的メンバ関数
@@ -51,7 +53,9 @@ private:
 	// メンバ変数
 	LPDIRECT3D9			m_pD3D;			// Direct3Dオブジェクト
 	LPDIRECT3DDEVICE9	m_pD3DDevice;	// Direct3Dデバイス
-	LPDIRECT3DTEXTURE9	m_pRenderTexture;			// テクスチャへのポインタ
+
+	int m_nRenderTextureID;		// レンダーテクスチャのインデックス
+	CObject2D *m_pDrawScreen;	// 画面描画用の2Dポリゴン
 	LPDIRECT3DSURFACE9	m_pRenderTextureSurface;	// 描画サーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDepthStencilSurface;		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDefRenderTextureSurface;	// 元の描画サーフェイス保存用

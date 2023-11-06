@@ -33,8 +33,31 @@ public:
 	// デストラクタ
 	~CTexture();
 
+	// テクスチャ情報構造体
+	struct SInfo
+	{
+	public:
+		// コンストラクタ
+		SInfo() {}
+
+		SInfo(const UINT nWidth, const UINT nHeight, const UINT nMip, const DWORD dwUsage, const D3DFORMAT format, const D3DPOOL pool)
+		{ Width = nWidth; Height = nHeight; MipLevels = nMip; Usage = dwUsage; Format = format; Pool = pool; }
+
+		// デストラクタ
+		~SInfo() {}
+
+		// メンバ変数
+        UINT		Width;		// テクスチャ横幅
+		UINT		Height;		// テクスチャ縦幅
+		UINT		MipLevels;	// ミップマップレベル
+		DWORD		Usage;		// 性質・確保オプション
+		D3DFORMAT	Format;		// ピクセルフォーマット
+		D3DPOOL		Pool;		// 格納メモリ
+	};
+
 	// メンバ関数
-	int Regist(const char *pFileName);				// テクスチャ登録
+	int Regist(const SInfo info);					// テクスチャ登録 (生成)
+	int Regist(const char *pFileName);				// テクスチャ登録 (パス)
 	LPDIRECT3DTEXTURE9 GetTexture(const int nID);	// テクスチャ情報取得
 
 	// 静的メンバ関数

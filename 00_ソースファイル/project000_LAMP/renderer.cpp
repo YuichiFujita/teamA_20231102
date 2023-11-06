@@ -11,7 +11,18 @@
 #include "object.h"
 #include "manager.h"
 #include "camera.h"
+#include "texture.h"
 #include "object2D.h"
+
+//************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	const D3DFORMAT FORMAT_DEPTH_STENCIL = D3DFMT_D16;					// 深度ステンシルのフォーマット
+	const DWORD		FLAG_CLEAR	= D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER;	// クリアするバッファーフラグ
+	const D3DCOLOR	COL_CLEAR	= D3DCOLOR_RGBA(0, 0, 0, 0);			// クリア時の色
+}
 
 //************************************************************
 //	親クラス [CRenderer] のメンバ関数
@@ -24,7 +35,9 @@ CRenderer::CRenderer()
 	// メンバ変数をクリア
 	m_pD3D			= NULL;	// Direct3Dオブジェクト
 	m_pD3DDevice	= NULL;	// Direct3Dデバイス
-	m_pRenderTexture			= NULL;	// テクスチャへのポインタ
+
+	m_nRenderTextureID			= 0;	// レンダーテクスチャのインデックス
+	m_pDrawScreen				= NULL;	// 画面描画用の2Dポリゴン
 	m_pRenderTextureSurface		= NULL;	// 描画サーフェイスへのポインタ
 	m_pDepthStencilSurface		= NULL;	// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
 	m_pDefRenderTextureSurface	= NULL;	// 元の描画サーフェイス保存用
@@ -45,18 +58,19 @@ CRenderer::~CRenderer()
 HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 {
 	// 変数を宣言
-	HRESULT					hr;		// 異常終了の確認用
 	D3DDISPLAYMODE			d3ddm;	// ディスプレイモード
 	D3DPRESENT_PARAMETERS	d3dpp;	// プレゼンテーションパラメータ
 
 	// メンバ変数を初期化
 	m_pD3D			= NULL;	// Direct3Dオブジェクト
 	m_pD3DDevice	= NULL;	// Direct3Dデバイス
-	m_pRenderTexture			= NULL;	// テクスチャへのポインタ
-	m_pRenderTextureSurface		= NULL;	// 描画サーフェイスへのポインタ
-	m_pDepthStencilSurface		= NULL;	// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
-	m_pDefRenderTextureSurface	= NULL;	// 元の描画サーフェイス保存用
-	m_pDefDepthStencilSurface	= NULL;	// 元のZバッファ・ステンシルバッファのサーフェイス保存用
+
+	m_nRenderTextureID			= NONE_IDX;	// レンダーテクスチャのインデックス
+	m_pDrawScreen				= NULL;		// 画面描画用の2Dポリゴン
+	m_pRenderTextureSurface		= NULL;		// 描画サーフェイスへのポインタ
+	m_pDepthStencilSurface		= NULL;		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
+	m_pDefRenderTextureSurface	= NULL;		// 元の描画サーフェイス保存用
+	m_pDefDepthStencilSurface	= NULL;		// 元のZバッファ・ステンシルバッファのサーフェイス保存用
 
 	// Direct3Dオブジェクトの生成
 	m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -83,90 +97,16 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	d3dpp.BackBufferHeight	= SCREEN_HEIGHT;	// ゲーム画面サイズ (高さ)
 	d3dpp.BackBufferFormat	= d3ddm.Format;		// バックバッファの形式
 	d3dpp.BackBufferCount	= 1;				// バックバッファの数
-	d3dpp.SwapEffect		= D3DSWAPEFFECT_DISCARD;	// ダブルバッファの切り替え (映像信号に同期)
-	d3dpp.EnableAutoDepthStencil	= TRUE;				// デプスバッファとステンシルバッファを作成
-	d3dpp.AutoDepthStencilFormat	= D3DFMT_D16;		// デプスバッファとして 16bit を使う
-	d3dpp.Windowed					= bWindow;			// ウインドウモード
+	d3dpp.SwapEffect		= D3DSWAPEFFECT_DISCARD;		// ダブルバッファの切り替え (映像信号に同期)
+	d3dpp.EnableAutoDepthStencil	= TRUE;					// デプスバッファとステンシルバッファを作成
+	d3dpp.AutoDepthStencilFormat	= FORMAT_DEPTH_STENCIL;	// デプスバッファとして 16bit を使う
+	d3dpp.Windowed					= bWindow;				// ウインドウモード
 	d3dpp.FullScreen_RefreshRateInHz	= D3DPRESENT_RATE_DEFAULT;		// リフレッシュレート
 	d3dpp.PresentationInterval			= D3DPRESENT_INTERVAL_DEFAULT;	// インターバル
 
 	// Direct3Dデバイスの生成
 	if (FAILED(CreateDevice(hWnd, d3dpp)))
 	{ // デバイスの生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 空のテクスチャを生成
-	hr = D3DXCreateTexture
-	( // 引数
-		m_pD3DDevice,			// Direct3Dデバイス
-		SCREEN_WIDTH,			// テクスチャ横幅
-		SCREEN_HEIGHT,			// テクスチャ縦幅
-		1,						// ミップマップレベル
-		D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
-		D3DFMT_A8R8G8B8,		// ピクセルフォーマット
-		D3DPOOL_DEFAULT,		// 格納メモリ
-		&m_pRenderTexture		// テクスチャへのポインタ
-	);
-	if (FAILED(hr))
-	{ // テクスチャの生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// テクスチャ用サーフェイスの生成
-	hr = m_pD3DDevice->CreateDepthStencilSurface
-	( // 引数
-		SCREEN_WIDTH,					// 深度ステンシルのサーフェス横幅
-		SCREEN_HEIGHT,					// 深度ステンシルのサーフェス縦幅
-		d3dpp.AutoDepthStencilFormat,	// 深度ステンシルのサーフェス形式
-		D3DMULTISAMPLE_NONE,			// マルチサンプリングのバッファー型
-		0,								// 品質レベル
-		FALSE,							// Zバッファ破棄の有効/無効
-		&m_pDepthStencilSurface,		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
-		NULL							// NULL
-	);
-	if (FAILED(hr))
-	{ // 描画先の生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 描画サーフェイスの取得
-	hr = m_pRenderTexture->GetSurfaceLevel
-	( // 引数
-		0,							// ミップマップレベル
-		&m_pRenderTextureSurface	// 描画サーフェイスへのポインタ
-	);
-	if (FAILED(hr))
-	{ // サーフェイスの取得に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 元の描画サーフェイスを保存
-	m_pD3DDevice->GetRenderTarget(0, &m_pDefRenderTextureSurface);
-	if (FAILED(hr))
-	{ // 描画サーフェイスの取得に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 元のZバッファ・ステンシルバッファのサーフェイスを保存
-	m_pD3DDevice->GetDepthStencilSurface(&m_pDefDepthStencilSurface);
-	if (FAILED(hr))
-	{ // Zバッファ・ステンシルバッファの取得に失敗した場合
 
 		// 失敗を返す
 		assert(false);
@@ -217,13 +157,11 @@ void CRenderer::Uninit(void)
 		m_pD3D = NULL;
 	}
 
-	// テクスチャの破棄
-	if (m_pRenderTexture != NULL)
-	{ // テクスチャが使用中の場合
+	if (m_pDrawScreen != NULL)
+	{ // 画面描画用の2Dポリゴンが使用中の場合
 
-		// メモリ開放
-		m_pRenderTexture->Release();
-		m_pRenderTexture = NULL;
+		// 画面描画用の2Dポリゴンの終了
+		m_pDrawScreen->Uninit();
 	}
 
 	// 描画サーフェイスの破棄
@@ -235,7 +173,7 @@ void CRenderer::Uninit(void)
 		m_pRenderTextureSurface = NULL;
 	}
 
-	//  Zバッファ・ステンシルバッファのサーフェイスの破棄
+	// Zバッファ・ステンシルバッファのサーフェイスの破棄
 	if (m_pDepthStencilSurface != NULL)
 	{ // Zバッファ・ステンシルバッファのサーフェイスが使用中の場合
 
@@ -293,7 +231,7 @@ void CRenderer::Draw(void)
 	if (FAILED(hr)) { assert(false); }
 
 	// バックバッファとZバッファのクリア
-	hr = m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
 	if (FAILED(hr)) { assert(false); }
 
 	// テクスチャ作成用の描画
@@ -329,7 +267,7 @@ void CRenderer::Draw(void)
 	if (FAILED(hr)) { assert(false); }
 
 	// バックバッファとZバッファのクリア
-	hr = m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
 	if (FAILED(hr)) { assert(false); }
 
 	// 画面の描画
@@ -342,8 +280,8 @@ void CRenderer::Draw(void)
 		// カメラの設定
 		CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
 
-		// オブジェクトの全描画
-		CObject::DrawAll();
+		// 画面描画用の2Dポリゴンの描画
+		m_pDrawScreen->Draw();
 
 		// デバッグ表示の描画
 		CManager::GetInstance()->GetDebugProc()->Draw();
@@ -359,6 +297,109 @@ void CRenderer::Draw(void)
 	// バックバッファとフロントバッファの入れ替え
 	hr = m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
 	if (FAILED(hr)) { assert(false); }
+}
+
+//============================================================
+//	レンダーテクスチャー生成処理
+//============================================================
+HRESULT CRenderer::CreateRenderTexture(void)
+{
+	// 変数を宣言
+	HRESULT hr;	// 異常終了の確認用
+
+	// ポインタを宣言
+	CTexture *pTexture = CManager::GetInstance()->GetTexture();	// テクスチャへのポインタ
+	if (pTexture == NULL) { assert(false); return E_FAIL; }		// 非使用中
+
+	// 空のテクスチャを生成
+	m_nRenderTextureID = pTexture->Regist(CTexture::SInfo
+	( // 引数
+		SCREEN_WIDTH,			// テクスチャ横幅
+		SCREEN_HEIGHT,			// テクスチャ縦幅
+		0,						// ミップマップレベル
+		D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
+		D3DFMT_A8R8G8B8,		// ピクセルフォーマット
+		D3DPOOL_DEFAULT			// 格納メモリ
+	));
+
+	// 画面描画用の2Dポリゴンの生成
+	if (m_pDrawScreen == NULL)
+	{ // 画面描画用の2Dポリゴンが非使用中の場合
+
+		// 画面描画用の2Dポリゴンの生成
+		m_pDrawScreen = CObject2D::Create(SCREEN_CENT, SCREEN_SIZE);
+		if (m_pDrawScreen == NULL)
+		{ // 画面描画用の2Dポリゴンが非使用中の場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを割当
+		m_pDrawScreen->BindTexture(m_nRenderTextureID);
+
+		// 自動描画をOFFにする
+		m_pDrawScreen->SetEnableDraw(false);
+	}
+	else { assert(false); return E_FAIL; }
+
+	// テクスチャ用サーフェイスの生成
+	hr = m_pD3DDevice->CreateDepthStencilSurface
+	( // 引数
+		SCREEN_WIDTH,				// 深度ステンシルのサーフェス横幅
+		SCREEN_HEIGHT,				// 深度ステンシルのサーフェス縦幅
+		FORMAT_DEPTH_STENCIL,		// 深度ステンシルのサーフェス形式
+		D3DMULTISAMPLE_NONE,		// マルチサンプリングのバッファー型
+		0,							// 品質レベル
+		FALSE,						// Zバッファ破棄の有効/無効
+		&m_pDepthStencilSurface,	// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
+		NULL						// NULL
+	);
+	if (FAILED(hr))
+	{ // 描画先の生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 描画サーフェイスの取得
+	hr = pTexture->GetTexture(m_nRenderTextureID)->GetSurfaceLevel
+	( // 引数
+		0,							// ミップマップレベル
+		&m_pRenderTextureSurface	// 描画サーフェイスへのポインタ
+	);
+	if (FAILED(hr))
+	{ // サーフェイスの取得に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 元の描画サーフェイスを保存
+	m_pD3DDevice->GetRenderTarget(0, &m_pDefRenderTextureSurface);
+	if (FAILED(hr))
+	{ // 描画サーフェイスの取得に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 元のZバッファ・ステンシルバッファのサーフェイスを保存
+	m_pD3DDevice->GetDepthStencilSurface(&m_pDefDepthStencilSurface);
+	if (FAILED(hr))
+	{ // Zバッファ・ステンシルバッファの取得に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 成功を返す
+	return S_OK;
 }
 
 //============================================================
