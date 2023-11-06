@@ -139,6 +139,13 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 //============================================================
 void CRenderer::Uninit(void)
 {
+	if (m_pDrawScreen != NULL)
+	{ // 画面描画用の2Dポリゴンが使用中の場合
+
+		// 画面描画用の2Dポリゴンの終了
+		m_pDrawScreen->Uninit();
+	}
+
 	// Direct3Dデバイスの破棄
 	if (m_pD3DDevice != NULL)
 	{ // Direct3Dデバイスが使用中の場合
@@ -155,13 +162,6 @@ void CRenderer::Uninit(void)
 		// メモリ開放
 		m_pD3D->Release();
 		m_pD3D = NULL;
-	}
-
-	if (m_pDrawScreen != NULL)
-	{ // 画面描画用の2Dポリゴンが使用中の場合
-
-		// 画面描画用の2Dポリゴンの終了
-		m_pDrawScreen->Uninit();
 	}
 
 	// 描画サーフェイスの破棄
@@ -266,10 +266,6 @@ void CRenderer::Draw(void)
 	hr = m_pD3DDevice->SetDepthStencilSurface(m_pDefDepthStencilSurface);
 	if (FAILED(hr)) { assert(false); }
 
-	// バックバッファとZバッファのクリア
-	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
-	if (FAILED(hr)) { assert(false); }
-
 	// 画面の描画
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 	{ // 描画開始が成功した場合
@@ -316,7 +312,7 @@ HRESULT CRenderer::CreateRenderTexture(void)
 	( // 引数
 		SCREEN_WIDTH,			// テクスチャ横幅
 		SCREEN_HEIGHT,			// テクスチャ縦幅
-		0,						// ミップマップレベル
+		1,						// ミップマップレベル
 		D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
 		D3DFMT_A8R8G8B8,		// ピクセルフォーマット
 		D3DPOOL_DEFAULT			// 格納メモリ

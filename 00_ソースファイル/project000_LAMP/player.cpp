@@ -221,10 +221,8 @@ void CPlayer::Draw(void)
 {
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
-
-	// 影の描画
-	m_pShadow->Draw();
 }
+
 
 //============================================================
 //	ヒット処理
@@ -449,8 +447,8 @@ void CPlayer::SetSpawn(void)
 	// 透明度を透明に再設定
 	SetAlpha(0.0f);
 
-	// プレイヤー自身の描画を再開
-	CObject::SetEnableDraw(true);
+	// 自動描画をONにする
+	SetEnableDraw(true);
 
 	// 追従カメラの目標位置の設定
 	CManager::GetInstance()->GetCamera()->SetDestFollow();
@@ -511,6 +509,9 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 着地判定
 	UpdateLanding(posPlayer);
 
+	// ジャンプ更新
+	UpdateJump();
+
 	// 向き更新
 	UpdateRotation(rotPlayer);
 
@@ -542,14 +543,42 @@ void CPlayer::UpdateOldPosition(void)
 CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 {
 	// 移動量を更新
-	m_move.x += sinf(m_destRot.y + D3DX_PI) * 1.0f;
-	m_move.z += cosf(m_destRot.y + D3DX_PI) * 1.0f;
+	m_move.x += sinf(m_destRot.y + D3DX_PI) * 0.0f;
+	m_move.z += cosf(m_destRot.y + D3DX_PI) * 0.0f;
 
 	// 目標向きを設定
 	atan2f(m_move.x, m_move.z);
 
 	// 待機モーションを返す
 	return MOTION_IDOL;
+}
+
+//============================================================
+//	ジャンプの更新処理
+//============================================================
+void CPlayer::UpdateJump(void)
+{
+	// ポインタを宣言
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+
+	if (pKeyboard->IsTrigger(DIK_W)
+	||  pPad->IsTrigger(CInputPad::KEY_B))
+	{ // ジャンプの操作が行われた場合
+
+		if (!m_bJump)
+		{ // ジャンプしていない場合
+
+			// 上移動量を加算
+			m_move.y += basic::JUMP;
+
+			// ジャンプしている状態にする
+			m_bJump = true;
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// ジャンプ音
+		}
+	}
 }
 
 //============================================================

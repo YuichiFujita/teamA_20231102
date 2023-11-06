@@ -133,7 +133,6 @@ HRESULT CSceneGame::Init(void)
 
 	// プレイヤーを出現
 	CScene::GetPlayer()->SetSpawn();
-	CScene::GetPlayer()->SetEnableDraw(false);	// 描画はOFFにする
 
 	// UIの描画状況を設定
 	SetEnableDrawUI(m_bDrawUI);
