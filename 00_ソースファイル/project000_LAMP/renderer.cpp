@@ -267,8 +267,8 @@ void CRenderer::Draw(void)
 	if (FAILED(hr)) { assert(false); }
 
 	// バックバッファとZバッファのクリア
-	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
-	if (FAILED(hr)) { assert(false); }
+	/*hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
+	if (FAILED(hr)) { assert(false); }*/
 
 	// 画面の描画
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
