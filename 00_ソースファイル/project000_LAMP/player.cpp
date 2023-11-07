@@ -38,30 +38,23 @@ namespace
 {
 	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
 
-	const int PRIORITY = 3;	// プレイヤーの優先順位
+	const int	PRIORITY	= 3;		// プレイヤーの優先順位
+	const float	JUMP		= 21.0f;	// ジャンプ上昇量
+	const float	GRAVITY		= 1.0f;		// 重力
+	const float	RADIUS		= 20.0f;	// 半径
+	const float	HEIGHT		= 100.0f;	// 縦幅
+	const float	REV_ROTA	= 0.15f;	// 向き変更の補正係数
+	const float	JUMP_REV	= 0.16f;	// 通常状態時の空中の移動量の減衰係数
+	const float	LAND_REV	= 0.16f;	// 通常状態時の地上の移動量の減衰係数
+	const float	STICK_REV	= 0.0001f;	// スティックの傾き量の補正係数
 
-	// プレイヤー基本情報
-	namespace basic
+	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.05f;	// スティックの無視する傾き量
+	const float	SPAWN_ADD_ALPHA		= 0.03f;			// スポーン状態時の透明度の加算量
+
+	// 影クラス情報
+	namespace shadow
 	{
-		const float	MOVE		= 2.8f;		// 移動量
-		const float	JUMP		= 21.0f;	// ジャンプ上昇量
-		const float	GRAVITY		= 1.0f;		// 重力
-		const float	RADIUS		= 20.0f;	// 半径
-		const float	HEIGHT		= 100.0f;	// 縦幅
-		const float	REV_ROTA	= 0.15f;	// 向き変更の補正係数
-		const float	ADD_MOVE	= 0.08f;	// 非アクション時の速度加算量
-
-		const float	JUMP_REV	= 0.16f;	// 通常状態時の空中の移動量の減衰係数
-		const float	LAND_REV	= 0.16f;	// 通常状態時の地上の移動量の減衰係数
-		const float	SPAWN_ADD_ALPHA	= 0.03f;	// スポーン状態時の透明度の加算量
-
-		const D3DXVECTOR3 DMG_ADDROT = D3DXVECTOR3(0.04f, 0.0f, -0.02f);	// ダメージ状態時のプレイヤー回転量
-	}
-
-	// プレイヤー他クラス情報
-	namespace other
-	{
-		const D3DXVECTOR3 SHADOW_SIZE = D3DXVECTOR3(80.0f, 0.0f, 80.0f);	// 影の大きさ
+		const D3DXVECTOR3 SIZE = D3DXVECTOR3(80.0f, 0.0f, 80.0f);	// 影の大きさ
 	}
 }
 
@@ -147,7 +140,7 @@ HRESULT CPlayer::Init(void)
 	SetModelInfo();
 
 	// 影の生成
-	m_pShadow = CShadow::Create(CShadow::TEXTURE_NORMAL, other::SHADOW_SIZE, this);
+	m_pShadow = CShadow::Create(CShadow::TEXTURE_NORMAL, shadow::SIZE, this);
 	if (m_pShadow == NULL)
 	{ // 非使用中の場合
 
@@ -287,7 +280,7 @@ int CPlayer::GetState(void) const
 float CPlayer::GetRadius(void) const
 {
 	// 半径を返す
-	return basic::RADIUS;
+	return RADIUS;
 }
 
 //============================================================
@@ -296,7 +289,7 @@ float CPlayer::GetRadius(void) const
 float CPlayer::GetHeight(void) const
 {
 	// 縦幅を返す
-	return basic::HEIGHT;
+	return HEIGHT;
 }
 
 //============================================================
@@ -466,7 +459,7 @@ CPlayer::EMotion CPlayer::UpdateSpawn(void)
 	EMotion currentMotion = MOTION_IDOL;	// 現在のモーション
 
 	// フェードアウト状態時の更新
-	if (UpdateFadeOut(basic::SPAWN_ADD_ALPHA))
+	if (UpdateFadeOut(SPAWN_ADD_ALPHA))
 	{ // 不透明になり切った場合
 
 		// 状態を設定
@@ -516,7 +509,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	UpdateRotation(rotPlayer);
 
 	// ステージ範囲外の補正
-	pStage->LimitPosition(posPlayer, basic::RADIUS);
+	pStage->LimitPosition(posPlayer, RADIUS);
 
 	// 位置を反映
 	SetVec3Position(posPlayer);
@@ -542,9 +535,82 @@ void CPlayer::UpdateOldPosition(void)
 //============================================================
 CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 {
-	// 移動量を更新
-	m_move.x += sinf(m_destRot.y + D3DX_PI) * 0.0f;
-	m_move.z += cosf(m_destRot.y + D3DX_PI) * 0.0f;
+	// ポインタを宣言
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+
+	// PC操作
+#if 0
+	if (pKeyboard->IsPress(DIK_W))
+	{
+		if (pKeyboard->IsPress(DIK_A))
+		{
+			// 移動量を更新
+			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+		}
+		else if (pKeyboard->IsPress(DIK_D))
+		{
+			// 移動量を更新
+			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+		}
+		else
+		{
+			// 移動量を更新
+			m_move.x += sinf(pCamera->rot.y) * MOVE_PLAYER;
+			m_move.z += cosf(pCamera->rot.y) * MOVE_PLAYER;
+		}
+	}
+	else if (pKeyboard->IsPress(DIK_S))
+	{
+		if (pKeyboard->IsPress(DIK_A))
+		{
+			// 移動量を更新
+			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+		}
+		else if (pKeyboard->IsPress(DIK_D))
+		{
+			// 移動量を更新
+			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+		}
+		else
+		{
+			// 移動量を更新
+			m_move.x -= sinf(pCamera->rot.y) * MOVE_PLAYER;
+			m_move.z -= cosf(pCamera->rot.y) * MOVE_PLAYER;
+		}
+	}
+	else if (pKeyboard->IsPress(DIK_A))
+	{
+		// 移動量を更新
+		m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
+		m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
+	}
+	else if (pKeyboard->IsPress(DIK_D))
+	{
+		// 移動量を更新
+		m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
+		m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
+	}
+#endif
+
+	// 変数を宣言
+	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(), (float)pPad->GetPressLStickY(), 0.0f);	// スティック各軸の倒し量
+	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
+
+	if (DEAD_ZONE < fStick)
+	{ // デッドゾーン以上の場合
+
+		// 変数を宣言
+		float fMove = fStick * STICK_REV;	// プレイヤー移動量
+
+		// 移動量を更新
+		m_move.x += sinf(pPad->GetPressLStickRot() + D3DX_PI) * fMove;
+		m_move.z += cosf(pPad->GetPressLStickRot() + D3DX_PI) * fMove;
+	}
 
 	// 目標向きを設定
 	atan2f(m_move.x, m_move.z);
@@ -570,7 +636,7 @@ void CPlayer::UpdateJump(void)
 		{ // ジャンプしていない場合
 
 			// 上移動量を加算
-			m_move.y += basic::JUMP;
+			m_move.y += JUMP;
 
 			// ジャンプしている状態にする
 			m_bJump = true;
@@ -587,7 +653,7 @@ void CPlayer::UpdateJump(void)
 void CPlayer::UpdateGravity(void)
 {
 	// 重力を加算
-	m_move.y -= basic::GRAVITY;
+	m_move.y -= GRAVITY;
 }
 
 //============================================================
@@ -629,14 +695,14 @@ void CPlayer::UpdatePosition(D3DXVECTOR3& rPos)
 	if (m_bJump)
 	{ // 空中の場合
 
-		m_move.x += (0.0f - m_move.x) * basic::JUMP_REV;
-		m_move.z += (0.0f - m_move.z) * basic::JUMP_REV;
+		m_move.x += (0.0f - m_move.x) * JUMP_REV;
+		m_move.z += (0.0f - m_move.z) * JUMP_REV;
 	}
 	else
 	{ // 地上の場合
 
-		m_move.x += (0.0f - m_move.x) * basic::LAND_REV;
-		m_move.z += (0.0f - m_move.z) * basic::LAND_REV;
+		m_move.x += (0.0f - m_move.x) * LAND_REV;
+		m_move.z += (0.0f - m_move.z) * LAND_REV;
 	}
 }
 
@@ -658,7 +724,7 @@ void CPlayer::UpdateRotation(D3DXVECTOR3& rRot)
 	useful::NormalizeRot(fDiffRot);
 
 	// 向きの更新
-	rRot.y += fDiffRot * basic::REV_ROTA;
+	rRot.y += fDiffRot * REV_ROTA;
 
 	// 向きの正規化
 	useful::NormalizeRot(rRot.y);
