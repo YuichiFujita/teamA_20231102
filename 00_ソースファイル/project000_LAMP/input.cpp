@@ -831,7 +831,7 @@ SHORT CInputPad::GetPressLStickY(int nPlayer)
 	useful::LimitNum(m_aKeyStatePress[nPlayer].Gamepad.sThumbLY, (SHORT)-SHRT_MAX, (SHORT)SHRT_MAX);
 
 	// スティックの傾きの値を返す (上下)
-	return m_aKeyStatePress[nPlayer].Gamepad.sThumbLY;
+	return -m_aKeyStatePress[nPlayer].Gamepad.sThumbLY;
 }
 
 //============================================================
