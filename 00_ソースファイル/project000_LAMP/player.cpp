@@ -48,7 +48,7 @@ namespace
 	const float	LAND_REV	= 0.16f;	// 通常状態時の地上の移動量の減衰係数
 	const float	STICK_REV	= 0.0001f;	// スティックの傾き量の補正係数
 
-	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.05f;	// スティックの無視する傾き量
+	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
 	const float	SPAWN_ADD_ALPHA		= 0.03f;			// スポーン状態時の透明度の加算量
 
 	// 影クラス情報
@@ -443,8 +443,8 @@ void CPlayer::SetSpawn(void)
 	// 自動描画をONにする
 	SetEnableDraw(true);
 
-	// 追従カメラの目標位置の設定
-	CManager::GetInstance()->GetCamera()->SetDestFollow();
+	// 見下ろしカメラの目標位置の設定
+	CManager::GetInstance()->GetCamera()->SetDestLookDown();
 
 	// サウンドの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// 生成音
@@ -538,6 +538,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+	CCamera			*pCamera	= CManager::GetInstance()->GetCamera();		// カメラ
+
+	if (pCamera == NULL) { assert(false); return MOTION_IDOL; }	// 非使用中
 
 	// PC操作
 #if 0
@@ -608,12 +611,15 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		float fMove = fStick * STICK_REV;	// プレイヤー移動量
 
 		// 移動量を更新
-		m_move.x += sinf(pPad->GetPressLStickRot() + D3DX_PI) * fMove;
-		m_move.z += cosf(pPad->GetPressLStickRot() + D3DX_PI) * fMove;
+		m_move.x += sinf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+		m_move.z += cosf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
 	}
 
 	// 目標向きを設定
 	atan2f(m_move.x, m_move.z);
+
+	// 位置を表示
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
 
 	// 待機モーションを返す
 	return MOTION_IDOL;

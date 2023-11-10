@@ -68,7 +68,7 @@ HRESULT CSceneTutorial::Init(void)
 	//	初期設定
 	//--------------------------------------------------------
 	// カメラを設定
-	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_FOLLOW);	// カメラを追従状態に設定
+	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
 	// プレイヤーを出現
 	CScene::GetPlayer()->SetSpawn();

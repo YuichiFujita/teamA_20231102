@@ -129,7 +129,7 @@ HRESULT CSceneGame::Init(void)
 	//	初期設定
 	//--------------------------------------------------------
 	// カメラを設定
-	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_FOLLOW);	// カメラを追従状態に設定
+	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
 	// プレイヤーを出現
 	CScene::GetPlayer()->SetSpawn();
@@ -401,7 +401,7 @@ void CSceneGame::SetEnableControlCamera(const bool bControl)
 	else
 	{ // 操作しない状況の場合
 
-		// 追従状態に変更
-		CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_FOLLOW);
+		// 見下ろし状態に変更
+		CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);
 	}
 }

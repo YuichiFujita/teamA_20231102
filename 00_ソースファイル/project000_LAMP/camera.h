@@ -36,8 +36,7 @@ public:
 		STATE_NONE = 0,	// なにもしない状態
 		STATE_CONTROL,	// 操作状態
 		STATE_ROTATE,	// 回転状態
-		STATE_FOLLOW,	// 追従状態
-		STATE_ZOOM,		// ズーム状態
+		STATE_LOOKDOWN,	// 見下ろし状態
 		STATE_MAX		// この列挙型の総数
 	};
 
@@ -74,7 +73,7 @@ public:
 	EState GetState(void) const;			// カメラ状態取得
 
 	void SetDestRotate(void);	// カメラ目標位置設定 (回転)
-	void SetDestFollow(void);	// カメラ目標位置設定 (追従)
+	void SetDestLookDown(void);	// カメラ目標位置設定 (見下ろし)
 	void SetEnableUpdate(const bool bUpdate);			// 更新状況設定
 	void SetVec3Rotation(const D3DXVECTOR3& rRot);		// 現在向き設定
 	void SetVec3DestRotation(const D3DXVECTOR3& rRot);	// 目標向き設定
@@ -88,8 +87,7 @@ public:
 private:
 	// メンバ関数
 	void Rotate(void);		// カメラの更新 (回転)
-	void Follow(void);		// カメラの更新 (追従)
-	void Zoom(void);		// カメラの更新 (ズーム)
+	void LookDown(void);	// カメラの更新 (見下ろし)
 	void Control(void);		// カメラの更新 (操作)
 	void Move(void);		// 位置の更新 (操作)
 	void Distance(void);	// 距離の更新 (操作)
