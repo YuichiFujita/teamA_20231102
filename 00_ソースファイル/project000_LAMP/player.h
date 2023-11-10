@@ -102,7 +102,7 @@ private:
 
 	void UpdateOldPosition(void);			// 過去位置の更新
 	EMotion UpdateMove(D3DXVECTOR3& rPos);	// 移動量・目標向きの更新
-	void UpdateJump(void);					// ジャンプの更新
+	void UpdateDash(void);					// ダッシュの更新
 	void UpdateGravity(void);				// 重力の更新
 	bool UpdateLanding(D3DXVECTOR3& rPos);	// 着地状況の更新
 	void UpdatePosition(D3DXVECTOR3& rPos);	// 位置の更新
@@ -120,8 +120,11 @@ private:
 	D3DXVECTOR3	m_oldPos;		// 過去位置
 	D3DXVECTOR3	m_move;			// 移動量
 	D3DXVECTOR3	m_destRot;		// 目標向き
+	D3DXVECTOR3	m_dashRot;		// ダッシュ向き
 	EState	m_state;			// 状態
 	int		m_nCounterState;	// 状態管理カウンター
+	float	m_fPlusMove;		// プラス移動量
+	bool	m_bDash;			// ダッシュ状況
 	bool	m_bJump;			// ジャンプ状況
 };
 

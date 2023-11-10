@@ -39,14 +39,19 @@ namespace
 	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
 
 	const int	PRIORITY	= 3;		// プレイヤーの優先順位
-	const float	JUMP		= 21.0f;	// ジャンプ上昇量
 	const float	GRAVITY		= 1.0f;		// 重力
 	const float	RADIUS		= 20.0f;	// 半径
 	const float	HEIGHT		= 100.0f;	// 縦幅
+
+	const float	DASH_UP			= 10.0f;	// ダッシュ上昇量
+	const float	DASH_SIDE		= 15.0f;	// ダッシュ横移動量
+	const float	DASH_REV		= 0.25f;	// ダッシュの減算係数
+	const float	DASH_MINMOVE	= 0.06f;	// ダッシュ再度可能になる移動量
+
 	const float	REV_ROTA	= 0.15f;	// 向き変更の補正係数
 	const float	JUMP_REV	= 0.16f;	// 通常状態時の空中の移動量の減衰係数
 	const float	LAND_REV	= 0.16f;	// 通常状態時の地上の移動量の減衰係数
-	const float	STICK_REV	= 0.0001f;	// スティックの傾き量の補正係数
+	const float	STICK_REV	= 0.00015f;	// スティックの傾き量の補正係数
 
 	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
 	const float	SPAWN_ADD_ALPHA		= 0.03f;			// スポーン状態時の透明度の加算量
@@ -97,8 +102,11 @@ CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_oldPos			= VEC3_ZERO;	// 過去位置
 	m_move				= VEC3_ZERO;	// 移動量
 	m_destRot			= VEC3_ZERO;	// 目標向き
+	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_fPlusMove			= 0.0f;			// プラス移動量
+	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= false;		// ジャンプ状況
 }
 
@@ -120,8 +128,11 @@ HRESULT CPlayer::Init(void)
 	m_oldPos			= VEC3_ZERO;	// 過去位置
 	m_move				= VEC3_ZERO;	// 移動量
 	m_destRot			= VEC3_ZERO;	// 目標向き
+	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_fPlusMove			= 0.0f;			// プラス移動量
+	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= true;			// ジャンプ状況
 
 	// オブジェクトキャラクターの初期化
@@ -502,8 +513,8 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 着地判定
 	UpdateLanding(posPlayer);
 
-	// ジャンプ更新
-	UpdateJump();
+	// ダッシュ更新
+	UpdateDash();
 
 	// 向き更新
 	UpdateRotation(rotPlayer);
@@ -610,13 +621,24 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		// 変数を宣言
 		float fMove = fStick * STICK_REV;	// プレイヤー移動量
 
-		// 移動量を更新
-		m_move.x += sinf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
-		m_move.z += cosf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+		if (!m_bDash)
+		{ // ダッシュ中ではない場合
+
+			// 移動量を更新
+			m_move.x += sinf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+			m_move.z += cosf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+		}
+		else
+		{ // ダッシュ中の場合
+
+			// 移動量を更新
+			m_move.x += sinf(m_dashRot.y) * fMove;
+			m_move.z += cosf(m_dashRot.y) * fMove;
+		}
 	}
 
 	// 目標向きを設定
-	atan2f(m_move.x, m_move.z);
+	m_destRot.y = atan2f(-m_move.x, -m_move.z);
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
@@ -626,29 +648,64 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 }
 
 //============================================================
-//	ジャンプの更新処理
+//	ダッシュの更新処理
 //============================================================
-void CPlayer::UpdateJump(void)
+void CPlayer::UpdateDash(void)
 {
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
-	if (pKeyboard->IsTrigger(DIK_W)
-	||  pPad->IsTrigger(CInputPad::KEY_B))
-	{ // ジャンプの操作が行われた場合
+	if (pCamera == NULL) { assert(false); }	// 非使用中
 
-		if (!m_bJump)
-		{ // ジャンプしていない場合
+	// 変数を宣言
+	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(), (float)pPad->GetPressLStickY(), 0.0f);	// スティック各軸の倒し量
+	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
-			// 上移動量を加算
-			m_move.y += JUMP;
+	if (DEAD_ZONE < fStick)
+	{ // デッドゾーン以上の場合
 
-			// ジャンプしている状態にする
-			m_bJump = true;
+		if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTrigger(CInputPad::KEY_A))
+		{ // ダッシュの操作が行われた場合
 
-			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// ジャンプ音
+			if (!m_bDash)
+			{ // ダッシュしていない場合
+
+				// 上移動量を加算
+				m_move.y += DASH_UP;
+
+				// プラス移動量を加算
+				m_fPlusMove += DASH_SIDE;
+
+				// ダッシュ時の向きを保存
+				m_dashRot.y = pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI;
+
+				// ダッシュしている状態にする
+				m_bDash = true;
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// ジャンプ音
+			}
+		}
+	}
+
+	if (m_bDash)
+	{ // ダッシュしている場合
+
+		// 移動量を更新
+		m_move.x += sinf(m_dashRot.y) * m_fPlusMove;
+		m_move.z += cosf(m_dashRot.y) * m_fPlusMove;
+
+		// プラス移動量を減算
+		m_fPlusMove += (0.0f - m_fPlusMove) * DASH_REV;
+
+		if (fabsf(m_fPlusMove) < DASH_MINMOVE)
+		{ // 移動量が一定値より少なくなった場合
+
+			// 再ダッシュできるようにする
+			m_fPlusMove = 0.0f;
+			m_bDash = false;
 		}
 	}
 }
