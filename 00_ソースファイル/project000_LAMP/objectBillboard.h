@@ -41,7 +41,7 @@ public:
 
 	// コンストラクタ
 	CObjectBillboard();
-	CObjectBillboard(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectBillboard(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectBillboard();

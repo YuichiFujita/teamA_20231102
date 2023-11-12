@@ -25,7 +25,7 @@ class CObjectMeshDome : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshDome();
-	CObjectMeshDome(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshDome(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshDome();

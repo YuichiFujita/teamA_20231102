@@ -33,7 +33,7 @@ public:
 
 	// コンストラクタ
 	CObject3D();
-	CObject3D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObject3D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObject3D();

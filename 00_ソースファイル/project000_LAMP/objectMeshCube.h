@@ -25,7 +25,7 @@ class CObjectMeshCube : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshCube();
-	CObjectMeshCube(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshCube(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshCube();

@@ -29,7 +29,7 @@ class CSceneResult : public CScene
 {
 public:
 	// コンストラクタ
-	CSceneResult(const EMode mode);
+	explicit CSceneResult(const EMode mode);
 
 	// デストラクタ
 	~CSceneResult();

@@ -25,7 +25,7 @@ class CObjectMeshCylinder : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshCylinder();
-	CObjectMeshCylinder(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshCylinder(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshCylinder();

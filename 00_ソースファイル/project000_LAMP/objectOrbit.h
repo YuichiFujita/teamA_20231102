@@ -51,7 +51,7 @@ public:
 
 	// コンストラクタ
 	CObjectOrbit();
-	CObjectOrbit(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectOrbit(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectOrbit();

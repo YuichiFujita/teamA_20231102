@@ -40,7 +40,7 @@ public:
 	};
 
 	// コンストラクタ
-	CScene(const EMode mode);
+	explicit CScene(const EMode mode);
 
 	// デストラクタ
 	~CScene();

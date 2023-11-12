@@ -25,7 +25,7 @@ class CObjectTornado : public CObject
 public:
 	// コンストラクタ
 	CObjectTornado();
-	CObjectTornado(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectTornado(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectTornado();

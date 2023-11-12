@@ -25,7 +25,7 @@ class CScrollMeshField : public CObjectMeshField
 public:
 	// コンストラクタ
 	CScrollMeshField();
-	CScrollMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CScrollMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CScrollMeshField();

@@ -25,7 +25,7 @@ class CObjectMeshWall : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshWall();
-	CObjectMeshWall(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshWall(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshWall();

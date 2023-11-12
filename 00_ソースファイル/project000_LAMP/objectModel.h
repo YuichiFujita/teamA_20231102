@@ -26,7 +26,7 @@ class CObjectModel : public CObject
 public:
 	// コンストラクタ
 	CObjectModel();
-	CObjectModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectModel();

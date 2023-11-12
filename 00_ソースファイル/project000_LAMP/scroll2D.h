@@ -25,7 +25,7 @@ class CScroll2D : public CObject2D
 public:
 	// コンストラクタ
 	CScroll2D();
-	CScroll2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CScroll2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CScroll2D();

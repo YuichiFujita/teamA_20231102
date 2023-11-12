@@ -25,7 +25,7 @@ class CObject2D : public CObject
 public:
 	// コンストラクタ
 	CObject2D();
-	CObject2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObject2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObject2D();

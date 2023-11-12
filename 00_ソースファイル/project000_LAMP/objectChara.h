@@ -32,7 +32,7 @@ class CObjectChara : public CObject
 public:
 	// コンストラクタ
 	CObjectChara();
-	CObjectChara(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectChara(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectChara();

@@ -26,7 +26,7 @@ class CMultiModel : CObject
 public:
 	// コンストラクタ
 	CMultiModel();
-	CMultiModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CMultiModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CMultiModel();

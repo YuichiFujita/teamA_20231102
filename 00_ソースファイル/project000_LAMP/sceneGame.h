@@ -32,7 +32,7 @@ class CSceneGame : public CScene
 {
 public:
 	// コンストラクタ
-	CSceneGame(const EMode mode);
+	explicit CSceneGame(const EMode mode);
 
 	// デストラクタ
 	~CSceneGame();

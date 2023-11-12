@@ -25,7 +25,7 @@ class CObjectMeshField : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshField();
-	CObjectMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshField();
