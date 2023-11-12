@@ -92,6 +92,9 @@ protected:
 	void SetVtx(void);	// 頂点情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void NormalizeNormal(void);	// 法線の正規化
 

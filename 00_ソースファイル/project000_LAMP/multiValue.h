@@ -87,6 +87,9 @@ public:
 
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void SetNumPosition(void);	// 数字の位置設定
 	void SetTexNum(void);		// 数字のテクスチャ座標設定

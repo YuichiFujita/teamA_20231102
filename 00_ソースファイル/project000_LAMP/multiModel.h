@@ -72,6 +72,9 @@ public:
 	CModel::SModel GetModelData(void) const;			// モデル情報取得
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	HRESULT SetOriginMaterial(const LPD3DXBUFFER pBuffMat, const int nNumMat);	// 元マテリアル設定
 

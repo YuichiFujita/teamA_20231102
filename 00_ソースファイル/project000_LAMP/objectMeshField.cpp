@@ -1376,6 +1376,15 @@ void CObjectMeshField::SetScrollTex(const float fTexU, const float fTexV)
 }
 
 //============================================================
+//	破棄処理
+//============================================================
+void CObjectMeshField::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}
+
+//============================================================
 //	法線の取得処理 (左)
 //============================================================
 D3DXVECTOR3 CObjectMeshField::GetNormalLeft(VERTEX_3D *pVtx)

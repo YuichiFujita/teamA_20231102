@@ -754,3 +754,12 @@ void CObjectTornado::SetVtx(void)
 	}
 	else { assert(false); }	// 非使用中
 }
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectTornado::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}

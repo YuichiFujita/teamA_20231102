@@ -717,4 +717,13 @@ void CObjectMeshDome::SetScrollTex(const float fTexU, const float fTexV)
 	}
 }
 
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectMeshDome::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}
+
 // TODO：テクスチャ座標動かすやつ検証

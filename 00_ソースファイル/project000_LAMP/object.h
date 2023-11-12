@@ -88,6 +88,7 @@ public:
 	virtual void Uninit(void)	= 0;	// 終了
 	virtual void Update(void)	= 0;	// 更新
 	virtual void Draw(void)		= 0;	// 描画
+	virtual void Release(void)	= 0;	// 破棄
 
 	// 仮想関数
 	virtual void Hit(void);	// ヒット
@@ -160,10 +161,6 @@ public:
 	CObject	*GetObject(void);			// オブジェクト取得
 	CObject	*GetPrev(void) const;		// 前オブジェクト取得
 	CObject	*GetNext(void) const;		// 次オブジェクト取得
-
-protected:
-	// メンバ関数
-	void Release(void);	// 破棄
 
 private:
 	// 静的メンバ関数

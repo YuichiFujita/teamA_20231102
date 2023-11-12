@@ -183,6 +183,9 @@ protected:
 	void SetIdx(void);	// インデックス情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// 静的メンバ変数
 	static const D3DXVECTOR3 aPosMeshCube[];	// 頂点座標の設定用定数
 	static const D3DXVECTOR3 aNorMeshCube[];	// 法線ベクトルの設定用定数

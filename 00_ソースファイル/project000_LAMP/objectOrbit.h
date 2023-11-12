@@ -108,6 +108,9 @@ protected:
 	void SetVtx(void);	// 頂点情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// 静的メンバ変数
 	static const D3DXVECTOR3 mc_aOffset[][MAX_OFFSET];	// オフセットの位置加減量
 

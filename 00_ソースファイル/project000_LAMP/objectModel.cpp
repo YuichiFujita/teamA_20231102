@@ -569,3 +569,12 @@ HRESULT CObjectModel::SetOriginMaterial(const LPD3DXBUFFER pBuffMat, const int n
 	// 成功を返す
 	return S_OK;
 }
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectModel::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}
