@@ -10,6 +10,7 @@
 #include "renderer.h"
 #include "object.h"
 #include "manager.h"
+#include "renderState.h"
 #include "camera.h"
 #include "texture.h"
 #include "object2D.h"
@@ -113,11 +114,8 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
         return E_FAIL;
     }
 
-    // レンダーステートの設定
-    m_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-    m_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    m_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    m_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	// レンダーステート情報の初期化
+	CRenderState::InitRenderState(m_pD3DDevice);
 
     // サンプラーステートの設定 (テクスチャの拡縮補間の設定)
     m_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
