@@ -39,7 +39,6 @@ public:
 	public:
 		// コンストラクタ
 		SInfo() {}
-
 		SInfo(const UINT nWidth, const UINT nHeight, const UINT nMip, const DWORD dwUsage, const D3DFORMAT format, const D3DPOOL pool)
 		{ Width = nWidth; Height = nHeight; MipLevels = nMip; Usage = dwUsage; Format = format; Pool = pool; }
 

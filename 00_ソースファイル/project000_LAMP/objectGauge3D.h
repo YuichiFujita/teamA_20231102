@@ -106,6 +106,9 @@ public:
 	bool GetEnableDrawFrame(void) const;			// 枠表示状況取得
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void SetVtx(void);	// 頂点情報の設定
 

@@ -26,7 +26,7 @@ class CObjectModel : public CObject
 public:
 	// コンストラクタ
 	CObjectModel();
-	CObjectModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectModel();
@@ -69,6 +69,9 @@ public:
 	void SetMtxWorld(const D3DXMATRIX& rMtxWorld);		// マトリックス設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	HRESULT SetOriginMaterial(const LPD3DXBUFFER pBuffMat, const int nNumMat);	// 元マテリアル設定
 

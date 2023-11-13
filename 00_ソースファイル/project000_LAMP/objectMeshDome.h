@@ -25,7 +25,7 @@ class CObjectMeshDome : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshDome();
-	CObjectMeshDome(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshDome(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshDome();
@@ -95,6 +95,9 @@ protected:
 	);
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9  m_pIdxBuff;	// インデックスバッファへのポインタ

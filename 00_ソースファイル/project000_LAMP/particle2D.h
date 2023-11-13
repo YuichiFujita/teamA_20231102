@@ -62,6 +62,9 @@ public:
 	);
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void Damage(const D3DXVECTOR3& rPos, const D3DXCOLOR& rCol);	// ダメージ
 	void Item(const D3DXVECTOR3& rPos, const D3DXCOLOR& rCol);		// アイテム

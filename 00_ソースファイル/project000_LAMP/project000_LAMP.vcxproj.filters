@@ -222,6 +222,9 @@
     <ClCompile Include="DepthShadow.cpp">
       <Filter>ソース ファイル\シェーダー</Filter>
     </ClCompile>
+    <ClCompile Include="renderState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anim2D.h">
@@ -424,6 +427,9 @@
     </ClInclude>
     <ClInclude Include="DepthShadow.h">
       <Filter>ヘッダー ファイル\シェーダー</Filter>
+    </ClInclude>
+    <ClInclude Include="renderState.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

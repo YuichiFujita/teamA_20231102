@@ -25,7 +25,7 @@ class CObject2D : public CObject
 public:
 	// コンストラクタ
 	CObject2D();
-	CObject2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObject2D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObject2D();
@@ -74,6 +74,9 @@ protected:
 	);
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファへのポインタ
 	D3DXVECTOR3	m_pos;	// 位置

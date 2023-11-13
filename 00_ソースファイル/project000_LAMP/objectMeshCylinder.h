@@ -25,7 +25,7 @@ class CObjectMeshCylinder : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshCylinder();
-	CObjectMeshCylinder(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshCylinder(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshCylinder();
@@ -96,6 +96,9 @@ protected:
 	);
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9  m_pIdxBuff;	// インデックスバッファへのポインタ

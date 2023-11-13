@@ -927,3 +927,12 @@ void CObjectMeshCube::SetIdx(void)
 		m_pIdxBuff->Unlock();
 	}
 }
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectMeshCube::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}

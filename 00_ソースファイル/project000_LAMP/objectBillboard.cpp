@@ -656,3 +656,12 @@ void CObjectBillboard::SetVtx(void)
 	// 頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
 }
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectBillboard::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}

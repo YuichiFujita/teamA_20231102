@@ -25,7 +25,7 @@ class CObjectMeshField : public CObject
 public:
 	// コンストラクタ
 	CObjectMeshField();
-	CObjectMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectMeshField(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectMeshField();
@@ -105,6 +105,9 @@ protected:
 	);
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	D3DXVECTOR3 GetNormalLeft(VERTEX_3D *pVtx);			// 法線の取得 (左)
 	D3DXVECTOR3 GetNormalLeftTop(VERTEX_3D *pVtx);		// 法線の取得 (左上)

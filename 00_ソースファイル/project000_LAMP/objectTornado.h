@@ -25,7 +25,7 @@ class CObjectTornado : public CObject
 public:
 	// コンストラクタ
 	CObjectTornado();
-	CObjectTornado(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectTornado(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectTornado();
@@ -131,6 +131,9 @@ protected:
 	void SetVtx(void);	// 頂点情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファへのポインタ
 	STornado m_tornado;	// 竜巻の情報

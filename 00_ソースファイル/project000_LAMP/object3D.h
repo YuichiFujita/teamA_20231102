@@ -33,7 +33,7 @@ public:
 
 	// コンストラクタ
 	CObject3D();
-	CObject3D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObject3D(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObject3D();
@@ -92,6 +92,9 @@ protected:
 	void SetVtx(void);	// 頂点情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void NormalizeNormal(void);	// 法線の正規化
 

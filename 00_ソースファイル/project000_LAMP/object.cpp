@@ -58,12 +58,13 @@ CObject::CObject()
 	}
 
 	// 自身の情報をクリア
-	m_label		= LABEL_NONE;	// オブジェクトラベル
-	m_nPriority	= DEFAULT_PRIO;	// 優先順位
-	m_dwID		= m_dwNextID;	// 自身のユニークID
-	m_bUpdate	= true;			// 自身の更新状況
-	m_bDraw		= true;			// 自身の描画状況
-	m_bDeath	= false;		// 自身の死亡フラグ
+	m_label			= LABEL_NONE;	// オブジェクトラベル
+	m_nPriority		= DEFAULT_PRIO;	// 優先順位
+	m_dwID			= m_dwNextID;	// 自身のユニークID
+	m_bUpdate		= true;			// 自身の更新状況
+	m_bDraw			= true;			// 自身の描画状況
+	m_bDeath		= false;		// 自身の死亡フラグ
+	m_bDepthShadow	= false;		// 自身の影表示状況
 
 	// ユニークIDを加算
 	m_dwNextID++;
@@ -109,12 +110,13 @@ CObject::CObject(const ELabel label, const int nPriority)
 	}
 
 	// 自身の情報を設定
-	m_label		= label;		// オブジェクトラベル
-	m_nPriority	= nPriority;	// 優先順位
-	m_dwID		= m_dwNextID;	// 自身のユニークID
-	m_bUpdate	= true;			// 自身の更新状況
-	m_bDraw		= true;			// 自身の描画状況
-	m_bDeath	= false;		// 自身の死亡フラグ
+	m_label			= label;		// オブジェクトラベル
+	m_nPriority		= nPriority;	// 優先順位
+	m_dwID			= m_dwNextID;	// 自身のユニークID
+	m_bUpdate		= true;			// 自身の更新状況
+	m_bDraw			= true;			// 自身の描画状況
+	m_bDeath		= false;		// 自身の死亡フラグ
+	m_bDepthShadow	= false;		// 自身の影表示状況
 
 	// ユニークIDを加算
 	m_dwNextID++;
@@ -130,6 +132,24 @@ CObject::~CObject()
 {
 	// オブジェクトの総数を減算
 	m_nNumAll--;
+}
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObject::Release(void)
+{
+	if (this != NULL)
+	{ // 使用されている場合
+
+		if (!m_bDeath)
+		{ // 死亡フラグが立っていない場合
+
+			// 死亡フラグを立てる
+			m_bDeath = true;
+		}
+		else { assert(false); }	// 死亡済み
+	}
 }
 
 //============================================================
@@ -647,6 +667,15 @@ void CObject::SetEnableDraw(const bool bDraw)
 }
 
 //============================================================
+//	影表示状況の設定処理
+//============================================================
+void CObject::SetEnableDepthShadow(const bool bShadow)
+{
+	// 引数の影表示状況を設定
+	m_bDepthShadow = bShadow;
+}
+
+//============================================================
 //	マトリックスポインタ取得処理
 //============================================================
 D3DXMATRIX *CObject::GetPtrMtxWorld(void)
@@ -981,6 +1010,15 @@ bool CObject::IsDeath(void) const
 }
 
 //============================================================
+//	影表示状況取得処理
+//============================================================
+bool CObject::IsShadow(void) const
+{
+	// 影表示状況を返す
+	return m_bDepthShadow;
+}
+
+//============================================================
 //	オブジェクト取得処理
 //============================================================
 CObject *CObject::GetObject(void)
@@ -1005,22 +1043,4 @@ CObject *CObject::GetNext(void) const
 {
 	// 次オブジェクトを返す
 	return m_pNext;
-}
-
-//============================================================
-//	破棄処理
-//============================================================
-void CObject::Release(void)
-{
-	if (this != NULL)
-	{ // 使用されている場合
-
-		if (!m_bDeath)
-		{ // 死亡フラグが立っていない場合
-
-			// 死亡フラグを立てる
-			m_bDeath = true;
-		}
-		else { assert(false); }	// 死亡済み
-	}
 }

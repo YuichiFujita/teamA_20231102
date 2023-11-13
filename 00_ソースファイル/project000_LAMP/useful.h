@@ -14,6 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "renderState.h"
 
 //************************************************************
 //	マクロ定義
@@ -64,6 +65,11 @@
 #define XCOL_GREEN	(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f))	// 緑(不透明)
 #define XCOL_ABLUE	(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.0f))	// 青(透明)
 #define XCOL_BLUE	(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f))	// 青(不透明)
+
+// RenderState関係
+#define RS_BL_NORMAL	(CRenderState::SBlendAlpha(D3DBLENDOP_ADD,			D3DBLEND_SRCALPHA,	D3DBLEND_INVSRCALPHA))	// 通常αブレンド
+#define RS_BL_ADD		(CRenderState::SBlendAlpha(D3DBLENDOP_ADD,			D3DBLEND_SRCALPHA,	D3DBLEND_ONE))			// 加算αブレンド
+#define RS_BL_SUB		(CRenderState::SBlendAlpha(D3DBLENDOP_REVSUBTRACT,	D3DBLEND_SRCALPHA,	D3DBLEND_ONE))			// 減算αブレンド
 
 //************************************************************
 //	構造体定義

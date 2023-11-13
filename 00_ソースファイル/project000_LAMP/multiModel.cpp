@@ -571,6 +571,15 @@ CModel::SModel CMultiModel::GetModelData(void) const
 }
 
 //============================================================
+//	破棄処理
+//============================================================
+void CMultiModel::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}
+
+//============================================================
 //	元マテリアルの設定処理
 //============================================================
 HRESULT CMultiModel::SetOriginMaterial(const LPD3DXBUFFER pBuffMat, const int nNumMat)

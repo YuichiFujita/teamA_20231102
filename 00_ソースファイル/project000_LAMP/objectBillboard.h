@@ -41,7 +41,7 @@ public:
 
 	// コンストラクタ
 	CObjectBillboard();
-	CObjectBillboard(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectBillboard(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectBillboard();
@@ -93,6 +93,9 @@ protected:
 	void SetVtx(void);	// 頂点情報の設定
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファへのポインタ
 	D3DXMATRIX	m_mtxWorld;	// ワールドマトリックス

@@ -76,6 +76,9 @@ public:
 	CMultiValue *GetMultiValue(void) const;			// 数字情報取得
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	void SetPositionRelative(void);	// 相対位置設定
 

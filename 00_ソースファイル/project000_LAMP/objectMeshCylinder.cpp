@@ -680,3 +680,12 @@ void CObjectMeshCylinder::SetScrollTex(const float fTexU, const float fTexV)
 		m_pVtxBuff->Unlock();
 	}
 }
+
+//============================================================
+//	破棄処理
+//============================================================
+void CObjectMeshCylinder::Release(void)
+{
+	// オブジェクトの破棄
+	CObject::Release();
+}

@@ -26,7 +26,7 @@ class CMultiModel : CObject
 public:
 	// コンストラクタ
 	CMultiModel();
-	CMultiModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CMultiModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CMultiModel();
@@ -72,6 +72,9 @@ public:
 	CModel::SModel GetModelData(void) const;			// モデル情報取得
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ関数
 	HRESULT SetOriginMaterial(const LPD3DXBUFFER pBuffMat, const int nNumMat);	// 元マテリアル設定
 

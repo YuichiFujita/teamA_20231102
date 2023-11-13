@@ -29,7 +29,7 @@ class CSceneRanking : public CScene
 {
 public:
 	// コンストラクタ
-	CSceneRanking(const EMode mode);
+	explicit CSceneRanking(const EMode mode);
 
 	// デストラクタ
 	~CSceneRanking();

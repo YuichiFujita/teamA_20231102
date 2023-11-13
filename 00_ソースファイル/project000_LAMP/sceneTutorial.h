@@ -29,7 +29,7 @@ class CSceneTutorial : public CScene
 {
 public:
 	// コンストラクタ
-	CSceneTutorial(const EMode mode);
+	explicit CSceneTutorial(const EMode mode);
 
 	// デストラクタ
 	~CSceneTutorial();

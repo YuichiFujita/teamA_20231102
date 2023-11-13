@@ -197,6 +197,7 @@
     </ClCompile>
     <ClCompile Include="rankingManager.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="renderState.cpp" />
     <ClCompile Include="resultManager.cpp" />
     <ClCompile Include="retentionManager.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="precompile.h" />
     <ClInclude Include="rankingManager.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="renderState.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resultManager.h" />
     <ClInclude Include="retentionManager.h" />

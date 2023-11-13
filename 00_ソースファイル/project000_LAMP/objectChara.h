@@ -32,7 +32,7 @@ class CObjectChara : public CObject
 public:
 	// コンストラクタ
 	CObjectChara();
-	CObjectChara(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
+	explicit CObjectChara(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
 	~CObjectChara();
@@ -80,6 +80,9 @@ public:
 	float GetMaxAlpha(void) const;				// 最大透明度取得
 
 private:
+	// オーバーライド関数
+	void Release(void) override;	// 破棄
+
 	// メンバ変数
 	CMultiModel	*m_apMultiModel[MAX_PARTS];	// モデルの情報
 	CMotion		*m_pMotion;		// モーションの情報
