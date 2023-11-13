@@ -21,6 +21,7 @@
 //	前方宣言
 //************************************************************
 class CShadow;	// 影クラス
+class CFlail;	// フレイルクラス
 
 //************************************************************
 //	クラス定義
@@ -117,12 +118,14 @@ private:
 
 	// メンバ変数
 	CShadow		*m_pShadow;			// 影の情報
+	CFlail		*m_pFlail;			// フレイルの情報
 	D3DXVECTOR3	m_oldPos;			// 過去位置
 	D3DXVECTOR3	m_move;				// 移動量
 	D3DXVECTOR3	m_destRot;			// 目標向き
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
 	int			m_nCounterState;	// 状態管理カウンター
+	int			m_nCounterFlail;	// フレイル管理カウンター
 	float		m_fPlusMove;		// プラス移動量
 	bool		m_bDash;			// ダッシュ状況
 	bool		m_bJump;			// ジャンプ状況

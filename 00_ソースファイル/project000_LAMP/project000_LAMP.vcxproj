@@ -162,6 +162,7 @@
     <ClCompile Include="effect3D.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
+    <ClCompile Include="flail.cpp" />
     <ClCompile Include="gameManager.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="effect3D.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
+    <ClInclude Include="flail.h" />
     <ClInclude Include="gameManager.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
