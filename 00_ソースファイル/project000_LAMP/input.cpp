@@ -636,10 +636,10 @@ void CInputPad::Update(void)
 
 			// パッドのプレス情報を保存
 			m_aKeyStatePress[nCntJoyKey] = aKeyState[nCntJoyKey];
-		}
 
-		// バイブレーションの更新
-		UpdateVibration(&m_aVibration[nCntJoyKey], nCntJoyKey);
+			// バイブレーションの更新
+			UpdateVibration(&m_aVibration[nCntJoyKey], nCntJoyKey);
+		}
 	}
 }
 
