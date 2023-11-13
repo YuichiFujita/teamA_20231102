@@ -13,6 +13,8 @@
 #include "camera.h"
 #include "texture.h"
 #include "object2D.h"
+#include "ZTexture.h"
+#include "DepthShadow.h"
 
 //************************************************************
 //	定数宣言
@@ -130,6 +132,18 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
     m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
+
+	//シェーダー用の初期化は以下
+	// Z値テクスチャ生成オブジェクトの生成と初期化
+	m_pDev = m_pD3DDevice;
+	D3DXCreateSprite(m_pD3DDevice, &m_pSprite);//スプライト作成
+	m_pZTex = new CZTexture;
+	m_pZTex->Init(*m_pDev, SCREEN_WIDTH, SCREEN_HEIGHT, D3DFMT_A8R8G8B8);
+	m_pZTex->GetZTex(*m_pZTexture);
+	// 深度バッファシャドウオブジェクトの生成と初期化
+	m_pDepthShadow = new CDepthShadow;
+	m_pDepthShadow->Init(*m_pDev);
+	m_pDepthShadow->SetShadowMap(*m_pZTexture);	// シャドウマップテクスチャを登録
     // 成功を返す
     return S_OK;
 }

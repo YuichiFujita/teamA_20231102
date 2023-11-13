@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ヘッダー ファイル\シェーダー">
+      <UniqueIdentifier>{8bdf9fcd-3a31-43f5-a036-eb64bece141a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="エフェクトファイル">
+      <UniqueIdentifier>{3c6965ab-f3dc-48d0-821c-78f2a3d93a53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\シェーダー">
+      <UniqueIdentifier>{1654cb94-f16f-4490-846d-03694039a535}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="anim2D.cpp">
@@ -206,6 +215,12 @@
     </ClCompile>
     <ClCompile Include="wall.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ZTexture.cpp">
+      <Filter>ソース ファイル\シェーダー</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthShadow.cpp">
+      <Filter>ソース ファイル\シェーダー</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -404,5 +419,19 @@
     <ClInclude Include="wall.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="ZTexture.h">
+      <Filter>ヘッダー ファイル\シェーダー</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthShadow.h">
+      <Filter>ヘッダー ファイル\シェーダー</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DepthBufShadowEffect.fx">
+      <Filter>エフェクトファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="ZTexCreator.fx">
+      <Filter>エフェクトファイル</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
