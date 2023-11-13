@@ -25,7 +25,7 @@
 //	静的メンバ変数宣言
 //************************************************************
 CStage *CScene::m_pStage = NULL;	// ステージ
-CPlayer	*CScene::m_pPlayer = NULL;	// プレイヤーオブジェクト
+CPlayer	*CScene::m_apPlayer[MAX_PLAYER] = {};	// プレイヤーオブジェクト
 
 //************************************************************
 //	親クラス [CScene] のメンバ関数
@@ -65,8 +65,12 @@ HRESULT CScene::Init(void)
 		return E_FAIL;
 	}
 
-	// プレイヤーオブジェクトの生成
-	m_pPlayer = CPlayer::Create(m_mode);
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの総数分繰り返す
+
+		// プレイヤーオブジェクトの生成
+		m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode);
+	}
 
 	// 成功を返す
 	return S_OK;
@@ -87,7 +91,12 @@ HRESULT CScene::Uninit(void)
 	}
 
 	// 終了済みのオブジェクトポインタをNULLにする
-	m_pPlayer = NULL;	// プレイヤーオブジェクト
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの総数分繰り返す
+
+		// プレイヤーオブジェクトをNULLにする
+		m_apPlayer[nCntPlayer] = NULL;
+	}
 
 	// 成功を返す
 	return S_OK;
@@ -261,10 +270,10 @@ CStage *CScene::GetStage(void)
 //============================================================
 //	プレイヤー取得処理
 //============================================================
-CPlayer *CScene::GetPlayer(void)
+CPlayer *CScene::GetPlayer(const int nID)
 {
-	// プレイヤーのポインタを返す
-	return m_pPlayer;
+	// 引数インデックスのプレイヤーポインタを返す
+	return m_apPlayer[nID];
 }
 
 //============================================================

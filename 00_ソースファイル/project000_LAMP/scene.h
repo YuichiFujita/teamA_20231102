@@ -14,6 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "input.h"
 
 //************************************************************
 //	前方宣言
@@ -57,8 +58,8 @@ public:
 	static CScene *Create(EMode mode);			// 生成
 	static HRESULT Release(CScene *&prScene);	// 破棄
 
-	static CStage *GetStage(void);		// ステージ取得
-	static CPlayer *GetPlayer(void);	// プレイヤー取得
+	static CStage *GetStage(void);				// ステージ取得
+	static CPlayer *GetPlayer(const int nID);	// プレイヤー取得
 
 	// メンバ関数
 	void SetMode(const EMode mode);	// モード設定
@@ -67,7 +68,7 @@ public:
 private:
 	// 静的メンバ変数
 	static CStage *m_pStage;	// ステージ
-	static CPlayer *m_pPlayer;	// プレイヤーオブジェクト
+	static CPlayer *m_apPlayer[MAX_PLAYER];	// プレイヤーオブジェクト
 
 	// メンバ変数
 	EMode m_mode;	// モード

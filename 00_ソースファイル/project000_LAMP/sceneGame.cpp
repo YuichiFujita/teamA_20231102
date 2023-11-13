@@ -131,8 +131,12 @@ HRESULT CSceneGame::Init(void)
 	// カメラを設定
 	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
-	// プレイヤーを出現
-	CScene::GetPlayer()->SetSpawn();
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの総数分繰り返す
+
+		// プレイヤーを出現
+		CScene::GetPlayer(nCntPlayer)->SetSpawn();
+	}
 
 	// UIの描画状況を設定
 	SetEnableDrawUI(m_bDrawUI);
@@ -213,24 +217,6 @@ void CSceneGame::Update(void)
 		// カメラの操作状況を反転
 		SetEnableControlCamera((!m_bControlCamera) ? true : false);
 	}
-	else if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F6))
-	{
-		// プレイヤーの出現を設定
-		CScene::GetPlayer()->SetSpawn();
-	}
-
-#if 0
-	else if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F7))
-	{
-		// リザルトに遷移
-		//CScene::GetPlayer()->SetState(CPlayer::STATE_CLEAR);
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F8))
-	{
-		// リザルトに遷移
-		//CScene::GetPlayer()->SetState(CPlayer::STATE_OVER);
-	}
-#endif
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
@@ -241,12 +227,6 @@ void CSceneGame::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F3]：UI描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F4]：ポーズ描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F5]：カメラ操作のON/OFF\n");
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F6]：プレイヤースポーン\n");
-
-#if 0
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F7]：成功リザルト遷移\n");
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F8]：失敗リザルト遷移\n");
-#endif
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ情報]\n");

@@ -112,20 +112,21 @@ private:
 	bool UpdateFadeIn(const float fSub);	// フェードイン状態時の更新
 
 	// 静的メンバ変数
-	static const char *mc_apTextureFile[];	// テクスチャ定数
 	static const char *mc_apModelFile[];	// モデル定数
+	static int m_nNumAll;	// プレイヤーの総数
 
 	// メンバ変数
-	CShadow *m_pShadow;			// 影の情報
-	D3DXVECTOR3	m_oldPos;		// 過去位置
-	D3DXVECTOR3	m_move;			// 移動量
-	D3DXVECTOR3	m_destRot;		// 目標向き
-	D3DXVECTOR3	m_dashRot;		// ダッシュ向き
-	EState	m_state;			// 状態
-	int		m_nCounterState;	// 状態管理カウンター
-	float	m_fPlusMove;		// プラス移動量
-	bool	m_bDash;			// ダッシュ状況
-	bool	m_bJump;			// ジャンプ状況
+	CShadow		*m_pShadow;			// 影の情報
+	D3DXVECTOR3	m_oldPos;			// 過去位置
+	D3DXVECTOR3	m_move;				// 移動量
+	D3DXVECTOR3	m_destRot;			// 目標向き
+	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
+	EState		m_state;			// 状態
+	int			m_nCounterState;	// 状態管理カウンター
+	float		m_fPlusMove;		// プラス移動量
+	bool		m_bDash;			// ダッシュ状況
+	bool		m_bJump;			// ジャンプ状況
+	const int	m_nPlayerID;		// プレイヤーインデックス
 };
 
 #endif	// _PLAYER_H_
