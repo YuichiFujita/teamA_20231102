@@ -211,6 +211,16 @@ void CRenderer::Uninit(void)
         m_pDefDepthStencilSurface->Release();
         m_pDefDepthStencilSurface = NULL;
     }
+	if (m_pDepthShadow != NULL)
+	{
+		delete m_pDepthShadow;
+		m_pDepthShadow = NULL;
+	}
+	if (m_pZTex != NULL)
+	{
+		delete m_pZTex;
+		m_pZTex = NULL;
+	}
 }
 
 //============================================================
