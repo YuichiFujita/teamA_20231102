@@ -436,7 +436,7 @@ void CPlayer::SetSpawn(void)
 	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 位置を設定
-	SetVec3Position(set);
+	SetVec3Position(set + D3DXVECTOR3(200.0f, 0.0f, 0.0f) - (D3DXVECTOR3(100.0f, 0.0f, 0.0f) * (float)m_nPlayerID));
 
 	// 向きを設定
 	SetVec3Rotation(set);
