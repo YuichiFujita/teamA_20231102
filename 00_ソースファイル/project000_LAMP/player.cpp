@@ -31,6 +31,8 @@
 #include "effect3D.h"
 #include "particle3D.h"
 
+#include "flail.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -102,6 +104,7 @@ CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPlayerID(
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= false;		// ジャンプ状況
@@ -132,6 +135,7 @@ HRESULT CPlayer::Init(void)
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= true;			// ジャンプ状況
@@ -161,6 +165,16 @@ HRESULT CPlayer::Init(void)
 		return E_FAIL;
 	}
 
+	// フレイルの生成
+	m_pFlail = CFlail::Create(VEC3_ZERO);
+	if (m_pFlail == NULL)
+	{ // 非使用中の場合
+
+	  // 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
 	// 成功を返す
 	return S_OK;
 }
@@ -172,6 +186,9 @@ void CPlayer::Uninit(void)
 {
 	// 影の終了
 	m_pShadow->Uninit();
+
+	// フレイルの終了
+	m_pFlail->Uninit();
 
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
@@ -202,6 +219,52 @@ void CPlayer::Update(void)
 
 	case STATE_NORMAL:
 
+		if (m_nCounterFlail > 0)
+		{
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
+			{
+				m_nCounterFlail++;
+
+				if (m_nCounterFlail > 60)
+				{
+					m_nCounterFlail = 60;
+				}
+			}
+
+			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE)
+			{
+				D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+				move *= (float)m_nCounterFlail;
+				m_pFlail->SetVec3Move(move);
+				m_nCounterFlail = -1;
+			}
+		}
+		else if (m_nCounterFlail == 0)
+		{
+			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
+			{
+				m_nCounterFlail++;
+			}
+		}
+		else
+		{
+			D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+			move = GetVec3Position() - m_pFlail->GetVec3Position();
+
+			if (D3DXVec3Length(&move) < 10.0f)
+			{
+				m_nCounterFlail = 0;
+				move = VEC3_ZERO;
+				m_pFlail->SetVec3Position(GetVec3Position());
+			}
+
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
+			{
+				D3DXVec3Normalize(&move, &move);
+				m_pFlail->SetVec3Move(move * 15.0f);
+			}
+		}
+
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
@@ -214,6 +277,9 @@ void CPlayer::Update(void)
 
 	// 影の更新
 	m_pShadow->Update();
+
+	// フレイルの更新
+	m_pFlail->Update();
 
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
