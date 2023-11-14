@@ -68,7 +68,7 @@ public:
 	};
 
 	// コンストラクタ
-	CPlayer();
+	explicit CPlayer(const int nPad);
 
 	// デストラクタ
 	~CPlayer();
@@ -90,7 +90,7 @@ public:
 	D3DXMATRIX GetMtxWorld(void) const override;		// マトリックス取得
 
 	// 静的メンバ関数
-	static CPlayer *Create(CScene::EMode mode);	// 生成
+	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
 	void SetSpawn(void);	// 出現設定
@@ -114,7 +114,6 @@ private:
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
-	static int m_nNumAll;	// プレイヤーの総数
 
 	// メンバ変数
 	CShadow		*m_pShadow;			// 影の情報
@@ -129,7 +128,7 @@ private:
 	float		m_fPlusMove;		// プラス移動量
 	bool		m_bDash;			// ダッシュ状況
 	bool		m_bJump;			// ジャンプ状況
-	const int	m_nPlayerID;		// プレイヤーインデックス
+	const int	m_nPadID;			// パッドインデックス
 };
 
 #endif	// _PLAYER_H_

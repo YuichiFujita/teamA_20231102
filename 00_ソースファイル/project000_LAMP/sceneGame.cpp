@@ -17,6 +17,7 @@
 #include "stage.h"
 #include "pause.h"
 #include "player.h"
+#include "retentionManager.h"
 
 //************************************************************
 //	マクロ定義
@@ -131,8 +132,8 @@ HRESULT CSceneGame::Init(void)
 	// カメラを設定
 	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤーの総数分繰り返す
+	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	{ // プレイヤー数分繰り返す
 
 		// プレイヤーを出現
 		CScene::GetPlayer(nCntPlayer)->SetSpawn();

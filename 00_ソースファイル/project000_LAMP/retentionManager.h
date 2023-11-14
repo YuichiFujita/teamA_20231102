@@ -14,6 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "input.h"
 
 //************************************************************
 //	クラス定義
@@ -50,11 +51,18 @@ public:
 	EResult GetResult(void) const;			// クリア状況取得
 	void SetTime(const long nTime);			// 経過タイム設定
 	long GetTime(void) const;				// 経過タイム取得
+	void SetNumPlayer(const int nNum);		// プレイ人数設定
+	int GetNumPlayer(void) const;			// プレイ人数取得
+	void AllSetEnableEntry(const bool bEntry);				// 全エントリー状況設定
+	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
+	bool IsEntry(const int nID) const;						// エントリー状況取得
 
 private:
 	// メンバ変数
 	EResult m_result;	// クリア状況
 	long m_nTime;		// 経過タイム
+	int m_nNumPlayer;	// プレイヤー数
+	bool m_aEntry[MAX_PLAYER];	// エントリー状況
 };
 
 #endif	// _RETENTION_MANAGER_H_

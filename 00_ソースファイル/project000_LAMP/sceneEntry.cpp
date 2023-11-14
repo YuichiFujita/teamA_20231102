@@ -68,14 +68,8 @@ HRESULT CSceneEntry::Init(void)
 	//	初期設定
 	//--------------------------------------------------------
 	// カメラを設定
-	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
-
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤーの総数分繰り返す
-
-		// プレイヤーを出現
-		CScene::GetPlayer(nCntPlayer)->SetSpawn();
-	}
+	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_ROTATE);	// 回転状態に設定
+	CManager::GetInstance()->GetCamera()->SetDestRotate();					// カメラの初期情報を設定
 
 	// BGMの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GENERAL);
