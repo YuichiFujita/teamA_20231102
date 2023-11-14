@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "sceneTitle.h"
 #include "sceneTutorial.h"
+#include "sceneEntry.h"
 #include "sceneGame.h"
 #include "sceneResult.h"
 #include "sceneRanking.h"
@@ -165,6 +166,13 @@ CScene *CScene::Create(EMode mode)
 
 			// チュートリアル画面を生成
 			pScene = new CSceneTutorial(mode);
+
+			break;
+
+		case MODE_ENTRY:
+
+			// エントリー画面を生成
+			pScene = new CSceneEntry(mode);
 
 			break;
 

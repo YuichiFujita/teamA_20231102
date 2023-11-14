@@ -160,6 +160,7 @@
     <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
+    <ClCompile Include="entryManager.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
     <ClCompile Include="flail.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="resultManager.cpp" />
     <ClCompile Include="retentionManager.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="sceneEntry.cpp" />
     <ClCompile Include="sceneGame.cpp" />
     <ClCompile Include="sceneRanking.cpp" />
     <ClCompile Include="sceneResult.cpp" />
@@ -233,6 +235,7 @@
     <ClInclude Include="DepthShadow.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
+    <ClInclude Include="entryManager.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
     <ClInclude Include="flail.h" />
@@ -273,6 +276,7 @@
     <ClInclude Include="resultManager.h" />
     <ClInclude Include="retentionManager.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="sceneEntry.h" />
     <ClInclude Include="sceneGame.h" />
     <ClInclude Include="sceneRanking.h" />
     <ClInclude Include="sceneResult.h" />
@@ -298,9 +302,11 @@
   <ItemGroup>
     <FxCompile Include="DepthBufShadowEffect.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ZTexCreator.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -104,7 +104,7 @@ CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPlayerID(
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
-	m_nCounterFlail = 0;			// フレイル管理カウンター
+	m_nCounterFlail		= 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= false;		// ジャンプ状況
@@ -135,7 +135,7 @@ HRESULT CPlayer::Init(void)
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
-	m_nCounterFlail = 0;			// フレイル管理カウンター
+	m_nCounterFlail		= 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= true;			// ジャンプ状況
