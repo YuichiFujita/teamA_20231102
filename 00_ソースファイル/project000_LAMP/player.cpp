@@ -31,6 +31,8 @@
 #include "effect3D.h"
 #include "particle3D.h"
 
+#include "flail.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -66,10 +68,6 @@ namespace
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-const char *CPlayer::mc_apTextureFile[] =	// テクスチャ定数
-{
-	"data\\TEXTURE\\clear000.png",	// クリア表示テクスチャ
-};
 const char *CPlayer::mc_apModelFile[] =	// モデル定数
 {
 	"data\\MODEL\\PLAYER\\00_waist.x",	// 腰
@@ -88,6 +86,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 	"data\\MODEL\\PLAYER\\13_footL.x",	// 左足
 	"data\\MODEL\\PLAYER\\14_footR.x",	// 右足
 };
+int CPlayer::m_nNumAll = 0;	// プレイヤーの総数
 
 //************************************************************
 //	子クラス [CPlayer] のメンバ関数
@@ -95,7 +94,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 //============================================================
 //	コンストラクタ
 //============================================================
-CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
+CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPlayerID(m_nNumAll)
 {
 	// メンバ変数をクリア
 	m_pShadow			= NULL;			// 影の情報
@@ -105,9 +104,13 @@ CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= false;		// ジャンプ状況
+
+	// プレイヤーの総数を加算
+	m_nNumAll++;
 }
 
 //============================================================
@@ -115,7 +118,8 @@ CPlayer::CPlayer() : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 //============================================================
 CPlayer::~CPlayer()
 {
-
+	// プレイヤーの総数を減算
+	m_nNumAll--;
 }
 
 //============================================================
@@ -131,6 +135,7 @@ HRESULT CPlayer::Init(void)
 	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
 	m_state				= STATE_NONE;	// 状態
 	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
 	m_fPlusMove			= 0.0f;			// プラス移動量
 	m_bDash				= false;		// ダッシュ状況
 	m_bJump				= true;			// ジャンプ状況
@@ -160,6 +165,16 @@ HRESULT CPlayer::Init(void)
 		return E_FAIL;
 	}
 
+	// フレイルの生成
+	m_pFlail = CFlail::Create(VEC3_ZERO);
+	if (m_pFlail == NULL)
+	{ // 非使用中の場合
+
+	  // 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
 	// 成功を返す
 	return S_OK;
 }
@@ -171,6 +186,9 @@ void CPlayer::Uninit(void)
 {
 	// 影の終了
 	m_pShadow->Uninit();
+
+	// フレイルの終了
+	m_pFlail->Uninit();
 
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
@@ -201,6 +219,52 @@ void CPlayer::Update(void)
 
 	case STATE_NORMAL:
 
+		if (m_nCounterFlail > 0)
+		{
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
+			{
+				m_nCounterFlail++;
+
+				if (m_nCounterFlail > 60)
+				{
+					m_nCounterFlail = 60;
+				}
+			}
+
+			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE)
+			{
+				D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+				move *= (float)m_nCounterFlail;
+				m_pFlail->SetVec3Move(move);
+				m_nCounterFlail = -1;
+			}
+		}
+		else if (m_nCounterFlail == 0)
+		{
+			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
+			{
+				m_nCounterFlail++;
+			}
+		}
+		else
+		{
+			D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+			move = GetVec3Position() - m_pFlail->GetVec3Position();
+
+			if (D3DXVec3Length(&move) < 10.0f)
+			{
+				m_nCounterFlail = 0;
+				move = VEC3_ZERO;
+				m_pFlail->SetVec3Position(GetVec3Position());
+			}
+
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
+			{
+				D3DXVec3Normalize(&move, &move);
+				m_pFlail->SetVec3Move(move * 15.0f);
+			}
+		}
+
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
@@ -214,6 +278,9 @@ void CPlayer::Update(void)
 	// 影の更新
 	m_pShadow->Update();
 
+	// フレイルの更新
+	m_pFlail->Update();
+
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
 }
@@ -226,7 +293,6 @@ void CPlayer::Draw(void)
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
 }
-
 
 //============================================================
 //	ヒット処理
@@ -436,7 +502,7 @@ void CPlayer::SetSpawn(void)
 	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 位置を設定
-	SetVec3Position(set);
+	SetVec3Position(set + D3DXVECTOR3(200.0f, 0.0f, 0.0f) - (D3DXVECTOR3(100.0f, 0.0f, 0.0f) * (float)m_nPlayerID));
 
 	// 向きを設定
 	SetVec3Rotation(set);
@@ -612,7 +678,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 #endif
 
 	// 変数を宣言
-	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(), (float)pPad->GetPressLStickY(), 0.0f);	// スティック各軸の倒し量
+	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPlayerID), (float)pPad->GetPressLStickY(m_nPlayerID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
 	if (DEAD_ZONE < fStick)
@@ -625,8 +691,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{ // ダッシュ中ではない場合
 
 			// 移動量を更新
-			m_move.x += sinf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
-			m_move.z += cosf(pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+			m_move.x += sinf(pPad->GetPressLStickRot(m_nPlayerID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+			m_move.z += cosf(pPad->GetPressLStickRot(m_nPlayerID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
 		}
 		else
 		{ // ダッシュ中の場合
@@ -655,18 +721,18 @@ void CPlayer::UpdateDash(void)
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
-	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
+	CCamera			*pCamera	= CManager::GetInstance()->GetCamera();		// カメラ
 
 	if (pCamera == NULL) { assert(false); }	// 非使用中
 
 	// 変数を宣言
-	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(), (float)pPad->GetPressLStickY(), 0.0f);	// スティック各軸の倒し量
+	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPlayerID), (float)pPad->GetPressLStickY(m_nPlayerID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
 	if (DEAD_ZONE < fStick)
 	{ // デッドゾーン以上の場合
 
-		if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTrigger(CInputPad::KEY_A))
+		if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTrigger(CInputPad::KEY_A, m_nPlayerID))
 		{ // ダッシュの操作が行われた場合
 
 			if (!m_bDash)
@@ -679,7 +745,7 @@ void CPlayer::UpdateDash(void)
 				m_fPlusMove += DASH_SIDE;
 
 				// ダッシュ時の向きを保存
-				m_dashRot.y = pPad->GetPressLStickRot() + pCamera->GetVec3Rotation().y + HALF_PI;
+				m_dashRot.y = pPad->GetPressLStickRot(m_nPlayerID) + pCamera->GetVec3Rotation().y + HALF_PI;
 
 				// ダッシュしている状態にする
 				m_bDash = true;

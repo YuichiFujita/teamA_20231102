@@ -14,6 +14,8 @@
 #include "camera.h"
 #include "texture.h"
 #include "object2D.h"
+#include "ZTexture.h"
+#include "DepthShadow.h"
 
 //************************************************************
 //	定数宣言
@@ -22,7 +24,7 @@ namespace
 {
     const D3DFORMAT FORMAT_DEPTH_STENCIL = D3DFMT_D16;					// 深度ステンシルのフォーマット
     const DWORD		FLAG_CLEAR	= D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER;	// クリアするバッファーフラグ
-    const D3DCOLOR	COL_CLEAR	= D3DCOLOR_RGBA(0, 0, 0, 0);			// クリア時の色
+    const D3DCOLOR	COL_CLEAR	= D3DCOLOR_RGBA(255, 255, 255, 255);	// クリア時の色
 }
 
 //************************************************************
@@ -128,6 +130,19 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
     m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
     m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
+
+
+	// シェーダー用の初期化は以下
+	// Z値テクスチャ生成オブジェクトの生成と初期化
+	m_pDev = m_pD3DDevice;
+	D3DXCreateSprite(m_pD3DDevice, &m_pSprite);// スプライト作成
+	m_pZTex = new CZTexture;
+	m_pZTex->Init(*m_pDev, SCREEN_WIDTH, SCREEN_HEIGHT, D3DFMT_A8R8G8B8);
+	m_pZTex->GetZTex(*m_pZTexture);
+	// 深度バッファシャドウオブジェクトの生成と初期化
+	m_pDepthShadow = new CDepthShadow;
+	m_pDepthShadow->Init(*m_pDev);
+	m_pDepthShadow->SetShadowMap(*m_pZTexture);	// シャドウマップテクスチャを登録
     // 成功を返す
     return S_OK;
 }
@@ -197,6 +212,16 @@ void CRenderer::Uninit(void)
         m_pDefDepthStencilSurface->Release();
         m_pDefDepthStencilSurface = NULL;
     }
+	if (m_pDepthShadow != NULL)
+	{
+		delete m_pDepthShadow;
+		m_pDepthShadow = NULL;
+	}
+	if (m_pZTex != NULL)
+	{
+		delete m_pZTex;
+		m_pZTex = NULL;
+	}
 }
 
 //============================================================
@@ -228,9 +253,9 @@ void CRenderer::Draw(void)
     hr = m_pD3DDevice->SetDepthStencilSurface(m_pDepthStencilSurface);
     if (FAILED(hr)) { assert(false); }
 
-    // バックバッファとZバッファのクリア
-    hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
-    if (FAILED(hr)) { assert(false); }
+	// バックバッファとZバッファのクリア
+	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
+	if (FAILED(hr)) { assert(false); }
 
     // テクスチャ作成用の描画
     if (SUCCEEDED(m_pD3DDevice->BeginScene()))
@@ -264,6 +289,9 @@ void CRenderer::Draw(void)
     hr = m_pD3DDevice->SetDepthStencilSurface(m_pDefDepthStencilSurface);
     if (FAILED(hr)) { assert(false); }
 
+	// バックバッファとZバッファのクリア
+	hr = m_pD3DDevice->Clear(0, NULL, FLAG_CLEAR, COL_CLEAR, 1.0f, 0);
+	if (FAILED(hr)) { assert(false); }
 
     // 画面の描画
     if (SUCCEEDED(m_pD3DDevice->BeginScene()))
@@ -275,11 +303,19 @@ void CRenderer::Draw(void)
         // カメラの設定
         CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
 
-        // 画面描画用の2Dポリゴンの描画
-        m_pDrawScreen->Draw();
+		// サンプラーステートを設定
+		m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP); // U方向のラッピングを無効化
+		m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP); // V方向のラッピングを無効化
+		
+		// 画面描画用の2Dポリゴンの描画
+		m_pDrawScreen->Draw();
 
-        // デバッグ表示の描画
+		// デバッグ表示の描画
         CManager::GetInstance()->GetDebugProc()->Draw();
+
+		// サンプラーステートを設定
+		m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);	// U方向のラッピングを有効化
+		m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);	// V方向のラッピングを有効化
 
         // ビューポートを元に戻す
         m_pD3DDevice->SetViewport(&viewportDef);
@@ -311,9 +347,9 @@ HRESULT CRenderer::CreateRenderTexture(void)
     ( // 引数
         SCREEN_WIDTH,			// テクスチャ横幅
         SCREEN_HEIGHT,			// テクスチャ縦幅						
-        1,						// ミップマップレベル
-        D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
-        D3DFMT_A8R8G8B8,		// ピクセルフォーマット
+        0,						// ミップマップレベル
+		D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
+		D3DFMT_X8R8G8B8,		// ピクセルフォーマット
         D3DPOOL_DEFAULT			// 格納メモリ
     ));
 
@@ -374,7 +410,7 @@ HRESULT CRenderer::CreateRenderTexture(void)
     }
 
     // 元の描画サーフェイスを保存
-    m_pD3DDevice->GetRenderTarget(0, &m_pDefRenderTextureSurface);
+	hr = m_pD3DDevice->GetRenderTarget(0, &m_pDefRenderTextureSurface);
     if (FAILED(hr))
     { // 描画サーフェイスの取得に失敗した場合
 
@@ -384,7 +420,7 @@ HRESULT CRenderer::CreateRenderTexture(void)
     }
 
     // 元のZバッファ・ステンシルバッファのサーフェイスを保存
-    m_pD3DDevice->GetDepthStencilSurface(&m_pDefDepthStencilSurface);
+	hr = m_pD3DDevice->GetDepthStencilSurface(&m_pDefDepthStencilSurface);
     if (FAILED(hr))
     { // Zバッファ・ステンシルバッファの取得に失敗した場合
 

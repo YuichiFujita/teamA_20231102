@@ -19,7 +19,8 @@
 //	前方宣言
 //************************************************************
 class CObject2D;	// オブジェクト2Dクラス
-
+class CZTexture;	//Zテクスチャ
+class CDepthShadow; //深度シャドウ
 //************************************************************
 //	クラス定義
 //************************************************************
@@ -53,9 +54,14 @@ private:
 	// メンバ変数
 	LPDIRECT3D9			m_pD3D;			// Direct3Dオブジェクト
 	LPDIRECT3DDEVICE9	m_pD3DDevice;	// Direct3Dデバイス
+	IDirect3DDevice9 * m_pDev; //描画デバイス
 
 	int m_nRenderTextureID;		// レンダーテクスチャのインデックス
 	CObject2D *m_pDrawScreen;	// 画面描画用の2Dポリゴン
+	ID3DXSprite * m_pSprite;	 //シャドウ用スプライト
+	CZTexture * m_pZTex;		//Zテクスチャ生成用
+	CDepthShadow * m_pDepthShadow;					//深度影
+	IDirect3DTexture9 * m_pZTexture;				//Zテクスチャ本体
 	LPDIRECT3DSURFACE9	m_pRenderTextureSurface;	// 描画サーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDepthStencilSurface;		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDefRenderTextureSurface;	// 元の描画サーフェイス保存用

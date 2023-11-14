@@ -157,10 +157,12 @@
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="debugproc.cpp" />
+    <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field.cpp" />
+    <ClCompile Include="flail.cpp" />
     <ClCompile Include="gameManager.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
@@ -220,6 +222,7 @@
     <ClCompile Include="value.cpp" />
     <ClCompile Include="valueUI.cpp" />
     <ClCompile Include="wall.cpp" />
+    <ClCompile Include="ZTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anim2D.h" />
@@ -227,10 +230,12 @@
     <ClInclude Include="collision.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="debugproc.h" />
+    <ClInclude Include="DepthShadow.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field.h" />
+    <ClInclude Include="flail.h" />
     <ClInclude Include="gameManager.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
@@ -288,6 +293,15 @@
     <ClInclude Include="value.h" />
     <ClInclude Include="valueUI.h" />
     <ClInclude Include="wall.h" />
+    <ClInclude Include="ZTexture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DepthBufShadowEffect.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="ZTexCreator.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
