@@ -39,8 +39,8 @@ namespace
 		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(190.0f, 45.0f, -200.0f);	// 視点の初期値
 		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(190.0f, 45.0f, 0.0f);		// 注視点の初期値
 
-		const int VIEW_WIDTH	= SCREEN_WIDTH * 0.4f;	// 画面の横幅
-		const int VIEW_HEIGHT	= SCREEN_HEIGHT * 0.4f;	// 画面の縦幅
+		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.4f;	// 画面の横幅
+		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.4f;	// 画面の縦幅
 	}
 
 	// 回転カメラ情報

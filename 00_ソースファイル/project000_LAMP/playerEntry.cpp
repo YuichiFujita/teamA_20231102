@@ -141,4 +141,8 @@ void CPlayerEntry::SetEntry(void)
 
 	// 透明度を不透明に設定
 	SetAlpha(1.0f);
+
+	// プレイヤーの付属品の自動描画を停止
+	CPlayer::SetEnableDraw(false);
+	CObject::SetEnableDraw(true);	// プレイヤーは描画ON
 }

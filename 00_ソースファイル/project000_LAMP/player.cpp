@@ -406,6 +406,7 @@ void CPlayer::SetEnableUpdate(const bool bUpdate)
 	// 引数の更新状況を設定
 	CObject::SetEnableUpdate(bUpdate);		// 自身
 	m_pShadow->SetEnableUpdate(bUpdate);	// 影
+	m_pFlail->SetEnableUpdate(bUpdate);		// フレイル
 }
 
 //============================================================
@@ -416,6 +417,7 @@ void CPlayer::SetEnableDraw(const bool bDraw)
 	// 引数の描画状況を設定
 	CObject::SetEnableDraw(bDraw);		// 自身
 	m_pShadow->SetEnableDraw(bDraw);	// 影
+	m_pFlail->SetEnableDraw(bDraw);		// フレイル
 }
 
 //============================================================
