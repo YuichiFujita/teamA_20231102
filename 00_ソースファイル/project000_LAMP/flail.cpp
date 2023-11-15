@@ -12,11 +12,21 @@
 #include "renderer.h"
 #include "camera.h"
 #include "model.h"
+#include "useful.h"
 
 //************************************************************
 //	マクロ定義
 //************************************************************
 #define MODEL_UI_PRIO	(14)	// モデルUI表示の優先順位
+
+//************************************************************
+//	静的メンバ変数宣言
+//************************************************************
+const char *CFlail::mc_apModelFile[] =	// モデル定数
+{
+	"data\\MODEL\\OBSTACLE\\obstacle017.x",	// 鉄球
+	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
+};
 
 //************************************************************
 //	子クラス [CFlail] のメンバ関数
@@ -26,7 +36,10 @@
 //============================================================
 CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, MODEL_UI_PRIO)
 {
-	m_move = VEC3_ZERO;
+	m_move = 0.0f;
+	m_fChainRot = 0.0f;
+	m_fLengthChain = 0.0f;
+	m_fChainRotMove = 0.0f;
 }
 
 //============================================================
@@ -51,7 +64,7 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel("data\\MODEL\\OBSTACLE\\obstacle017.x");
+	BindModel(mc_apModelFile[CFlail::MODEL_PREFABHUT]);
 
 	// 成功を返す
 	return S_OK;
@@ -71,10 +84,42 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
-	SetVec3Position(GetVec3Position() + m_move);
+	//鎖の長さに移動量代入
+	m_fLengthChain += m_move;
 
-	m_move.x += (0.0f - m_move.x) * 0.15f;
-	m_move.z += (0.0f - m_move.z) * 0.15f;
+	//移動量減衰
+	m_move += (0.0f - m_move) * 0.12f;
+
+	//角度修正
+	useful::NormalizeRot(m_fChainRot);
+	useful::NormalizeRot(m_fChainRotMove);
+
+	//引っ張る時のみ角度調整
+	if (m_move < 0.0f)
+	{
+		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
+	}
+	
+	//角度修正
+	useful::NormalizeRot(m_fChainRot);
+	useful::NormalizeRot(m_fChainRotMove);
+
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖目標角度 %f\n", m_fChainRotMove);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖角度 %f\n", m_fChainRot);
+
+	//一定の長さを超えたら止める
+	if (m_fLengthChain > 1600.0f)
+	{
+		m_fLengthChain = 1600.0f;
+	}
+
+	//角度と長さから鉄球の位置決定
+	D3DXVECTOR3 pos = VEC3_ZERO;
+
+	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+
+	SetVec3Position(pos);
 
 	// オブジェクトモデルの更新
 	CObjectModel::Update();
@@ -161,7 +206,25 @@ CFlail *CFlail::Create
 //============================================================
 //	移動量の設定処理
 //============================================================
-void CFlail::SetVec3Move(const D3DXVECTOR3& rMove)
+void CFlail::SetVec3PosOrg(const D3DXVECTOR3& rPosOrg)
+{
+	// 引数の位置を設定
+	m_posOrg = rPosOrg;
+}
+
+//============================================================
+//	移動量の設定処理
+//============================================================
+D3DXVECTOR3 CFlail::GetVec3PosOrg(void)
+{
+	// 位置を返す
+	return m_posOrg;
+}
+
+//============================================================
+//	移動量の設定処理
+//============================================================
+void CFlail::SetMove(const float& rMove)
 {
 	// 引数の位置を設定
 	m_move = rMove;
@@ -170,8 +233,62 @@ void CFlail::SetVec3Move(const D3DXVECTOR3& rMove)
 //============================================================
 //	移動量の取得処理
 //============================================================
-D3DXVECTOR3 CFlail::GetVec3Move(void)
+float CFlail::GetMove(void)
 {
 	// 位置を返す
 	return m_move;
+}
+
+//============================================================
+//	角度の設定処理
+//============================================================
+void CFlail::SetChainRot(const float& rChainRot)
+{
+	// 引数の角度を設定
+	m_fChainRot = rChainRot;
+}
+
+//============================================================
+//	角度の取得処理
+//============================================================
+float CFlail::GetChainRot(void)
+{
+	// 角度を返す
+	return m_fChainRot;
+}
+
+//============================================================
+//	目標角度の設定処理
+//============================================================
+void CFlail::SetChainRotMove(const float& rChainRotMove)
+{
+	// 引数の目標角度を設定
+	m_fChainRotMove = rChainRotMove;
+}
+
+//============================================================
+//	目標角度の取得処理
+//============================================================
+float CFlail::GetChainRotMove(void)
+{
+	// 目標角度を返す
+	return m_fChainRotMove;
+}
+
+//============================================================
+//	長さの設定処理
+//============================================================
+void CFlail::SetLengthChain(const float& rLengthChain)
+{
+	// 引数の長さを設定
+	m_fLengthChain = rLengthChain;
+}
+
+//============================================================
+//	長さの取得処理
+//============================================================
+float CFlail::GetLengthChain(void)
+{
+	// 長さを返す
+	return m_fLengthChain;
 }
