@@ -14,6 +14,7 @@
 #include "input.h"
 #include "player.h"
 #include "stage.h"
+#include "retentionManager.h"
 
 //************************************************************
 //	定数宣言
@@ -39,8 +40,8 @@ namespace
 		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(190.0f, 45.0f, -200.0f);	// 視点の初期値
 		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(190.0f, 45.0f, 0.0f);		// 注視点の初期値
 
-		const int VIEW_WIDTH	= SCREEN_WIDTH * 0.4f;	// 画面の横幅
-		const int VIEW_HEIGHT	= SCREEN_HEIGHT * 0.4f;	// 画面の縦幅
+		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.4f;	// 画面の横幅
+		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.4f;	// 画面の縦幅
 	}
 
 	// 回転カメラ情報
@@ -372,8 +373,33 @@ void CCamera::SetDestLookDown(void)
 	//----------------------------------------------------
 	//	位置の更新
 	//----------------------------------------------------
+	int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
+	D3DXVECTOR3 posLook = VEC3_ZERO;	// 注視点の位置
+
+	// 注視点の位置を計算
+	for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
+	{ // プレイヤー数分繰り返す
+
+		CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが使用されている場合
+
+			// プレイヤーの位置を加算
+			posLook += pPlayer->GetVec3Position();
+		}
+		else { assert(false); }	// 非使用中
+	}
+
+	// プレイヤーの位置の平均を求める
+	posLook /= (float)nNumPlayer;
+	posLook.y = 0.0f;	// Y座標は固定
+
 	// 注視点の更新
-	m_aCamera[TYPE_MAIN].posR = m_aCamera[TYPE_MAIN].destPosR = VEC3_ZERO;
+	m_aCamera[TYPE_MAIN].destPosR = posLook;
+
+	// 注視点の更新
+	m_aCamera[TYPE_MAIN].posR = m_aCamera[TYPE_MAIN].destPosR = posLook;
 
 	// 視点の更新
 	m_aCamera[TYPE_MAIN].posV.x = m_aCamera[TYPE_MAIN].destPosV.x = m_aCamera[TYPE_MAIN].destPosR.x + ((-m_aCamera[TYPE_MAIN].fDis * sinf(m_aCamera[TYPE_MAIN].rot.x)) * sinf(m_aCamera[TYPE_MAIN].rot.y));
@@ -575,9 +601,11 @@ void CCamera::Rotate(void)
 void CCamera::LookDown(void)
 {
 	// 変数を宣言
+	D3DXVECTOR3 posLook  = VEC3_ZERO;	// 注視点の位置
 	D3DXVECTOR3 diffPosV = VEC3_ZERO;	// 視点の差分位置
 	D3DXVECTOR3 diffPosR = VEC3_ZERO;	// 注視点の差分位置
 	D3DXVECTOR3 diffRot  = VEC3_ZERO;	// 差分向き
+	int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
 
 	//----------------------------------------------------
 	//	向きの更新
@@ -605,8 +633,27 @@ void CCamera::LookDown(void)
 	//----------------------------------------------------
 	//	位置の更新
 	//----------------------------------------------------
+	// 注視点の位置を計算
+	for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
+	{ // プレイヤー数分繰り返す
+
+		CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが使用されている場合
+
+			// プレイヤーの位置を加算
+			posLook += pPlayer->GetVec3Position();
+		}
+		else { assert(false); }	// 非使用中
+	}
+
+	// プレイヤーの位置の平均を求める
+	posLook /= (float)nNumPlayer;
+	posLook.y = 0.0f;	// Y座標は固定
+
 	// 注視点の更新
-	m_aCamera[TYPE_MAIN].destPosR = VEC3_ZERO;
+	m_aCamera[TYPE_MAIN].destPosR = posLook;
 
 	// 視点の更新
 	m_aCamera[TYPE_MAIN].destPosV.x = m_aCamera[TYPE_MAIN].destPosR.x + ((-m_aCamera[TYPE_MAIN].fDis * sinf(m_aCamera[TYPE_MAIN].rot.x)) * sinf(m_aCamera[TYPE_MAIN].rot.y));
