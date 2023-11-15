@@ -71,6 +71,13 @@ HRESULT CSceneEntry::Init(void)
 	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_ROTATE);	// 回転状態に設定
 	CManager::GetInstance()->GetCamera()->SetDestRotate();					// カメラの初期情報を設定
 
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤー数分繰り返す
+
+		// プレイヤーをエントリー状態にする
+		CScene::GetPlayer(nCntPlayer)->SetEntry();
+	}
+
 	// BGMの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GENERAL);
 

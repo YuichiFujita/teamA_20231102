@@ -94,6 +94,8 @@ public:
 
 	// メンバ関数
 	void SetSpawn(void);	// 出現設定
+	void SetEntry(void);	// エントリー設定
+	void DrawEntry(void);	// エントリー時の描画
 
 private:
 	// メンバ関数
