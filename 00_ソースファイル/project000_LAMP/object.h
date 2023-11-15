@@ -60,6 +60,7 @@ public:
 		LABEL_NUMBER,		// 数字
 		LABEL_PLAYER,		// プレイヤー
 		LABEL_GROUND,		// 地盤
+		LABEL_BLOCK,		// ブロック
 		LABEL_FIELD,		// 地面
 		LABEL_WALL,			// 壁
 		LABEL_SCENERY,		// 景色

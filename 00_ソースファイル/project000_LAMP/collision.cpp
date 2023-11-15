@@ -535,19 +535,43 @@ bool collision::ResponseSingleX
 	D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 	D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 	D3DXVECTOR3 *pMove,	// 移動量
+	bool bYColl,		// Y判定
+	bool bZColl,		// Z判定
 	bool *pLeft,		// 左からの判定
 	bool *pRight		// 右からの判定
 )
 {
 	// 変数を宣言
+	bool bColl = true;	// 判定可能状況
 	bool bHit = false;	// 衝突判定結果
 
+	if (bYColl)
+	{ // Y判定を行う場合
+
+		if (rCenterPos.y + centerSizeUp.y   <= targetPos.y - targetSizeDown.y
+		||  rCenterPos.y - centerSizeDown.y >= targetPos.y + targetSizeUp.y)
+		{ // 上下の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
+	if (bZColl)
+	{ // Z判定を行う場合
+
+		if (rCenterPos.z + centerSizeUp.z   <= targetPos.z - targetSizeDown.z
+		||  rCenterPos.z - centerSizeDown.z >= targetPos.z + targetSizeUp.z)
+		{ // 前後の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
 	// 左右の当たり判定
-	if (rCenterPos.y + centerSizeUp.y   > targetPos.y - targetSizeDown.y
-	&&  rCenterPos.y - centerSizeDown.y < targetPos.y + targetSizeUp.y
-	&&  rCenterPos.z + centerSizeUp.z   > targetPos.z - targetSizeDown.z
-	&&  rCenterPos.z - centerSizeDown.z < targetPos.z + targetSizeUp.z)
-	{ // 上下と前後の範囲内の場合
+	if (bColl)
+	{ // 判定可能な場合
 
 		if (rCenterPos.x    + centerSizeUp.x >  targetPos.x - targetSizeDown.x
 		&&  rCenterPosOld.x + centerSizeUp.x <= targetPos.x - targetSizeDown.x)
@@ -616,19 +640,43 @@ bool collision::ResponseSingleY
 	D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 	D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 	D3DXVECTOR3 *pMove,	// 移動量
+	bool bXColl,		// X判定
+	bool bZColl,		// Z判定
 	bool *pDown,		// 下からの判定
 	bool *pUp			// 上からの判定
 )
 {
 	// 変数を宣言
+	bool bColl = true;	// 判定可能状況
 	bool bHit = false;	// 衝突判定結果
 
+	if (bXColl)
+	{ // X判定を行う場合
+
+		if (rCenterPos.x + centerSizeUp.x   <= targetPos.x - targetSizeDown.x
+		||  rCenterPos.x - centerSizeDown.x >= targetPos.x + targetSizeUp.x)
+		{ // 左右の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
+	if (bZColl)
+	{ // Z判定を行う場合
+
+		if (rCenterPos.z + centerSizeUp.z   <= targetPos.z - targetSizeDown.z
+		||  rCenterPos.z - centerSizeDown.z >= targetPos.z + targetSizeUp.z)
+		{ // 前後の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
 	// 上下の当たり判定
-	if (rCenterPos.x + centerSizeUp.x   > targetPos.x - targetSizeDown.x
-	&&  rCenterPos.x - centerSizeDown.x < targetPos.x + targetSizeUp.x
-	&&  rCenterPos.z + centerSizeUp.z   > targetPos.z - targetSizeDown.z
-	&&  rCenterPos.z - centerSizeDown.z < targetPos.z + targetSizeUp.z)
-	{ // 左右と前後の範囲内の場合
+	if (bColl)
+	{ // 判定可能な場合
 
 		if (rCenterPos.y    + centerSizeUp.y >  targetPos.y - targetSizeDown.y
 		&&  rCenterPosOld.y + centerSizeUp.y <= targetPos.y - targetSizeDown.y)
@@ -697,19 +745,43 @@ bool collision::ResponseSingleZ
 	D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 	D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 	D3DXVECTOR3 *pMove,	// 移動量
+	bool bXColl,		// X判定
+	bool bYColl,		// Y判定
 	bool *pBefore,		// 前からの判定
 	bool *pAfter		// 後からの判定
 )
 {
 	// 変数を宣言
+	bool bColl = true;	// 判定可能状況
 	bool bHit = false;	// 衝突判定結果
 
+	if (bXColl)
+	{ // X判定を行う場合
+
+		if (rCenterPos.x + centerSizeUp.x   <= targetPos.x - targetSizeDown.x
+		||  rCenterPos.x - centerSizeDown.x >= targetPos.x + targetSizeUp.x)
+		{ // 左右の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
+	if (bYColl)
+	{ // Y判定を行う場合
+
+		if (rCenterPos.y + centerSizeUp.y   <= targetPos.y - targetSizeDown.y
+		||  rCenterPos.y - centerSizeDown.y >= targetPos.y + targetSizeUp.y)
+		{ // 上下の範囲外の場合
+
+			// 判定不可能状態にする
+			bColl = false;
+		}
+	}
+
 	// 前後の当たり判定
-	if (rCenterPos.x + centerSizeUp.x   > targetPos.x - targetSizeDown.x
-	&&  rCenterPos.x - centerSizeDown.x < targetPos.x + targetSizeUp.x
-	&&  rCenterPos.y + centerSizeUp.y   > targetPos.y - targetSizeDown.y
-	&&  rCenterPos.y - centerSizeDown.y < targetPos.y + targetSizeUp.y)
-	{ // 左右と上下の範囲内の場合
+	if (bColl)
+	{ // 判定可能な場合
 
 		if (rCenterPos.z    + centerSizeUp.z >  targetPos.z - targetSizeDown.z
 		&&  rCenterPosOld.z + centerSizeUp.z <= targetPos.z - targetSizeDown.z)
