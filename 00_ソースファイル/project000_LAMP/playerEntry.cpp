@@ -11,6 +11,15 @@
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
+#include "retentionManager.h"
+
+//************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	const int SPACE_WIDTH = 320;	// 空白
+}
 
 //************************************************************
 //	子クラス [CPlayerEntry] のメンバ関数
@@ -76,25 +85,37 @@ void CPlayerEntry::Update(void)
 void CPlayerEntry::Draw(void)
 {
 	// 変数を宣言
-	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
+	D3DVIEWPORT9 defViewport;		// カメラのビューポート保存用
+	D3DVIEWPORT9 currentViewport;	// 現在のビューポート保存用
+	int nPadID = GetPadID();		// パッドインデックス
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+	CCamera *pCamera = CManager::GetInstance()->GetCamera();	// カメラのポインタ
 
-	// 現在のビューポートを取得
-	pDevice->GetViewport(&viewportDef);
+	// カメラのビューポートの位置を設定
+	currentViewport = pCamera->GetViewport(CCamera::TYPE_ENTRY);	// ビューポート取得
+	currentViewport.X = (nPadID * SPACE_WIDTH);						// 左上位置を設定
+	pCamera->SetViewport(CCamera::TYPE_ENTRY, currentViewport);		// ビューポート設定
 
-	// カメラの設定
-	CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_ENTRY);
+	if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nPadID))
+	{ // 現在のプレイヤーがエントリーしている場合
 
-	// オブジェクトキャラクターの描画
-	CObjectChara::Draw();
+		// 現在のビューポートを取得
+		pDevice->GetViewport(&defViewport);
 
-	// カメラの設定を元に戻す
-	CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
+		// カメラの設定
+		CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_ENTRY);
 
-	// ビューポートを元に戻す
-	pDevice->SetViewport(&viewportDef);
+		// オブジェクトキャラクターの描画
+		CObjectChara::Draw();
+
+		// カメラの設定を元に戻す
+		CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
+
+		// ビューポートを元に戻す
+		pDevice->SetViewport(&defViewport);
+	}
 }
 
 //============================================================
@@ -102,8 +123,6 @@ void CPlayerEntry::Draw(void)
 //============================================================
 void CPlayerEntry::SetEntry(void)
 {
-#if 0
-
 	// 変数を宣言
 	D3DXVECTOR3 set = VEC3_ZERO;	// 引数設定用
 
@@ -111,27 +130,19 @@ void CPlayerEntry::SetEntry(void)
 	SetState(STATE_NONE);	// 何もしない状態の設定
 	SetMotion(MOTION_IDOL);	// 待機モーションを設定
 
-	// カウンターを初期化
-	m_nCounterState = 0;	// 状態管理カウンター
-
 	// 位置を設定
 	SetVec3Position(set);
 
 	// 向きを設定
 	SetVec3Rotation(set);
-	m_destRot = set;
-
-	// 移動量を初期化
-	m_move = VEC3_ZERO;
 
 	// マテリアルを再設定
 	ResetMaterial();
 
-	// 透明度を透明に再設定
-	SetAlpha(0.0f);
+	// 透明度を不透明に設定
+	SetAlpha(1.0f);
 
-	// 自動描画をOFFにする
-	SetEnableDraw(false);
-
-#endif
+	// プレイヤーの付属品の自動描画を停止
+	CPlayer::SetEnableDraw(false);
+	CObject::SetEnableDraw(true);	// プレイヤーは描画ON
 }

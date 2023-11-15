@@ -72,6 +72,8 @@ public:
 	SCamera GetCamera(const EType type);	// カメラ取得
 	void SetState(const EState state);		// カメラ状態設定
 	EState GetState(void) const;			// カメラ状態取得
+	void SetViewport(const EType type, const D3DVIEWPORT9& rViewport);	// ビューポート設定
+	D3DVIEWPORT9 GetViewport(const EType type) const;					// ビューポート取得
 
 	void SetDestRotate(void);	// カメラ目標位置設定 (回転)
 	void SetDestLookDown(void);	// カメラ目標位置設定 (見下ろし)

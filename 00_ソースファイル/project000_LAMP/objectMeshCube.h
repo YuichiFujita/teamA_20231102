@@ -35,6 +35,7 @@ public:
 	{
 		ORIGIN_CENTER = 0,	// 中心原点
 		ORIGIN_DOWN,		// 下原点
+		ORIGIN_UP,			// 上原点
 		ORIGIN_MAX,			// この列挙型の総数
 	};
 

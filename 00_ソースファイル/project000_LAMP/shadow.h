@@ -63,8 +63,7 @@ public:
 	HRESULT SetDrawInfo(void);			// 描画情報設定
 	D3DXVECTOR3 SetDrawPosition(void);	// 描画位置設定
 	void DeleteObjectParent(void);		// 親オブジェクト削除
-	bool CollisionObstacle(D3DXVECTOR3& rPos, float& rDrawPos);	// 障害物との当たり判定
-	bool CollisionBuilding(D3DXVECTOR3& rPos, float& rDrawPos);	// ビルとの当たり判定
+	bool CollisionGround(D3DXVECTOR3& rPos, float& rDrawPos);	// 地盤との当たり判定
 
 private:
 	// メンバ関数
