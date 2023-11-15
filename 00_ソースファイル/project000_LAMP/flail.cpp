@@ -88,7 +88,7 @@ void CFlail::Update(void)
 	m_fLengthChain += m_move;
 
 	//ˆÚ“®—ÊŒ¸Š
-	m_move += (0.0f - m_move) * 0.11f;
+	m_move += (0.0f - m_move) * 0.12f;
 
 	//Šp“xC³
 	useful::NormalizeRot(m_fChainRot);
