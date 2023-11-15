@@ -258,10 +258,43 @@ void CPlayer::Update(void)
 				m_pFlail->SetVec3Position(GetVec3Position());
 			}
 
+			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
+			{
+				m_flailMove = move * 1.0f;
+
+				float rot = atan2f(move.z, move.x);
+
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_flailMove.x = m_flailMove.x * -sinf(rot);
+					m_flailMove.z = m_flailMove.z * cosf(rot);
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_flailMove.x = m_flailMove.x * sinf(rot);
+					m_flailMove.z = m_flailMove.z * -cosf(rot);
+				}
+				else
+				{
+					m_flailMove = VEC3_ZERO;
+				}
+			}
+
 			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
 			{
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_flailMove.y = 0.0f;
+					move = move + m_flailMove;
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_flailMove.y = 0.0f;
+					move = move + m_flailMove;
+				}
+			
 				D3DXVec3Normalize(&move, &move);
-				m_pFlail->SetVec3Move(move * 15.0f);
+				m_pFlail->SetVec3Move(move * 25.0f);
 			}
 		}
 
