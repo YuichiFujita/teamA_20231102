@@ -193,6 +193,7 @@
     <ClCompile Include="particle3D.cpp" />
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="playerEntry.cpp" />
     <ClCompile Include="precompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -268,6 +269,7 @@
     <ClInclude Include="particle3D.h" />
     <ClInclude Include="pause.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="playerEntry.h" />
     <ClInclude Include="precompile.h" />
     <ClInclude Include="rankingManager.h" />
     <ClInclude Include="renderer.h" />
