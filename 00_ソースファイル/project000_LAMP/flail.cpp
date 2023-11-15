@@ -108,9 +108,9 @@ void CFlail::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "½Šp“x %f\n", m_fChainRot);
 
 	//ˆê’è‚Ì’·‚³‚ð’´‚¦‚½‚çŽ~‚ß‚é
-	if (m_fLengthChain > 1500.0f)
+	if (m_fLengthChain > 1600.0f)
 	{
-		m_fLengthChain = 1500.0f;
+		m_fLengthChain = 1600.0f;
 	}
 
 	//Šp“x‚Æ’·‚³‚©‚ç“S‹…‚ÌˆÊ’uŒˆ’è
