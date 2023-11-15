@@ -1011,11 +1011,11 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 
 				// ’n”Õ‚ÌÅ¬‚Ì‘å‚«‚³‚ğİ’è
 				sizeMinGround = pObjCheck->GetVec3Sizing();
-				sizeMinGround.y = 0.0f;		// c‚Ì‘å‚«‚³‚ğ‰Šú‰»
+				sizeMinGround.y *= 2.0f;	// c‚Ì‘å‚«‚³‚ğ”{‚É‚·‚é
 
 				// ’n”Õ‚ÌÅ‘å‚Ì‘å‚«‚³‚ğİ’è
 				sizeMaxGround = pObjCheck->GetVec3Sizing();
-				sizeMaxGround.y *= 2.0f;	// c‚Ì‘å‚«‚³‚ğ”{‚É‚·‚é
+				sizeMaxGround.y = 0.0f;		// c‚Ì‘å‚«‚³‚ğ‰Šú‰»
 
 				switch (axis)
 				{ // ”»’è²‚²‚Æ‚Ìˆ—

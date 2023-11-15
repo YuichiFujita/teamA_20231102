@@ -129,7 +129,7 @@ HRESULT CSceneGame::Init(void)
 	}
 
 	// TODOÅFínñ íºíuÇ´
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(0.0f, -180.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(0.0f, 20.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
 
 	//--------------------------------------------------------
 	//	èâä˙ê›íË

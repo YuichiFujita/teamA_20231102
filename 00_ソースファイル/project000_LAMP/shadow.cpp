@@ -391,7 +391,7 @@ bool CShadow::CollisionGround(D3DXVECTOR3& rPos, float& rDrawPos)
 				{ // 当たっていた場合
 
 					// 変数を宣言
-					float fDis = rPos.y - (posGround.y + (sizeGround.y * 2.0f));	// 影と地盤のY距離
+					float fDis = rPos.y - posGround.y;	// 影と地盤のY距離
 
 					if (fDis >= 0.0f)
 					{ // プレイヤーと地盤のY距離がプラスの場合
@@ -444,7 +444,7 @@ bool CShadow::CollisionGround(D3DXVECTOR3& rPos, float& rDrawPos)
 		sizeGround = pCurrentObj->GetVec3Sizing();
 
 		// 描画位置を設定
-		rDrawPos = posGround.y + (sizeGround.y * 2.0f);
+		rDrawPos = posGround.y;
 
 		// 当たっている判定を返す
 		return true;

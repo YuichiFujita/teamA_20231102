@@ -70,7 +70,7 @@ HRESULT CGround::Init(void)
 	}
 
 	// 原点を設定
-	SetOrigin(CObjectMeshCube::ORIGIN_DOWN);
+	SetOrigin(CObjectMeshCube::ORIGIN_UP);
 
 	// キューブ色を設定
 	SetColor(XCOL_WHITE);
