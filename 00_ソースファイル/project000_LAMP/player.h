@@ -93,7 +93,8 @@ public:
 	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
-	void SetSpawn(void);	// 出現設定
+	void SetSpawn(void);		// 出現設定
+	int GetPadID(void) const;	// パッドインデックス取得
 
 private:
 	// メンバ関数
