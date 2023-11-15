@@ -284,7 +284,13 @@ D3DXVECTOR3 CShadow::SetDrawPosition(void)
 	// 影の位置を求める
 	posShadow = posParent;	// 親オブジェクトの座標代入
 
-	if (pStage->IsFieldPositionRange(posParent))
+	if (CollisionGround(posParent, fPosHeight))
+	{ // 地盤の範囲内の場合
+
+		// 高さを地盤の上に設定
+		posShadow.y = fPosHeight + PLUS_POSY;
+	}
+	else if (pStage->IsFieldPositionRange(posParent))
 	{ // 地面の範囲内の場合
 
 		// 高さを地面に設定
@@ -317,4 +323,136 @@ void CShadow::DeleteObjectParent(void)
 {
 	// 親オブジェクトをNULLにする
 	m_pParentObject = NULL;
+}
+
+//============================================================
+//	地盤との当たり判定
+//============================================================
+bool CShadow::CollisionGround(D3DXVECTOR3& rPos, float& rDrawPos)
+{
+	// 変数を宣言
+	float fDisPosY = 0.0f;	// プレイヤーと地盤のY距離
+	bool bInitDis = false;	// Y距離の初期化状況
+
+	// ポインタを宣言
+	CObject *pCurrentObj = NULL;	// 現在の影乗っかりオブジェクト
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// 変数を宣言
+				D3DXVECTOR3 posGround  = VEC3_ZERO;	// 地盤位置
+				D3DXVECTOR3 sizeGround = VEC3_ZERO;	// 地盤大きさ
+				bool bHit = false;	// 判定状況
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
+				{ // オブジェクトラベルが地盤ではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 地盤の位置を取得
+				posGround = pObjCheck->GetVec3Position();
+
+				// 地盤の大きさを取得
+				sizeGround = pObjCheck->GetVec3Sizing();
+
+				// 地盤との当たり判定
+				bHit = collision::Box2D
+				( // 引数
+					rPos,		// 判定位置
+					posGround,	// 判定目標位置
+					VEC3_ZERO,	// 判定サイズ(右・上・後)
+					VEC3_ZERO,	// 判定サイズ(左・下・前)
+					sizeGround,	// 判定目標サイズ(右・上・後)
+					sizeGround	// 判定目標サイズ(左・下・前)
+				);
+
+				if (bHit)
+				{ // 当たっていた場合
+
+					// 変数を宣言
+					float fDis = rPos.y - (posGround.y + (sizeGround.y * 2.0f));	// 影と地盤のY距離
+
+					if (fDis >= 0.0f)
+					{ // プレイヤーと地盤のY距離がプラスの場合
+
+						if (!bInitDis)
+						{ // 初期化していない場合
+
+							// 現在の距離を代入
+							fDisPosY = fDis;
+
+							// 現在の影乗っかりオブジェクトを代入
+							pCurrentObj = pObjCheck;
+
+							// 初期化済みにする
+							bInitDis = true;
+						}
+						else
+						{ // 初期化している場合
+
+							if (fDis < fDisPosY)
+							{ // より近い地盤の場合
+
+								// 現在の距離を代入
+								fDisPosY = fDis;
+
+								// 現在の影乗っかりオブジェクトを代入
+								pCurrentObj = pObjCheck;
+							}
+						}
+					}
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	if (pCurrentObj != NULL)
+	{ // 地盤があった場合
+
+		// 変数を宣言
+		D3DXVECTOR3 posGround = VEC3_ZERO;	// 地盤位置
+		D3DXVECTOR3 sizeGround = VEC3_ZERO;	// 地盤大きさ
+		
+		// 地盤の位置を取得
+		posGround = pCurrentObj->GetVec3Position();
+
+		// 地盤の大きさを取得
+		sizeGround = pCurrentObj->GetVec3Sizing();
+
+		// 描画位置を設定
+		rDrawPos = posGround.y + (sizeGround.y * 2.0f);
+
+		// 当たっている判定を返す
+		return true;
+	}
+	else
+	{ // 地盤がなかった場合
+
+		// 当たっていない判定を返す
+		return false;
+	}
 }
