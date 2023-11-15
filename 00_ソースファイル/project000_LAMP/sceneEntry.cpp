@@ -1,17 +1,17 @@
 //============================================================
 //
-//	チュートリアル画面処理 [sceneTutorial.cpp]
+//	エントリー画面処理 [sceneEntry.cpp]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	インクルードファイル
 //************************************************************
-#include "sceneTutorial.h"
+#include "sceneEntry.h"
 #include "manager.h"
 #include "sound.h"
 #include "camera.h"
-#include "tutorialManager.h"
+#include "entryManager.h"
 
 #include "player.h"
 #include "stage.h"
@@ -22,15 +22,15 @@
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-CTutorialManager *CSceneTutorial::m_pTutorialManager = NULL;	// チュートリアルマネージャー
+CEntryManager *CSceneEntry::m_pEntryManager = NULL;	// エントリーマネージャー
 
 //************************************************************
-//	子クラス [CSceneTutorial] のメンバ関数
+//	子クラス [CSceneEntry] のメンバ関数
 //************************************************************
 //============================================================
 //	コンストラクタ
 //============================================================
-CSceneTutorial::CSceneTutorial(const EMode mode) : CScene(mode)
+CSceneEntry::CSceneEntry(const EMode mode) : CScene(mode)
 {
 
 }
@@ -38,7 +38,7 @@ CSceneTutorial::CSceneTutorial(const EMode mode) : CScene(mode)
 //============================================================
 //	デストラクタ
 //============================================================
-CSceneTutorial::~CSceneTutorial()
+CSceneEntry::~CSceneEntry()
 {
 
 }
@@ -46,14 +46,14 @@ CSceneTutorial::~CSceneTutorial()
 //============================================================
 //	初期化処理
 //============================================================
-HRESULT CSceneTutorial::Init(void)
+HRESULT CSceneEntry::Init(void)
 {
 	//--------------------------------------------------------
-	//	チュートリアルの初期化
+	//	エントリーの初期化
 	//--------------------------------------------------------
-	// チュートリアルマネージャーの生成
-	m_pTutorialManager = CTutorialManager::Create();
-	if (m_pTutorialManager == NULL)
+	// エントリーマネージャーの生成
+	m_pEntryManager = CEntryManager::Create();
+	if (m_pEntryManager == NULL)
 	{ // 非使用中の場合
 
 		// 失敗を返す
@@ -68,11 +68,18 @@ HRESULT CSceneTutorial::Init(void)
 	//	初期設定
 	//--------------------------------------------------------
 	// カメラを設定
-	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
-	CManager::GetInstance()->GetCamera()->SetDestLookDown();					// カメラ情報の初期化
+	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_ROTATE);	// 回転状態に設定
+	CManager::GetInstance()->GetCamera()->SetDestRotate();					// カメラの初期情報を設定
+
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤー数分繰り返す
+
+		// プレイヤーをエントリー状態にする
+		CScene::GetPlayer(nCntPlayer)->SetEntry();
+	}
 
 	// BGMの再生
-	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_TUTORIAL);
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GENERAL);
 
 	// 成功を返す
 	return S_OK;
@@ -81,10 +88,10 @@ HRESULT CSceneTutorial::Init(void)
 //============================================================
 //	終了処理
 //============================================================
-HRESULT CSceneTutorial::Uninit(void)
+HRESULT CSceneEntry::Uninit(void)
 {
-	// チュートリアルマネージャーの破棄
-	if (FAILED(CTutorialManager::Release(m_pTutorialManager)))
+	// エントリーマネージャーの破棄
+	if (FAILED(CEntryManager::Release(m_pEntryManager)))
 	{ // 破棄に失敗した場合
 
 		// 失敗を返す
@@ -102,18 +109,18 @@ HRESULT CSceneTutorial::Uninit(void)
 //============================================================
 //	更新処理
 //============================================================
-void CSceneTutorial::Update(void)
+void CSceneEntry::Update(void)
 {
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ情報]\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 
-	if (m_pTutorialManager != NULL)
+	if (m_pEntryManager != NULL)
 	{ // 使用中の場合
 
-		// チュートリアルマネージャーの更新
-		m_pTutorialManager->Update();
+		// エントリーマネージャーの更新
+		m_pEntryManager->Update();
 	}
 	else { assert(false); }	// 非使用中
 
@@ -124,16 +131,16 @@ void CSceneTutorial::Update(void)
 //============================================================
 //	描画処理
 //============================================================
-void CSceneTutorial::Draw(void)
+void CSceneEntry::Draw(void)
 {
 
 }
 
 //============================================================
-//	チュートリアルマネージャー取得処理
+//	エントリーマネージャー取得処理
 //============================================================
-CTutorialManager *CSceneTutorial::GetTutorialManager(void)
+CEntryManager *CSceneEntry::GetEntryManager(void)
 {
-	// チュートリアルマネージャーのポインタを返す
-	return m_pTutorialManager;
+	// エントリーマネージャーのポインタを返す
+	return m_pEntryManager;
 }

@@ -21,6 +21,8 @@ CRetentionManager::CRetentionManager()
 	// メンバ変数をクリア
 	m_result = RESULT_NONE;	// クリア状況
 	m_nTime  = 0;			// 経過タイム
+	m_nNumPlayer = 0;		// プレイヤー数
+	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
 }
 
 //============================================================
@@ -39,6 +41,14 @@ HRESULT CRetentionManager::Init(void)
 	// メンバ変数を初期化
 	m_result = RESULT_NONE;	// クリア状況
 	m_nTime  = 0;			// 経過タイム
+	m_nNumPlayer = 0;		// プレイヤー数
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// エントリー状況を初期化
+		m_aEntry[nCntEntry] = false;
+	}
 
 	// 成功を返す
 	return S_OK;
@@ -149,4 +159,53 @@ long CRetentionManager::GetTime(void) const
 {
 	// 経過タイムを返す
 	return m_nTime;
+}
+
+//============================================================
+//	プレイ人数の設定処理
+//============================================================
+void CRetentionManager::SetNumPlayer(const int nNum)
+{
+	// プレイ人数を設定
+	m_nNumPlayer = nNum;
+}
+
+//============================================================
+//	プレイ人数取得処理
+//============================================================
+int CRetentionManager::GetNumPlayer(void) const
+{
+	// プレイ人数を返す
+	return m_nNumPlayer;
+}
+
+//============================================================
+//	全エントリー状況の設定処理
+//============================================================
+void CRetentionManager::AllSetEnableEntry(const bool bEntry)
+{
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// エントリー状況を設定
+		m_aEntry[nCntEntry] = bEntry;
+	}
+}
+
+//============================================================
+//	エントリーの設定処理
+//============================================================
+void CRetentionManager::SetEnableEntry(const int nID, const bool bEntry)
+{
+	// 引数インデックスのエントリー状況を設定
+	m_aEntry[nID] = bEntry;
+}
+
+//============================================================
+//	エントリー取得処理
+//============================================================
+bool CRetentionManager::IsEntry(const int nID) const
+{
+	// 引数インデックスのエントリー状況を返す
+	return m_aEntry[nID];
 }

@@ -14,12 +14,14 @@
 #include "camera.h"
 #include "sceneTitle.h"
 #include "sceneTutorial.h"
+#include "sceneEntry.h"
 #include "sceneGame.h"
 #include "sceneResult.h"
 #include "sceneRanking.h"
 
 #include "stage.h"
 #include "player.h"
+#include "retentionManager.h"
 
 //************************************************************
 //	静的メンバ変数宣言
@@ -54,6 +56,7 @@ HRESULT CScene::Init(void)
 {
 	// 変数を宣言
 	CStage::ELoad load = (m_mode == MODE_TUTORIAL) ? CStage::LOAD_TUTORIAL : CStage::LOAD_GAME;	// 読込ステージ
+	int nNumCreate = 0;	// プレイヤー生成数
 
 	// ステージの生成
 	m_pStage = CStage::Create(load);
@@ -65,11 +68,32 @@ HRESULT CScene::Init(void)
 		return E_FAIL;
 	}
 
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤーの総数分繰り返す
+	if (m_mode == MODE_ENTRY)
+	{ // エントリーモードの場合
 
-		// プレイヤーオブジェクトの生成
-		m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode);
+		for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+		{ // プレイヤー数分繰り返す
+
+			// プレイヤーオブジェクトの生成
+			m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
+		}
+	}
+	else if (m_mode == MODE_GAME)
+	{ // ゲームモードの場合
+
+		for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+		{ // プレイヤー数分繰り返す
+
+			if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nCntPlayer))
+			{ // エントリーされている場合
+
+				// プレイヤーオブジェクトの生成
+				m_apPlayer[nNumCreate] = CPlayer::Create(m_mode, nCntPlayer);
+
+				// 生成数を加算
+				nNumCreate++;
+			}
+		}
 	}
 
 	// 成功を返す
@@ -165,6 +189,13 @@ CScene *CScene::Create(EMode mode)
 
 			// チュートリアル画面を生成
 			pScene = new CSceneTutorial(mode);
+
+			break;
+
+		case MODE_ENTRY:
+
+			// エントリー画面を生成
+			pScene = new CSceneEntry(mode);
 
 			break;
 

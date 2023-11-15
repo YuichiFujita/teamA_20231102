@@ -32,6 +32,14 @@ namespace
 		const float VIEW_ANGLE = D3DXToRadian(45.0f);	// 視野角
 	}
 
+	// エントリーカメラ情報
+	namespace entry
+	{
+		const D3DXVECTOR3 INIT_VECU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトルの初期値
+		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(0.0f, 60.0f, -600.0f);	// 視点の初期値
+		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(0.0f, 60.0f, 0.0f);		// 注視点の初期値
+	}
+
 	// 回転カメラ情報
 	namespace rotate
 	{
@@ -65,16 +73,6 @@ namespace
 		const float LIMIT_ROT_HIGH	= D3DX_PI - 0.1f;	// X上回転の制限値
 		const float LIMIT_ROT_LOW	= 0.1f;				// X下回転の制限値
 	}
-
-#if _DEBUG
-
-	// エディットカメラ情報
-	namespace edit
-	{
-		const float INIT_DIS = -1000.0f;	// エディットカメラの距離
-	}
-
-#endif	// _DEBUG
 }
 
 //************************************************************
@@ -153,6 +151,28 @@ HRESULT CCamera::Init(void)
 	m_aCamera[TYPE_MODELUI].viewport.Height	= SCREEN_HEIGHT;	// 描画する画面の縦幅
 	m_aCamera[TYPE_MODELUI].viewport.MinZ	= 0.0f;
 	m_aCamera[TYPE_MODELUI].viewport.MaxZ	= 0.5f;
+
+	//--------------------------------------------------------
+	//	エントリー表示カメラの初期化
+	//--------------------------------------------------------
+	// カメラ情報を初期化
+	m_aCamera[TYPE_ENTRY].posV		= entry::INIT_POSV;	// 現在の視点
+	m_aCamera[TYPE_ENTRY].posR		= entry::INIT_POSR;	// 現在の注視点
+	m_aCamera[TYPE_ENTRY].destPosV	= entry::INIT_POSV;	// 目標の視点
+	m_aCamera[TYPE_ENTRY].destPosR	= entry::INIT_POSR;	// 目標の注視点
+	m_aCamera[TYPE_ENTRY].vecU		= entry::INIT_VECU;	// 上方向ベクトル
+	m_aCamera[TYPE_ENTRY].rot		= VEC3_ZERO;		// 現在の向き
+	m_aCamera[TYPE_ENTRY].destRot	= VEC3_ZERO;		// 目標の向き
+	m_aCamera[TYPE_ENTRY].fDis		= 0.0f;				// 現在の視点と注視点の距離
+	m_aCamera[TYPE_ENTRY].fDestDis	= 0.0f;				// 目標の視点と注視点の距離
+
+	// ビューポート情報を初期化
+	m_aCamera[TYPE_ENTRY].viewport.X		= 0;				// 左上隅のピクセル座標 (x)
+	m_aCamera[TYPE_ENTRY].viewport.Y		= 0;				// 左上隅のピクセル座標 (y)
+	m_aCamera[TYPE_ENTRY].viewport.Width	= SCREEN_WIDTH;		// 描画する画面の横幅
+	m_aCamera[TYPE_ENTRY].viewport.Height	= SCREEN_HEIGHT;	// 描画する画面の縦幅
+	m_aCamera[TYPE_ENTRY].viewport.MinZ		= 0.0f;
+	m_aCamera[TYPE_ENTRY].viewport.MaxZ		= 0.5f;
 
 	// 成功を返す
 	return S_OK;
