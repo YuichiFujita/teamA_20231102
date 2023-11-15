@@ -12,6 +12,7 @@
 #include "sound.h"
 #include "camera.h"
 #include "entryManager.h"
+#include "retentionManager.h"
 
 #include "player.h"
 #include "stage.h"
@@ -111,7 +112,23 @@ HRESULT CSceneEntry::Uninit(void)
 //============================================================
 void CSceneEntry::Update(void)
 {
+	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
+	{
+		// プレイヤーを全参加させる
+		CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true);
+		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(MAX_PLAYER);
+
+		// シーンの設定
+		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
+	}
+
 	// デバッグ表示
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ操作]\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F1]：デバッグ表示のON/OFF\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F2]：プレイヤーの全参加・遷移\n");
+
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ情報]\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
