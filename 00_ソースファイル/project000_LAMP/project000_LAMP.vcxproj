@@ -165,6 +165,7 @@
     <ClCompile Include="field.cpp" />
     <ClCompile Include="flail.cpp" />
     <ClCompile Include="gameManager.cpp" />
+    <ClCompile Include="ground.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="field.h" />
     <ClInclude Include="flail.h" />
     <ClInclude Include="gameManager.h" />
+    <ClInclude Include="ground.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />

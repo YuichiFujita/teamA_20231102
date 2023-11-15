@@ -19,6 +19,8 @@
 #include "player.h"
 #include "retentionManager.h"
 
+#include "ground.h"
+
 //************************************************************
 //	マクロ定義
 //************************************************************
@@ -125,6 +127,9 @@ HRESULT CSceneGame::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
+
+	// TODO：地面直置き
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(0.0f, -180.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
 
 	//--------------------------------------------------------
 	//	初期設定
