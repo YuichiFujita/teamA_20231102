@@ -215,82 +215,116 @@ void CPlayer::Update(void)
 
 	case STATE_NORMAL:
 
+		//カウンターの値によって挙動を変更
 		if (m_nCounterFlail > 0)
-		{
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
-			{
+		{//0より大きい時
+
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE && m_nCounterFlail <= 60)
+			{//投げるボタンが押されている時
+				//カウンターアップ
 				m_nCounterFlail++;
 
+				//一定値でカウンターを止める
 				if (m_nCounterFlail > 60)
 				{
 					m_nCounterFlail = 60;
 				}
+
+				//溜めてる間鉄球を振り回す
+				m_pFlail->SetChainRot(m_pFlail->GetChainRot() - 1.0f);
+				m_pFlail->SetLengthChain(100.0f);
+
+				//目標角度変更処理
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+				}
+			}
+			else
+			{
+				//目標角度変更処理
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+				}
 			}
 
-			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE)
+			//投擲
+			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE && m_nCounterFlail != 120)
 			{
-				D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+				//溜めた時間に応じて飛距離増加
+				float move = 5.0f;
 				move *= (float)m_nCounterFlail;
-				m_pFlail->SetVec3Move(move);
+				m_pFlail->SetMove(move);
+
+				//目標角度に合わせる
+				m_pFlail->SetChainRot(m_pFlail->GetChainRotMove());
+
+				//カウンターの設定
+				m_nCounterFlail = 120;
+			}
+
+			//フレイルが止まったらカウンターを次の段階へ
+			if (m_pFlail->GetMove() < 1.0f && m_nCounterFlail == 120)
+			{
 				m_nCounterFlail = -1;
 			}
 		}
 		else if (m_nCounterFlail == 0)
 		{
+			//カウンターアップ開始
 			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
 			{
 				m_nCounterFlail++;
 			}
+
+			m_pFlail->SetLengthChain(0.0f);
+
+			//目標角度変更処理
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+			}
+			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+			}
 		}
 		else
 		{
-			D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
-			move = GetVec3Position() - m_pFlail->GetVec3Position();
+			//引き戻す速度決定
+			float move = -20.0f;
 
-			if (D3DXVec3Length(&move) < 10.0f)
+			//鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
+			if (m_pFlail->GetLengthChain() < 10.0f)
 			{
 				m_nCounterFlail = 0;
-				move = VEC3_ZERO;
-				m_pFlail->SetVec3Position(GetVec3Position());
+				move = 0.0f;
+				m_pFlail->SetLengthChain(0.0f);
 			}
 
-			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
-			{
-				m_flailMove = move * 1.0f;
-
-				float rot = atan2f(move.z, move.x);
-
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_flailMove.x = m_flailMove.x * -sinf(rot);
-					m_flailMove.z = m_flailMove.z * cosf(rot);
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_flailMove.x = m_flailMove.x * sinf(rot);
-					m_flailMove.z = m_flailMove.z * -cosf(rot);
-				}
-				else
-				{
-					m_flailMove = VEC3_ZERO;
-				}
-			}
-
+			//引き戻す
 			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
 			{
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_flailMove.y = 0.0f;
-					move = move + m_flailMove;
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_flailMove.y = 0.0f;
-					move = move + m_flailMove;
-				}
-			
-				D3DXVec3Normalize(&move, &move);
-				m_pFlail->SetVec3Move(move * 25.0f);
+				m_pFlail->SetMove(move);
+			}
+
+			//目標角度変更処理
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+			}
+			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
 			}
 		}
 
@@ -308,6 +342,7 @@ void CPlayer::Update(void)
 	m_pShadow->Update();
 
 	// フレイルの更新
+	m_pFlail->SetVec3PosOrg(GetVec3Position());
 	m_pFlail->Update();
 
 	// モーション・オブジェクトキャラクターの更新
