@@ -1,7 +1,7 @@
 //============================================================
 //
-//	モデルUI処理 [flail.cpp]
-//	Author：藤田勇一
+//	フレイル処理 [flail.cpp]
+//	Author：中村陸
 //
 //============================================================
 //************************************************************
@@ -86,17 +86,17 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
-	//鎖の長さに移動量代入
+	// 鎖の長さに移動量代入
 	m_fLengthChain += m_move;
 
-	//移動量減衰
+	// 移動量減衰
 	m_move += (0.0f - m_move) * 0.08f;
 
-	//角度修正
+	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotMove);
 
-	//引っ張る時のみ角度調整
+	// 引っ張る時のみ角度調整
 	if (m_move < 0.0f)
 	{
 		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
@@ -107,7 +107,7 @@ void CFlail::Update(void)
 		m_move = 0.0f;
 	}
 	
-	//角度修正
+	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotMove);
 
@@ -116,13 +116,13 @@ void CFlail::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖長さ %f\n", m_fLengthChain);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[原点位置]：%f %f %f\n", m_posOrg.x, m_posOrg.y, m_posOrg.z);
 
-	//一定の長さを超えたら止める
+	// 一定の長さを超えたら止める
 	if (m_fLengthChain > 1400.0f)
 	{
 		m_fLengthChain = 1400.0f;
 	}
 
-	//角度と長さから鉄球の位置決定
+	// 角度と長さから鉄球の位置決定
 	D3DXVECTOR3 pos = VEC3_ZERO;
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
