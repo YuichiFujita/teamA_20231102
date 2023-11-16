@@ -108,8 +108,9 @@ void CSceneEntry::Update(void)
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
 	{
 		// プレイヤーを全参加させる
-		CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true);
-		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(MAX_PLAYER);
+		CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(0, true);
+		//CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true);
+		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(1);
 
 		// シーンの設定
 		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面

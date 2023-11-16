@@ -24,7 +24,7 @@
 //************************************************************
 const char *CFlail::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\OBSTACLE\\obstacle017.x",	// 鉄球
+	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
 	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
 };
 
@@ -64,7 +64,7 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel(mc_apModelFile[CFlail::MODEL_PREFABHUT]);
+	BindModel(mc_apModelFile[CFlail::MODEL_FLAIL]);
 
 	// 成功を返す
 	return S_OK;
@@ -117,6 +117,7 @@ void CFlail::Update(void)
 	D3DXVECTOR3 pos = VEC3_ZERO;
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+	pos.y = 40.0f;
 	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
 
 	SetVec3Position(pos);
