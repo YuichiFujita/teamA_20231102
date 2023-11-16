@@ -13,6 +13,8 @@
 #include "camera.h"
 #include "model.h"
 #include "useful.h"
+#include "player.h"
+#include "retentionManager.h"
 
 //************************************************************
 //	マクロ定義
@@ -88,7 +90,7 @@ void CFlail::Update(void)
 	m_fLengthChain += m_move;
 
 	//移動量減衰
-	m_move += (0.0f - m_move) * 0.12f;
+	m_move += (0.0f - m_move) * 0.08f;
 
 	//角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -99,6 +101,11 @@ void CFlail::Update(void)
 	{
 		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
 	}
+
+	if (m_move > 0.0f && m_move < 5.0f)
+	{
+		m_move = 0.0f;
+	}
 	
 	//角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -106,19 +113,22 @@ void CFlail::Update(void)
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖目標角度 %f\n", m_fChainRotMove);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖角度 %f\n", m_fChainRot);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖長さ %f\n", m_fLengthChain);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[原点位置]：%f %f %f\n", m_posOrg.x, m_posOrg.y, m_posOrg.z);
 
 	//一定の長さを超えたら止める
-	if (m_fLengthChain > 1600.0f)
+	if (m_fLengthChain > 1400.0f)
 	{
-		m_fLengthChain = 1600.0f;
+		m_fLengthChain = 1400.0f;
 	}
 
 	//角度と長さから鉄球の位置決定
 	D3DXVECTOR3 pos = VEC3_ZERO;
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
-	pos.y = 40.0f;
 	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+
+	Collision();
 
 	SetVec3Position(pos);
 
@@ -205,6 +215,34 @@ CFlail *CFlail::Create
 }
 
 //============================================================
+//	当たり判定処理
+//============================================================
+void CFlail::Collision(void)
+{
+	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	{
+		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
+
+		if (player != NULL && nCntPlayer != m_nPlayerID)
+		{
+			D3DXVECTOR3 vec;
+			float length;
+
+			vec = player->GetVec3Position() - GetVec3Position();
+			vec.y = 0.0f;
+			length = D3DXVec3Length(&vec);
+
+			if (length < 50.0f)
+			{
+				D3DXVECTOR3 pos = player->GetVec3Position();
+
+				player->SetVec3Position(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+			}
+		}
+	}
+}
+
+//============================================================
 //	移動量の設定処理
 //============================================================
 void CFlail::SetVec3PosOrg(const D3DXVECTOR3& rPosOrg)
@@ -220,6 +258,24 @@ D3DXVECTOR3 CFlail::GetVec3PosOrg(void)
 {
 	// 位置を返す
 	return m_posOrg;
+}
+
+//============================================================
+//	プレイヤー番号の設定処理
+//============================================================
+void CFlail::SetPlayerID(const int& rPlayerID)
+{
+	// 引数のプレイヤー番号を設定
+	m_nPlayerID = rPlayerID;
+}
+
+//============================================================
+//	プレイヤー番号の設定処理
+//============================================================
+int CFlail::GetPlayerID(void)
+{
+	// プレイヤー番号を返す
+	return m_nPlayerID;
 }
 
 //============================================================

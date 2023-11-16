@@ -170,6 +170,7 @@ HRESULT CPlayer::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
+	m_pFlail->SetPlayerID(m_nPadID);
 
 	// 成功を返す
 	return S_OK;
@@ -230,6 +231,22 @@ void CPlayer::Update(void)
 
 	// フレイルの更新
 	m_pFlail->SetVec3PosOrg(GetVec3Position());
+
+	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail != 0)
+	{
+		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (m_pFlail->GetVec3PosOrg());
+		float length, chainRot;
+
+		vecFlail.y = 0.0f;
+		length = D3DXVec3Length(&vecFlail);
+		chainRot = atan2f(vecFlail.x, vecFlail.z);
+
+		m_pFlail->SetChainRot(chainRot);
+		m_pFlail->SetChainRotMove(chainRot);
+		m_pFlail->SetLengthChain(length);
+		m_pFlail->SetMove(0.0f);
+	}
+
 	m_pFlail->Update();
 
 	// モーション・オブジェクトキャラクターの更新
@@ -642,16 +659,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z += cosf(m_dashRot.y) * fMove;
 		}
 
-		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (GetVec3Position() + m_move);
-		float length, chainRot;
-
-		length = D3DXVec3Length(&vecFlail);
-		chainRot = atan2f(vecFlail.x, vecFlail.z);
-
-		m_pFlail->SetChainRot(chainRot);
-		m_pFlail->SetLengthChain(length);
-
-		if (m_pFlail->GetLengthChain() > 1600.0f)
+		if (m_pFlail->GetLengthChain() >= 1400.0f)
 		{
 			// 移動量を更新
 			m_move.x *= 0.8f;
@@ -675,8 +683,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			//溜めてる間鉄球を振り回す
-			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.02f * m_nCounterFlail));
-			m_pFlail->SetLengthChain(100.0f);
+			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.01f * m_nCounterFlail));
+			m_pFlail->SetLengthChain(2.0f * m_nCounterFlail);
 
 			// 移動量を更新
 			m_move.x *= 0.5f;
@@ -687,7 +695,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != 120)
 		{
 			//溜めた時間に応じて飛距離増加
-			float move = 5.0f;
+			float move = 2.0f;
 			move *= (float)m_nCounterFlail;
 			m_pFlail->SetMove(move);
 
@@ -727,7 +735,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		float move = -20.0f;
 
 		//鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() < 10.0f)
+		if (m_pFlail->GetLengthChain() < 50.0f)
 		{
 			m_nCounterFlail = 0;
 			move = 0.0f;
