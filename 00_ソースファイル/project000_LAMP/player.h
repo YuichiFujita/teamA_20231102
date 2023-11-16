@@ -102,8 +102,12 @@ public:
 	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
-	void SetSpawn(void);		// 出現設定
-	int GetPadID(void) const;	// パッドインデックス取得
+	void SetSpawn(void);			// 出現設定
+	int GetPadID(void) const;		// パッドインデックス取得
+
+protected:
+	// メンバ関数
+	void UpdateMotion(int nMotion);	// モーション・オブジェクトキャラクターの更新
 
 private:
 	// メンバ関数
@@ -117,7 +121,6 @@ private:
 	void UpdateGravity(void);				// 重力の更新
 	bool UpdateLanding(D3DXVECTOR3& rPos);	// 着地状況の更新
 	void UpdateRotation(D3DXVECTOR3& rRot);	// 向きの更新
-	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
 	bool UpdateFadeOut(const float fAdd);	// フェードアウト状態時の更新
 	bool UpdateFadeIn(const float fSub);	// フェードイン状態時の更新
 

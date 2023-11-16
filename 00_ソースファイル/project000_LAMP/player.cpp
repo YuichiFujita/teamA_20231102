@@ -488,6 +488,33 @@ int CPlayer::GetPadID(void) const
 }
 
 //============================================================
+//	モーション・オブジェクトキャラクターの更新処理
+//============================================================
+void CPlayer::UpdateMotion(int nMotion)
+{
+	// 変数を宣言
+	int nAnimMotion = GetMotionType();	// 現在再生中のモーション
+
+	if (nMotion != NONE_IDX)
+	{ // モーションが設定されている場合
+
+		if (IsMotionLoop(nAnimMotion))
+		{ // ループするモーションだった場合
+
+			if (nAnimMotion != nMotion)
+			{ // 現在のモーションが再生中のモーションと一致しない場合
+
+				// 現在のモーションの設定
+				SetMotion(nMotion);
+			}
+		}
+	}
+
+	// オブジェクトキャラクターの更新
+	CObjectChara::Update();
+}
+
+//============================================================
 //	スポーン状態時の更新処理
 //============================================================
 CPlayer::EMotion CPlayer::UpdateSpawn(void)
@@ -914,33 +941,6 @@ void CPlayer::UpdateRotation(D3DXVECTOR3& rRot)
 
 	// 向きの正規化
 	useful::NormalizeRot(rRot.y);
-}
-
-//============================================================
-//	モーション・オブジェクトキャラクターの更新処理
-//============================================================
-void CPlayer::UpdateMotion(int nMotion)
-{
-	// 変数を宣言
-	int nAnimMotion = GetMotionType();	// 現在再生中のモーション
-
-	if (nMotion != NONE_IDX)
-	{ // モーションが設定されている場合
-
-		if (IsMotionLoop(nAnimMotion))
-		{ // ループするモーションだった場合
-
-			if (nAnimMotion != nMotion)
-			{ // 現在のモーションが再生中のモーションと一致しない場合
-
-				// 現在のモーションの設定
-				SetMotion(nMotion);
-			}
-		}
-	}
-
-	// オブジェクトキャラクターの更新
-	CObjectChara::Update();
 }
 
 //============================================================
