@@ -859,6 +859,15 @@ void CObjectMeshCube::SetVtx(void)
 					pVtx[0].pos.z = (m_meshCube.size.z * aPosMeshCube[nVtxID].z) - (fSetBord * fUseBord * -aPosMeshCube[nVtxID].z);
 			
 					break;
+
+				case ORIGIN_UP:		// 上原点
+
+					// 頂点座標の設定
+					pVtx[0].pos.x = (m_meshCube.size.x * aPosMeshCube[nVtxID].x) - (fSetBord * fUseBord * -aPosMeshCube[nVtxID].x);
+					pVtx[0].pos.y = (m_meshCube.size.y * aPosMeshCube[nVtxID].y * 2.0f) * (nVtxID % 2) - (fSetBord * fUseBord * -aPosMeshCube[nVtxID].y);
+					pVtx[0].pos.z = (m_meshCube.size.z * aPosMeshCube[nVtxID].z) - (fSetBord * fUseBord * -aPosMeshCube[nVtxID].z);
+
+					break;
 			
 				default:	// 例外処理
 					assert(false);

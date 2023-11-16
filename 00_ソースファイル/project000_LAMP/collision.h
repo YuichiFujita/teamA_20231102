@@ -107,6 +107,8 @@ namespace collision
 		D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 		D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 		D3DXVECTOR3 *pMove = NULL,	// 移動量
+		bool bYColl = true,			// Y判定
+		bool bZColl = true,			// Z判定
 		bool *pLeft = NULL,			// 左からの判定
 		bool *pRight = NULL			// 右からの判定
 	);
@@ -120,6 +122,8 @@ namespace collision
 		D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 		D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 		D3DXVECTOR3 *pMove = NULL,	// 移動量
+		bool bXColl = true,			// X判定
+		bool bZColl = true,			// Z判定
 		bool *pDown = NULL,			// 下からの判定
 		bool *pUp = NULL			// 上からの判定
 	);
@@ -133,6 +137,8 @@ namespace collision
 		D3DXVECTOR3 targetSizeUp,	// 判定目標サイズ(右・上・後)
 		D3DXVECTOR3 targetSizeDown,	// 判定目標サイズ(左・下・前)
 		D3DXVECTOR3 *pMove = NULL,	// 移動量
+		bool bXColl = true,			// X判定
+		bool bYColl = true,			// Y判定
 		bool *pBefore = NULL,		// 前からの判定
 		bool *pAfter = NULL			// 後からの判定
 	);

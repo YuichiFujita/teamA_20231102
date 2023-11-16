@@ -67,6 +67,15 @@ public:
 		STATE_MAX		// この列挙型の総数
 	};
 
+	// 軸列挙
+	enum EAxis
+	{
+		AXIS_X = 0,	// X軸
+		AXIS_Y,		// Y軸
+		AXIS_Z,		// Z軸
+		AXIS_MAX	// この列挙型の総数
+	};
+
 	// コンストラクタ
 	explicit CPlayer(const int nPad);
 
@@ -107,11 +116,14 @@ private:
 	void UpdateDash(void);					// ダッシュの更新
 	void UpdateGravity(void);				// 重力の更新
 	bool UpdateLanding(D3DXVECTOR3& rPos);	// 着地状況の更新
-	void UpdatePosition(D3DXVECTOR3& rPos);	// 位置の更新
 	void UpdateRotation(D3DXVECTOR3& rRot);	// 向きの更新
 	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
 	bool UpdateFadeOut(const float fAdd);	// フェードアウト状態時の更新
 	bool UpdateFadeIn(const float fSub);	// フェードイン状態時の更新
+
+	bool ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos);	// 地盤との一軸ごとの当たり判定
+	bool ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos);	// ブロックとの一軸ごとの当たり判定
+	bool CollisionGroundBlock(D3DXVECTOR3& rPos);	// 地盤・ブロックとの当たり判定
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
@@ -123,7 +135,6 @@ private:
 	D3DXVECTOR3	m_move;				// 移動量
 	D3DXVECTOR3	m_destRot;			// 目標向き
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
-	D3DXVECTOR3	m_flailMove;		// フレイルの動き
 	EState		m_state;			// 状態
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

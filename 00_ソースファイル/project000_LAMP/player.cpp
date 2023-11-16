@@ -215,82 +215,116 @@ void CPlayer::Update(void)
 
 	case STATE_NORMAL:
 
+		//カウンターの値によって挙動を変更
 		if (m_nCounterFlail > 0)
-		{
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
-			{
+		{//0より大きい時
+
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE && m_nCounterFlail <= 60)
+			{//投げるボタンが押されている時
+				//カウンターアップ
 				m_nCounterFlail++;
 
+				//一定値でカウンターを止める
 				if (m_nCounterFlail > 60)
 				{
 					m_nCounterFlail = 60;
 				}
+
+				//溜めてる間鉄球を振り回す
+				m_pFlail->SetChainRot(m_pFlail->GetChainRot() - 1.0f);
+				m_pFlail->SetLengthChain(100.0f);
+
+				//目標角度変更処理
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+				}
+			}
+			else
+			{
+				//目標角度変更処理
+				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+				}
+				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+				{
+					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+				}
 			}
 
-			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE)
+			//投擲
+			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE && m_nCounterFlail != 120)
 			{
-				D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
+				//溜めた時間に応じて飛距離増加
+				float move = 5.0f;
 				move *= (float)m_nCounterFlail;
-				m_pFlail->SetVec3Move(move);
+				m_pFlail->SetMove(move);
+
+				//目標角度に合わせる
+				m_pFlail->SetChainRot(m_pFlail->GetChainRotMove());
+
+				//カウンターの設定
+				m_nCounterFlail = 120;
+			}
+
+			//フレイルが止まったらカウンターを次の段階へ
+			if (m_pFlail->GetMove() < 1.0f && m_nCounterFlail == 120)
+			{
 				m_nCounterFlail = -1;
 			}
 		}
 		else if (m_nCounterFlail == 0)
 		{
+			//カウンターアップ開始
 			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
 			{
 				m_nCounterFlail++;
 			}
+
+			m_pFlail->SetLengthChain(0.0f);
+
+			//目標角度変更処理
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+			}
+			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+			}
 		}
 		else
 		{
-			D3DXVECTOR3 move = D3DXVECTOR3(3.0f, 0.0f, 3.0f);
-			move = GetVec3Position() - m_pFlail->GetVec3Position();
+			//引き戻す速度決定
+			float move = -20.0f;
 
-			if (D3DXVec3Length(&move) < 10.0f)
+			//鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
+			if (m_pFlail->GetLengthChain() < 10.0f)
 			{
 				m_nCounterFlail = 0;
-				move = VEC3_ZERO;
-				m_pFlail->SetVec3Position(GetVec3Position());
+				move = 0.0f;
+				m_pFlail->SetLengthChain(0.0f);
 			}
 
-			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
-			{
-				m_flailMove = move * 1.0f;
-
-				float rot = atan2f(move.z, move.x);
-
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_flailMove.x = m_flailMove.x * -sinf(rot);
-					m_flailMove.z = m_flailMove.z * cosf(rot);
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_flailMove.x = m_flailMove.x * sinf(rot);
-					m_flailMove.z = m_flailMove.z * -cosf(rot);
-				}
-				else
-				{
-					m_flailMove = VEC3_ZERO;
-				}
-			}
-
+			//引き戻す
 			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
 			{
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_flailMove.y = 0.0f;
-					move = move + m_flailMove;
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_flailMove.y = 0.0f;
-					move = move + m_flailMove;
-				}
-			
-				D3DXVec3Normalize(&move, &move);
-				m_pFlail->SetVec3Move(move * 25.0f);
+				m_pFlail->SetMove(move);
+			}
+
+			//目標角度変更処理
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+			}
+			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+			{
+				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
 			}
 		}
 
@@ -308,6 +342,7 @@ void CPlayer::Update(void)
 	m_pShadow->Update();
 
 	// フレイルの更新
+	m_pFlail->SetVec3PosOrg(GetVec3Position());
 	m_pFlail->Update();
 
 	// モーション・オブジェクトキャラクターの更新
@@ -594,9 +629,6 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 重力の更新
 	UpdateGravity();
 
-	// 位置更新
-	UpdatePosition(posPlayer);
-
 	// 着地判定
 	UpdateLanding(posPlayer);
 
@@ -817,6 +849,18 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 	// ジャンプしている状態にする
 	m_bJump = true;
 
+	// 位置の更新
+	// 地盤の当たり判定・着地判定
+	if (CollisionGroundBlock(rPos))
+	{ // 地盤に着地していた場合
+
+		// 着地している状態にする
+		bLand = true;
+
+		// ジャンプしていない状態にする
+		m_bJump = false;
+	}
+
 	// 地面・制限位置の着地判定
 	if (CScene::GetStage()->LandFieldPosition(rPos, m_move)
 	||  CScene::GetStage()->LandLimitPosition(rPos, m_move, 0.0f))
@@ -831,29 +875,6 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 
 	// 着地状況を返す
 	return bLand;
-}
-
-//============================================================
-//	位置の更新処理
-//============================================================
-void CPlayer::UpdatePosition(D3DXVECTOR3& rPos)
-{
-	// 移動量を加算
-	rPos += m_move;
-
-	// 移動量を減衰
-	if (m_bJump)
-	{ // 空中の場合
-
-		m_move.x += (0.0f - m_move.x) * JUMP_REV;
-		m_move.z += (0.0f - m_move.z) * JUMP_REV;
-	}
-	else
-	{ // 地上の場合
-
-		m_move.x += (0.0f - m_move.x) * LAND_REV;
-		m_move.z += (0.0f - m_move.z) * LAND_REV;
-	}
 }
 
 //============================================================
@@ -969,6 +990,297 @@ bool CPlayer::UpdateFadeIn(const float fSub)
 
 	// 透明状況を返す
 	return bAlpha;
+}
+
+//============================================================
+//	地盤との一軸ごとの当たり判定
+//============================================================
+bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(RADIUS, 0.0f, RADIUS);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(RADIUS, HEIGHT, RADIUS);	// プレイヤー最大大きさ
+	bool bMin = false;	// 不の方向の判定状況
+	bool bMax = false;	// 正の方向の判定状況
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// 変数を宣言
+				D3DXVECTOR3 posGround = VEC3_ZERO;		// 地盤位置
+				D3DXVECTOR3 rotGround = VEC3_ZERO;		// 地盤向き
+				D3DXVECTOR3 sizeMinGround = VEC3_ZERO;	// 地盤最小大きさ
+				D3DXVECTOR3 sizeMaxGround = VEC3_ZERO;	// 地盤最大大きさ
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
+				{ // オブジェクトラベルが地盤ではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 地盤の位置を設定
+				posGround = pObjCheck->GetVec3Position();
+
+				// 地盤の向きを設定
+				rotGround = pObjCheck->GetVec3Rotation();
+
+				// 地盤の最小の大きさを設定
+				sizeMinGround = pObjCheck->GetVec3Sizing();
+				sizeMinGround.y *= 2.0f;	// 縦の大きさを倍にする
+
+				// 地盤の最大の大きさを設定
+				sizeMaxGround = pObjCheck->GetVec3Sizing();
+				sizeMaxGround.y = 0.0f;		// 縦の大きさを初期化
+
+				switch (axis)
+				{ // 判定軸ごとの処理
+				case AXIS_X:	// X軸
+
+					// X軸の衝突判定
+					collision::ResponseSingleX
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				case AXIS_Y:	// Y軸
+
+					// Y軸の衝突判定
+					collision::ResponseSingleY
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						true,			// X判定
+						true,			// Z判定
+						&bMin,			// 下からの判定
+						&bMax			// 上からの判定
+					);
+
+					if (bMax)
+					{ // 上から当たっていた場合
+
+						// 着地している状況にする
+						bHit = true;
+					}
+
+					break;
+
+				case AXIS_Z:	// Z軸
+
+					// Z軸の衝突判定
+					collision::ResponseSingleZ
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				default:	// 例外処理
+					assert(false);
+					break;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 各軸の判定情報を返す
+	return bHit;
+}
+
+//============================================================
+//	ブロックとの一軸ごとの当たり判定
+//============================================================
+bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(RADIUS, 0.0f, RADIUS);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(RADIUS, HEIGHT, RADIUS);	// プレイヤー最大大きさ
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// 変数を宣言
+				D3DXVECTOR3 posBlock = VEC3_ZERO;	// ブロック位置
+				D3DXVECTOR3 rotBlock = VEC3_ZERO;	// ブロック向き
+				D3DXVECTOR3 sizeBlock = VEC3_ZERO;	// ブロック大きさ
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルがブロックではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// ブロックの位置を設定
+				posBlock = pObjCheck->GetVec3Position();
+
+				// ブロックの向きを設定
+				rotBlock = pObjCheck->GetVec3Rotation();
+
+				// ブロックの最小の大きさを設定
+				sizeBlock = pObjCheck->GetVec3Sizing();
+
+				switch (axis)
+				{ // 判定軸ごとの処理
+				case AXIS_X:	// X軸
+
+					// X軸の衝突判定
+					collision::ResponseSingleX
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posBlock,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeBlock,		// 判定目標サイズ(右・上・後)
+						sizeBlock,		// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						false			// Y判定
+					);
+
+					break;
+
+				case AXIS_Z:	// Z軸
+
+					// Z軸の衝突判定
+					collision::ResponseSingleZ
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posBlock,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeBlock,		// 判定目標サイズ(右・上・後)
+						sizeBlock,		// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						true,			// X判定
+						false			// Y判定
+					);
+
+					break;
+
+				default:	// 例外処理
+					assert(false);
+					break;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 各軸の判定情報を返す
+	return bHit;
+}
+
+//============================================================
+//	地盤・ブロックとの当たり判定
+//============================================================
+bool CPlayer::CollisionGroundBlock(D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	bool bLand = false;	// 着地状況
+
+	// 移動量を加算
+	rPos.x += m_move.x;
+
+	// X軸の当たり判定
+	ResponseSingleGround(AXIS_X, rPos);
+	ResponseSingleBlock(AXIS_X, rPos);
+
+	// 移動量を加算
+	rPos.y += m_move.y;
+
+	// Y軸の当たり判定
+	bLand = ResponseSingleGround(AXIS_Y, rPos);
+
+	// 移動量を加算
+	rPos.z += m_move.z;
+
+	// Z軸の当たり判定
+	ResponseSingleGround(AXIS_Z, rPos);
+	ResponseSingleBlock(AXIS_Z, rPos);
+
+	// 移動量を減衰
+	if (m_bJump)
+	{ // 空中の場合
+
+		m_move.x += (0.0f - m_move.x) * JUMP_REV;
+		m_move.z += (0.0f - m_move.z) * JUMP_REV;
+	}
+	else
+	{ // 地上の場合
+
+		m_move.x += (0.0f - m_move.x) * LAND_REV;
+		m_move.z += (0.0f - m_move.z) * LAND_REV;
+	}
+
+	// 着地状況を返す
+	return bLand;
 }
 
 //============================================================

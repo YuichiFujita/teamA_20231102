@@ -59,13 +59,8 @@ public:
 		LABEL_UI,			// UI
 		LABEL_NUMBER,		// 数字
 		LABEL_PLAYER,		// プレイヤー
-		LABEL_FRIEND,		// 友達
-		LABEL_BUILDING,		// ビル
-		LABEL_WINDOW,		// 窓
-		LABEL_SIGNBOARD,	// 看板
-		LABEL_OBSTACLE,		// 障害物
-		LABEL_SAVEPOINT,	// セーブポイント
-		LABEL_GOALPOINT,	// ゴールポイント
+		LABEL_GROUND,		// 地盤
+		LABEL_BLOCK,		// ブロック
 		LABEL_FIELD,		// 地面
 		LABEL_WALL,			// 壁
 		LABEL_SCENERY,		// 景色

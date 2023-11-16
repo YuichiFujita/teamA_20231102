@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="anim2D.cpp" />
+    <ClCompile Include="block.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="debug.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="field.cpp" />
     <ClCompile Include="flail.cpp" />
     <ClCompile Include="gameManager.cpp" />
+    <ClCompile Include="ground.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -229,6 +231,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anim2D.h" />
+    <ClInclude Include="block.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="debug.h" />
@@ -241,6 +244,7 @@
     <ClInclude Include="field.h" />
     <ClInclude Include="flail.h" />
     <ClInclude Include="gameManager.h" />
+    <ClInclude Include="ground.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
