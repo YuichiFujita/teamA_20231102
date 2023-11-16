@@ -22,6 +22,7 @@
 // TODO：いらないインクルード削除
 #include "ground.h"
 #include "block.h"
+#include "liquid.h"
 
 //************************************************************
 //	マクロ定義
@@ -131,8 +132,14 @@ HRESULT CSceneGame::Init(void)
 	}
 
 	// TODO：直がきやめようね
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 20.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 400.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(1650.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+
+	CLiquid::Create();
 
 	//--------------------------------------------------------
 	//	初期設定
