@@ -57,8 +57,8 @@ namespace
 	// 見下ろしカメラ情報
 	namespace lookdown
 	{
-		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(1.95f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
-		const float INIT_DIS	= 1420.0f;	// 見下ろしカメラの距離
+		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.0f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
+		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
 
 		const float REV_POS		= 0.25f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数
