@@ -134,25 +134,12 @@ HRESULT CSceneGame::Init(void)
 #if 1
 
 	// TODO：直がきやめようね
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(1650.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(1650.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
 
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 40.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-
-	#define DOWN	(D3DXVECTOR2(-0.0f, 0.002f))				// 液体(下)の移動量
-	#define UP		(D3DXVECTOR2(-0.0f, 0.0001f))				// 液体(上)の移動量
-	#define ROT		(D3DXVECTOR3(0.0f, D3DXToRadian(45), 0.0f))	// 向き
-	#define SIZE	(D3DXVECTOR2(24000.0f, 24000.0f))			// 大きさ
-	#define COL		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))			// 色
-	#define PART	(POSGRID2(128, 128))						// 分割数
-
-	#define ADD_ROT		(60)	// 頂点ごとのカーブ加算量
-	#define ADD_UP		(6.0f)	// 波の最高点
-	#define ADD_SINROT	(5)		// 毎フレームの波打ち向き加算量
-
-	CLiquid::Create(CLiquid::TYPE_SEA, VEC3_ZERO, ROT, SIZE, COL, PART, CLiquid::STexMove(DOWN, UP), ADD_UP, D3DXToRadian(ADD_SINROT), D3DXToRadian(ADD_ROT));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 
 #endif
 

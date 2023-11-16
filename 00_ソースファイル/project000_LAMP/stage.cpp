@@ -16,6 +16,7 @@
 #include "wall.h"
 #include "scenery.h"
 #include "sky.h"
+#include "liquid.h"
 
 //************************************************************
 //	定数宣言
@@ -24,8 +25,7 @@ namespace
 {
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
-		"data\\TXT\\stageGame.txt",		// ゲームステージ
-		"data\\TXT\\stageTutorial.txt",	// チュートリアルステージ
+		"data\\TXT\\stageGame.txt",	// ゲームステージ
 	};
 }
 
@@ -43,6 +43,7 @@ CStage::CStage()
 	memset(&m_wall,			0, sizeof(m_wall));			// 壁情報
 	memset(&m_scenery,		0, sizeof(m_scenery));		// 景色情報
 	memset(&m_sky,			0, sizeof(m_sky));			// 空情報
+	memset(&m_liquid,		0, sizeof(m_liquid));		// 液体情報
 }
 
 //============================================================
@@ -76,6 +77,10 @@ HRESULT CStage::Init(void)
 	// 空の情報を初期化
 	m_sky.ppSky = NULL;	// 空の情報
 	m_sky.nNum = 0;		// 空の総数
+
+	// 液体の情報を初期化
+	m_liquid.ppLiquid = NULL;	// 液体の情報
+	m_liquid.nNum = 0;			// 液体の総数
 
 	// 成功を返す
 	return S_OK;
@@ -120,6 +125,15 @@ void CStage::Uninit(void)
 		// メモリ開放
 		delete[] m_sky.ppSky;
 		m_sky.ppSky = NULL;
+	}
+
+	// 液体の破棄
+	if (m_liquid.ppLiquid != NULL)
+	{ // 液体が使用されている場合
+
+		// メモリ開放
+		delete[] m_liquid.ppLiquid;
+		m_liquid.ppLiquid = NULL;
 	}
 }
 
@@ -475,6 +489,15 @@ HRESULT CStage::LoadSetup(CStage *pStage, const ELoad load)
 				assert(false);
 				return E_FAIL;
 			}
+
+			// 液体の読込
+			else if (FAILED(LoadLiquid(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
 		}
 		
 		// ファイルを閉じる
@@ -600,7 +623,7 @@ HRESULT CStage::LoadField(const char* pString, FILE *pFile, CStage *pStage)
 	// 変数を宣言
 	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
 	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
-	D3DXVECTOR2 size = VEC3_ZERO;	// 二軸大きさの代入用
+	D3DXVECTOR2 size = VEC3_ZERO;	// 大きさの代入用
 	D3DXCOLOR col = XCOL_WHITE;		// 色の代入用
 	POSGRID2 part = GRID2_ZERO;		// 分割数の代入用
 	D3DCULL cull = D3DCULL_CCW;		// カリング状況の代入用
@@ -776,7 +799,7 @@ HRESULT CStage::LoadWall(const char* pString, FILE *pFile, CStage *pStage)
 	// 変数を宣言
 	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
 	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
-	D3DXVECTOR2 size = VEC3_ZERO;	// 二軸大きさの代入用
+	D3DXVECTOR2 size = VEC3_ZERO;	// 大きさの代入用
 	D3DXCOLOR col = XCOL_WHITE;		// 色の代入用
 	POSGRID2 part = GRID2_ZERO;		// 分割数の代入用
 	D3DCULL cull = D3DCULL_CCW;		// カリング状況の代入用
@@ -957,8 +980,8 @@ HRESULT CStage::LoadScenery(const char* pString, FILE *pFile, CStage *pStage)
 
 	float fRadius = 0.0f;	// 半径の代入用
 	float fHeight = 0.0f;	// 縦幅の代入用
-	int nCurrentID = 0;		// 現在の読み込み数の保存用
 	int nTextureID = 0;		// テクスチャインデックスの代入用
+	int nCurrentID = 0;		// 現在の読み込み数の保存用
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -1120,8 +1143,8 @@ HRESULT CStage::LoadSky(const char* pString, FILE *pFile, CStage *pStage)
 	POSGRID2 part = GRID2_ZERO;		// 分割数の代入用
 
 	float fRadius = 0.0f;	// 半径の代入用
-	int nCurrentID = 0;		// 現在の読み込み数の保存用
 	int nTextureID = 0;		// テクスチャインデックスの代入用
+	int nCurrentID = 0;		// 現在の読み込み数の保存用
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -1259,6 +1282,212 @@ HRESULT CStage::LoadSky(const char* pString, FILE *pFile, CStage *pStage)
 
 		// 読込総数の不一致
 		assert(nCurrentID == pStage->m_sky.nNum);
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	液体情報の読込処理
+//============================================================
+HRESULT CStage::LoadLiquid(const char* pString, FILE *pFile, CStage *pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
+	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
+	D3DXVECTOR2 size = VEC3_ZERO;	// 大きさの代入用
+	D3DXCOLOR col = XCOL_WHITE;		// 色の代入用
+	POSGRID2 part = GRID2_ZERO;		// 分割数の代入用
+	CLiquid::STexMove texMove;		// テクスチャ移動量の代入用
+
+	float fMaxUp = 0.0f;		// 波の最高上昇量
+	float fAddSinRot = 0.0f;	// 波打ち向き加算量
+	float fAddVtxRot = 0.0f;	// 隣波の向き加算量
+	int nTypeID = 0;			// 種類インデックスの代入用
+	int nCurrentID = 0;			// 現在の読み込み数の保存用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 液体の設定
+	if (strcmp(pString, "STAGE_LIQUIDSET") == 0)
+	{ // 読み込んだ文字列が STAGE_LIQUIDSET の場合
+
+		// 現在の読み込み数を初期化
+		nCurrentID = 0;
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_LIQUIDSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "NUM") == 0)
+			{ // 読み込んだ文字列が NUM の場合
+
+				fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+				fscanf(pFile, "%d", &pStage->m_liquid.nNum);	// 読み込み数を読み込む
+
+				if (pStage->m_liquid.nNum > 0)
+				{ // 読み込むものがある場合
+
+					if (pStage->m_liquid.ppLiquid == NULL)
+					{ // 液体が使用されていない場合
+
+						// 液体の読み込み数分メモリ確保
+						pStage->m_liquid.ppLiquid = new CLiquid*[pStage->m_liquid.nNum];
+
+						if (pStage->m_liquid.ppLiquid != NULL)
+						{ // 確保に成功した場合
+
+							// メモリクリア
+							memset(pStage->m_liquid.ppLiquid, 0, sizeof(CLiquid*) * pStage->m_liquid.nNum);
+						}
+						else { assert(false); return E_FAIL; }	// 確保失敗
+					}
+					else { assert(false); return E_FAIL; }	// 使用中
+				}
+				else
+				{ // 読み込むものがない場合
+
+					// 処理を抜ける
+					break;
+				}
+			}
+			else if (strcmp(&aString[0], "LIQUIDSET") == 0)
+			{ // 読み込んだ文字列が LIQUIDSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_LIQUIDSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "TYPE") == 0)
+					{ // 読み込んだ文字列が TYPE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &nTypeID);		// 種類を読み込む
+					}
+					else if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &rot.x);		// 向きXを読み込む
+						fscanf(pFile, "%f", &rot.y);		// 向きYを読み込む
+						fscanf(pFile, "%f", &rot.z);		// 向きZを読み込む
+					}
+					else if (strcmp(&aString[0], "SIZE") == 0)
+					{ // 読み込んだ文字列が SIZE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &size.x);		// 大きさXを読み込む
+						fscanf(pFile, "%f", &size.y);		// 大きさYを読み込む
+					}
+					else if (strcmp(&aString[0], "COL") == 0)
+					{ // 読み込んだ文字列が COL の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &col.r);		// 色Rを読み込む
+						fscanf(pFile, "%f", &col.g);		// 色Gを読み込む
+						fscanf(pFile, "%f", &col.b);		// 色Bを読み込む
+						fscanf(pFile, "%f", &col.a);		// 色Aを読み込む
+					}
+					else if (strcmp(&aString[0], "PART") == 0)
+					{ // 読み込んだ文字列が PART の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &part.x);		// 横分割数を読み込む
+						fscanf(pFile, "%d", &part.y);		// 縦分割数を読み込む
+					}
+					else if (strcmp(&aString[0], "TEXMOVE_LOW") == 0)
+					{ // 読み込んだ文字列が TEXMOVE_LOW の場合
+
+						fscanf(pFile, "%s", &aString[0]);			// = を読み込む (不要)
+						fscanf(pFile, "%f", &texMove.texMoveLow.x);	// 下液体のテクスチャ移動量を読み込む
+						fscanf(pFile, "%f", &texMove.texMoveLow.y);	// 下液体のテクスチャ移動量を読み込む
+					}
+					else if (strcmp(&aString[0], "TEXMOVE_HIGH") == 0)
+					{ // 読み込んだ文字列が TEXMOVE_HIGH の場合
+
+						fscanf(pFile, "%s", &aString[0]);				// = を読み込む (不要)
+						fscanf(pFile, "%f", &texMove.texMoveHigh.x);	// 上液体のテクスチャ移動量を読み込む
+						fscanf(pFile, "%f", &texMove.texMoveHigh.y);	// 上液体のテクスチャ移動量を読み込む
+					}
+					else if (strcmp(&aString[0], "MAX_UP") == 0)
+					{ // 読み込んだ文字列が MAX_UP の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &fMaxUp);		// 波の最高上昇量を読み込む
+					}
+					else if (strcmp(&aString[0], "ADD_SINROT") == 0)
+					{ // 読み込んだ文字列が ADD_SINROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &fAddSinRot);	// 波打ち向き加算量を読み込む
+					}
+					else if (strcmp(&aString[0], "ADD_VTXROT") == 0)
+					{ // 読み込んだ文字列が ADD_VTXROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &fAddVtxRot);	// 隣波の向き加算量を読み込む
+					}
+				} while (strcmp(&aString[0], "END_LIQUIDSET") != 0);	// 読み込んだ文字列が END_LIQUIDSET ではない場合ループ
+
+				if (pStage->m_liquid.ppLiquid[nCurrentID] == NULL)
+				{ // 使用されていない場合
+
+					// 液体オブジェクトの生成
+					pStage->m_liquid.ppLiquid[nCurrentID] = CLiquid::Create
+					( // 引数
+						(CLiquid::EType)nTypeID,	// 種類
+						pos,						// 位置
+						D3DXToRadian(rot),			// 向き
+						size,						// 大きさ
+						col,						// 色
+						part,						// 分割数
+						texMove,					// テクスチャ移動量
+						fMaxUp,						// 波の最高上昇量
+						D3DXToRadian(fAddSinRot),	// 波打ち向き加算量
+						D3DXToRadian(fAddVtxRot)	// 隣波の向き加算量
+					);
+					if (pStage->m_liquid.ppLiquid[nCurrentID] == NULL)
+					{ // 確保に失敗した場合
+
+						// 失敗を返す
+						assert(false);
+						return E_FAIL;
+					}
+				}
+				else { assert(false); }	// 使用中
+
+				// 読込総数オーバー
+				assert(nCurrentID < pStage->m_liquid.nNum);
+
+				// 現在の読み込み数を加算
+				nCurrentID++;
+			}
+		} while (strcmp(&aString[0], "END_STAGE_LIQUIDSET") != 0);	// 読み込んだ文字列が END_STAGE_LIQUIDSET ではない場合ループ
+
+		// 読込総数の不一致
+		assert(nCurrentID == pStage->m_liquid.nNum);
 	}
 
 	// 成功を返す
