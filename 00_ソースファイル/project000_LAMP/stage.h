@@ -22,6 +22,7 @@ class CField;	// 地面クラス
 class CWall;	// 壁クラス
 class CScenery;	// 景色クラス
 class CSky;		// 空クラス
+class CLiquid;	// 液体クラス
 
 //************************************************************
 //	クラス定義
@@ -34,7 +35,6 @@ public:
 	enum ELoad
 	{
 		LOAD_GAME = 0,	// ゲームステージ
-		LOAD_TUTORIAL,	// チュートリアルステージ
 		LOAD_MAX		// この列挙型の総数
 	};
 
@@ -93,6 +93,13 @@ public:
 		int nNum;		// 空の総数
 	};
 
+	// 液体構造体
+	struct SLiquid
+	{
+		CLiquid **ppLiquid;	// 液体の情報
+		int nNum;			// 液体の総数
+	};
+
 	// メンバ関数
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
@@ -120,6 +127,7 @@ private:
 	static HRESULT LoadWall(const char* pString, FILE *pFile, CStage *pStage);		// 壁情報の読込
 	static HRESULT LoadScenery(const char* pString, FILE *pFile, CStage *pStage);	// 景色情報の読込
 	static HRESULT LoadSky(const char* pString, FILE *pFile, CStage *pStage);		// 空情報の読込
+	static HRESULT LoadLiquid(const char* pString, FILE *pFile, CStage *pStage);	// 液体情報の読込
 
 	// メンバ変数
 	SStageLimit	m_stageLimit;	// 範囲情報
@@ -127,6 +135,7 @@ private:
 	SWall		m_wall;			// 壁情報
 	SScenery	m_scenery;		// 景色情報
 	SSky		m_sky;			// 空情報
+	SLiquid		m_liquid;		// 液体情報
 };
 
 #endif	// _STAGE_H_
