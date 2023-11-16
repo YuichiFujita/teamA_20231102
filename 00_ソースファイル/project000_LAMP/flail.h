@@ -46,6 +46,9 @@ public:
 	void SetVec3PosOrg(const D3DXVECTOR3& rPosOrg);		// 回転原点設定
 	D3DXVECTOR3 GetVec3PosOrg(void);					// 回転原点取得
 
+	void SetPlayerID(const int& rPlayerID);				// プレイヤー番号設定
+	int GetPlayerID(void);								// プレイヤー番号取得
+
 	void SetMove(const float& rMove);					// 位置設定
 	float GetMove(void);								// 位置取得
 
@@ -67,11 +70,15 @@ public:
 	);
 
 private:
+	//メンバ関数
+	void Collision(void);		// 長さ設定
+
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
 	D3DXVECTOR3 m_posOrg;			// 回転原点
+	int			m_nPlayerID;		// プレイヤーID
 	float		m_move;				// 移動量
 	float		m_fChainRot;		// 角度
 	float		m_fChainRotMove;	// 目標角度
