@@ -122,7 +122,8 @@ private:
 	bool UpdateFadeIn(const float fSub);	// フェードイン状態時の更新
 
 	bool ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos);	// 地盤との一軸ごとの当たり判定
-	bool CollisionGround(D3DXVECTOR3& rPos);	// 地盤との当たり判定
+	bool ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos);	// ブロックとの一軸ごとの当たり判定
+	bool CollisionGroundBlock(D3DXVECTOR3& rPos);	// 地盤・ブロックとの当たり判定
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数

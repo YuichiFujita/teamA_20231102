@@ -19,7 +19,9 @@
 #include "player.h"
 #include "retentionManager.h"
 
+// TODO：いらないインクルード削除
 #include "ground.h"
+#include "block.h"
 
 //************************************************************
 //	マクロ定義
@@ -128,8 +130,9 @@ HRESULT CSceneGame::Init(void)
 		return E_FAIL;
 	}
 
-	// TODO：地面直置き
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(0.0f, 20.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
+	// TODO：直がきやめようね
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 20.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 400.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
 
 	//--------------------------------------------------------
 	//	初期設定

@@ -1047,7 +1047,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\wood-texture_00004.jpg";
+    "data\\MODEL\\TEXTURE\\wood-texture_00004.jpg";
    }
   }
   Material {
@@ -1056,7 +1056,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "data\\TEXTURE\\Wood-Design000.png";
+    "data\\MODEL\\TEXTURE\\Wood-Design000.png";
    }
   }
  }

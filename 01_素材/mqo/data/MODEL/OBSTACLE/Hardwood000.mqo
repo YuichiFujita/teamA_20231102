@@ -4,8 +4,8 @@ Format Text Ver 1.0
 Scene {
 	pos 7.1803 -402.9046 9536.7461
 	lookat 0.0000 0.0000 0.0000
-	head 6.2700
-	pich 0.0505
+	head 6.2800
+	pich 0.2005
 	bank 0.0000
 	ortho 0
 	zoom2 0.7862
@@ -18,8 +18,8 @@ Scene {
 	}
 }
 Material 2 {
-	"Branch-Tip" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("data\TEXTURE\wood-texture_00004.jpg")
-	"Wood-Surface" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("data\TEXTURE\Wood-Design000.png")
+	"Branch-Tip" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\フォルダ集\MyFolder\MetasequiaLE専用\2023\Team\data\MODEL\TEXTURE\wood-texture_00004.jpg")
+	"Wood-Surface" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\フォルダ集\MyFolder\MetasequiaLE専用\2023\Team\data\MODEL\TEXTURE\Wood-Design000.png")
 }
 Object "Trunk" {
 	visible 15

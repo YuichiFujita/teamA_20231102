@@ -858,7 +858,7 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 
 	// 位置の更新
 	// 地盤の当たり判定・着地判定
-	if (CollisionGround(rPos))
+	if (CollisionGroundBlock(rPos))
 	{ // 地盤に着地していた場合
 
 		// 着地している状態にする
@@ -1091,6 +1091,8 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 						sizeMaxGround,	// 判定目標サイズ(右・上・後)
 						sizeMinGround,	// 判定目標サイズ(左・下・前)
 						&m_move,		// 移動量
+						true,			// X判定
+						true,			// Z判定
 						&bMin,			// 下からの判定
 						&bMax			// 上からの判定
 					);
@@ -1137,9 +1139,115 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 }
 
 //============================================================
-//	地盤との当たり判定
+//	ブロックとの一軸ごとの当たり判定
 //============================================================
-bool CPlayer::CollisionGround(D3DXVECTOR3& rPos)
+bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(RADIUS, 0.0f, RADIUS);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(RADIUS, HEIGHT, RADIUS);	// プレイヤー最大大きさ
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// 変数を宣言
+				D3DXVECTOR3 posBlock = VEC3_ZERO;	// ブロック位置
+				D3DXVECTOR3 rotBlock = VEC3_ZERO;	// ブロック向き
+				D3DXVECTOR3 sizeBlock = VEC3_ZERO;	// ブロック大きさ
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルがブロックではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// ブロックの位置を設定
+				posBlock = pObjCheck->GetVec3Position();
+
+				// ブロックの向きを設定
+				rotBlock = pObjCheck->GetVec3Rotation();
+
+				// ブロックの最小の大きさを設定
+				sizeBlock = pObjCheck->GetVec3Sizing();
+
+				switch (axis)
+				{ // 判定軸ごとの処理
+				case AXIS_X:	// X軸
+
+					// X軸の衝突判定
+					collision::ResponseSingleX
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posBlock,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeBlock,		// 判定目標サイズ(右・上・後)
+						sizeBlock,		// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						false			// Y判定
+					);
+
+					break;
+
+				case AXIS_Z:	// Z軸
+
+					// Z軸の衝突判定
+					collision::ResponseSingleZ
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posBlock,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeBlock,		// 判定目標サイズ(右・上・後)
+						sizeBlock,		// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						true,			// X判定
+						false			// Y判定
+					);
+
+					break;
+
+				default:	// 例外処理
+					assert(false);
+					break;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 各軸の判定情報を返す
+	return bHit;
+}
+
+//============================================================
+//	地盤・ブロックとの当たり判定
+//============================================================
+bool CPlayer::CollisionGroundBlock(D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
 	bool bLand = false;	// 着地状況
@@ -1149,6 +1257,7 @@ bool CPlayer::CollisionGround(D3DXVECTOR3& rPos)
 
 	// X軸の当たり判定
 	ResponseSingleGround(AXIS_X, rPos);
+	ResponseSingleBlock(AXIS_X, rPos);
 
 	// 移動量を加算
 	rPos.y += m_move.y;
@@ -1161,6 +1270,7 @@ bool CPlayer::CollisionGround(D3DXVECTOR3& rPos)
 
 	// Z軸の当たり判定
 	ResponseSingleGround(AXIS_Z, rPos);
+	ResponseSingleBlock(AXIS_Z, rPos);
 
 	// 移動量を減衰
 	if (m_bJump)
