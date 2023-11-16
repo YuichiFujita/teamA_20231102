@@ -64,7 +64,7 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel(mc_apModelFile[CFlail::MODEL_PREFABHUT]);
+	BindModel(mc_apModelFile[CFlail::MODEL_FLAIL]);
 
 	// ê¨å˜Çï‘Ç∑
 	return S_OK;
