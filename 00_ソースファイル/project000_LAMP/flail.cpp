@@ -99,7 +99,7 @@ void CFlail::Update(void)
 	// ˆø‚Á’£‚é‚Ì‚İŠp“x’²®
 	if (m_move < 0.0f)
 	{
-		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
+		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.003f;
 	}
 
 	if (m_move > 0.0f && m_move < 5.0f)

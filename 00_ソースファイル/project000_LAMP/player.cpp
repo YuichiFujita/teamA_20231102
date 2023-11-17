@@ -759,7 +759,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 引き戻す速度決定
-		float move = -20.0f;
+		float move = 0.4f;
 
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
 		if (m_pFlail->GetLengthChain() < 50.0f)
@@ -772,7 +772,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		// 引き戻す
 		if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
-			m_pFlail->SetMove(move);
+			m_nCounterFlail--;
+
+			if (m_nCounterFlail < -50)
+			{
+				m_nCounterFlail = -50;
+			}
+
+			m_pFlail->SetMove(move * m_nCounterFlail);
 
 			// 移動量を更新
 			m_move.x = 0.0f;
