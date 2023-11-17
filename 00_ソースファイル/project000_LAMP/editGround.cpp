@@ -40,8 +40,6 @@
 //************************************************************
 namespace
 {
-	const D3DXVECTOR3 INIT_SIZE = D3DXVECTOR3(50.0f, 50.0f, 50.0f);	// 大きさ
-
 	const float	INIT_ALPHA = 0.5f;	// 配置前のα値
 }
 
@@ -85,7 +83,7 @@ HRESULT CEditGround::Init(void)
 	m_ground.type = CGround::TYPE_GRASS;	// 地盤種類
 
 	// 地盤の生成
-	m_ground.pGround = CGround::Create(m_ground.type, VEC3_ZERO, VEC3_ZERO, INIT_SIZE);
+	m_ground.pGround = CGround::Create(m_ground.type, VEC3_ZERO, VEC3_ZERO, VEC3_ZERO);
 	if (m_ground.pGround == NULL)
 	{ // 生成に失敗した場合
 
@@ -151,6 +149,9 @@ void CEditGround::Update(void)
 	// 向きを反映
 	m_ground.pGround->SetVec3Rotation(m_pEdit->GetVec3Rotation());
 
+	// 大きさを反映
+	m_ground.pGround->SetVec3Sizing(m_pEdit->GetVec3Sizing());
+
 	// 種類を反映
 	m_ground.pGround->SetType(m_ground.type);
 
@@ -171,6 +172,12 @@ void CEditGround::SetDisp(const bool bDisp)
 
 		// 位置を反映
 		m_ground.pGround->SetVec3Position(m_pEdit->GetVec3Position());
+
+		// 向きを反映
+		m_ground.pGround->SetVec3Rotation(m_pEdit->GetVec3Rotation());
+
+		// 大きさを反映
+		m_ground.pGround->SetVec3Sizing(m_pEdit->GetVec3Sizing());
 	}
 	else
 	{ // 表示OFFの場合
@@ -393,6 +400,7 @@ void CEditGround::CreateGround(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = m_pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = m_pEdit->GetVec3Rotation();	// エディットの向き
+	D3DXVECTOR3 sizeEdit = m_pEdit->GetVec3Sizing();	// エディットの大きさ
 	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
 
 	// ポインタを宣言
@@ -419,7 +427,7 @@ void CEditGround::CreateGround(void)
 		//	新しい地盤の生成
 		//----------------------------------------------------
 		// 地盤の生成
-		m_ground.pGround = CGround::Create(m_ground.type, posEdit, rotEdit, INIT_SIZE);
+		m_ground.pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
 		assert(m_ground.pGround != NULL);
 
 		// 色を設定

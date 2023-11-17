@@ -50,6 +50,7 @@ public:
 	bool IsEdit(void) const;					// エディット状況取得
 	D3DXVECTOR3 GetVec3Position(void) const;	// 位置取得
 	D3DXVECTOR3 GetVec3Rotation(void) const;	// 向き取得
+	D3DXVECTOR3 GetVec3Sizing(void) const;		// 大きさ取得
 
 	// 静的メンバ関数
 	static CEditStageManager *Create(void);	// 生成
@@ -61,6 +62,7 @@ private:
 	void UpdateChangeMove(void);	// 移動量変更の更新
 	void UpdatePosition(void);		// 位置更新
 	void UpdateRotation(void);		// 向き更新
+	void UpdateSizing(void);		// 大きさ更新
 	void DrawDebugControl(void);	// 操作表示描画
 	void DrawDebugInfo(void);		// 情報表示描画
 	void SaveStage(void);			// ステージ保存
@@ -71,6 +73,7 @@ private:
 
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
+	D3DXVECTOR3 m_size;	// 大きさ
 	EThing m_thing;		// 配置物
 	float m_fMove;		// 位置移動量
 	bool m_bSave;		// 保存状況
