@@ -71,21 +71,19 @@ namespace
 //************************************************************
 const char *CPlayer::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\PLAYER\\00_waist.x",	// 腰
-	"data\\MODEL\\PLAYER\\01_body.x",	// 体
-	"data\\MODEL\\PLAYER\\02_head.x",	// 頭
-	"data\\MODEL\\PLAYER\\03_armUL.x",	// 左上腕
-	"data\\MODEL\\PLAYER\\04_armUR.x",	// 右上腕
-	"data\\MODEL\\PLAYER\\05_armDL.x",	// 左下腕
-	"data\\MODEL\\PLAYER\\06_armDR.x",	// 右下腕
-	"data\\MODEL\\PLAYER\\07_handL.x",	// 左手
-	"data\\MODEL\\PLAYER\\08_handR.x",	// 右手
-	"data\\MODEL\\PLAYER\\09_legUL.x",	// 左太もも
-	"data\\MODEL\\PLAYER\\10_legUR.x",	// 右太もも
-	"data\\MODEL\\PLAYER\\11_legDL.x",	// 左脛
-	"data\\MODEL\\PLAYER\\12_legDR.x",	// 右脛
-	"data\\MODEL\\PLAYER\\13_footL.x",	// 左足
-	"data\\MODEL\\PLAYER\\14_footR.x",	// 右足
+	"data\\MODEL\\PLAYER\\00_waist.x",		// 腰
+	"data\\MODEL\\PLAYER\\01_body.x",		// 体
+	"data\\MODEL\\PLAYER\\02_head.x",		// 頭
+	"data\\MODEL\\PLAYER\\03_shoulder_R.x",	// 左上腕
+	"data\\MODEL\\PLAYER\\04_arm_R.x",		// 右上腕
+	"data\\MODEL\\PLAYER\\05_hand_R.x",		// 左下腕
+	"data\\MODEL\\PLAYER\\06_shoulder_L.x",	// 右下腕
+	"data\\MODEL\\PLAYER\\07_arm_L.x",		// 左手
+	"data\\MODEL\\PLAYER\\08_hand_L.x",		// 右手
+	"data\\MODEL\\PLAYER\\09_thigh_R.x",	// 左太もも
+	"data\\MODEL\\PLAYER\\10_leg_R.x",		// 右太もも
+	"data\\MODEL\\PLAYER\\11_thigh_L.x",	// 左脛
+	"data\\MODEL\\PLAYER\\12_leg_L.x",		// 右脛
 };
 
 //************************************************************
