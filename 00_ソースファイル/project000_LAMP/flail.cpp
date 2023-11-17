@@ -89,11 +89,21 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
 	// ½‚Ì’·‚³‚ÉˆÚ“®—Ê‘ã“ü
 	m_fLengthChain += m_move;
 
-	// ˆÚ“®—ÊŒ¸Š
-	m_move += (0.0f - m_move) * 0.08f;
+	if (player->GetCounterFlail() < 0)
+	{
+		// ˆÚ“®—ÊŒ¸Š
+		m_move += (0.0f - m_move) * 0.15f;
+	}
+	else
+	{
+		// ˆÚ“®—ÊŒ¸Š
+		m_move += (0.0f - m_move) * 0.08f;
+	}
 
 	// Šp“xC³
 	useful::NormalizeRot(m_fChainRot);
@@ -102,7 +112,7 @@ void CFlail::Update(void)
 	// ˆø‚Á’£‚éŽž‚Ì‚ÝŠp“x’²®
 	if (m_move < 0.0f)
 	{
-		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.003f;
+		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
 	}
 
 	if (m_move > 0.0f && m_move < 5.0f)
@@ -127,7 +137,6 @@ void CFlail::Update(void)
 
 	// Šp“x‚Æ’·‚³‚©‚ç“S‹…‚ÌˆÊ’uŒˆ’è
 	D3DXVECTOR3 pos = GetVec3Position();
-	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
 
@@ -135,7 +144,7 @@ void CFlail::Update(void)
 	{
 		if (player->GetCounterFlail() < 0)
 		{
-			if (pos.y > -35.0f)
+			if (pos.y > -13.0f)
 			{
 				pos.y -= 5.0f;
 			}

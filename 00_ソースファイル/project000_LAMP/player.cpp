@@ -766,31 +766,37 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 引き戻す速度決定
-		float move = 0.4f;
+		float move = 0.0001f;
 
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
 		if (m_pFlail->GetLengthChain() < 50.0f)
 		{
 			m_nCounterFlail = 1;
-			move = 0.0f;
+			m_pFlail->SetMove(0.0f);
 			m_pFlail->SetLengthChain(0.0f);
 		}
 
 		// 引き戻す
 		if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
-			m_nCounterFlail--;
+			m_nCounterFlail -= 10;
 
-			if (m_nCounterFlail < -50)
+			if (m_nCounterFlail < -500)
 			{
-				m_nCounterFlail = -50;
+				m_nCounterFlail = -500;
 			}
 
-			m_pFlail->SetMove(move * m_nCounterFlail);
+			m_pFlail->SetMove(m_pFlail->GetMove() + (move * m_nCounterFlail * -m_nCounterFlail));
 
 			// 移動量を更新
 			m_move.x = 0.0f;
 			m_move.z = 0.0f;
+		}
+
+		// 投擲
+		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
+		{
+			m_nCounterFlail = -1;
 		}
 	}
 
