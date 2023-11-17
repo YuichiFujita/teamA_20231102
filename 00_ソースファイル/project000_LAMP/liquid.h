@@ -118,6 +118,8 @@ public:
 	void SetAddVtxRot(const float fAddVtxRot);	// 隣波の向き加算量設定
 	float GetAddVtxRot(void) const;				// 隣波の向き加算量取得
 
+	CScrollMeshField *GetScrollMeshField(int num) const;	// 波のメッシュフィールド取得
+
 private:
 	// オーバーライド関数
 	void Release(void) override;	// 破棄
