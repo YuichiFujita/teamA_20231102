@@ -115,6 +115,8 @@ public:
 	bool IsFieldPositionRange(const D3DXVECTOR3&rPos);		// メッシュの範囲内取得 (回転考慮)
 	float GetFieldPositionHeight(const D3DXVECTOR3&rPos);	// メッシュの着地位置取得 (回転考慮)
 
+	CLiquid *GetLiquid(void);	// 液体取得
+
 	// 静的メンバ関数
 	static CStage *Create(const ELoad load);	// 生成
 	static HRESULT Release(CStage *&prStage);	// 破棄
