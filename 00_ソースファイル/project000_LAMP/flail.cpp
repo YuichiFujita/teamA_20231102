@@ -97,7 +97,7 @@ void CFlail::Update(void)
 	if (player->GetCounterFlail() < 0)
 	{
 		// ˆÚ“®—ÊŒ¸Š
-		m_move += (0.0f - m_move) * 0.15f;
+		m_move += (0.0f - m_move) * 0.01f;
 	}
 	else
 	{
