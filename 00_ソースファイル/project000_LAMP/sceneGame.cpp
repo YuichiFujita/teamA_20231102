@@ -18,11 +18,12 @@
 #include "pause.h"
 #include "player.h"
 #include "retentionManager.h"
+#include "gameManager.h"
+#include "editStageManager.h"
 
 // TODO：いらないインクルード削除
 #include "ground.h"
 #include "block.h"
-#include "liquid.h"
 
 //************************************************************
 //	マクロ定義
@@ -218,7 +219,7 @@ void CSceneGame::Update(void)
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
 	{
 		// エディット状況を反転
-		//CGameManager::GetEditStage()->SetEnableEdit((!CGameManager::GetEditStage()->IsEdit()) ? true : false);
+		CGameManager::GetEditStage()->SetEnableEdit(!CGameManager::GetEditStage()->IsEdit());
 	}
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F3))
 	{
