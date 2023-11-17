@@ -488,6 +488,15 @@ int CPlayer::GetPadID(void) const
 }
 
 //============================================================
+//	フレイルカウンター取得処理
+//============================================================
+int CPlayer::GetCounterFlail(void) const
+{
+	// フレイルカウンターを返す
+	return m_nCounterFlail;
+}
+
+//============================================================
 //	モーション・オブジェクトキャラクターの更新処理
 //============================================================
 void CPlayer::UpdateMotion(int nMotion)
@@ -686,7 +695,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z += cosf(m_dashRot.y) * fMove;
 		}
 
-		if (m_pFlail->GetLengthChain() >= 1400.0f)
+		if (m_pFlail->GetLengthChain() >= 1000.0f)
 		{
 			// 移動量を更新
 			m_move.x *= 0.8f;
@@ -722,7 +731,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != 120)
 		{
 			// 溜めた時間に応じて飛距離増加
-			float move = 2.0f;
+			float move = 1.3f;
 			move *= (float)m_nCounterFlail;
 			m_pFlail->SetMove(move);
 
@@ -764,7 +773,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
 		if (m_pFlail->GetLengthChain() < 50.0f)
 		{
-			m_nCounterFlail = 0;
+			m_nCounterFlail = 1;
 			move = 0.0f;
 			m_pFlail->SetLengthChain(0.0f);
 		}
@@ -810,6 +819,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[カウンター]：%d\n", m_nCounterFlail);
 
 	// 待機モーションを返す
 	return MOTION_IDOL;
