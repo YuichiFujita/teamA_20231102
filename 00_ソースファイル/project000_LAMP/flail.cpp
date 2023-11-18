@@ -15,6 +15,9 @@
 #include "useful.h"
 #include "player.h"
 #include "retentionManager.h"
+#include "stage.h"
+#include "liquid.h"
+#include "scrollMeshField.h"
 
 //************************************************************
 //	ƒ}ƒNƒ’è‹`
@@ -86,11 +89,21 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
 	// ½‚Ì’·‚³‚ÉˆÚ“®—Ê‘ã“ü
 	m_fLengthChain += m_move;
 
-	// ˆÚ“®—ÊŒ¸Š
-	m_move += (0.0f - m_move) * 0.08f;
+	if (player->GetCounterFlail() < 0)
+	{
+		// ˆÚ“®—ÊŒ¸Š
+		m_move += (0.0f - m_move) * 0.15f;
+	}
+	else
+	{
+		// ˆÚ“®—ÊŒ¸Š
+		m_move += (0.0f - m_move) * 0.08f;
+	}
 
 	// Šp“xC³
 	useful::NormalizeRot(m_fChainRot);
@@ -99,7 +112,7 @@ void CFlail::Update(void)
 	// ˆø‚Á’£‚éŽž‚Ì‚ÝŠp“x’²®
 	if (m_move < 0.0f)
 	{
-		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
+		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
 	}
 
 	if (m_move > 0.0f && m_move < 5.0f)
@@ -117,15 +130,35 @@ void CFlail::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[Œ´“_ˆÊ’u]F%f %f %f\n", m_posOrg.x, m_posOrg.y, m_posOrg.z);
 
 	// ˆê’è‚Ì’·‚³‚ð’´‚¦‚½‚çŽ~‚ß‚é
-	if (m_fLengthChain > 1400.0f)
+	if (m_fLengthChain > 1000.0f)
 	{
-		m_fLengthChain = 1400.0f;
+		m_fLengthChain = 1000.0f;
 	}
 
 	// Šp“x‚Æ’·‚³‚©‚ç“S‹…‚ÌˆÊ’uŒˆ’è
-	D3DXVECTOR3 pos = VEC3_ZERO;
+	D3DXVECTOR3 pos = GetVec3Position();
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+
+	if (m_move == 0.0f)
+	{
+		if (player->GetCounterFlail() < 0)
+		{
+			if (pos.y > -13.0f)
+			{
+				pos.y -= 5.0f;
+			}
+			else
+			{
+				pos.y = CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetScrollMeshField(0)->GetPositionHeight(pos);
+			}
+		}
+		else
+		{
+			pos.y = m_posOrg.y;
+		}
+	}
+
 	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
 
 	Collision();
@@ -231,8 +264,8 @@ void CFlail::Collision(void)
 			vec = player->GetVec3Position() - GetVec3Position();
 			vec.y = 0.0f;
 			length = D3DXVec3Length(&vec);
-
-			if (length < 50.0f)
+			
+			if (length < GetModelData().fRadius + player->GetRadius())
 			{
 				D3DXVECTOR3 pos = player->GetVec3Position();
 
