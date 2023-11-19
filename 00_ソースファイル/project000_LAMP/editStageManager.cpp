@@ -89,14 +89,14 @@ CEditStageManager::CEditStageManager()
 #if _DEBUG
 
 	// メンバ変数をクリア
-	m_pGround	= NULL;			// エディット地盤の情報
-	m_pos	= VEC3_ZERO;		// 位置
-	m_rot	= VEC3_ZERO;		// 向き
-	m_size	= VEC3_ZERO;		// 大きさ
-	m_fMove	= 0.0f;				// 位置移動量
-	m_thing	= THING_GROUND;		// 配置物
-	m_bSave	= false;			// 保存状況
-	m_bEdit	= false;			// エディット状況
+	m_pStage	= NULL;						// エディットステージの情報
+	m_thing		= CEditStage::THING_GROUND;	// 配置物
+	m_pos		= VEC3_ZERO;				// 位置
+	m_rot		= VEC3_ZERO;				// 向き
+	m_size		= VEC3_ZERO;				// 大きさ
+	m_fMove		= 0.0f;						// 位置移動量
+	m_bSave		= false;					// 保存状況
+	m_bEdit		= false;					// エディット状況
 
 #endif	// _DEBUG
 }
@@ -118,18 +118,18 @@ HRESULT CEditStageManager::Init(void)
 #if _DEBUG
 
 	// メンバ変数を初期化
-	m_pGround	= NULL;			// エディット地盤の情報
-	m_pos	= VEC3_ZERO;		// 位置
-	m_rot	= VEC3_ZERO;		// 向き
-	m_size	= INIT_SIZE;		// 大きさ
-	m_fMove	= INIT_MOVE;		// 位置移動量
-	m_thing	= THING_GROUND;		// 配置物
-	m_bSave	= false;			// 保存状況
-	m_bEdit	= false;			// エディット状況
+	m_pStage	= NULL;						// エディットステージの情報
+	m_thing		= CEditStage::THING_GROUND;	// 配置物
+	m_pos		= VEC3_ZERO;				// 位置
+	m_rot		= VEC3_ZERO;				// 向き
+	m_size		= INIT_SIZE;				// 大きさ
+	m_fMove		= INIT_MOVE;				// 位置移動量
+	m_bSave		= false;					// 保存状況
+	m_bEdit		= false;					// エディット状況
 
-	// エディット地盤の生成
-	m_pGround = CEditGround::Create(this);
-	if (m_pGround == NULL)
+	// エディットステージの生成
+	m_pStage = CEditStage::Create(this, m_thing);
+	if (m_pStage == NULL)
 	{ // 生成に失敗した場合
 
 		// 失敗を返す
@@ -155,13 +155,12 @@ void CEditStageManager::Uninit(void)
 {
 #if _DEBUG
 
-	if (m_pGround != NULL)
-	{ // エディット地盤が使用されている場合
+	if (m_pStage != NULL)
+	{ // エディットステージが使用されている場合
 
-		// エディット地盤の破棄
-		CEditGround::Release(m_pGround);
+		// エディットステージの破棄
+		CEditGround::Release(m_pStage);
 	}
-	else { assert(false); }	// 非使用中
 
 #endif	// _DEBUG
 }
@@ -195,30 +194,13 @@ void CEditStageManager::Update(void)
 	// 大きさの更新
 	UpdateSizing();
 
-	switch (m_thing)
-	{ // 配置物ごとの処理
-	case THING_GROUND:	// 地盤
+	if (m_pStage != NULL)
+	{ // エディットステージが使用されている場合
 
-		if (m_pGround != NULL)
-		{ // エディット地盤が使用されている場合
-
-			// エディット地盤の更新
-			m_pGround->Update();
-		}
-		else { assert(false); }	// 非使用中
-
-		break;
-
-	case THING_BLOCK:	// ブロック
-
-
-
-		break;
-
-	default:	// 例外処理
-		assert(false);
-		break;
+		// エディットステージの更新
+		m_pStage->Update();
 	}
+	else { assert(false); }	// 非使用中
 
 	// ステージ保存
 	SaveStage();
@@ -249,29 +231,27 @@ void CEditStageManager::SetEnableEdit(const bool bEdit)
 	// 引数のエディット状況にする
 	m_bEdit = bEdit;
 
-	switch (m_thing)
-	{ // 配置物ごとの処理
-	case THING_GROUND:	// 地盤
+	if (bEdit)
+	{ // エディットモードの場合
 
-		if (m_pGround != NULL)
-		{ // エディット地盤が使用されている場合
+		// エディットステージの生成
+		if (m_pStage == NULL)
+		{ // エディットステージが使用されていない場合
 
-			// エディット地盤の表示の設定
-			m_pGround->SetDisp(m_bEdit);
+			m_pStage = CEditStage::Create(this, m_thing);
+			assert(m_pStage != NULL);	// 生成失敗
 		}
-		else { assert(false); }	// 非使用中
+	}
+	else
+	{ // エディットモードではない場合
 
-		break;
+		// エディットステージの破棄
+		if (m_pStage != NULL)
+		{ // エディットステージが使用されている場合
 
-	case THING_BLOCK:	// ブロック
-
-
-
-		break;
-
-	default:	// 例外処理
-		assert(false);
-		break;
+			HRESULT hr = CEditStage::Release(m_pStage);
+			assert(hr != E_FAIL);	// 破棄失敗
+		}
 	}
 }
 
@@ -400,57 +380,23 @@ void CEditStageManager::UpdateChangeThing(void)
 	{
 		if (m_pKeyboard->IsTrigger(KEY_CHANGE_THING))
 		{
-			switch (m_thing)
-			{ // 配置物ごとの処理
-			case THING_GROUND:	// 地盤
+			// エディットステージの破棄
+			if (m_pStage != NULL)
+			{ // エディットステージが使用されている場合
 
-				if (m_pGround != NULL)
-				{ // エディット地盤が使用されている場合
-
-					// エディット地盤の表示の設定
-					m_pGround->SetDisp(false);
-				}
-				else { assert(false); }	// 非使用中
-
-				break;
-
-			case THING_BLOCK:	// ブロック
-
-
-
-				break;
-
-			default:	// 例外処理
-				assert(false);
-				break;
+				HRESULT hr = CEditStage::Release(m_pStage);
+				assert(hr != E_FAIL);	// 破棄失敗
 			}
 
 			// 配置物の変更
-			m_thing = (EThing)((m_thing + 1) % THING_MAX);
+			m_thing = (CEditStage::EThing)((m_thing + 1) % CEditStage::THING_MAX);
 
-			switch (m_thing)
-			{ // 配置物ごとの処理
-			case THING_GROUND:	// 地盤
+			// エディットステージの生成
+			if (m_pStage == NULL)
+			{ // エディットステージが使用されていない場合
 
-				if (m_pGround != NULL)
-				{ // エディット地盤が使用されている場合
-
-					// エディット地盤の表示の設定
-					m_pGround->SetDisp(true);
-				}
-				else { assert(false); }	// 非使用中
-
-				break;
-
-			case THING_BLOCK:	// ブロック
-
-
-
-				break;
-
-			default:	// 例外処理
-				assert(false);
-				break;
+				m_pStage = CEditStage::Create(this, m_thing);
+				assert(m_pStage != NULL);	// 生成失敗
 			}
 		}
 	}
@@ -662,29 +608,11 @@ void CEditStageManager::DrawDebugControl(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "大きさ：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Y, NAME_DOWN_SCALE_Y, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "配置物変更：[%s]\n", NAME_CHANGE_THING);
 
-	switch (m_thing)
-	{ // 配置物ごとの処理
-	case THING_GROUND:	// 地盤
+	if (m_pStage != NULL)
+	{ // エディットステージが使用されている場合
 
-		if (m_pGround != NULL)
-		{ // エディット地盤が使用されている場合
-
-			// エディット地盤の操作表示
-			m_pGround->DrawDebugControl();
-		}
-		else { assert(false); }	// 非使用中
-
-		break;
-
-	case THING_BLOCK:	// ブロック
-
-
-
-		break;
-
-	default:	// 例外処理
-		assert(false);
-		break;
+		// エディットステージの操作表示
+		m_pStage->DrawDebugControl();
 	}
 }
 
@@ -698,7 +626,7 @@ void CEditStageManager::DrawDebugInfo(void)
 	static char* apThing[] = { "地盤", "ブロック", };	// 配置物
 
 	// 配置物数の不一致
-	assert((sizeof(apThing) / sizeof(apThing[0])) == THING_MAX);
+	assert((sizeof(apThing) / sizeof(apThing[0])) == CEditStage::THING_MAX);
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "======================================\n");
 	pDebug->Print(CDebugProc::POINT_RIGHT, "[エディット情報]　\n");
@@ -710,29 +638,11 @@ void CEditStageManager::DrawDebugInfo(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[大きさ]\n", m_size.x, m_size.y, m_size.z);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f：[移動量]\n", m_fMove);
 
-	switch (m_thing)
-	{ // 配置物ごとの処理
-	case THING_GROUND:	// 地盤
+	if (m_pStage != NULL)
+	{ // エディットステージが使用されている場合
 
-		if (m_pGround != NULL)
-		{ // エディット地盤が使用されている場合
-
-			// エディット地盤の情報表示
-			m_pGround->DrawDebugInfo();
-		}
-		else { assert(false); }	// 非使用中
-
-		break;
-
-	case THING_BLOCK:	// ブロック
-
-
-
-		break;
-
-	default:	// 例外処理
-		assert(false);
-		break;
+		// エディットステージの情報表示
+		m_pStage->DrawDebugInfo();
 	}
 }
 
@@ -781,8 +691,50 @@ void CEditStageManager::Save(void)
 		fprintf(pFile, "#==============================================================================\n");
 		fprintf(pFile, "---------->--<---------- ここから下を コピーし貼り付け ---------->--<----------\n\n");
 
-		// 地盤の保存
-		m_pGround->Save(pFile);
+		// 情報保存
+		m_pStage->SaveInfo();
+
+		for (int nCntThing = 0; nCntThing < CEditStage::THING_MAX; nCntThing++)
+		{ // 配置物の総数分繰り返す
+
+			// エディットステージの破棄
+			if (m_pStage != NULL)
+			{ // エディットステージが使用されている場合
+
+				HRESULT hr = CEditStage::Release(m_pStage);
+				assert(hr != E_FAIL);	// 破棄失敗
+			}
+
+			// エディットステージの生成
+			if (m_pStage == NULL)
+			{ // エディットステージが使用されていない場合
+
+				m_pStage = CEditStage::Create(this, (CEditStage::EThing)nCntThing);
+				assert(m_pStage != NULL);	// 生成失敗
+			}
+
+			// 配置物の保存
+			m_pStage->Save(pFile);
+		}
+
+		// エディットステージの破棄
+		if (m_pStage != NULL)
+		{ // エディットステージが使用されている場合
+
+			HRESULT hr = CEditStage::Release(m_pStage);
+			assert(hr != E_FAIL);	// 破棄失敗
+		}
+
+		// エディットステージの生成
+		if (m_pStage == NULL)
+		{ // エディットステージが使用されていない場合
+
+			m_pStage = CEditStage::Create(this, m_thing);
+			assert(m_pStage != NULL);	// 生成失敗
+		}
+
+		// 情報読込
+		m_pStage->LoadInfo();
 
 		// ファイルを閉じる
 		fclose(pFile);

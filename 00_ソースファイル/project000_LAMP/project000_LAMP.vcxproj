@@ -160,6 +160,7 @@
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="editGround.cpp" />
+    <ClCompile Include="editStage.cpp" />
     <ClCompile Include="editStageManager.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="DepthShadow.h" />
     <ClInclude Include="editGround.h" />
+    <ClInclude Include="editStage.h" />
     <ClInclude Include="editStageManager.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />

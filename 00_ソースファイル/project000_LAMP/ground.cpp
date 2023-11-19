@@ -30,6 +30,15 @@ const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 		"data\\TEXTURE\\groundSide000.png",	// 前テクスチャ
 		"data\\TEXTURE\\groundSide000.png",	// 後テクスチャ
 	},
+
+	{ // 石テクスチャ
+		"data\\TEXTURE\\block000.png",	// 左テクスチャ
+		"data\\TEXTURE\\block000.png",	// 右テクスチャ
+		"data\\TEXTURE\\block000.png",	// 下テクスチャ
+		"data\\TEXTURE\\block000.png",	// 上テクスチャ
+		"data\\TEXTURE\\block000.png",	// 前テクスチャ
+		"data\\TEXTURE\\block000.png",	// 後テクスチャ
+	},
 };
 
 //************************************************************

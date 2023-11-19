@@ -14,6 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "editStage.h"
 #include "ground.h"
 
 //************************************************************
@@ -25,34 +26,30 @@ class CEditStageManager;	// エディットステージマネージャークラス
 //	クラス定義
 //************************************************************
 // エディット地盤クラス
-class CEditGround
+class CEditGround : public CEditStage
 {
 public:
 	// コンストラクタ
 	CEditGround();
 
 	// デストラクタ
-	~CEditGround();
+	~CEditGround() override;
 
 	// 地盤情報構造体
 	struct SInfo
 	{
-		CGround *pGround;		// 地盤情報
 		CGround::EType type;	// 地盤種類
 	};
 
-	// メンバ関数
-	HRESULT Init(void);	// 初期化
-	void Uninit(void);	// 終了
-	void Update(void);	// 更新
-	void SetDisp(const bool bDisp);	// 表示設定
-	void DrawDebugControl(void);	// 操作表示描画
-	void DrawDebugInfo(void);		// 情報表示描画
-	void Save(FILE *pFile);			// 保存
-
-	// 静的メンバ関数
-	static CEditGround *Create(CEditStageManager *pEdit);	// 生成
-	static HRESULT Release(CEditGround *&prEditGround);	// 破棄
+	// オーバーライド関数
+	HRESULT Init(void) override;	// 初期化
+	void Uninit(void) override;		// 終了
+	void Update(void) override;		// 更新
+	void DrawDebugControl(void) override;	// 操作表示描画
+	void DrawDebugInfo(void) override;		// 情報表示描画
+	void SaveInfo(void) override;			// 情報保存
+	void LoadInfo(void) override;			// 情報読込
+	void Save(FILE *pFile) override;		// 保存
 
 private:
 	// メンバ関数
@@ -63,9 +60,12 @@ private:
 	void DeleteCollisionGround(const bool bRelase);	// 地盤の削除判定
 	void InitAllColorGround(void);					// 地盤の色全初期化
 
+	// 静的メンバ変数
+	static SInfo m_save;	// 保存情報
+
 	// メンバ変数
-	CEditStageManager *m_pEdit;	// エディットステージの情報
-	SInfo m_ground;	// 地盤配置情報
+	CGround *m_pGround;	// 地盤情報
+	SInfo m_ground;		// 地盤配置情報
 };
 
 #endif	// _EDIT_GROUND_H_

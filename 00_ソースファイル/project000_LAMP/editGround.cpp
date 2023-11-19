@@ -44,6 +44,11 @@ namespace
 }
 
 //************************************************************
+//	静的メンバ変数宣言
+//************************************************************
+CEditGround::SInfo CEditGround::m_save = {};	// 保存情報
+
+//************************************************************
 //	親クラス [CEditGround] のメンバ関数
 //************************************************************
 //============================================================
@@ -54,7 +59,7 @@ CEditGround::CEditGround()
 #if _DEBUG
 
 	// メンバ変数をクリア
-	m_pEdit = NULL;	// エディットステージの情報
+	m_pGround = NULL;	// 地盤情報
 	memset(&m_ground, 0, sizeof(m_ground));	// 地盤配置情報
 
 #endif	// _DEBUG
@@ -76,15 +81,28 @@ HRESULT CEditGround::Init(void)
 {
 #if _DEBUG
 
-	// メンバ変数を初期化
-	m_pEdit = NULL;	// エディットステージの情報
+	// ポインタを宣言
+	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
+	if (pEdit == NULL)
+	{ // エディットステージが存在しない場合
 
-	m_ground.pGround = NULL;				// 地盤情報
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 変数を宣言
+	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
+	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
+
+	// メンバ変数を初期化
+	m_pGround = NULL;	// 地盤情報
 	m_ground.type = CGround::TYPE_GRASS;	// 地盤種類
 
 	// 地盤の生成
-	m_ground.pGround = CGround::Create(m_ground.type, VEC3_ZERO, VEC3_ZERO, VEC3_ZERO);
-	if (m_ground.pGround == NULL)
+	m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
+	if (m_pGround == NULL)
 	{ // 生成に失敗した場合
 
 		// 失敗を返す
@@ -93,11 +111,8 @@ HRESULT CEditGround::Init(void)
 	}
 
 	// 色を設定
-	D3DXCOLOR col = m_ground.pGround->GetColor();	// 元の色を取得
-	m_ground.pGround->SetColor(D3DXCOLOR(col.r, col.g, col.b, INIT_ALPHA));
-
-	// 表示をOFFにする
-	SetDisp(false);
+	D3DXCOLOR col = m_pGround->GetColor();	// 元の色を取得
+	m_pGround->SetColor(D3DXCOLOR(col.r, col.g, col.b, INIT_ALPHA));
 
 	// 成功を返す
 	return S_OK;
@@ -116,6 +131,17 @@ HRESULT CEditGround::Init(void)
 void CEditGround::Uninit(void)
 {
 #if _DEBUG
+
+	if (m_pGround != NULL)
+	{ // 生成に失敗した場合
+
+		// 地盤の色の全初期化
+		InitAllColorGround();
+
+		// 地盤の終了
+		m_pGround->Uninit();
+	}
+
 #endif	// _DEBUG
 }
 
@@ -126,7 +152,9 @@ void CEditGround::Update(void)
 {
 #if _DEBUG
 
-	if (m_pEdit == NULL)
+	// ポインタを宣言
+	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
+	if (pEdit == NULL)
 	{ // エディットステージが存在しない場合
 
 		// 処理を抜ける
@@ -144,51 +172,18 @@ void CEditGround::Update(void)
 	ReleaseGround();
 
 	// 位置を反映
-	m_ground.pGround->SetVec3Position(m_pEdit->GetVec3Position());
+	m_pGround->SetVec3Position(pEdit->GetVec3Position());
 
 	// 向きを反映
-	m_ground.pGround->SetVec3Rotation(m_pEdit->GetVec3Rotation());
+	m_pGround->SetVec3Rotation(pEdit->GetVec3Rotation());
 
 	// 大きさを反映
-	m_ground.pGround->SetVec3Sizing(m_pEdit->GetVec3Sizing());
+	m_pGround->SetVec3Sizing(pEdit->GetVec3Sizing());
 
 	// 種類を反映
-	m_ground.pGround->SetType(m_ground.type);
+	m_pGround->SetType(m_ground.type);
 
 #endif	// _DEBUG
-}
-
-//============================================================
-//	表示の設定処理
-//============================================================
-void CEditGround::SetDisp(const bool bDisp)
-{
-	// 自動更新・自動描画を表示状況に合わせる
-	m_ground.pGround->SetEnableUpdate(bDisp);	// 更新
-	m_ground.pGround->SetEnableDraw(bDisp);		// 描画
-
-	if (bDisp)
-	{ // 表示ONの場合
-
-		// 位置を反映
-		m_ground.pGround->SetVec3Position(m_pEdit->GetVec3Position());
-
-		// 向きを反映
-		m_ground.pGround->SetVec3Rotation(m_pEdit->GetVec3Rotation());
-
-		// 大きさを反映
-		m_ground.pGround->SetVec3Sizing(m_pEdit->GetVec3Sizing());
-	}
-	else
-	{ // 表示OFFの場合
-
-		// 地盤の色の全初期化
-		InitAllColorGround();
-
-		// 位置をステージの範囲外に設定
-		D3DXVECTOR3 outLimit = D3DXVECTOR3(0.0f, 0.0f, CScene::GetStage()->GetStageLimit().fNear - m_ground.pGround->GetVec3Sizing().z);
-		m_ground.pGround->SetVec3Position(outLimit);
-	}
 }
 
 //============================================================
@@ -213,6 +208,24 @@ void CEditGround::DrawDebugInfo(void)
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_ground.type);
+}
+
+//============================================================
+//	情報保存処理
+//============================================================
+void CEditGround::SaveInfo(void)
+{
+	// 現在の情報を保存
+	m_save = m_ground;
+}
+
+//============================================================
+//	情報読込処理
+//============================================================
+void CEditGround::LoadInfo(void)
+{
+	// 保存情報を設定
+	m_ground = m_save;
 }
 
 //============================================================
@@ -261,7 +274,7 @@ void CEditGround::Save(FILE *pFile)
 						continue;
 					}
 	
-					if (pObjCheck == (CObject*)m_ground.pGround)
+					if (pObjCheck == (CObject*)m_pGround)
 					{ // 同じアドレスだった場合
 	
 						// 次のオブジェクトへのポインタを代入
@@ -299,85 +312,6 @@ void CEditGround::Save(FILE *pFile)
 }
 
 //============================================================
-//	生成処理
-//============================================================
-CEditGround *CEditGround::Create(CEditStageManager *pEdit)
-{
-#if _DEBUG
-
-	// ポインタを宣言
-	CEditGround *pEditGround = NULL;	// エディット地盤生成用
-
-	if (pEditGround == NULL)
-	{ // 使用されていない場合
-
-		// メモリ確保
-		pEditGround = new CEditGround;	// エディット地盤
-	}
-	else { assert(false); return NULL; }	// 使用中
-
-	if (pEditGround != NULL)
-	{ // 使用されている場合
-		
-		// エディット地盤の初期化
-		if (FAILED(pEditGround->Init()))
-		{ // 初期化に失敗した場合
-
-			// メモリ開放
-			delete pEditGround;
-			pEditGround = NULL;
-
-			// 失敗を返す
-			return NULL;
-		}
-
-		// エディットステージの情報を設定
-		pEditGround->m_pEdit = pEdit;
-
-		// 確保したアドレスを返す
-		return pEditGround;
-	}
-	else { assert(false); return NULL; }	// 確保失敗
-
-#else	// NDEBUG
-
-	// NULLを返す
-	return NULL;
-
-#endif	// _DEBUG
-}
-
-//============================================================
-//	破棄処理
-//============================================================
-HRESULT CEditGround::Release(CEditGround *&prEditGround)
-{
-#if _DEBUG
-
-	if (prEditGround != NULL)
-	{ // 使用中の場合
-
-		// エディット地盤の終了
-		prEditGround->Uninit();
-
-		// メモリ開放
-		delete prEditGround;
-		prEditGround = NULL;
-
-		// 成功を返す
-		return S_OK;
-	}
-	else { assert(false); return E_FAIL; }	// 非使用中
-
-#else	// NDEBUG
-
-	// 成功を返す
-	return S_OK;
-
-#endif	// _DEBUG
-}
-
-//============================================================
 //	種類変更の更新処理
 //============================================================
 void CEditGround::UpdateChangeType(void)
@@ -397,14 +331,22 @@ void CEditGround::UpdateChangeType(void)
 //============================================================
 void CEditGround::CreateGround(void)
 {
-	// 変数を宣言
-	D3DXVECTOR3 posEdit = m_pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = m_pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeEdit = m_pEdit->GetVec3Sizing();	// エディットの大きさ
-	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
-
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
+	if (pEdit == NULL)
+	{ // エディットステージが存在しない場合
+
+		// 処理を抜ける
+		assert(false);
+		return;
+	}
+
+	// 変数を宣言
+	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
+	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
+	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
 
 	// 地盤を配置
 	if (m_pKeyboard->IsTrigger(KEY_CREATE))
@@ -413,26 +355,26 @@ void CEditGround::CreateGround(void)
 		//	地盤の情報を配置用に変更
 		//----------------------------------------------------
 		// 自動更新・自動描画をONにする
-		m_ground.pGround->SetEnableUpdate(true);
-		m_ground.pGround->SetEnableDraw(true);
+		m_pGround->SetEnableUpdate(true);
+		m_pGround->SetEnableDraw(true);
 
 		// 色を設定
-		colBuild = m_ground.pGround->GetColor();	// 元の色を取得
-		m_ground.pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
+		colBuild = m_pGround->GetColor();	// 元の色を取得
+		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
 
 		// 未保存を設定
-		m_pEdit->UnSave();
+		pEdit->UnSave();
 
 		//----------------------------------------------------
 		//	新しい地盤の生成
 		//----------------------------------------------------
 		// 地盤の生成
-		m_ground.pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
-		assert(m_ground.pGround != NULL);
+		m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
+		assert(m_pGround != NULL);
 
 		// 色を設定
-		colBuild = m_ground.pGround->GetColor();	// 元の色を取得
-		m_ground.pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
+		colBuild = m_pGround->GetColor();	// 元の色を取得
+		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
 	}
 }
 
@@ -463,9 +405,19 @@ void CEditGround::ReleaseGround(void)
 //============================================================
 void CEditGround::DeleteCollisionGround(const bool bRelase)
 {
+	// ポインタを宣言
+	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
+	if (pEdit == NULL)
+	{ // エディットステージが存在しない場合
+
+		// 処理を抜ける
+		assert(false);
+		return;
+	}
+
 	// 変数を宣言
-	D3DXVECTOR3 posEdit = m_pEdit->GetVec3Position();				// エディットの位置
-	D3DXVECTOR3 sizeEdit = m_ground.pGround->GetVec3Sizing();	// エディット地盤の大きさ
+	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -499,7 +451,7 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_ground.pGround)
+				if (pObjCheck == (CObject*)m_pGround)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入
@@ -532,7 +484,7 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 						pObjCheck->Uninit();
 
 						// 未保存を設定
-						m_pEdit->UnSave();
+						pEdit->UnSave();
 					}
 					else
 					{ // 破棄しない場合
@@ -588,7 +540,7 @@ void CEditGround::InitAllColorGround(void)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_ground.pGround)
+				if (pObjCheck == (CObject*)m_pGround)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入
