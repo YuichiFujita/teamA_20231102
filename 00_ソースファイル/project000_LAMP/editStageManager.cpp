@@ -11,7 +11,6 @@
 #include "manager.h"
 #include "input.h"
 #include "camera.h"
-#include "editGround.h"
 
 //************************************************************
 //	マクロ定義
@@ -159,7 +158,7 @@ void CEditStageManager::Uninit(void)
 	{ // エディットステージが使用されている場合
 
 		// エディットステージの破棄
-		CEditGround::Release(m_pStage);
+		CEditStage::Release(m_pStage);
 	}
 
 #endif	// _DEBUG
