@@ -1,21 +1,21 @@
 //============================================================
 //
-//	エディット地盤ヘッダー [editGround.h]
+//	エディットブロックヘッダー [editBlock.h]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	二重インクルード防止
 //************************************************************
-#ifndef _EDIT_GROUND_H_
-#define _EDIT_GROUND_H_
+#ifndef _EDIT_BLOCK_H_
+#define _EDIT_BLOCK_H_
 
 //************************************************************
 //	インクルードファイル
 //************************************************************
 #include "main.h"
 #include "editStage.h"
-#include "ground.h"
+#include "block.h"
 
 //************************************************************
 //	前方宣言
@@ -25,20 +25,20 @@ class CEditStageManager;	// エディットステージマネージャークラス
 //************************************************************
 //	クラス定義
 //************************************************************
-// エディット地盤クラス
-class CEditGround : public CEditStage
+// エディットブロッククラス
+class CEditBlock : public CEditStage
 {
 public:
 	// コンストラクタ
-	CEditGround();
+	CEditBlock();
 
 	// デストラクタ
-	~CEditGround() override;
+	~CEditBlock() override;
 
-	// 地盤情報構造体
+	// ブロック情報構造体
 	struct SInfo
 	{
-		CGround::EType type;	// 地盤種類
+		CBlock::EType type;	// ブロック種類
 	};
 
 	// オーバーライド関数
@@ -54,18 +54,18 @@ public:
 private:
 	// メンバ関数
 	void UpdateChangeType(void);	// 種類変更の更新
-	void CreateGround(void);		// 地盤生成
-	void ReleaseGround(void);		// 地盤破棄
+	void CreateBlock(void);			// ブロック生成
+	void ReleaseBlock(void);		// ブロック破棄
 
-	void DeleteCollisionGround(const bool bRelase);	// 地盤の削除判定
-	void InitAllColorGround(void);					// 地盤の色全初期化
+	void DeleteCollisionBlock(const bool bRelase);	// ブロックの削除判定
+	void InitAllColorBlock(void);					// ブロックの色全初期化
 
 	// 静的メンバ変数
 	static SInfo m_save;	// 保存情報
 
 	// メンバ変数
-	CGround *m_pGround;	// 地盤情報
-	SInfo m_ground;		// 地盤配置情報
+	CBlock *m_pBlock;	// ブロック情報
+	SInfo m_block;		// ブロック配置情報
 };
 
-#endif	// _EDIT_GROUND_H_
+#endif	// _EDIT_BLOCK_H_

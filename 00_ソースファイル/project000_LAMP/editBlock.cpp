@@ -1,13 +1,13 @@
 //============================================================
 //
-//	エディット地盤処理 [editGround.cpp]
+//	エディットブロック処理 [editBlock.cpp]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	インクルードファイル
 //************************************************************
-#include "editGround.h"
+#include "editBlock.h"
 #include "manager.h"
 #include "input.h"
 #include "collision.h"
@@ -39,21 +39,21 @@ namespace
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-CEditGround::SInfo CEditGround::m_save = {};	// 保存情報
+CEditBlock::SInfo CEditBlock::m_save = {};	// 保存情報
 
 //************************************************************
-//	親クラス [CEditGround] のメンバ関数
+//	親クラス [CEditBlock] のメンバ関数
 //************************************************************
 //============================================================
 //	コンストラクタ
 //============================================================
-CEditGround::CEditGround()
+CEditBlock::CEditBlock()
 {
 #if _DEBUG
 
 	// メンバ変数をクリア
-	m_pGround = NULL;	// 地盤情報
-	memset(&m_ground, 0, sizeof(m_ground));	// 地盤配置情報
+	m_pBlock = NULL;	// ブロック情報
+	memset(&m_block, 0, sizeof(m_block));	// ブロック配置情報
 
 #endif	// _DEBUG
 }
@@ -61,7 +61,7 @@ CEditGround::CEditGround()
 //============================================================
 //	デストラクタ
 //============================================================
-CEditGround::~CEditGround()
+CEditBlock::~CEditBlock()
 {
 #if _DEBUG
 #endif	// _DEBUG
@@ -70,7 +70,7 @@ CEditGround::~CEditGround()
 //============================================================
 //	初期化処理
 //============================================================
-HRESULT CEditGround::Init(void)
+HRESULT CEditBlock::Init(void)
 {
 #if _DEBUG
 
@@ -90,12 +90,12 @@ HRESULT CEditGround::Init(void)
 	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	// メンバ変数を初期化
-	m_pGround = NULL;	// 地盤情報
-	m_ground.type = CGround::TYPE_GRASS;	// 地盤種類
+	m_pBlock = NULL;	// ブロック情報
+	m_block.type = CBlock::TYPE_STONE;	// ブロック種類
 
-	// 地盤の生成
-	m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
-	if (m_pGround == NULL)
+	// ブロックの生成
+	m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, sizeEdit);
+	if (m_pBlock == NULL)
 	{ // 生成に失敗した場合
 
 		// 失敗を返す
@@ -104,8 +104,8 @@ HRESULT CEditGround::Init(void)
 	}
 
 	// 色を設定
-	D3DXCOLOR col = m_pGround->GetColor();	// 元の色を取得
-	m_pGround->SetColor(D3DXCOLOR(col.r, col.g, col.b, INIT_ALPHA));
+	D3DXCOLOR col = m_pBlock->GetColor();	// 元の色を取得
+	m_pBlock->SetColor(D3DXCOLOR(col.r, col.g, col.b, INIT_ALPHA));
 
 	// 成功を返す
 	return S_OK;
@@ -121,18 +121,18 @@ HRESULT CEditGround::Init(void)
 //============================================================
 //	終了処理
 //============================================================
-void CEditGround::Uninit(void)
+void CEditBlock::Uninit(void)
 {
 #if _DEBUG
 
-	if (m_pGround != NULL)
+	if (m_pBlock != NULL)
 	{ // 生成に失敗した場合
 
-		// 地盤の色の全初期化
-		InitAllColorGround();
+		// ブロックの色の全初期化
+		InitAllColorBlock();
 
-		// 地盤の終了
-		m_pGround->Uninit();
+		// ブロックの終了
+		m_pBlock->Uninit();
 	}
 
 #endif	// _DEBUG
@@ -141,7 +141,7 @@ void CEditGround::Uninit(void)
 //============================================================
 //	更新処理
 //============================================================
-void CEditGround::Update(void)
+void CEditBlock::Update(void)
 {
 #if _DEBUG
 
@@ -158,23 +158,23 @@ void CEditGround::Update(void)
 	// 種類変更の更新
 	UpdateChangeType();
 
-	// 地盤の生成
-	CreateGround();
+	// ブロックの生成
+	CreateBlock();
 
-	// 地盤の破棄
-	ReleaseGround();
+	// ブロックの破棄
+	ReleaseBlock();
 
 	// 位置を反映
-	m_pGround->SetVec3Position(pEdit->GetVec3Position());
+	m_pBlock->SetVec3Position(pEdit->GetVec3Position());
 
 	// 向きを反映
-	m_pGround->SetVec3Rotation(pEdit->GetVec3Rotation());
+	m_pBlock->SetVec3Rotation(pEdit->GetVec3Rotation());
 
 	// 大きさを反映
-	m_pGround->SetVec3Sizing(pEdit->GetVec3Sizing());
+	m_pBlock->SetVec3Sizing(pEdit->GetVec3Sizing());
 
 	// 種類を反映
-	m_pGround->SetType(m_ground.type);
+	m_pBlock->SetType(m_block.type);
 
 #endif	// _DEBUG
 }
@@ -182,7 +182,7 @@ void CEditGround::Update(void)
 //============================================================
 //	操作表示の描画処理
 //============================================================
-void CEditGround::DrawDebugControl(void)
+void CEditBlock::DrawDebugControl(void)
 {
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
@@ -195,36 +195,36 @@ void CEditGround::DrawDebugControl(void)
 //============================================================
 //	情報表示の描画処理
 //============================================================
-void CEditGround::DrawDebugInfo(void)
+void CEditBlock::DrawDebugInfo(void)
 {
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_ground.type);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_block.type);
 }
 
 //============================================================
 //	情報保存処理
 //============================================================
-void CEditGround::SaveInfo(void)
+void CEditBlock::SaveInfo(void)
 {
 	// 現在の情報を保存
-	m_save = m_ground;
+	m_save = m_block;
 }
 
 //============================================================
 //	情報読込処理
 //============================================================
-void CEditGround::LoadInfo(void)
+void CEditBlock::LoadInfo(void)
 {
 	// 保存情報を設定
-	m_ground = m_save;
+	m_block = m_save;
 }
 
 //============================================================
 //	保存処理
 //============================================================
-void CEditGround::Save(FILE *pFile)
+void CEditBlock::Save(FILE *pFile)
 {
 #if _DEBUG
 
@@ -233,11 +233,11 @@ void CEditGround::Save(FILE *pFile)
 
 		// 見出しを書き出し
 		fprintf(pFile, "#------------------------------------------------------------------------------\n");
-		fprintf(pFile, "#	地盤の配置情報\n");
+		fprintf(pFile, "#	ブロックの配置情報\n");
 		fprintf(pFile, "#------------------------------------------------------------------------------\n");
 
 		// 情報開始地点を書き出し
-		fprintf(pFile, "STAGE_GROUNDSET\n\n");
+		fprintf(pFile, "STAGE_BLOCKSET\n\n");
 
 		for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 		{ // 優先順位の総数分繰り返す
@@ -257,8 +257,8 @@ void CEditGround::Save(FILE *pFile)
 					// ポインタを宣言
 					CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 	
-					if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-					{ // オブジェクトラベルが地盤ではない場合
+					if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+					{ // オブジェクトラベルがブロックではない場合
 	
 						// 次のオブジェクトへのポインタを代入
 						pObjCheck = pObjectNext;
@@ -267,7 +267,7 @@ void CEditGround::Save(FILE *pFile)
 						continue;
 					}
 	
-					if (pObjCheck == (CObject*)m_pGround)
+					if (pObjCheck == (CObject*)m_pBlock)
 					{ // 同じアドレスだった場合
 	
 						// 次のオブジェクトへのポインタを代入
@@ -277,19 +277,19 @@ void CEditGround::Save(FILE *pFile)
 						continue;
 					}
 
-					// 地盤の情報を取得
+					// ブロックの情報を取得
 					D3DXVECTOR3 posBuild = pObjCheck->GetVec3Position();	// 位置
 					D3DXVECTOR3 rotBuild = pObjCheck->GetVec3Rotation();	// 向き
 					D3DXVECTOR3 sizeBuild = pObjCheck->GetVec3Sizing();		// 大きさ
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
-					fprintf(pFile, "	GROUNDSET\n");
+					fprintf(pFile, "	BLOCKSET\n");
 					fprintf(pFile, "		TYPE = %d\n", nType);
 					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posBuild.x, posBuild.y, posBuild.z);
 					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotBuild.x, rotBuild.y, rotBuild.z);
 					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeBuild.x, sizeBuild.y, sizeBuild.z);
-					fprintf(pFile, "	END_GROUNDSET\n\n");
+					fprintf(pFile, "	END_BLOCKSET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -298,7 +298,7 @@ void CEditGround::Save(FILE *pFile)
 		}
 
 		// 情報終了地点を書き出し
-		fprintf(pFile, "END_STAGE_GROUNDSET\n\n");
+		fprintf(pFile, "END_STAGE_BLOCKSET\n\n");
 	}
 
 #endif	// _DEBUG
@@ -307,7 +307,7 @@ void CEditGround::Save(FILE *pFile)
 //============================================================
 //	種類変更の更新処理
 //============================================================
-void CEditGround::UpdateChangeType(void)
+void CEditBlock::UpdateChangeType(void)
 {
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
@@ -315,14 +315,14 @@ void CEditGround::UpdateChangeType(void)
 	// 種類を変更
 	if (m_pKeyboard->IsTrigger(KEY_TYPE))
 	{
-		m_ground.type = (CGround::EType)((m_ground.type + 1) % CGround::TYPE_MAX);
+		m_block.type = (CBlock::EType)((m_block.type + 1) % CBlock::TYPE_MAX);
 	}
 }
 
 //============================================================
-//	地盤の生成処理
+//	ブロックの生成処理
 //============================================================
-void CEditGround::CreateGround(void)
+void CEditBlock::CreateBlock(void)
 {
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
@@ -341,40 +341,40 @@ void CEditGround::CreateGround(void)
 	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
 
-	// 地盤を配置
+	// ブロックを配置
 	if (m_pKeyboard->IsTrigger(KEY_CREATE))
 	{
 		//----------------------------------------------------
-		//	地盤の情報を配置用に変更
+		//	ブロックの情報を配置用に変更
 		//----------------------------------------------------
 		// 自動更新・自動描画をONにする
-		m_pGround->SetEnableUpdate(true);
-		m_pGround->SetEnableDraw(true);
+		m_pBlock->SetEnableUpdate(true);
+		m_pBlock->SetEnableDraw(true);
 
 		// 色を設定
-		colBuild = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
+		colBuild = m_pBlock->GetColor();	// 元の色を取得
+		m_pBlock->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
 
 		// 未保存を設定
 		pEdit->UnSave();
 
 		//----------------------------------------------------
-		//	新しい地盤の生成
+		//	新しいブロックの生成
 		//----------------------------------------------------
-		// 地盤の生成
-		m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
-		assert(m_pGround != NULL);
+		// ブロックの生成
+		m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, sizeEdit);
+		assert(m_pBlock != NULL);
 
 		// 色を設定
-		colBuild = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
+		colBuild = m_pBlock->GetColor();	// 元の色を取得
+		m_pBlock->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
 	}
 }
 
 //============================================================
-//	地盤の破棄処理
+//	ブロックの破棄処理
 //============================================================
-void CEditGround::ReleaseGround(void)
+void CEditBlock::ReleaseBlock(void)
 {
 	// 変数を宣言
 	bool bRelease = false;	// 破棄状況
@@ -382,21 +382,21 @@ void CEditGround::ReleaseGround(void)
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
-	// 地盤を削除
+	// ブロックを削除
 	if (m_pKeyboard->IsTrigger(KEY_RELEASE))
 	{
 		// 破棄する状態を設定
 		bRelease = true;
 	}
 
-	// 地盤の削除判定
-	DeleteCollisionGround(bRelease);
+	// ブロックの削除判定
+	DeleteCollisionBlock(bRelease);
 }
 
 //============================================================
-//	地盤の削除判定
+//	ブロックの削除判定
 //============================================================
-void CEditGround::DeleteCollisionGround(const bool bRelase)
+void CEditBlock::DeleteCollisionBlock(const bool bRelase)
 {
 	// ポインタを宣言
 	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
@@ -428,14 +428,14 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
-				D3DXVECTOR3 posBuild = VEC3_ZERO;	// 地盤位置
-				D3DXVECTOR3 sizeBuild = VEC3_ZERO;	// 地盤大きさ
+				D3DXVECTOR3 posBuild = VEC3_ZERO;	// ブロック位置
+				D3DXVECTOR3 sizeBuild = VEC3_ZERO;	// ブロック大きさ
 
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
-				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-				{ // オブジェクトラベルが地盤ではない場合
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルがブロックではない場合
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -444,7 +444,7 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_pGround)
+				if (pObjCheck == (CObject*)m_pBlock)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入
@@ -454,10 +454,10 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					continue;
 				}
 
-				// 地盤の位置を取得
+				// ブロックの位置を取得
 				posBuild = pObjCheck->GetVec3Position();
 
-				// 地盤の大きさを取得
+				// ブロックの大きさを取得
 				sizeBuild = pObjCheck->GetVec3Sizing();
 
 				// 球体の当たり判定
@@ -501,9 +501,9 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 }
 
 //============================================================
-//	地盤の色の全初期化処理
+//	ブロックの色の全初期化処理
 //============================================================
-void CEditGround::InitAllColorGround(void)
+void CEditBlock::InitAllColorBlock(void)
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -523,8 +523,8 @@ void CEditGround::InitAllColorGround(void)
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
-				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-				{ // オブジェクトラベルが地盤ではない場合
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルがブロックではない場合
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -533,7 +533,7 @@ void CEditGround::InitAllColorGround(void)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_pGround)
+				if (pObjCheck == (CObject*)m_pBlock)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入

@@ -14,11 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
-
-//************************************************************
-//	前方宣言
-//************************************************************
-class CEditGround;	// エディット地盤クラス
+#include "editStage.h"
 
 //************************************************************
 //	クラス定義
@@ -27,14 +23,6 @@ class CEditGround;	// エディット地盤クラス
 class CEditStageManager
 {
 public:
-	// 配置物列挙
-	enum EThing
-	{
-		THING_GROUND = 0,	// 地盤
-		THING_BLOCK,		// ブロック
-		THING_MAX			// この列挙型の総数
-	};
-
 	// コンストラクタ
 	CEditStageManager();
 
@@ -69,12 +57,11 @@ private:
 	void Save(void);				// 保存
 
 	// メンバ変数
-	CEditGround	*m_pGround;	// エディット地盤の情報
-
-	D3DXVECTOR3 m_pos;	// 位置
-	D3DXVECTOR3 m_rot;	// 向き
-	D3DXVECTOR3 m_size;	// 大きさ
-	EThing m_thing;		// 配置物
+	CEditStage	*m_pStage;		// エディットステージの情報
+	CEditStage::EThing m_thing;	// 配置物
+	D3DXVECTOR3	m_pos;	// 位置
+	D3DXVECTOR3	m_rot;	// 向き
+	D3DXVECTOR3	m_size;	// 大きさ
 	float m_fMove;		// 位置移動量
 	bool m_bSave;		// 保存状況
 	bool m_bEdit;		// エディット状況
