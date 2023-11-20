@@ -16,6 +16,11 @@
 #include "main.h"
 
 //************************************************************
+//	前方宣言
+//************************************************************
+class CEditStageManager;	// エディットステージマネージャークラス
+
+//************************************************************
 //	クラス定義
 //************************************************************
 // ゲームマネージャークラス
@@ -47,8 +52,12 @@ public:
 	// 静的メンバ関数
 	static CGameManager *Create(void);	// 生成
 	static HRESULT Release(CGameManager *&prGameManager);	// 破棄
+	static CEditStageManager *GetEditStage(void);	// エディットステージ取得
 
 private:
+	// 静的メンバ変数
+	static CEditStageManager *m_pEditStage;	// エディットステージの情報
+
 	// メンバ変数
 	EState m_state;	// 状態
 };

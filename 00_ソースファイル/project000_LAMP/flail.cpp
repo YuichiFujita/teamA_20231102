@@ -1,7 +1,7 @@
 //============================================================
 //
-//	モデルUI処理 [flail.cpp]
-//	Author：藤田勇一
+//	フレイル処理 [flail.cpp]
+//	Author：中村陸
 //
 //============================================================
 //************************************************************
@@ -13,6 +13,11 @@
 #include "camera.h"
 #include "model.h"
 #include "useful.h"
+#include "player.h"
+#include "retentionManager.h"
+#include "stage.h"
+#include "liquid.h"
+#include "scrollMeshField.h"
 
 //************************************************************
 //	マクロ定義
@@ -24,7 +29,7 @@
 //************************************************************
 const char *CFlail::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\OBSTACLE\\obstacle017.x",	// 鉄球
+	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
 	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
 };
 
@@ -64,7 +69,7 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel(mc_apModelFile[CFlail::MODEL_PREFABHUT]);
+	BindModel(mc_apModelFile[CFlail::MODEL_FLAIL]);
 
 	// 成功を返す
 	return S_OK;
@@ -84,40 +89,79 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
-	//鎖の長さに移動量代入
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
+	// 鎖の長さに移動量代入
 	m_fLengthChain += m_move;
 
-	//移動量減衰
-	m_move += (0.0f - m_move) * 0.12f;
+	if (player->GetCounterFlail() < 0)
+	{
+		// 移動量減衰
+		m_move += (0.0f - m_move) * 0.15f;
+	}
+	else
+	{
+		// 移動量減衰
+		m_move += (0.0f - m_move) * 0.08f;
+	}
 
-	//角度修正
+	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotMove);
 
-	//引っ張る時のみ角度調整
+	// 引っ張る時のみ角度調整
 	if (m_move < 0.0f)
 	{
-		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.025f;
+		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
+	}
+
+	if (m_move > 0.0f && m_move < 5.0f)
+	{
+		m_move = 0.0f;
 	}
 	
-	//角度修正
+	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotMove);
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖目標角度 %f\n", m_fChainRotMove);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖角度 %f\n", m_fChainRot);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖長さ %f\n", m_fLengthChain);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[原点位置]：%f %f %f\n", m_posOrg.x, m_posOrg.y, m_posOrg.z);
 
-	//一定の長さを超えたら止める
-	if (m_fLengthChain > 1600.0f)
+	// 一定の長さを超えたら止める
+	if (m_fLengthChain > 1000.0f)
 	{
-		m_fLengthChain = 1600.0f;
+		m_fLengthChain = 1000.0f;
 	}
 
-	//角度と長さから鉄球の位置決定
-	D3DXVECTOR3 pos = VEC3_ZERO;
+	// 角度と長さから鉄球の位置決定
+	D3DXVECTOR3 pos = GetVec3Position();
 
 	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+
+	if (m_move == 0.0f)
+	{
+		if (player->GetCounterFlail() < 0)
+		{
+			if (pos.y > -13.0f)
+			{
+				pos.y -= 5.0f;
+			}
+			else
+			{
+				pos.y = CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetScrollMeshField(0)->GetPositionHeight(pos);
+			}
+		}
+		else
+		{
+			pos.y = m_posOrg.y;
+		}
+	}
+
 	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+
+	Collision();
 
 	SetVec3Position(pos);
 
@@ -204,6 +248,34 @@ CFlail *CFlail::Create
 }
 
 //============================================================
+//	当たり判定処理
+//============================================================
+void CFlail::Collision(void)
+{
+	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	{
+		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
+
+		if (player != NULL && nCntPlayer != m_nPlayerID)
+		{
+			D3DXVECTOR3 vec;
+			float length;
+
+			vec = player->GetVec3Position() - GetVec3Position();
+			vec.y = 0.0f;
+			length = D3DXVec3Length(&vec);
+			
+			if (length < GetModelData().fRadius + player->GetRadius())
+			{
+				D3DXVECTOR3 pos = player->GetVec3Position();
+
+				player->SetVec3Position(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+			}
+		}
+	}
+}
+
+//============================================================
 //	移動量の設定処理
 //============================================================
 void CFlail::SetVec3PosOrg(const D3DXVECTOR3& rPosOrg)
@@ -219,6 +291,24 @@ D3DXVECTOR3 CFlail::GetVec3PosOrg(void)
 {
 	// 位置を返す
 	return m_posOrg;
+}
+
+//============================================================
+//	プレイヤー番号の設定処理
+//============================================================
+void CFlail::SetPlayerID(const int& rPlayerID)
+{
+	// 引数のプレイヤー番号を設定
+	m_nPlayerID = rPlayerID;
+}
+
+//============================================================
+//	プレイヤー番号の設定処理
+//============================================================
+int CFlail::GetPlayerID(void)
+{
+	// プレイヤー番号を返す
+	return m_nPlayerID;
 }
 
 //============================================================

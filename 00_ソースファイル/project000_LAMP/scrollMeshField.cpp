@@ -327,6 +327,15 @@ void CScrollMeshField::SetMoveU(const float fMoveU)
 }
 
 //============================================================
+//	横座標の移動量取得処理
+//============================================================
+float CScrollMeshField::GetMoveU(void) const
+{
+	// テクスチャ横座標の移動量を返す
+	return m_fMoveU;
+}
+
+//============================================================
 //	縦座標の移動量設定処理
 //============================================================
 void CScrollMeshField::SetMoveV(const float fMoveV)
@@ -336,4 +345,13 @@ void CScrollMeshField::SetMoveV(const float fMoveV)
 
 	// スクロールのテクスチャ座標の設定
 	CObjectMeshField::SetScrollTex(m_fTexU, m_fTexV);
+}
+
+//============================================================
+//	縦座標の移動量取得処理
+//============================================================
+float CScrollMeshField::GetMoveV(void) const
+{
+	// テクスチャ縦座標の移動量を返す
+	return m_fMoveV;
 }

@@ -37,11 +37,11 @@ namespace
 	namespace entry
 	{
 		const D3DXVECTOR3 INIT_VECU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトルの初期値
-		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(190.0f, 45.0f, -200.0f);	// 視点の初期値
-		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(190.0f, 45.0f, 0.0f);		// 注視点の初期値
+		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(360.0f, 100.0f, -200.0f);	// 視点の初期値
+		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(360.0f, 100.0f, 0.0f);	// 注視点の初期値
 
-		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.4f;	// 画面の横幅
-		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.4f;	// 画面の縦幅
+		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.75f;		// 画面の横幅
+		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.75f;	// 画面の縦幅
 	}
 
 	// 回転カメラ情報
@@ -57,8 +57,8 @@ namespace
 	// 見下ろしカメラ情報
 	namespace lookdown
 	{
-		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(1.95f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
-		const float INIT_DIS	= 1420.0f;	// 見下ろしカメラの距離
+		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.0f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
+		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
 
 		const float REV_POS		= 0.25f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数

@@ -18,6 +18,8 @@
 #include "pause.h"
 #include "player.h"
 #include "retentionManager.h"
+#include "gameManager.h"
+#include "editStageManager.h"
 
 // TODO：いらないインクルード削除
 #include "ground.h"
@@ -130,9 +132,17 @@ HRESULT CSceneGame::Init(void)
 		return E_FAIL;
 	}
 
+#if 1
+
 	// TODO：直がきやめようね
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 20.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 400.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(100.0f, 100.0f, 100.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(1650.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
+
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
+
+#endif
 
 	//--------------------------------------------------------
 	//	初期設定
@@ -209,7 +219,7 @@ void CSceneGame::Update(void)
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
 	{
 		// エディット状況を反転
-		//CGameManager::GetEditStage()->SetEnableEdit((!CGameManager::GetEditStage()->IsEdit()) ? true : false);
+		CGameManager::GetEditStage()->SetEnableEdit(!CGameManager::GetEditStage()->IsEdit());
 	}
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F3))
 	{

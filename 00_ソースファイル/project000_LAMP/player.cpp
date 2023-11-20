@@ -71,21 +71,19 @@ namespace
 //************************************************************
 const char *CPlayer::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\PLAYER\\00_waist.x",	// 腰
-	"data\\MODEL\\PLAYER\\01_body.x",	// 体
-	"data\\MODEL\\PLAYER\\02_head.x",	// 頭
-	"data\\MODEL\\PLAYER\\03_armUL.x",	// 左上腕
-	"data\\MODEL\\PLAYER\\04_armUR.x",	// 右上腕
-	"data\\MODEL\\PLAYER\\05_armDL.x",	// 左下腕
-	"data\\MODEL\\PLAYER\\06_armDR.x",	// 右下腕
-	"data\\MODEL\\PLAYER\\07_handL.x",	// 左手
-	"data\\MODEL\\PLAYER\\08_handR.x",	// 右手
-	"data\\MODEL\\PLAYER\\09_legUL.x",	// 左太もも
-	"data\\MODEL\\PLAYER\\10_legUR.x",	// 右太もも
-	"data\\MODEL\\PLAYER\\11_legDL.x",	// 左脛
-	"data\\MODEL\\PLAYER\\12_legDR.x",	// 右脛
-	"data\\MODEL\\PLAYER\\13_footL.x",	// 左足
-	"data\\MODEL\\PLAYER\\14_footR.x",	// 右足
+	"data\\MODEL\\PLAYER\\00_waist.x",		// 腰
+	"data\\MODEL\\PLAYER\\01_body.x",		// 体
+	"data\\MODEL\\PLAYER\\02_head.x",		// 頭
+	"data\\MODEL\\PLAYER\\03_shoulder_R.x",	// 左上腕
+	"data\\MODEL\\PLAYER\\04_arm_R.x",		// 右上腕
+	"data\\MODEL\\PLAYER\\05_hand_R.x",		// 左下腕
+	"data\\MODEL\\PLAYER\\06_shoulder_L.x",	// 右下腕
+	"data\\MODEL\\PLAYER\\07_arm_L.x",		// 左手
+	"data\\MODEL\\PLAYER\\08_hand_L.x",		// 右手
+	"data\\MODEL\\PLAYER\\09_thigh_R.x",	// 左太もも
+	"data\\MODEL\\PLAYER\\10_leg_R.x",		// 右太もも
+	"data\\MODEL\\PLAYER\\11_thigh_L.x",	// 左脛
+	"data\\MODEL\\PLAYER\\12_leg_L.x",		// 右脛
 };
 
 //************************************************************
@@ -170,6 +168,7 @@ HRESULT CPlayer::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
+	m_pFlail->SetPlayerID(m_nPadID);
 
 	// 成功を返す
 	return S_OK;
@@ -215,119 +214,6 @@ void CPlayer::Update(void)
 
 	case STATE_NORMAL:
 
-		//カウンターの値によって挙動を変更
-		if (m_nCounterFlail > 0)
-		{//0より大きい時
-
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE && m_nCounterFlail <= 60)
-			{//投げるボタンが押されている時
-				//カウンターアップ
-				m_nCounterFlail++;
-
-				//一定値でカウンターを止める
-				if (m_nCounterFlail > 60)
-				{
-					m_nCounterFlail = 60;
-				}
-
-				//溜めてる間鉄球を振り回す
-				m_pFlail->SetChainRot(m_pFlail->GetChainRot() - 1.0f);
-				m_pFlail->SetLengthChain(100.0f);
-
-				//目標角度変更処理
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
-				}
-			}
-			else
-			{
-				//目標角度変更処理
-				if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-				{
-					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
-				}
-				else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-				{
-					m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
-				}
-			}
-
-			//投擲
-			if (CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE && m_nCounterFlail != 120)
-			{
-				//溜めた時間に応じて飛距離増加
-				float move = 5.0f;
-				move *= (float)m_nCounterFlail;
-				m_pFlail->SetMove(move);
-
-				//目標角度に合わせる
-				m_pFlail->SetChainRot(m_pFlail->GetChainRotMove());
-
-				//カウンターの設定
-				m_nCounterFlail = 120;
-			}
-
-			//フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetMove() < 1.0f && m_nCounterFlail == 120)
-			{
-				m_nCounterFlail = -1;
-			}
-		}
-		else if (m_nCounterFlail == 0)
-		{
-			//カウンターアップ開始
-			if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE)
-			{
-				m_nCounterFlail++;
-			}
-
-			m_pFlail->SetLengthChain(0.0f);
-
-			//目標角度変更処理
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-			{
-				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
-			}
-			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-			{
-				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
-			}
-		}
-		else
-		{
-			//引き戻す速度決定
-			float move = -20.0f;
-
-			//鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-			if (m_pFlail->GetLengthChain() < 10.0f)
-			{
-				m_nCounterFlail = 0;
-				move = 0.0f;
-				m_pFlail->SetLengthChain(0.0f);
-			}
-
-			//引き戻す
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE)
-			{
-				m_pFlail->SetMove(move);
-			}
-
-			//目標角度変更処理
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-			{
-				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
-			}
-			else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-			{
-				m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
-			}
-		}
-
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
@@ -343,6 +229,22 @@ void CPlayer::Update(void)
 
 	// フレイルの更新
 	m_pFlail->SetVec3PosOrg(GetVec3Position());
+
+	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
+	{
+		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (m_pFlail->GetVec3PosOrg());
+		float length, chainRot;
+
+		vecFlail.y = 0.0f;
+		length = D3DXVec3Length(&vecFlail);
+		chainRot = atan2f(vecFlail.x, vecFlail.z);
+
+		m_pFlail->SetChainRot(chainRot);
+		m_pFlail->SetChainRotMove(chainRot);
+		m_pFlail->SetLengthChain(length);
+		m_pFlail->SetMove(0.0f);
+	}
+
 	m_pFlail->Update();
 
 	// モーション・オブジェクトキャラクターの更新
@@ -584,6 +486,42 @@ int CPlayer::GetPadID(void) const
 }
 
 //============================================================
+//	フレイルカウンター取得処理
+//============================================================
+int CPlayer::GetCounterFlail(void) const
+{
+	// フレイルカウンターを返す
+	return m_nCounterFlail;
+}
+
+//============================================================
+//	モーション・オブジェクトキャラクターの更新処理
+//============================================================
+void CPlayer::UpdateMotion(int nMotion)
+{
+	// 変数を宣言
+	int nAnimMotion = GetMotionType();	// 現在再生中のモーション
+
+	if (nMotion != NONE_IDX)
+	{ // モーションが設定されている場合
+
+		if (IsMotionLoop(nAnimMotion))
+		{ // ループするモーションだった場合
+
+			if (nAnimMotion != nMotion)
+			{ // 現在のモーションが再生中のモーションと一致しない場合
+
+				// 現在のモーションの設定
+				SetMotion(nMotion);
+			}
+		}
+	}
+
+	// オブジェクトキャラクターの更新
+	CObjectChara::Update();
+}
+
+//============================================================
 //	スポーン状態時の更新処理
 //============================================================
 CPlayer::EMotion CPlayer::UpdateSpawn(void)
@@ -754,6 +692,130 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x += sinf(m_dashRot.y) * fMove;
 			m_move.z += cosf(m_dashRot.y) * fMove;
 		}
+
+		if (m_pFlail->GetLengthChain() >= 1000.0f)
+		{
+			// 移動量を更新
+			m_move.x *= 0.8f;
+			m_move.z *= 0.8f;
+		}
+	}
+
+	// カウンターの値によって挙動を変更
+	if (m_nCounterFlail > 0)
+	{// 0より大きい時
+
+		if ((CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= 60)
+		{// 投げるボタンが押されている時
+		 // カウンターアップ
+			m_nCounterFlail++;
+
+			// 一定値でカウンターを止める
+			if (m_nCounterFlail > 60)
+			{
+				m_nCounterFlail = 60;
+			}
+
+			// 溜めてる間鉄球を振り回す
+			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.01f * m_nCounterFlail));
+			m_pFlail->SetLengthChain(2.0f * m_nCounterFlail);
+
+			// 移動量を更新
+			m_move.x *= 0.5f;
+			m_move.z *= 0.5f;
+		}
+
+		// 投擲
+		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != 120)
+		{
+			// 溜めた時間に応じて飛距離増加
+			float move = 1.3f;
+			move *= (float)m_nCounterFlail;
+			m_pFlail->SetMove(move);
+
+			// 目標角度に合わせる
+			m_pFlail->SetChainRot(m_pFlail->GetChainRotMove());
+
+			// カウンターの設定
+			m_nCounterFlail = 120;
+		}
+
+		if (m_nCounterFlail == 120)
+		{
+			// 移動量を更新
+			m_move.x = 0.0f;
+			m_move.z = 0.0f;
+
+			// フレイルが止まったらカウンターを次の段階へ
+			if (m_pFlail->GetMove() < 1.0f)
+			{
+				m_nCounterFlail = -1;
+			}
+		}
+	}
+	else if (m_nCounterFlail == 0)
+	{
+		// カウンターアップ開始
+		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
+		{
+			m_nCounterFlail++;
+		}
+
+		m_pFlail->SetLengthChain(0.0f);
+	}
+	else
+	{
+		// 引き戻す速度決定
+		float move = 0.0001f;
+
+		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
+		if (m_pFlail->GetLengthChain() < 50.0f)
+		{
+			m_nCounterFlail = 1;
+			m_pFlail->SetMove(0.0f);
+			m_pFlail->SetLengthChain(0.0f);
+		}
+
+		// 引き戻す
+		if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
+		{
+			m_nCounterFlail -= 10;
+
+			if (m_nCounterFlail < -500)
+			{
+				m_nCounterFlail = -500;
+			}
+
+			m_pFlail->SetMove(m_pFlail->GetMove() + (move * m_nCounterFlail * -m_nCounterFlail));
+
+			// 移動量を更新
+			m_move.x = 0.0f;
+			m_move.z = 0.0f;
+		}
+
+		// 投擲
+		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
+		{
+			m_nCounterFlail = -1;
+		}
+	}
+
+	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
+
+	if (DEAD_ZONE < fStick)
+	{ // デッドゾーン以上の場合
+		m_pFlail->SetChainRotMove(CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f);
+	}
+
+	// 目標角度変更処理
+	if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
+	{
+		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+	}
+	else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
+	{
+		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
 	}
 
 	// 目標向きを設定
@@ -761,6 +823,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[カウンター]：%d\n", m_nCounterFlail);
 
 	// 待機モーションを返す
 	return MOTION_IDOL;
@@ -899,33 +962,6 @@ void CPlayer::UpdateRotation(D3DXVECTOR3& rRot)
 
 	// 向きの正規化
 	useful::NormalizeRot(rRot.y);
-}
-
-//============================================================
-//	モーション・オブジェクトキャラクターの更新処理
-//============================================================
-void CPlayer::UpdateMotion(int nMotion)
-{
-	// 変数を宣言
-	int nAnimMotion = GetMotionType();	// 現在再生中のモーション
-
-	if (nMotion != NONE_IDX)
-	{ // モーションが設定されている場合
-
-		if (IsMotionLoop(nAnimMotion))
-		{ // ループするモーションだった場合
-
-			if (nAnimMotion != nMotion)
-			{ // 現在のモーションが再生中のモーションと一致しない場合
-
-				// 現在のモーションの設定
-				SetMotion(nMotion);
-			}
-		}
-	}
-
-	// オブジェクトキャラクターの更新
-	CObjectChara::Update();
 }
 
 //============================================================

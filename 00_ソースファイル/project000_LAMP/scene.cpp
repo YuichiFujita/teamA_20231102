@@ -55,7 +55,7 @@ CScene::~CScene()
 HRESULT CScene::Init(void)
 {
 	// 変数を宣言
-	CStage::ELoad load = (m_mode == MODE_TUTORIAL) ? CStage::LOAD_TUTORIAL : CStage::LOAD_GAME;	// 読込ステージ
+	CStage::ELoad load = CStage::LOAD_GAME;	// 読込ステージ
 	int nNumCreate = 0;	// プレイヤー生成数
 
 	// ステージの生成

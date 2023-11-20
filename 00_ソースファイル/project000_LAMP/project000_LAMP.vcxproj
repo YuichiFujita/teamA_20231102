@@ -159,6 +159,10 @@
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="DepthShadow.cpp" />
+    <ClCompile Include="editBlock.cpp" />
+    <ClCompile Include="editGround.cpp" />
+    <ClCompile Include="editStage.cpp" />
+    <ClCompile Include="editStageManager.cpp" />
     <ClCompile Include="effect2D.cpp" />
     <ClCompile Include="effect3D.cpp" />
     <ClCompile Include="entryManager.cpp" />
@@ -169,6 +173,7 @@
     <ClCompile Include="ground.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
+    <ClCompile Include="liquid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="model.cpp" />
@@ -237,6 +242,10 @@
     <ClInclude Include="debug.h" />
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="DepthShadow.h" />
+    <ClInclude Include="editBlock.h" />
+    <ClInclude Include="editGround.h" />
+    <ClInclude Include="editStage.h" />
+    <ClInclude Include="editStageManager.h" />
     <ClInclude Include="effect2D.h" />
     <ClInclude Include="effect3D.h" />
     <ClInclude Include="entryManager.h" />
@@ -247,6 +256,7 @@
     <ClInclude Include="ground.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
+    <ClInclude Include="liquid.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="model.h" />

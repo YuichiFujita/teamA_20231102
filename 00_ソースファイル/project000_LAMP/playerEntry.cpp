@@ -75,8 +75,8 @@ void CPlayerEntry::Uninit(void)
 //============================================================
 void CPlayerEntry::Update(void)
 {
-	// プレイヤーの更新
-	CPlayer::Update();
+	// モーション・オブジェクトキャラクターの更新
+	UpdateMotion(CPlayer::MOTION_IDOL);
 }
 
 //============================================================

@@ -65,7 +65,7 @@ public:
 		LABEL_WALL,			// 壁
 		LABEL_SCENERY,		// 景色
 		LABEL_SKY,			// 空
-		LABEL_SEA,			// 海
+		LABEL_LIQUID,		// 液体
 		LABEL_EFFECT,		// エフェクト
 		LABEL_PARTICLE,		// パーティクル
 		LABEL_MAX			// この列挙型の総数
