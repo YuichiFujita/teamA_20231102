@@ -27,7 +27,16 @@ public:
 	enum EType
 	{
 		TYPE_STONE = 0,	// 石テクスチャ
+		TYPE_BOX,		// 箱テクスチャ
 		TYPE_MAX		// この列挙型の総数
+	};
+
+	// 破壊列挙
+	enum EBreak
+	{
+		BREAK_FALSE = 0,	// 破壊OFF
+		BREAK_TRUE,			// 破壊ON
+		BREAK_MAX			// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -35,6 +44,13 @@ public:
 
 	// デストラクタ
 	~CBlock();
+
+	// ステータス構造体
+	struct SStatusInfo
+	{
+		EBreak state;	// 破壊状況
+		int nLife;		// 体力
+	};
 
 	// オーバーライド関数
 	HRESULT Init(void) override;	// 初期化
@@ -52,13 +68,17 @@ public:
 		const D3DXVECTOR3& rRot,	// 向き
 		const D3DXVECTOR3& rSize	// 大きさ
 	);
+	static void LoadSetup(void);	// セットアップ
 
 private:
 	// 静的メンバ変数
+	static SStatusInfo m_aStatusInfo[TYPE_MAX];	// ステータス情報
 	static const char *mc_apTextureFile[][6];	// テクスチャ定数
 
 	// メンバ変数
+	SStatusInfo m_status;	// ステータス
 	EType m_type;	// 種類
+	int m_nLife;	// 体力
 };
 
 #endif	// _BLOCK_H_
