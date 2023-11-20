@@ -31,18 +31,18 @@ namespace
 
 	namespace number
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(125.0f, 80.0f, 0.0f);		// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(230.0f, 80.0f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(165.0f, 90.0f, 0.0f);		// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
 		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
 		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(145.0f, -10.0f, 0.0f);	// タイトル空白
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);	// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;							// 数字空白
 		const int			DIGIT		= 1;									// 桁数
 	}
 
 	namespace frame
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 320.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 360.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 440.0f, 0.0f);	// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
@@ -55,8 +55,8 @@ namespace
 
 	namespace start
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(1160.0f, 640.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(198.0f, 120.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(1100.0f, 600.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(300.0f, 180.0f, 0.0f);	// 大きさ
 	}
 }
 
@@ -65,8 +65,8 @@ namespace
 //************************************************************
 const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\entry000.png",	// PLAYERテクスチャ
-	"data\\TEXTURE\\entry001.png",	// フレームテクスチャ
+	"data\\TEXTURE\\entry_player.png",	// PLAYERテクスチャ
+	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
 	"data\\TEXTURE\\entry002.png",	// 操作表示テクスチャ
 	"data\\TEXTURE\\entry003.png",	// 開始表示テクスチャ
 };
