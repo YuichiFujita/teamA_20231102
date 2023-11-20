@@ -13,13 +13,18 @@
 #include "texture.h"
 
 //************************************************************
-//	マクロ定義
+//	定数宣言
 //************************************************************
-#define BLOCK_PRIO	(1)	// ブロックの優先順位
+namespace
+{
+	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
+	const int	PRIORITY = 1;	// プレイヤーの優先順位
+}
 
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
+CBlock::SStatusInfo CBlock::m_aStatusInfo[TYPE_MAX] = {};	// ステータス情報
 const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 {
 	{ // 石テクスチャ
@@ -30,6 +35,15 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 		"data\\TEXTURE\\block000.png",	// 前テクスチャ
 		"data\\TEXTURE\\block000.png",	// 後テクスチャ
 	},
+
+	{ // 箱テクスチャ
+		"data\\TEXTURE\\block001.png",	// 左テクスチャ
+		"data\\TEXTURE\\block001.png",	// 右テクスチャ
+		"data\\TEXTURE\\block001.png",	// 下テクスチャ
+		"data\\TEXTURE\\block001.png",	// 上テクスチャ
+		"data\\TEXTURE\\block001.png",	// 前テクスチャ
+		"data\\TEXTURE\\block001.png",	// 後テクスチャ
+	},
 };
 
 //************************************************************
@@ -38,10 +52,12 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 //============================================================
 //	コンストラクタ
 //============================================================
-CBlock::CBlock() : CObjectMeshCube(CObject::LABEL_BLOCK, BLOCK_PRIO)
+CBlock::CBlock() : CObjectMeshCube(CObject::LABEL_BLOCK, PRIORITY)
 {
 	// メンバ変数をクリア
-	m_type = TYPE_STONE;	// 種類
+	memset(&m_status, 0, sizeof(m_status));	// ステータス
+	m_type	= TYPE_STONE;	// 種類
+	m_nLife	= 0;			// 体力
 }
 
 //============================================================
@@ -58,7 +74,9 @@ CBlock::~CBlock()
 HRESULT CBlock::Init(void)
 {
 	// メンバ変数を初期化
+	memset(&m_status, 0, sizeof(m_status));	// ステータス
 	m_type = TYPE_STONE;	// 種類
+	m_nLife = 0;			// 体力
 
 	// オブジェクトメッシュキューブの初期化
 	if (FAILED(CObjectMeshCube::Init()))
@@ -163,6 +181,12 @@ void CBlock::SetType(const int nType)
 		// 引数の種類を設定
 		m_type = (EType)nType;
 
+		// 引数の種類のステータス情報を設定
+		m_status = m_aStatusInfo[nType];
+
+		// 引数の種類の体力を設定
+		m_nLife = m_status.nLife;
+
 		// 引数の種類のテクスチャを登録
 		faceTex = SFaceTex
 		( // 引数
@@ -240,4 +264,88 @@ CBlock *CBlock::Create
 		return pBlock;
 	}
 	else { assert(false); return NULL; }	// 確保失敗
+}
+
+//============================================================
+//	セットアップ処理
+//============================================================
+void CBlock::LoadSetup(void)
+{
+	// 変数を宣言
+	int nType = 0;	// 種類の代入用
+	int nEnd = 0;	// テキスト読み込み終了の確認用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	// ポインタを宣言
+	FILE *pFile;	// ファイルポインタ
+
+	// ステータス情報の静的メンバ変数を初期化
+	memset(&m_aStatusInfo[0], 0, sizeof(m_aStatusInfo));
+
+	// ファイルを読み込み形式で開く
+	pFile = fopen(SETUP_TXT, "r");
+
+	if (pFile != NULL)
+	{ // ファイルが開けた場合
+
+		do
+		{ // 読み込んだ文字列が EOF ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
+
+			// ステータスの設定
+			if (strcmp(&aString[0], "STATUSSET") == 0)
+			{ // 読み込んだ文字列が STATUSSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_STATUSSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "BLOCKSET") == 0)
+					{ // 読み込んだ文字列が BLOCKSET の場合
+
+						do
+						{ // 読み込んだ文字列が END_BLOCKSET ではない場合ループ
+
+							// ファイルから文字列を読み込む
+							fscanf(pFile, "%s", &aString[0]);
+
+							if (strcmp(&aString[0], "TYPE") == 0)
+							{ // 読み込んだ文字列が TYPE の場合
+
+								fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+								fscanf(pFile, "%d", &nType);		// 種類を読み込む
+							}
+							else if (strcmp(&aString[0], "BREAK") == 0)
+							{ // 読み込んだ文字列が BREAK の場合
+
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &m_aStatusInfo[nType].state);	// 破壊状況を読み込む
+							}
+							else if (strcmp(&aString[0], "LIFE") == 0)
+							{ // 読み込んだ文字列が LIFE の場合
+
+								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
+								fscanf(pFile, "%d", &m_aStatusInfo[nType].nLife);	// 破壊状況を読み込む
+							}
+						} while (strcmp(&aString[0], "END_BLOCKSET") != 0);	// 読み込んだ文字列が END_BLOCKSET ではない場合ループ
+					}
+				} while (strcmp(&aString[0], "END_STATUSSET") != 0);	// 読み込んだ文字列が END_STATUSSET ではない場合ループ
+			}
+		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
+		
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "ブロックセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
+	}
 }

@@ -49,18 +49,18 @@
 #define KEY_ROTA_LEFT	(DIK_C)	// 左回転キー
 #define NAME_ROTA_LEFT	("C")	// 左回転表示
 
-#define KEY_UP_SCALE_X		(DIK_T)	// X軸拡大キー
-#define NAME_UP_SCALE_X		("T")	// X軸拡大表示
-#define KEY_DOWN_SCALE_X	(DIK_G)	// X軸縮小キー
-#define NAME_DOWN_SCALE_X	("G")	// X軸縮小表示
-#define KEY_UP_SCALE_Y		(DIK_Y)	// Y軸拡大キー
-#define NAME_UP_SCALE_Y		("Y")	// Y軸拡大表示
-#define KEY_DOWN_SCALE_Y	(DIK_H)	// Y軸縮小キー
-#define NAME_DOWN_SCALE_Y	("H")	// Y軸縮小表示
-#define KEY_UP_SCALE_Z		(DIK_U)	// Z軸拡大キー
-#define NAME_UP_SCALE_Z		("U")	// Z軸拡大表示
-#define KEY_DOWN_SCALE_Z	(DIK_J)	// Z軸縮小キー
-#define NAME_DOWN_SCALE_Z	("J")	// Z軸縮小表示
+#define KEY_UP_SCALE_X		(DIK_R)	// X軸拡大キー
+#define NAME_UP_SCALE_X		("R")	// X軸拡大表示
+#define KEY_DOWN_SCALE_X	(DIK_F)	// X軸縮小キー
+#define NAME_DOWN_SCALE_X	("F")	// X軸縮小表示
+#define KEY_UP_SCALE_Y		(DIK_T)	// Y軸拡大キー
+#define NAME_UP_SCALE_Y		("T")	// Y軸拡大表示
+#define KEY_DOWN_SCALE_Y	(DIK_G)	// Y軸縮小キー
+#define NAME_DOWN_SCALE_Y	("G")	// Y軸縮小表示
+#define KEY_UP_SCALE_Z		(DIK_Y)	// Z軸拡大キー
+#define NAME_UP_SCALE_Z		("Y")	// Z軸拡大表示
+#define KEY_DOWN_SCALE_Z	(DIK_H)	// Z軸縮小キー
+#define NAME_DOWN_SCALE_Z	("H")	// Z軸縮小表示
 
 //************************************************************
 //	定数宣言

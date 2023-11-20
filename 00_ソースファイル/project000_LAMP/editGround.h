@@ -39,6 +39,7 @@ public:
 	struct SInfo
 	{
 		CGround::EType type;	// 地盤種類
+		D3DXVECTOR2 partX, partY, partZ;	// テクスチャ分割数
 	};
 
 	// オーバーライド関数
@@ -54,6 +55,7 @@ public:
 private:
 	// メンバ関数
 	void UpdateChangeType(void);	// 種類変更の更新
+	void UpdateTexPart(void);		// テクスチャ分割の更新
 	void CreateGround(void);		// 地盤生成
 	void ReleaseGround(void);		// 地盤破棄
 

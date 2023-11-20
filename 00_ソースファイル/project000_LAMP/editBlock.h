@@ -39,6 +39,7 @@ public:
 	struct SInfo
 	{
 		CBlock::EType type;	// ブロック種類
+		D3DXVECTOR2 partX, partY, partZ;	// テクスチャ分割数
 	};
 
 	// オーバーライド関数
@@ -54,6 +55,7 @@ public:
 private:
 	// メンバ関数
 	void UpdateChangeType(void);	// 種類変更の更新
+	void UpdateTexPart(void);		// テクスチャ分割の更新
 	void CreateBlock(void);			// ブロック生成
 	void ReleaseBlock(void);		// ブロック破棄
 

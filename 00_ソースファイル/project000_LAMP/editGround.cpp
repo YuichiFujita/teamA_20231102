@@ -20,6 +20,8 @@
 //************************************************************
 #define KEY_TRIGGER		(DIK_LSHIFT)	// トリガー化キー
 #define NAME_TRIGGER	("LSHIFT")		// トリガー化表示
+#define KEY_REVERSE		(DIK_LCONTROL)	// 操作逆転化キー
+#define NAME_REVERSE	("LCTRL")		// 操作逆転化表示
 
 #define KEY_CREATE		(DIK_0)	// 生成キー
 #define NAME_CREATE		("0")	// 生成表示
@@ -27,6 +29,19 @@
 #define NAME_RELEASE	("9")	// 破棄表示
 #define KEY_TYPE		(DIK_2)	// 種類変更キー
 #define NAME_TYPE		("2")	// 種類変更表示
+
+#define KEY_UP_TEXPART_X	(DIK_U)	// テクスチャ分割X拡大キー
+#define NAME_UP_TEXPART_X	("U")	// テクスチャ分割X拡大表示
+#define KEY_DOWN_TEXPART_X	(DIK_J)	// テクスチャ分割X縮小キー
+#define NAME_DOWN_TEXPART_X	("J")	// テクスチャ分割X縮小表示
+#define KEY_UP_TEXPART_Y	(DIK_I)	// テクスチャ分割Y拡大キー
+#define NAME_UP_TEXPART_Y	("I")	// テクスチャ分割Y拡大表示
+#define KEY_DOWN_TEXPART_Y	(DIK_K)	// テクスチャ分割Y縮小キー
+#define NAME_DOWN_TEXPART_Y	("K")	// テクスチャ分割Y縮小表示
+#define KEY_UP_TEXPART_Z	(DIK_O)	// テクスチャ分割Z拡大キー
+#define NAME_UP_TEXPART_Z	("O")	// テクスチャ分割Z拡大表示
+#define KEY_DOWN_TEXPART_Z	(DIK_L)	// テクスチャ分割Z縮小キー
+#define NAME_DOWN_TEXPART_Z	("L")	// テクスチャ分割Z縮小表示
 
 //************************************************************
 //	定数宣言
@@ -90,8 +105,11 @@ HRESULT CEditGround::Init(void)
 	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	// メンバ変数を初期化
-	m_pGround = NULL;	// 地盤情報
-	m_ground.type = CGround::TYPE_GRASS;	// 地盤種類
+	m_pGround		= NULL;					// 地盤情報
+	m_ground.type	= CGround::TYPE_GRASS;	// 地盤種類
+	m_ground.partX	= VEC2_ONE;				// テクスチャ分割数X
+	m_ground.partY	= VEC2_ONE;				// テクスチャ分割数Y
+	m_ground.partZ	= VEC2_ONE;				// テクスチャ分割数Z
 
 	// 地盤の生成
 	m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
@@ -158,6 +176,9 @@ void CEditGround::Update(void)
 	// 種類変更の更新
 	UpdateChangeType();
 
+	// テクスチャ分割の更新
+	UpdateTexPart();
+
 	// 地盤の生成
 	CreateGround();
 
@@ -173,9 +194,6 @@ void CEditGround::Update(void)
 	// 大きさを反映
 	m_pGround->SetVec3Sizing(pEdit->GetVec3Sizing());
 
-	// 種類を反映
-	m_pGround->SetType(m_ground.type);
-
 #endif	// _DEBUG
 }
 
@@ -188,6 +206,7 @@ void CEditGround::DrawDebugControl(void)
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s]\n", NAME_TYPE);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "テクスチャ分割：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_TEXPART_X, NAME_DOWN_TEXPART_X, NAME_UP_TEXPART_Y, NAME_DOWN_TEXPART_Y, NAME_UP_TEXPART_Z, NAME_DOWN_TEXPART_Z, NAME_REVERSE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "削除：[%s]\n", NAME_RELEASE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "設置：[%s]\n", NAME_CREATE);
 }
@@ -201,6 +220,9 @@ void CEditGround::DrawDebugInfo(void)
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_ground.type);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割X]\n", m_ground.partX.x, m_ground.partX.y);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Y]\n", m_ground.partY.x, m_ground.partY.y);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Z]\n", m_ground.partZ.x, m_ground.partZ.y);
 }
 
 //============================================================
@@ -317,6 +339,79 @@ void CEditGround::UpdateChangeType(void)
 	{
 		m_ground.type = (CGround::EType)((m_ground.type + 1) % CGround::TYPE_MAX);
 	}
+
+	// 種類を反映
+	m_pGround->SetType(m_ground.type);
+}
+
+//============================================================
+//	テクスチャ分割の更新処理
+//============================================================
+void CEditGround::UpdateTexPart(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// テクスチャ分割を変更
+	if (!m_pKeyboard->IsPress(KEY_REVERSE))
+	{
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
+		{
+			m_ground.partX.x += 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
+		{
+			m_ground.partX.y += 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
+		{
+			m_ground.partY.x += 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
+		{
+			m_ground.partY.y += 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
+		{
+			m_ground.partZ.x += 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
+		{
+			m_ground.partZ.y += 1.0f;
+		}
+	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
+		{
+			m_ground.partX.x -= 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
+		{
+			m_ground.partX.y -= 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
+		{
+			m_ground.partY.x -= 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
+		{
+			m_ground.partY.y -= 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
+		{
+			m_ground.partZ.x -= 1.0f;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
+		{
+			m_ground.partZ.y -= 1.0f;
+		}
+	}
+
+	// テクスチャ分割数を割当
+	m_pGround->SetTexturePatternX(m_ground.partX);
+	m_pGround->SetTexturePatternY(m_ground.partY);
+	m_pGround->SetTexturePatternZ(m_ground.partZ);
 }
 
 //============================================================
