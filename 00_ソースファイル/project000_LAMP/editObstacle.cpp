@@ -1,13 +1,13 @@
 //============================================================
 //
-//	エディット地盤処理 [editGround.cpp]
+//	エディット障害物処理 [editObstacle.cpp]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	インクルードファイル
 //************************************************************
-#include "editGround.h"
+#include "editObstacle.h"
 #include "manager.h"
 #include "input.h"
 #include "collision.h"
@@ -30,19 +30,6 @@
 #define KEY_TYPE		(DIK_2)	// 種類変更キー
 #define NAME_TYPE		("2")	// 種類変更表示
 
-#define KEY_UP_TEXPART_X	(DIK_U)	// テクスチャ分割X拡大キー
-#define NAME_UP_TEXPART_X	("U")	// テクスチャ分割X拡大表示
-#define KEY_DOWN_TEXPART_X	(DIK_J)	// テクスチャ分割X縮小キー
-#define NAME_DOWN_TEXPART_X	("J")	// テクスチャ分割X縮小表示
-#define KEY_UP_TEXPART_Y	(DIK_I)	// テクスチャ分割Y拡大キー
-#define NAME_UP_TEXPART_Y	("I")	// テクスチャ分割Y拡大表示
-#define KEY_DOWN_TEXPART_Y	(DIK_K)	// テクスチャ分割Y縮小キー
-#define NAME_DOWN_TEXPART_Y	("K")	// テクスチャ分割Y縮小表示
-#define KEY_UP_TEXPART_Z	(DIK_O)	// テクスチャ分割Z拡大キー
-#define NAME_UP_TEXPART_Z	("O")	// テクスチャ分割Z拡大表示
-#define KEY_DOWN_TEXPART_Z	(DIK_L)	// テクスチャ分割Z縮小キー
-#define NAME_DOWN_TEXPART_Z	("L")	// テクスチャ分割Z縮小表示
-
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -54,21 +41,21 @@ namespace
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-CEditGround::SInfo CEditGround::m_save = {};	// 保存情報
+CEditObstacle::SInfo CEditObstacle::m_save = {};	// 保存情報
 
 //************************************************************
-//	親クラス [CEditGround] のメンバ関数
+//	親クラス [CEditObstacle] のメンバ関数
 //************************************************************
 //============================================================
 //	コンストラクタ
 //============================================================
-CEditGround::CEditGround()
+CEditObstacle::CEditObstacle()
 {
 #if _DEBUG
 
 	// メンバ変数をクリア
-	m_pGround = NULL;	// 地盤情報
-	memset(&m_ground, 0, sizeof(m_ground));	// 地盤配置情報
+	m_pObstacle = NULL;	// 障害物情報
+	memset(&m_obstacle, 0, sizeof(m_obstacle));	// 障害物配置情報
 
 #endif	// _DEBUG
 }
@@ -76,7 +63,7 @@ CEditGround::CEditGround()
 //============================================================
 //	デストラクタ
 //============================================================
-CEditGround::~CEditGround()
+CEditObstacle::~CEditObstacle()
 {
 #if _DEBUG
 #endif	// _DEBUG
@@ -85,7 +72,7 @@ CEditGround::~CEditGround()
 //============================================================
 //	初期化処理
 //============================================================
-HRESULT CEditGround::Init(void)
+HRESULT CEditObstacle::Init(void)
 {
 #if _DEBUG
 
@@ -102,18 +89,14 @@ HRESULT CEditGround::Init(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	// メンバ変数を初期化
-	m_pGround		= NULL;					// 地盤情報
-	m_ground.type	= CGround::TYPE_GRASS;	// 地盤種類
-	m_ground.partX	= VEC2_ONE;				// テクスチャ分割数X
-	m_ground.partY	= VEC2_ONE;				// テクスチャ分割数Y
-	m_ground.partZ	= VEC2_ONE;				// テクスチャ分割数Z
+	m_pObstacle		= NULL;					// 障害物情報
+	m_obstacle.type	= CObstacle::TYPE_WOOD;	// 障害物種類
 
-	// 地盤の生成
-	m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
-	if (m_pGround == NULL)
+	// 障害物の生成
+	m_pObstacle = CObstacle::Create(m_obstacle.type, posEdit, rotEdit);
+	if (m_pObstacle == NULL)
 	{ // 生成に失敗した場合
 
 		// 失敗を返す
@@ -121,9 +104,8 @@ HRESULT CEditGround::Init(void)
 		return E_FAIL;
 	}
 
-	// 色を設定
-	D3DXCOLOR col = m_pGround->GetColor();	// 元の色を取得
-	m_pGround->SetColor(D3DXCOLOR(col.r, col.g, col.b, INIT_ALPHA));
+	// 透明度を設定
+	m_pObstacle->SetAlpha(INIT_ALPHA);
 
 	// 成功を返す
 	return S_OK;
@@ -139,18 +121,18 @@ HRESULT CEditGround::Init(void)
 //============================================================
 //	終了処理
 //============================================================
-void CEditGround::Uninit(void)
+void CEditObstacle::Uninit(void)
 {
 #if _DEBUG
 
-	if (m_pGround != NULL)
+	if (m_pObstacle != NULL)
 	{ // 生成に失敗した場合
 
-		// 地盤の色の全初期化
-		InitAllColorGround();
+		// 障害物の色の全初期化
+		InitAllColorObstacle();
 
-		// 地盤の終了
-		m_pGround->Uninit();
+		// 障害物の終了
+		m_pObstacle->Uninit();
 	}
 
 #endif	// _DEBUG
@@ -159,7 +141,7 @@ void CEditGround::Uninit(void)
 //============================================================
 //	更新処理
 //============================================================
-void CEditGround::Update(void)
+void CEditObstacle::Update(void)
 {
 #if _DEBUG
 
@@ -176,23 +158,17 @@ void CEditGround::Update(void)
 	// 種類変更の更新
 	UpdateChangeType();
 
-	// テクスチャ分割の更新
-	UpdateTexPart();
+	// 障害物の生成
+	CreateObstacle();
 
-	// 地盤の生成
-	CreateGround();
-
-	// 地盤の破棄
-	ReleaseGround();
+	// 障害物の破棄
+	ReleaseObstacle();
 
 	// 位置を反映
-	m_pGround->SetVec3Position(pEdit->GetVec3Position());
+	m_pObstacle->SetVec3Position(pEdit->GetVec3Position());
 
 	// 向きを反映
-	m_pGround->SetVec3Rotation(pEdit->GetVec3Rotation());
-
-	// 大きさを反映
-	m_pGround->SetVec3Sizing(pEdit->GetVec3Sizing());
+	m_pObstacle->SetVec3Rotation(pEdit->GetVec3Rotation());
 
 #endif	// _DEBUG
 }
@@ -200,13 +176,12 @@ void CEditGround::Update(void)
 //============================================================
 //	操作表示の描画処理
 //============================================================
-void CEditGround::DrawDebugControl(void)
+void CEditObstacle::DrawDebugControl(void)
 {
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s]\n", NAME_TYPE);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "テクスチャ分割：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_TEXPART_X, NAME_DOWN_TEXPART_X, NAME_UP_TEXPART_Y, NAME_DOWN_TEXPART_Y, NAME_UP_TEXPART_Z, NAME_DOWN_TEXPART_Z, NAME_REVERSE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "削除：[%s]\n", NAME_RELEASE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "設置：[%s]\n", NAME_CREATE);
 }
@@ -214,39 +189,36 @@ void CEditGround::DrawDebugControl(void)
 //============================================================
 //	情報表示の描画処理
 //============================================================
-void CEditGround::DrawDebugInfo(void)
+void CEditObstacle::DrawDebugInfo(void)
 {
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_ground.type);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割X]\n", m_ground.partX.x, m_ground.partX.y);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Y]\n", m_ground.partY.x, m_ground.partY.y);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Z]\n", m_ground.partZ.x, m_ground.partZ.y);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_obstacle.type);
 }
 
 //============================================================
 //	情報保存処理
 //============================================================
-void CEditGround::SaveInfo(void)
+void CEditObstacle::SaveInfo(void)
 {
 	// 現在の情報を保存
-	m_save = m_ground;
+	m_save = m_obstacle;
 }
 
 //============================================================
 //	情報読込処理
 //============================================================
-void CEditGround::LoadInfo(void)
+void CEditObstacle::LoadInfo(void)
 {
 	// 保存情報を設定
-	m_ground = m_save;
+	m_obstacle = m_save;
 }
 
 //============================================================
 //	保存処理
 //============================================================
-void CEditGround::Save(FILE *pFile)
+void CEditObstacle::Save(FILE *pFile)
 {
 #if _DEBUG
 
@@ -255,11 +227,11 @@ void CEditGround::Save(FILE *pFile)
 
 		// 見出しを書き出し
 		fprintf(pFile, "#------------------------------------------------------------------------------\n");
-		fprintf(pFile, "#	地盤の配置情報\n");
+		fprintf(pFile, "#	障害物の配置情報\n");
 		fprintf(pFile, "#------------------------------------------------------------------------------\n");
 
 		// 情報開始地点を書き出し
-		fprintf(pFile, "STAGE_GROUNDSET\n\n");
+		fprintf(pFile, "STAGE_OBSTACLESET\n\n");
 
 		for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 		{ // 優先順位の総数分繰り返す
@@ -279,8 +251,8 @@ void CEditGround::Save(FILE *pFile)
 					// ポインタを宣言
 					CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 	
-					if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-					{ // オブジェクトラベルが地盤ではない場合
+					if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
+					{ // オブジェクトラベルが障害物ではない場合
 	
 						// 次のオブジェクトへのポインタを代入
 						pObjCheck = pObjectNext;
@@ -289,7 +261,7 @@ void CEditGround::Save(FILE *pFile)
 						continue;
 					}
 	
-					if (pObjCheck == (CObject*)m_pGround)
+					if (pObjCheck == (CObject*)m_pObstacle)
 					{ // 同じアドレスだった場合
 	
 						// 次のオブジェクトへのポインタを代入
@@ -299,19 +271,17 @@ void CEditGround::Save(FILE *pFile)
 						continue;
 					}
 
-					// 地盤の情報を取得
-					D3DXVECTOR3 posGround = pObjCheck->GetVec3Position();	// 位置
-					D3DXVECTOR3 rotGround = pObjCheck->GetVec3Rotation();	// 向き
-					D3DXVECTOR3 sizeGround = pObjCheck->GetVec3Sizing();		// 大きさ
+					// 障害物の情報を取得
+					D3DXVECTOR3 posObs = pObjCheck->GetVec3Position();	// 位置
+					D3DXVECTOR3 rotObs = pObjCheck->GetVec3Rotation();	// 向き
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
-					fprintf(pFile, "	GROUNDSET\n");
+					fprintf(pFile, "	OBSTACLESET\n");
 					fprintf(pFile, "		TYPE = %d\n", nType);
-					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posGround.x, posGround.y, posGround.z);
-					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotGround.x, rotGround.y, rotGround.z);
-					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeGround.x, sizeGround.y, sizeGround.z);
-					fprintf(pFile, "	END_GROUNDSET\n\n");
+					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posObs.x, posObs.y, posObs.z);
+					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotObs.x, rotObs.y, rotObs.z);
+					fprintf(pFile, "	END_OBSTACLESET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -320,7 +290,7 @@ void CEditGround::Save(FILE *pFile)
 		}
 
 		// 情報終了地点を書き出し
-		fprintf(pFile, "END_STAGE_GROUNDSET\n\n");
+		fprintf(pFile, "END_STAGE_OBSTACLESET\n\n");
 	}
 
 #endif	// _DEBUG
@@ -329,95 +299,28 @@ void CEditGround::Save(FILE *pFile)
 //============================================================
 //	種類変更の更新処理
 //============================================================
-void CEditGround::UpdateChangeType(void)
+void CEditObstacle::UpdateChangeType(void)
 {
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
-	// 種類を変更
 	if (m_pKeyboard->IsTrigger(KEY_TYPE))
 	{
-		m_ground.type = (CGround::EType)((m_ground.type + 1) % CGround::TYPE_MAX);
-	}
+		// 種類を変更
+		m_obstacle.type = (CObstacle::EType)((m_obstacle.type + 1) % CObstacle::TYPE_MAX);
 
-	// 種類を反映
-	m_pGround->SetType(m_ground.type);
+		// 種類を反映
+		m_pObstacle->SetType(m_obstacle.type);
+
+		// 透明度を設定
+		m_pObstacle->SetAlpha(INIT_ALPHA);
+	}
 }
 
 //============================================================
-//	テクスチャ分割の更新処理
+//	障害物の生成処理
 //============================================================
-void CEditGround::UpdateTexPart(void)
-{
-	// ポインタを宣言
-	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
-
-	// テクスチャ分割を変更
-	if (!m_pKeyboard->IsPress(KEY_REVERSE))
-	{
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
-		{
-			m_ground.partX.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
-		{
-			m_ground.partX.y += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
-		{
-			m_ground.partY.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
-		{
-			m_ground.partY.y += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
-		{
-			m_ground.partZ.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
-		{
-			m_ground.partZ.y += 1.0f;
-		}
-	}
-	else
-	{
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
-		{
-			m_ground.partX.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
-		{
-			m_ground.partX.y -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
-		{
-			m_ground.partY.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
-		{
-			m_ground.partY.y -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
-		{
-			m_ground.partZ.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
-		{
-			m_ground.partZ.y -= 1.0f;
-		}
-	}
-
-	// テクスチャ分割数を割当
-	m_pGround->SetTexturePatternX(m_ground.partX);
-	m_pGround->SetTexturePatternY(m_ground.partY);
-	m_pGround->SetTexturePatternZ(m_ground.partZ);
-}
-
-//============================================================
-//	地盤の生成処理
-//============================================================
-void CEditGround::CreateGround(void)
+void CEditObstacle::CreateObstacle(void)
 {
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
@@ -433,43 +336,39 @@ void CEditGround::CreateGround(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
-	D3DXCOLOR colGround = XCOL_WHITE;	// 色保存用
 
-	// 地盤を配置
+	// 障害物を配置
 	if (m_pKeyboard->IsTrigger(KEY_CREATE))
 	{
 		//----------------------------------------------------
-		//	地盤の情報を配置用に変更
+		//	障害物の情報を配置用に変更
 		//----------------------------------------------------
 		// 自動更新・自動描画をONにする
-		m_pGround->SetEnableUpdate(true);
-		m_pGround->SetEnableDraw(true);
+		m_pObstacle->SetEnableUpdate(true);
+		m_pObstacle->SetEnableDraw(true);
 
-		// 色を設定
-		colGround = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colGround.r, colGround.g, colGround.b, 1.0f));
+		// 透明度を設定
+		m_pObstacle->SetAlpha(1.0f);
 
 		// 未保存を設定
 		pEdit->UnSave();
 
 		//----------------------------------------------------
-		//	新しい地盤の生成
+		//	新しい障害物の生成
 		//----------------------------------------------------
-		// 地盤の生成
-		m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, sizeEdit);
-		assert(m_pGround != NULL);
+		// 障害物の生成
+		m_pObstacle = CObstacle::Create(m_obstacle.type, posEdit, rotEdit);
+		assert(m_pObstacle != NULL);
 
-		// 色を設定
-		colGround = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colGround.r, colGround.g, colGround.b, INIT_ALPHA));
+		// 透明度を設定
+		m_pObstacle->SetAlpha(INIT_ALPHA);
 	}
 }
 
 //============================================================
-//	地盤の破棄処理
+//	障害物の破棄処理
 //============================================================
-void CEditGround::ReleaseGround(void)
+void CEditObstacle::ReleaseObstacle(void)
 {
 	// 変数を宣言
 	bool bRelease = false;	// 破棄状況
@@ -477,21 +376,21 @@ void CEditGround::ReleaseGround(void)
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
-	// 地盤を削除
+	// 障害物を削除
 	if (m_pKeyboard->IsTrigger(KEY_RELEASE))
 	{
 		// 破棄する状態を設定
 		bRelease = true;
 	}
 
-	// 地盤の削除判定
-	DeleteCollisionGround(bRelease);
+	// 障害物の削除判定
+	DeleteCollisionObstacle(bRelease);
 }
 
 //============================================================
-//	地盤の削除判定
+//	障害物の削除判定
 //============================================================
-void CEditGround::DeleteCollisionGround(const bool bRelase)
+void CEditObstacle::DeleteCollisionObstacle(const bool bRelase)
 {
 	// ポインタを宣言
 	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
@@ -505,7 +404,6 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -523,14 +421,14 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
-				D3DXVECTOR3 posGround = VEC3_ZERO;	// 地盤位置
-				D3DXVECTOR3 sizeGround = VEC3_ZERO;	// 地盤大きさ
+				D3DXVECTOR3 posObs = VEC3_ZERO;	// 障害物位置
+				float fRadiusObs = 0.0f;		// 障害物半径
 
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
-				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-				{ // オブジェクトラベルが地盤ではない場合
+				if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
+				{ // オブジェクトラベルが障害物ではない場合
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -539,7 +437,7 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_pGround)
+				if (pObjCheck == (CObject*)m_pObstacle)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入
@@ -549,19 +447,19 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					continue;
 				}
 
-				// 地盤の位置を取得
-				posGround = pObjCheck->GetVec3Position();
+				// 障害物の位置を取得
+				posObs = pObjCheck->GetVec3Position();
 
-				// 地盤の大きさを取得
-				sizeGround = pObjCheck->GetVec3Sizing();
+				// 障害物の半径を取得
+				fRadiusObs = pObjCheck->GetRadius();
 
 				// 球体の当たり判定
 				if (collision::Circle3D
 				( // 引数
-					posEdit,							// 判定位置
-					posGround,							// 判定目標位置
-					(sizeGround.x + sizeGround.z) * 0.5f,	// 判定半径
-					(sizeEdit.x + sizeEdit.z) * 0.5f	// 判定目標半径
+					posEdit,	// 判定位置
+					posObs,		// 判定目標位置
+					fRadiusObs,	// 判定半径
+					200.0f		// 判定目標半径
 				))
 				{ // 判定内だった場合
 
@@ -577,15 +475,15 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 					else
 					{ // 破棄しない場合
 
-						// 赤を設定
-						pObjCheck->SetColor(XCOL_RED);
+						// 赤マテリアルを設定
+						pObjCheck->SetAllMaterial(material::Red());
 					}
 				}
 				else
 				{ // 判定外だった場合
 
-					// 通常色を設定
-					pObjCheck->SetColor(XCOL_WHITE);
+					// マテリアルを再設定
+					pObjCheck->ResetMaterial();
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -596,9 +494,9 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 }
 
 //============================================================
-//	地盤の色の全初期化処理
+//	障害物の色の全初期化処理
 //============================================================
-void CEditGround::InitAllColorGround(void)
+void CEditObstacle::InitAllColorObstacle(void)
 {
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -618,8 +516,8 @@ void CEditGround::InitAllColorGround(void)
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
-				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
-				{ // オブジェクトラベルが地盤ではない場合
+				if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
+				{ // オブジェクトラベルが障害物ではない場合
 
 					// 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
@@ -628,7 +526,7 @@ void CEditGround::InitAllColorGround(void)
 					continue;
 				}
 
-				if (pObjCheck == (CObject*)m_pGround)
+				if (pObjCheck == (CObject*)m_pObstacle)
 				{ // 同じアドレスだった場合
 
 					// 次のオブジェクトへのポインタを代入
@@ -638,8 +536,8 @@ void CEditGround::InitAllColorGround(void)
 					continue;
 				}
 
-				// 通常色を設定
-				pObjCheck->SetColor(XCOL_WHITE);
+				// マテリアルを再設定
+				pObjCheck->ResetMaterial();
 
 				// 次のオブジェクトへのポインタを代入
 				pObjCheck = pObjectNext;

@@ -64,8 +64,7 @@ public:
 	( // 引数
 		const EType type,			// 種類
 		const D3DXVECTOR3& rPos,	// 位置
-		const D3DXVECTOR3& rRot,	// 向き
-		const D3DXVECTOR3& rScale	// 拡大率
+		const D3DXVECTOR3& rRot		// 向き
 	);
 	static void LoadSetup(void);	// セットアップ
 

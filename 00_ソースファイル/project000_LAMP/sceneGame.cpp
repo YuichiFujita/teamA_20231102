@@ -152,7 +152,7 @@ HRESULT CSceneGame::Init(void)
 	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
 
-	CObstacle::Create(CObstacle::TYPE_WOOD, D3DXVECTOR3(0.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	CObstacle::Create(CObstacle::TYPE_WOOD, D3DXVECTOR3(0.0f, 0.0f, 0.0f), VEC3_ZERO);
 
 #endif
 

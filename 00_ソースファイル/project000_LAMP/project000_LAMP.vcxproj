@@ -116,7 +116,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -161,6 +161,7 @@
     <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="editBlock.cpp" />
     <ClCompile Include="editGround.cpp" />
+    <ClCompile Include="editObstacle.cpp" />
     <ClCompile Include="editStage.cpp" />
     <ClCompile Include="editStageManager.cpp" />
     <ClCompile Include="effect2D.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="DepthShadow.h" />
     <ClInclude Include="editBlock.h" />
     <ClInclude Include="editGround.h" />
+    <ClInclude Include="editObstacle.h" />
     <ClInclude Include="editStage.h" />
     <ClInclude Include="editStageManager.h" />
     <ClInclude Include="effect2D.h" />

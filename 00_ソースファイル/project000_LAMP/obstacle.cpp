@@ -151,8 +151,7 @@ CObstacle *CObstacle::Create
 (
 	const EType type,			// 種類
 	const D3DXVECTOR3& rPos,	// 位置
-	const D3DXVECTOR3& rRot,	// 向き
-	const D3DXVECTOR3& rScale	// 拡大率
+	const D3DXVECTOR3& rRot		// 向き
 )
 {
 	// ポインタを宣言
@@ -189,9 +188,6 @@ CObstacle *CObstacle::Create
 
 		// 向きを設定
 		pObstacle->SetVec3Rotation(rRot);
-
-		// 拡大率を設定
-		pObstacle->SetVec3Scaling(rScale);
 
 		// 確保したアドレスを返す
 		return pObstacle;

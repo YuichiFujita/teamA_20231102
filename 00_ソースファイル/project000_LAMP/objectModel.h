@@ -45,6 +45,7 @@ public:
 	D3DXVECTOR3 GetVec3Rotation(void) const override;			// 向き取得
 	void SetVec3Scaling(const D3DXVECTOR3& rScale) override;	// 拡大率設定
 	D3DXVECTOR3 GetVec3Scaling(void) const override;			// 拡大率取得
+	float GetRadius(void) const override;						// 半径取得
 	void SetAllMaterial(const D3DXMATERIAL& rMat) override;		// マテリアル全設定
 	void ResetMaterial(void) override;							// マテリアル再設定
 	D3DXMATRIX *GetPtrMtxWorld(void) override;					// マトリックスポインタ取得
