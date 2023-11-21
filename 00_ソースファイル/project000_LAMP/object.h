@@ -61,6 +61,7 @@ public:
 		LABEL_PLAYER,		// プレイヤー
 		LABEL_GROUND,		// 地盤
 		LABEL_BLOCK,		// ブロック
+		LABEL_OBSTACLE,		// 障害物
 		LABEL_FIELD,		// 地面
 		LABEL_WALL,			// 壁
 		LABEL_SCENERY,		// 景色

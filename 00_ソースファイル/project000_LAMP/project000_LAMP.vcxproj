@@ -196,6 +196,7 @@
     <ClCompile Include="objectModel.cpp" />
     <ClCompile Include="objectOrbit.cpp" />
     <ClCompile Include="objectTornado.cpp" />
+    <ClCompile Include="obstacle.cpp" />
     <ClCompile Include="particle2D.cpp" />
     <ClCompile Include="particle3D.cpp" />
     <ClCompile Include="pause.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="objectModel.h" />
     <ClInclude Include="objectOrbit.h" />
     <ClInclude Include="objectTornado.h" />
+    <ClInclude Include="obstacle.h" />
     <ClInclude Include="particle2D.h" />
     <ClInclude Include="particle3D.h" />
     <ClInclude Include="pause.h" />
