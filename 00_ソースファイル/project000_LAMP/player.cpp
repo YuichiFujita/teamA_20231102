@@ -228,7 +228,9 @@ void CPlayer::Update(void)
 	m_pShadow->Update();
 
 	// フレイルの更新
-	m_pFlail->SetVec3PosOrg(GetVec3Position());
+	D3DXMATRIX partsMtx = GetMultiModel(MODEL_HAND_R)->GetMtxWorld();
+	D3DXVECTOR3 partsPos = D3DXVECTOR3(partsMtx._41, partsMtx._42, partsMtx._43);
+	m_pFlail->SetVec3PosOrg(partsPos);
 
 	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
 	{
@@ -241,8 +243,8 @@ void CPlayer::Update(void)
 
 		m_pFlail->SetChainRot(chainRot);
 		m_pFlail->SetChainRotMove(chainRot);
-		m_pFlail->SetLengthChain(length);
-		m_pFlail->SetMove(0.0f);
+		m_pFlail->SetLengthChain(length - 1.0f);
+		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
 	m_pFlail->Update();
@@ -696,8 +698,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		if (m_pFlail->GetLengthChain() >= 1000.0f)
 		{
 			// 移動量を更新
-			m_move.x *= 0.8f;
-			m_move.z *= 0.8f;
+			m_move.x *= 0.7f;
+			m_move.z *= 0.7f;
 		}
 	}
 
@@ -729,8 +731,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != 120)
 		{
 			// 溜めた時間に応じて飛距離増加
-			float move = 1.3f;
-			move *= (float)m_nCounterFlail;
+			D3DXVECTOR3 move = VEC3_ZERO;
+			move.x = (sinf(m_pFlail->GetChainRotMove()) * 5.0f * m_nCounterFlail);
+			move.z = (cosf(m_pFlail->GetChainRotMove()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
 
 			// 目標角度に合わせる
@@ -747,7 +750,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetMove() < 1.0f)
+			if (D3DXVec3Length(&m_pFlail->GetMove()) < 1.0f)
 			{
 				m_nCounterFlail = -1;
 			}
@@ -765,28 +768,29 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 	else
 	{
-		// 引き戻す速度決定
-		float move = 0.0001f;
-
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
 		if (m_pFlail->GetLengthChain() < 50.0f)
 		{
 			m_nCounterFlail = 1;
-			m_pFlail->SetMove(0.0f);
+			m_pFlail->SetMove(VEC3_ZERO);
 			m_pFlail->SetLengthChain(0.0f);
 		}
 
 		// 引き戻す
 		if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
-			m_nCounterFlail -= 10;
+			m_nCounterFlail -= 1;
 
-			if (m_nCounterFlail < -500)
+			if (m_nCounterFlail < -50)
 			{
-				m_nCounterFlail = -500;
+				m_nCounterFlail = -50;
 			}
 
-			m_pFlail->SetMove(m_pFlail->GetMove() + (move * m_nCounterFlail * -m_nCounterFlail));
+			// 溜めた時間に応じて飛距離増加
+			D3DXVECTOR3 move = VEC3_ZERO;
+			move.x = (sinf(m_pFlail->GetChainRotMove()) * (m_nCounterFlail * -m_nCounterFlail));
+			move.z = (cosf(m_pFlail->GetChainRotMove()) * (m_nCounterFlail * -m_nCounterFlail));
+			m_pFlail->SetMove(move);
 
 			// 移動量を更新
 			m_move.x = 0.0f;

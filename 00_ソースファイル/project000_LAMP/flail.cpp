@@ -13,11 +13,11 @@
 #include "camera.h"
 #include "model.h"
 #include "useful.h"
-#include "player.h"
 #include "retentionManager.h"
 #include "stage.h"
 #include "liquid.h"
 #include "scrollMeshField.h"
+#include "collision.h"
 
 //************************************************************
 //	マクロ定義
@@ -41,7 +41,8 @@ const char *CFlail::mc_apModelFile[] =	// モデル定数
 //============================================================
 CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, MODEL_UI_PRIO)
 {
-	m_move = 0.0f;
+	m_oldPos = VEC3_ZERO;
+	m_move = VEC3_ZERO;
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
 	m_fChainRotMove = 0.0f;
@@ -89,36 +90,24 @@ void CFlail::Uninit(void)
 //============================================================
 void CFlail::Update(void)
 {
+	m_oldPos = GetVec3Position();
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
-
-	// 鎖の長さに移動量代入
-	m_fLengthChain += m_move;
-
-	if (player->GetCounterFlail() < 0)
-	{
-		// 移動量減衰
-		m_move += (0.0f - m_move) * 0.15f;
-	}
-	else
-	{
-		// 移動量減衰
-		m_move += (0.0f - m_move) * 0.08f;
-	}
 
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotMove);
 
 	// 引っ張る時のみ角度調整
-	if (m_move < 0.0f)
+	if (player->GetCounterFlail() < -1)
 	{
 		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
 	}
 
-	if (m_move > 0.0f && m_move < 5.0f)
+	if (D3DXVec3Length(&m_move) > 0.0f && D3DXVec3Length(&m_move) < 5.0f)
 	{
-		m_move = 0.0f;
-	}
+		m_move.x = 0.0f;
+		m_move.z = 0.0f;
+	}			 
 	
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -129,18 +118,13 @@ void CFlail::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "鎖長さ %f\n", m_fLengthChain);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[原点位置]：%f %f %f\n", m_posOrg.x, m_posOrg.y, m_posOrg.z);
 
-	// 一定の長さを超えたら止める
-	if (m_fLengthChain > 1000.0f)
-	{
-		m_fLengthChain = 1000.0f;
-	}
-
 	// 角度と長さから鉄球の位置決定
 	D3DXVECTOR3 pos = GetVec3Position();
 
-	pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+	pos.x += m_move.x;
+	pos.z += m_move.z;
 
-	if (m_move == 0.0f)
+	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
 		if (player->GetCounterFlail() < 0)
 		{
@@ -159,9 +143,34 @@ void CFlail::Update(void)
 		}
 	}
 
-	pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+	if (player->GetCounterFlail() < 0)
+	{
+		// 移動量減衰
+		m_move.x += (0.0f - m_move.x) * 0.15f;
+		m_move.z += (0.0f - m_move.z) * 0.15f;
+	}
+	else
+	{
+		// 移動量減衰
+		m_move.x += (0.0f - m_move.x) * 0.15f;
+		m_move.z += (0.0f - m_move.z) * 0.15f;
+	}
+	
+	if (player->GetCounterFlail() != -1 && player->GetCounterFlail() != 120)
+	{
+		pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+	}
 
-	Collision();
+	// 一定の長さを超えたら止める
+	if (m_fLengthChain > 1000.0f)
+	{
+		m_fLengthChain = 1000.0f;
+		pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
+		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
+	}
+
+	Collision(pos);
 
 	SetVec3Position(pos);
 
@@ -250,7 +259,7 @@ CFlail *CFlail::Create
 //============================================================
 //	当たり判定処理
 //============================================================
-void CFlail::Collision(void)
+void CFlail::Collision(D3DXVECTOR3& rPos)
 {
 	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
 	{
@@ -270,6 +279,281 @@ void CFlail::Collision(void)
 				D3DXVECTOR3 pos = player->GetVec3Position();
 
 				player->SetVec3Position(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+			}
+		}
+	}
+
+	CollisionGround(CPlayer::AXIS_X, rPos);
+	CollisionBlock(CPlayer::AXIS_X, rPos);
+
+	CollisionGround(CPlayer::AXIS_Y, rPos);
+	CollisionBlock(CPlayer::AXIS_Y, rPos);
+
+	CollisionGround(CPlayer::AXIS_Z, rPos);
+	CollisionBlock(CPlayer::AXIS_Z, rPos);
+}
+
+void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最大大きさ
+	bool bMin = false;	// 不の方向の判定状況
+	bool bMax = false;	// 正の方向の判定状況
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+	  // ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+		  // ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+			  // 変数を宣言
+				D3DXVECTOR3 posGround = VEC3_ZERO;		// 地盤位置
+				D3DXVECTOR3 rotGround = VEC3_ZERO;		// 地盤向き
+				D3DXVECTOR3 sizeMinGround = VEC3_ZERO;	// 地盤最小大きさ
+				D3DXVECTOR3 sizeMaxGround = VEC3_ZERO;	// 地盤最大大きさ
+
+														// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
+				{ // オブジェクトラベルが地盤ではない場合
+
+				  // 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 地盤の位置を設定
+				posGround = pObjCheck->GetVec3Position();
+
+				// 地盤の向きを設定
+				rotGround = pObjCheck->GetVec3Rotation();
+
+				// 地盤の最小の大きさを設定
+				sizeMinGround = pObjCheck->GetVec3Sizing();
+				sizeMinGround.y *= 2.0f;	// 縦の大きさを倍にする
+
+											// 地盤の最大の大きさを設定
+				sizeMaxGround = pObjCheck->GetVec3Sizing();
+				sizeMaxGround.y = 0.0f;		// 縦の大きさを初期化
+
+				switch (axis)
+				{ // 判定軸ごとの処理
+				case CPlayer::AXIS_X:	// X軸
+
+								// X軸の衝突判定
+					collision::ResponseSingleX
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				case CPlayer::AXIS_Y:	// Y軸
+
+								// Y軸の衝突判定
+					collision::ResponseSingleY
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						true,			// X判定
+						true,			// Z判定
+						&bMin,			// 下からの判定
+						&bMax			// 上からの判定
+					);
+
+					if (bMax)
+					{ // 上から当たっていた場合
+
+					  // 着地している状況にする
+						bHit = true;
+					}
+
+					break;
+
+				case CPlayer::AXIS_Z:	// Z軸
+
+								// Z軸の衝突判定
+					collision::ResponseSingleZ
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				default:	// 例外処理
+					assert(false);
+					break;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+}
+
+void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最大大きさ
+	bool bMin = false;	// 不の方向の判定状況
+	bool bMax = false;	// 正の方向の判定状況
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+	  // ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+		  // ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+			  // 変数を宣言
+				D3DXVECTOR3 posGround = VEC3_ZERO;		// 地盤位置
+				D3DXVECTOR3 rotGround = VEC3_ZERO;		// 地盤向き
+				D3DXVECTOR3 sizeMinGround = VEC3_ZERO;	// 地盤最小大きさ
+				D3DXVECTOR3 sizeMaxGround = VEC3_ZERO;	// 地盤最大大きさ
+
+														// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルが地盤ではない場合
+
+				  // 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 地盤の位置を設定
+				posGround = pObjCheck->GetVec3Position();
+
+				// 地盤の向きを設定
+				rotGround = pObjCheck->GetVec3Rotation();
+
+				// 地盤の最小の大きさを設定
+				sizeMinGround = pObjCheck->GetVec3Sizing();
+				sizeMinGround.y *= 2.0f;	// 縦の大きさを倍にする
+
+											// 地盤の最大の大きさを設定
+				sizeMaxGround = pObjCheck->GetVec3Sizing();
+				sizeMaxGround.y = 0.0f;		// 縦の大きさを初期化
+
+				switch (axis)
+				{ // 判定軸ごとの処理
+				case CPlayer::AXIS_X:	// X軸
+
+										// X軸の衝突判定
+					collision::ResponseSingleX
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				case CPlayer::AXIS_Y:	// Y軸
+
+										// Y軸の衝突判定
+					collision::ResponseSingleY
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move,		// 移動量
+						true,			// X判定
+						true,			// Z判定
+						&bMin,			// 下からの判定
+						&bMax			// 上からの判定
+					);
+
+					if (bMax)
+					{ // 上から当たっていた場合
+
+					  // 着地している状況にする
+						bHit = true;
+					}
+
+					break;
+
+				case CPlayer::AXIS_Z:	// Z軸
+
+										// Z軸の衝突判定
+					collision::ResponseSingleZ
+					( // 引数
+						rPos,			// 判定位置
+						m_oldPos,		// 判定過去位置
+						posGround,		// 判定目標位置
+						sizeMaxPlayer,	// 判定サイズ(右・上・後)
+						sizeMinPlayer,	// 判定サイズ(左・下・前)
+						sizeMaxGround,	// 判定目標サイズ(右・上・後)
+						sizeMinGround,	// 判定目標サイズ(左・下・前)
+						&m_move			// 移動量
+					);
+
+					break;
+
+				default:	// 例外処理
+					assert(false);
+					break;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
 			}
 		}
 	}
@@ -314,7 +598,7 @@ int CFlail::GetPlayerID(void)
 //============================================================
 //	移動量の設定処理
 //============================================================
-void CFlail::SetMove(const float& rMove)
+void CFlail::SetMove(const D3DXVECTOR3& rMove)
 {
 	// 引数の位置を設定
 	m_move = rMove;
@@ -323,7 +607,7 @@ void CFlail::SetMove(const float& rMove)
 //============================================================
 //	移動量の取得処理
 //============================================================
-float CFlail::GetMove(void)
+D3DXVECTOR3 CFlail::GetMove(void)
 {
 	// 位置を返す
 	return m_move;

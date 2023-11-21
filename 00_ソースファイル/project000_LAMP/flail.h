@@ -15,6 +15,7 @@
 //************************************************************
 #include "main.h"
 #include "objectModel.h"
+#include "player.h"
 
 //************************************************************
 //	クラス定義
@@ -49,8 +50,8 @@ public:
 	void SetPlayerID(const int& rPlayerID);				// プレイヤー番号設定
 	int GetPlayerID(void);								// プレイヤー番号取得
 
-	void SetMove(const float& rMove);					// 位置設定
-	float GetMove(void);								// 位置取得
+	void SetMove(const D3DXVECTOR3& rMove);				// 位置設定
+	D3DXVECTOR3 GetMove(void);							// 位置取得
 
 	void SetChainRot(const float& rChainRot);			// 角度設定
 	float GetChainRot(void);							// 角度取得
@@ -71,15 +72,18 @@ public:
 
 private:
 	//メンバ関数
-	void Collision(void);		// 長さ設定
+	void Collision(D3DXVECTOR3& rPos);		// 長さ設定
+	void CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	void CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
 	D3DXVECTOR3 m_posOrg;			// 回転原点
+	D3DXVECTOR3 m_oldPos;			// 回転原点
+	D3DXVECTOR3	m_move;				// 移動量
 	int			m_nPlayerID;		// プレイヤーID
-	float		m_move;				// 移動量
 	float		m_fChainRot;		// 角度
 	float		m_fChainRotMove;	// 目標角度
 	float		m_fLengthChain;		// 鎖の長さ
