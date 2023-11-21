@@ -170,6 +170,9 @@ HRESULT CPlayer::Init(void)
 	}
 	m_pFlail->SetPlayerID(m_nPadID);
 
+	// メインカラーを設定
+	SetMainMaterial();
+
 	// 成功を返す
 	return S_OK;
 }
@@ -464,6 +467,9 @@ void CPlayer::SetSpawn(void)
 
 	// マテリアルを再設定
 	ResetMaterial();
+	
+	// メインカラーを設定
+	SetMainMaterial();
 
 	// 透明度を透明に再設定
 	SetAlpha(0.0f);
@@ -494,6 +500,52 @@ int CPlayer::GetCounterFlail(void) const
 {
 	// フレイルカウンターを返す
 	return m_nCounterFlail;
+}
+
+//============================================================
+//	自身のメインカラーマテリアル設定処理
+//============================================================
+void CPlayer::SetMainMaterial(void)
+{
+	for (int nCntPlayer = 0; nCntPlayer < MODEL_MAX; nCntPlayer++)
+	{ // パーツの最大数分繰り返す
+
+		// モデルの先頭マテリアルを設定
+		SetMaterial(GetMainMaterial(), nCntPlayer, 0);
+	}
+}
+
+//============================================================
+//	自身のメインカラーマテリアル取得処理
+//============================================================
+D3DXMATERIAL CPlayer::GetMainMaterial(void)
+{
+	switch (m_nPadID)
+	{ // パッドインデックスごとの処理
+	case PLAYER_RED:	// プレイヤー1：赤
+
+		// 赤マテリアルを返す
+		return material::Red();
+
+	case PLAYER_BLUE:	// プレイヤー2：青
+
+		// 青マテリアルを返す
+		return material::Blue();
+
+	case PLAYER_YELLOW:	// プレイヤー3：黄
+
+		// 黄マテリアルを返す
+		return material::Yellow();
+
+	case PLAYER_GREEN:	// プレイヤー4：緑
+
+		// 緑マテリアルを返す
+		return material::Green();
+
+	default:	// 例外処理
+		assert(false);
+		return material::White();
+	}
 }
 
 //============================================================
