@@ -276,6 +276,15 @@ D3DXVECTOR3 CObjectModel::GetVec3Scaling(void) const
 }
 
 //============================================================
+//	半径取得処理
+//============================================================
+float CObjectModel::GetRadius(void) const
+{
+	// モデルの半径を返す
+	return m_modelData.fRadius;
+}
+
+//============================================================
 //	マテリアルの全設定処理
 //============================================================
 void CObjectModel::SetAllMaterial(const D3DXMATERIAL& rMat)

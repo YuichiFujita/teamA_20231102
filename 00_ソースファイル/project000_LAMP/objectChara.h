@@ -46,6 +46,7 @@ public:
 	D3DXVECTOR3 GetVec3Position(void) const override;		// 位置取得
 	void SetVec3Rotation(const D3DXVECTOR3& rRot) override;	// 向き設定
 	D3DXVECTOR3 GetVec3Rotation(void) const override;		// 向き取得
+	void SetAllMaterial(const D3DXMATERIAL& rMat) override;	// マテリアル全設定
 	D3DXMATRIX *GetPtrMtxWorld(void) override;				// マトリックスポインタ取得
 
 	// メンバ関数
@@ -73,11 +74,12 @@ public:
 	int  GetMotionCounter(void) const;			// モーションカウンター取得
 	bool IsMotionFinish(void) const;			// モーション終了取得
 	bool IsMotionLoop(const int nType) const;	// モーションループ取得
-	void SetMaterial(const D3DXMATERIAL& rMat);	// マテリアル設定
-	void ResetMaterial(void);					// マテリアル再設定
-	void SetAlpha(const float fAlpha);			// 透明度設定
-	float GetAlpha(void) const;					// 透明度取得
-	float GetMaxAlpha(void) const;				// 最大透明度取得
+
+	void SetMaterial(const D3DXMATERIAL& rMat, const int nParts, const int nID);	// マテリアル設定
+	void ResetMaterial(void);			// マテリアル再設定
+	void SetAlpha(const float fAlpha);	// 透明度設定
+	float GetAlpha(void) const;			// 透明度取得
+	float GetMaxAlpha(void) const;		// 最大透明度取得
 
 private:
 	// オーバーライド関数

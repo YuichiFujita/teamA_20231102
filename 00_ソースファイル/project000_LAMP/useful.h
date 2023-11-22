@@ -55,16 +55,20 @@
 #define GRID3_ONE	(POSGRID3(1, 1, 1))	// 1クリア
 
 // D3DXCOLOR関係
-#define XCOL_ABLACK	(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f))	// 黒(透明)
-#define XCOL_BLACK	(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	// 黒(不透明)
-#define XCOL_AWHITE	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f))	// 白(透明)
-#define XCOL_WHITE	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 白(不透明)
-#define XCOL_ARED	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f))	// 赤(透明)
-#define XCOL_RED	(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))	// 赤(不透明)
-#define XCOL_AGREEN	(D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.0f))	// 緑(透明)
-#define XCOL_GREEN	(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f))	// 緑(不透明)
-#define XCOL_ABLUE	(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.0f))	// 青(透明)
-#define XCOL_BLUE	(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f))	// 青(不透明)
+#define XCOL_ABLACK		(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f))	// 黒色(透明)
+#define XCOL_BLACK		(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f))	// 黒色(不透明)
+#define XCOL_AWHITE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f))	// 白色(透明)
+#define XCOL_WHITE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 白色(不透明)
+#define XCOL_ARED		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f))	// 赤色(透明)
+#define XCOL_RED		(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f))	// 赤色(不透明)
+#define XCOL_AGREEN		(D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.0f))	// 緑色(透明)
+#define XCOL_GREEN		(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f))	// 緑色(不透明)
+#define XCOL_ABLUE		(D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.0f))	// 青色(透明)
+#define XCOL_BLUE		(D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f))	// 青色(不透明)
+#define XCOL_AYELLOW	(D3DXCOLOR(1.0f, 1.0f, 0.0f, 0.0f))	// 黄色(透明)
+#define XCOL_YELLOW		(D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f))	// 黄色(不透明)
+#define XCOL_ACYAN		(D3DXCOLOR(0.0f, 1.0f, 1.0f, 0.0f))	// 水色(透明)
+#define XCOL_CYAN		(D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f))	// 水色(不透明)
 
 // RenderState関係
 #define RS_BL_NORMAL	(CRenderState::SBlendAlpha(D3DBLENDOP_ADD,			D3DBLEND_SRCALPHA,	D3DBLEND_INVSRCALPHA))	// 通常αブレンド
@@ -159,7 +163,11 @@ namespace useful
 namespace material
 {
 	// 通常関数
+	D3DXMATERIAL White(void);		// 白マテリアル取得
 	D3DXMATERIAL Red(void);			// 赤マテリアル取得
+	D3DXMATERIAL Green(void);		// 緑マテリアル取得
+	D3DXMATERIAL Blue(void);		// 青マテリアル取得
+	D3DXMATERIAL Yellow(void);		// 黄マテリアル取得
 	D3DXMATERIAL GlowGreen(void);	// 発光緑マテリアル取得
 }
 

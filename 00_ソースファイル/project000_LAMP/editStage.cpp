@@ -12,6 +12,7 @@
 #include "editStageManager.h"
 #include "editGround.h"
 #include "editBlock.h"
+#include "editObstacle.h"
 
 //************************************************************
 //	親クラス [CEditStage] のメンバ関数
@@ -55,11 +56,15 @@ CEditStage *CEditStage::Create(CEditStageManager *pEdit, const EThing thing)
 		switch (thing)
 		{ // 配置物ごとの処理
 		case THING_GROUND:
-			pEditGround = new CEditGround;	// エディット地盤
+			pEditGround = new CEditGround;		// エディット地盤
 			break;
 
 		case THING_BLOCK:
-			pEditGround = new CEditBlock;	// エディットブロック
+			pEditGround = new CEditBlock;		// エディットブロック
+			break;
+
+		case THING_OBSTACLE:
+			pEditGround = new CEditObstacle;	// エディット障害物
 			break;
 
 		default:

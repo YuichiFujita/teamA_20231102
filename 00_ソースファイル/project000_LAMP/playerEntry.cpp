@@ -139,6 +139,9 @@ void CPlayerEntry::SetEntry(void)
 	// マテリアルを再設定
 	ResetMaterial();
 
+	// メインカラーを設定
+	SetMainMaterial();
+
 	// 透明度を不透明に設定
 	SetAlpha(1.0f);
 

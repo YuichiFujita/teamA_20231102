@@ -189,6 +189,19 @@ D3DXVECTOR3 CObjectChara::GetVec3Rotation(void) const
 }
 
 //============================================================
+//	マテリアル全設定処理
+//============================================================
+void CObjectChara::SetAllMaterial(const D3DXMATERIAL& rMat)
+{
+	for (int nCntObjectChara = 0; nCntObjectChara < m_nNumModel; nCntObjectChara++)
+	{ // パーツの総数分繰り返す
+
+		// 引数のマテリアルを全マテリアルに設定
+		m_apMultiModel[nCntObjectChara]->SetAllMaterial(rMat);
+	}
+}
+
+//============================================================
 //	マトリックスポインタ取得処理
 //============================================================
 D3DXMATRIX *CObjectChara::GetPtrMtxWorld(void)
@@ -371,14 +384,10 @@ bool CObjectChara::IsMotionLoop(const int nType) const
 //============================================================
 //	マテリアルの設定処理
 //============================================================
-void CObjectChara::SetMaterial(const D3DXMATERIAL& rMat)
+void CObjectChara::SetMaterial(const D3DXMATERIAL& rMat, const int nParts, const int nID)
 {
-	for (int nCntObjectChara = 0; nCntObjectChara < m_nNumModel; nCntObjectChara++)
-	{ // パーツの総数分繰り返す
-
-		// 引数のマテリアルを全マテリアルに設定
-		m_apMultiModel[nCntObjectChara]->SetAllMaterial(rMat);
-	}
+	// 引数のマテリアルを設定
+	m_apMultiModel[nParts]->SetMaterial(rMat, nID);
 }
 
 //============================================================

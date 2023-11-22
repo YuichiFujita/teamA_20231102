@@ -56,6 +56,16 @@ public:
 		MOTION_MAX			// この列挙型の総数
 	};
 
+	// プレイヤー列挙
+	enum EPlayer
+	{
+		PLAYER_RED = 0,	// プレイヤー1：赤
+		PLAYER_BLUE,	// プレイヤー2：青
+		PLAYER_YELLOW,	// プレイヤー3：黄
+		PLAYER_GREEN,	// プレイヤー4：緑
+		PLAYER_MAX		// この列挙型の総数
+	};
+
 	// 状態列挙
 	enum EState
 	{
@@ -100,13 +110,15 @@ public:
 	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
-	void SetSpawn(void);					// 出現設定
-	int GetPadID(void) const;				// パッドインデックス取得
-	int GetCounterFlail(void) const;		// パッドインデックス取得
+	void SetSpawn(void);				// 出現設定
+	int GetPadID(void) const;			// パッドインデックス取得
+	int GetCounterFlail(void) const;	// フレイルカウンター取得
 
 protected:
 	// メンバ関数
-	void UpdateMotion(int nMotion);	// モーション・オブジェクトキャラクターの更新
+	void UpdateMotion(int nMotion);		// モーション・オブジェクトキャラクターの更新
+	void SetMainMaterial(void);			// 自身のメインカラーマテリアル設定
+	D3DXMATERIAL GetMainMaterial(void);	// 自身のメインカラーマテリアル取得
 
 private:
 	// メンバ関数

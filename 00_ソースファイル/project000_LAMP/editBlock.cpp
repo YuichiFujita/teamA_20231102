@@ -300,17 +300,17 @@ void CEditBlock::Save(FILE *pFile)
 					}
 
 					// ブロックの情報を取得
-					D3DXVECTOR3 posBuild = pObjCheck->GetVec3Position();	// 位置
-					D3DXVECTOR3 rotBuild = pObjCheck->GetVec3Rotation();	// 向き
-					D3DXVECTOR3 sizeBuild = pObjCheck->GetVec3Sizing();		// 大きさ
+					D3DXVECTOR3 posBlock = pObjCheck->GetVec3Position();	// 位置
+					D3DXVECTOR3 rotBlock = pObjCheck->GetVec3Rotation();	// 向き
+					D3DXVECTOR3 sizeBlock = pObjCheck->GetVec3Sizing();		// 大きさ
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
 					fprintf(pFile, "	BLOCKSET\n");
 					fprintf(pFile, "		TYPE = %d\n", nType);
-					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posBuild.x, posBuild.y, posBuild.z);
-					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotBuild.x, rotBuild.y, rotBuild.z);
-					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeBuild.x, sizeBuild.y, sizeBuild.z);
+					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posBlock.x, posBlock.y, posBlock.z);
+					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotBlock.x, rotBlock.y, rotBlock.z);
+					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeBlock.x, sizeBlock.y, sizeBlock.z);
 					fprintf(pFile, "	END_BLOCKSET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
@@ -434,7 +434,7 @@ void CEditBlock::CreateBlock(void)
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
-	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
+	D3DXCOLOR colBlock = XCOL_WHITE;	// 色保存用
 
 	// ブロックを配置
 	if (m_pKeyboard->IsTrigger(KEY_CREATE))
@@ -447,8 +447,8 @@ void CEditBlock::CreateBlock(void)
 		m_pBlock->SetEnableDraw(true);
 
 		// 色を設定
-		colBuild = m_pBlock->GetColor();	// 元の色を取得
-		m_pBlock->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
+		colBlock = m_pBlock->GetColor();	// 元の色を取得
+		m_pBlock->SetColor(D3DXCOLOR(colBlock.r, colBlock.g, colBlock.b, 1.0f));
 
 		// 未保存を設定
 		pEdit->UnSave();
@@ -461,8 +461,8 @@ void CEditBlock::CreateBlock(void)
 		assert(m_pBlock != NULL);
 
 		// 色を設定
-		colBuild = m_pBlock->GetColor();	// 元の色を取得
-		m_pBlock->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
+		colBlock = m_pBlock->GetColor();	// 元の色を取得
+		m_pBlock->SetColor(D3DXCOLOR(colBlock.r, colBlock.g, colBlock.b, INIT_ALPHA));
 	}
 }
 
@@ -523,8 +523,8 @@ void CEditBlock::DeleteCollisionBlock(const bool bRelase)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
-				D3DXVECTOR3 posBuild = VEC3_ZERO;	// ブロック位置
-				D3DXVECTOR3 sizeBuild = VEC3_ZERO;	// ブロック大きさ
+				D3DXVECTOR3 posBlock = VEC3_ZERO;	// ブロック位置
+				D3DXVECTOR3 sizeBlock = VEC3_ZERO;	// ブロック大きさ
 
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
@@ -550,17 +550,17 @@ void CEditBlock::DeleteCollisionBlock(const bool bRelase)
 				}
 
 				// ブロックの位置を取得
-				posBuild = pObjCheck->GetVec3Position();
+				posBlock = pObjCheck->GetVec3Position();
 
 				// ブロックの大きさを取得
-				sizeBuild = pObjCheck->GetVec3Sizing();
+				sizeBlock = pObjCheck->GetVec3Sizing();
 
 				// 球体の当たり判定
 				if (collision::Circle3D
 				( // 引数
 					posEdit,							// 判定位置
-					posBuild,							// 判定目標位置
-					(sizeBuild.x + sizeBuild.z) * 0.5f,	// 判定半径
+					posBlock,							// 判定目標位置
+					(sizeBlock.x + sizeBlock.z) * 0.5f,	// 判定半径
 					(sizeEdit.x + sizeEdit.z) * 0.5f	// 判定目標半径
 				))
 				{ // 判定内だった場合

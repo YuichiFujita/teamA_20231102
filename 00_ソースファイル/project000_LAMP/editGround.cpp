@@ -300,17 +300,17 @@ void CEditGround::Save(FILE *pFile)
 					}
 
 					// 地盤の情報を取得
-					D3DXVECTOR3 posBuild = pObjCheck->GetVec3Position();	// 位置
-					D3DXVECTOR3 rotBuild = pObjCheck->GetVec3Rotation();	// 向き
-					D3DXVECTOR3 sizeBuild = pObjCheck->GetVec3Sizing();		// 大きさ
+					D3DXVECTOR3 posGround = pObjCheck->GetVec3Position();	// 位置
+					D3DXVECTOR3 rotGround = pObjCheck->GetVec3Rotation();	// 向き
+					D3DXVECTOR3 sizeGround = pObjCheck->GetVec3Sizing();		// 大きさ
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
 					fprintf(pFile, "	GROUNDSET\n");
 					fprintf(pFile, "		TYPE = %d\n", nType);
-					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posBuild.x, posBuild.y, posBuild.z);
-					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotBuild.x, rotBuild.y, rotBuild.z);
-					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeBuild.x, sizeBuild.y, sizeBuild.z);
+					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posGround.x, posGround.y, posGround.z);
+					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotGround.x, rotGround.y, rotGround.z);
+					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeGround.x, sizeGround.y, sizeGround.z);
 					fprintf(pFile, "	END_GROUNDSET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
@@ -434,7 +434,7 @@ void CEditGround::CreateGround(void)
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
-	D3DXCOLOR colBuild = XCOL_WHITE;	// 色保存用
+	D3DXCOLOR colGround = XCOL_WHITE;	// 色保存用
 
 	// 地盤を配置
 	if (m_pKeyboard->IsTrigger(KEY_CREATE))
@@ -447,8 +447,8 @@ void CEditGround::CreateGround(void)
 		m_pGround->SetEnableDraw(true);
 
 		// 色を設定
-		colBuild = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, 1.0f));
+		colGround = m_pGround->GetColor();	// 元の色を取得
+		m_pGround->SetColor(D3DXCOLOR(colGround.r, colGround.g, colGround.b, 1.0f));
 
 		// 未保存を設定
 		pEdit->UnSave();
@@ -461,8 +461,8 @@ void CEditGround::CreateGround(void)
 		assert(m_pGround != NULL);
 
 		// 色を設定
-		colBuild = m_pGround->GetColor();	// 元の色を取得
-		m_pGround->SetColor(D3DXCOLOR(colBuild.r, colBuild.g, colBuild.b, INIT_ALPHA));
+		colGround = m_pGround->GetColor();	// 元の色を取得
+		m_pGround->SetColor(D3DXCOLOR(colGround.r, colGround.g, colGround.b, INIT_ALPHA));
 	}
 }
 
@@ -523,8 +523,8 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
-				D3DXVECTOR3 posBuild = VEC3_ZERO;	// 地盤位置
-				D3DXVECTOR3 sizeBuild = VEC3_ZERO;	// 地盤大きさ
+				D3DXVECTOR3 posGround = VEC3_ZERO;	// 地盤位置
+				D3DXVECTOR3 sizeGround = VEC3_ZERO;	// 地盤大きさ
 
 				// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
@@ -550,17 +550,17 @@ void CEditGround::DeleteCollisionGround(const bool bRelase)
 				}
 
 				// 地盤の位置を取得
-				posBuild = pObjCheck->GetVec3Position();
+				posGround = pObjCheck->GetVec3Position();
 
 				// 地盤の大きさを取得
-				sizeBuild = pObjCheck->GetVec3Sizing();
+				sizeGround = pObjCheck->GetVec3Sizing();
 
 				// 球体の当たり判定
 				if (collision::Circle3D
 				( // 引数
 					posEdit,							// 判定位置
-					posBuild,							// 判定目標位置
-					(sizeBuild.x + sizeBuild.z) * 0.5f,	// 判定半径
+					posGround,							// 判定目標位置
+					(sizeGround.x + sizeGround.z) * 0.5f,	// 判定半径
 					(sizeEdit.x + sizeEdit.z) * 0.5f	// 判定目標半径
 				))
 				{ // 判定内だった場合

@@ -17,8 +17,8 @@
 //************************************************************
 namespace
 {
-	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
-	const int	PRIORITY = 1;	// プレイヤーの優先順位
+	const char* SETUP_TXT = "data\\TXT\\block.txt";	// ブロックセットアップテキスト
+	const int	PRIORITY = 1;	// ブロックの優先順位
 }
 
 //************************************************************
@@ -75,8 +75,8 @@ HRESULT CBlock::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_status, 0, sizeof(m_status));	// ステータス
-	m_type = TYPE_STONE;	// 種類
-	m_nLife = 0;			// 体力
+	m_type	= TYPE_STONE;	// 種類
+	m_nLife	= 0;			// 体力
 
 	// オブジェクトメッシュキューブの初期化
 	if (FAILED(CObjectMeshCube::Init()))
@@ -331,7 +331,7 @@ void CBlock::LoadSetup(void)
 							{ // 読み込んだ文字列が LIFE の場合
 
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
-								fscanf(pFile, "%d", &m_aStatusInfo[nType].nLife);	// 破壊状況を読み込む
+								fscanf(pFile, "%d", &m_aStatusInfo[nType].nLife);	// 体力を読み込む
 							}
 						} while (strcmp(&aString[0], "END_BLOCKSET") != 0);	// 読み込んだ文字列が END_BLOCKSET ではない場合ループ
 					}
