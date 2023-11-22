@@ -34,6 +34,10 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+	void SetVec3Position(const D3DXVECTOR3& rPos);	// 三軸の位置設定
+	D3DXVECTOR3 GetVec3Position(void) const;		// 三軸の位置取得
+	void SetVec3Rotation(const D3DXVECTOR3& rRot);	// 向き設定
+	D3DXVECTOR3 GetVec3Rotation(void) const;		// 向き取得
 
 	// 静的メンバ関数
 	static CSpawnPoint *Create	// 生成
@@ -47,7 +51,10 @@ private:
 	void Release(void) override;	// 破棄
 
 	// メンバ変数
-
+	const int m_Idx;		//スポーン番号
+	static int m_nNumIdx;	//スポーン番号の個数
+	D3DXVECTOR3 m_pos;		//位置
+	D3DXVECTOR3 m_rot;		//向き
 };
 
 #endif	// _SPAWN_POINT_H_

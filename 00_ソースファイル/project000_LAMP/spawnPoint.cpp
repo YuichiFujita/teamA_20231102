@@ -18,6 +18,10 @@ namespace
 {
 	const int PRIORITY = 0;	// 生成位置の優先順位
 }
+//************************************************************
+//	静的メンバ変数
+//************************************************************
+int CSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
 
 //************************************************************
 //	子クラス [CSpawnPoint] のメンバ関数
@@ -25,10 +29,14 @@ namespace
 //============================================================
 //	コンストラクタ
 //============================================================
-CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY)
+CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY), m_Idx(m_nNumIdx)
 {
-	// メンバ変数をクリア
+	// メンバ変数を初期化
+	m_pos = VEC3_ZERO;
+	m_rot = VEC3_ZERO;
 
+	// スポーン番号の個数を加算
+	m_nNumIdx++;
 }
 
 //============================================================
@@ -36,7 +44,8 @@ CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY)
 //============================================================
 CSpawnPoint::~CSpawnPoint()
 {
-
+	// スポーン番号の個数を減算
+	m_nNumIdx--;
 }
 
 //============================================================
@@ -45,7 +54,8 @@ CSpawnPoint::~CSpawnPoint()
 HRESULT CSpawnPoint::Init(void)
 {
 	// メンバ変数を初期化
-
+	m_pos = VEC3_ZERO;
+	m_rot = VEC3_ZERO;
 
 	// 成功を返す
 	return S_OK;
@@ -74,6 +84,38 @@ void CSpawnPoint::Update(void)
 void CSpawnPoint::Draw(void)
 {
 
+}
+
+//============================================================
+//	位置設定
+//============================================================
+void CSpawnPoint::SetVec3Position(const D3DXVECTOR3& rPos)
+{
+	m_pos = rPos;
+}
+
+//============================================================
+//	位置取得
+//============================================================
+D3DXVECTOR3 CSpawnPoint::GetVec3Position(void) const
+{
+	return m_pos;
+}
+
+//============================================================
+//	向き設定
+//============================================================
+void CSpawnPoint::SetVec3Rotation(const D3DXVECTOR3& rRot)
+{
+	m_rot = rRot;
+}
+
+//============================================================
+//	向き取得
+//============================================================
+D3DXVECTOR3 CSpawnPoint::GetVec3Rotation(void) const
+{
+	return m_rot;
 }
 
 //============================================================
@@ -106,6 +148,12 @@ CSpawnPoint *CSpawnPoint::Create
 			// 失敗を返す
 			return NULL;
 		}
+
+		// 位置を設定
+		pSpawnPoint->SetVec3Position(rPos);
+
+		// 向きを設定
+		pSpawnPoint->SetVec3Rotation(rRot);
 
 		// 確保したアドレスを返す
 		return pSpawnPoint;
