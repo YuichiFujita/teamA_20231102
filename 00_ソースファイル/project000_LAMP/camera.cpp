@@ -59,7 +59,7 @@ namespace
 	{
 		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.45f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
 		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
-
+		const float MUL_DIS		= 1.2f;		// 加算距離の乗算量
 		const float REV_POS		= 0.25f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数
 	}
@@ -354,6 +354,65 @@ void CCamera::SetDestLookDown(void)
 		return;
 	}
 
+	D3DXVECTOR3 posLook = VEC3_ZERO;	// 注視点の位置
+	float fDis = lookdown::INIT_DIS;	// 距離
+
+	//----------------------------------------------------
+	//	注視点の位置を計算
+	//----------------------------------------------------
+	{
+		int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
+		D3DXVECTOR3 posMin = VEC3_ZERO;	// 最小の位置
+		D3DXVECTOR3 posMax = VEC3_ZERO;	// 最大の位置
+
+		for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
+		{ // プレイヤー数分繰り返す
+
+			CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);	// プレイヤー情報
+
+			if (pPlayer != NULL)
+			{ // プレイヤーが使用されている場合
+
+				D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
+
+				// プレイヤーの位置を加算
+				posLook += posPlayer;
+
+				// 最小位置の更新
+				if (posPlayer.x < posMin.x)
+				{ // 現在の最小位置より小さい場合
+
+					posMin.x = posPlayer.x;
+				}
+				if (posPlayer.z < posMin.z)
+				{ // 現在の最小位置より小さい場合
+
+					posMin.z = posPlayer.z;
+				}
+
+				// 最大位置の更新
+				if (posPlayer.x > posMax.x)
+				{ // 現在の最大位置より大きい場合
+
+					posMax.x = posPlayer.x;
+				}
+				if (posPlayer.z > posMax.z)
+				{ // 現在の最大位置より大きい場合
+
+					posMax.z = posPlayer.z;
+				}
+			}
+			else { assert(false); }	// 非使用中
+		}
+
+		// プレイヤーの位置の平均を求める
+		posLook /= (float)nNumPlayer;
+		posLook.y = 0.0f;	// Y座標は固定
+
+		// カメラの距離を加算
+		fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
+	}
+
 	//----------------------------------------------------
 	//	向きの更新
 	//----------------------------------------------------
@@ -368,33 +427,11 @@ void CCamera::SetDestLookDown(void)
 	//	距離の更新
 	//----------------------------------------------------
 	// 目標距離を設定
-	m_aCamera[TYPE_MAIN].fDis = m_aCamera[TYPE_MAIN].fDestDis = lookdown::INIT_DIS;
+	m_aCamera[TYPE_MAIN].fDis = m_aCamera[TYPE_MAIN].fDestDis = fDis;
 
 	//----------------------------------------------------
 	//	位置の更新
 	//----------------------------------------------------
-	int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
-	D3DXVECTOR3 posLook = VEC3_ZERO;	// 注視点の位置
-
-	// 注視点の位置を計算
-	for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
-	{ // プレイヤー数分繰り返す
-
-		CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);
-
-		if (pPlayer != NULL)
-		{ // プレイヤーが使用されている場合
-
-			// プレイヤーの位置を加算
-			posLook += pPlayer->GetVec3Position();
-		}
-		else { assert(false); }	// 非使用中
-	}
-
-	// プレイヤーの位置の平均を求める
-	posLook /= (float)nNumPlayer;
-	posLook.y = 0.0f;	// Y座標は固定
-
 	// 注視点の更新
 	m_aCamera[TYPE_MAIN].destPosR = posLook;
 
@@ -658,8 +695,9 @@ void CCamera::LookDown(void)
 	posLook.y = 0.0f;	// Y座標は固定
 
 	// カメラの距離を加算
-	fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * 1.2f;
+	fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
 
+	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[最小位置]：%f %f %f\n", posMin.x, posMin.y, posMin.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[最大位置]：%f %f %f\n", posMax.x, posMax.y, posMax.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[距離]：%f\n", fDis);
