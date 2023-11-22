@@ -387,7 +387,7 @@ void CEntryManager::UpdateEntry(void)
 	}
 
 	// デバッグ表示
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "エントリー数：%d", nNumPlayer);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー数]：%d\n", nNumPlayer);
 
 	// プレイ人数を設定
 	pRetention->SetNumPlayer(nNumPlayer);
