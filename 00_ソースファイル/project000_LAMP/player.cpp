@@ -34,6 +34,8 @@
 
 #include "flail.h"
 
+#include "spawnpoint.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -446,7 +448,12 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 void CPlayer::SetSpawn(void)
 {
 	// 変数を宣言
-	D3DXVECTOR3 set = VEC3_ZERO;	// 引数設定用
+	CObject *pSpawnPoint = CSpawnPoint::GetSavePoint(m_nPadID);
+	if (pSpawnPoint == NULL)
+	{ // スポーンポイントが無い場合
+
+		assert(false);
+	}
 
 	// 情報を初期化
 	SetState(STATE_SPAWN);		// スポーン状態の設定
@@ -456,11 +463,11 @@ void CPlayer::SetSpawn(void)
 	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 位置を設定
-	SetVec3Position(set + D3DXVECTOR3(200.0f, 0.0f, 0.0f) - (D3DXVECTOR3(100.0f, 0.0f, 0.0f) * (float)m_nPadID));
+	SetVec3Position(pSpawnPoint->GetVec3Position());
 
 	// 向きを設定
-	SetVec3Rotation(set);
-	m_destRot = set;
+	SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
+	m_destRot = pSpawnPoint->GetVec3Rotation();
 
 	// 移動量を初期化
 	m_move = VEC3_ZERO;
@@ -753,6 +760,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
 		}
+
+		// 目標向きを設定
+		m_destRot.y = atan2f(-m_move.x, -m_move.z);
 	}
 
 	// カウンターの値によって挙動を変更
@@ -873,9 +883,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	{
 		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
 	}
-
-	// 目標向きを設定
-	m_destRot.y = atan2f(-m_move.x, -m_move.z);
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);

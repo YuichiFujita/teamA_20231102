@@ -119,6 +119,14 @@ D3DXVECTOR3 CSpawnPoint::GetVec3Rotation(void) const
 }
 
 //============================================================
+//	番号取得
+//============================================================
+int CSpawnPoint::GetIndex(void) const
+{
+	return m_Idx;
+}
+
+//============================================================
 //	生成処理
 //============================================================
 CSpawnPoint *CSpawnPoint::Create
@@ -159,6 +167,59 @@ CSpawnPoint *CSpawnPoint::Create
 		return pSpawnPoint;
 	}
 	else { assert(false); return NULL; }	// 確保失敗
+}
+
+//============================================================
+//	セーブポイント取得
+//============================================================
+CObject * CSpawnPoint::GetSavePoint(int Idx)
+{
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_SPAWNPOINT)
+				{ // オブジェクトラベルがスポーンポイントではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				if (pObjCheck->GetIndex() != Idx)
+				{ // 番号が引き数の番号ではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 現在のオブジェクトを返す
+				return pObjCheck;
+			}
+		}
+	}
+
+	// nullptrを返す
+	return nullptr;
 }
 
 //============================================================

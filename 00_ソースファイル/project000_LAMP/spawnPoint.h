@@ -34,10 +34,11 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
-	void SetVec3Position(const D3DXVECTOR3& rPos);	// 三軸の位置設定
-	D3DXVECTOR3 GetVec3Position(void) const;		// 三軸の位置取得
-	void SetVec3Rotation(const D3DXVECTOR3& rRot);	// 向き設定
-	D3DXVECTOR3 GetVec3Rotation(void) const;		// 向き取得
+	void SetVec3Position(const D3DXVECTOR3& rPos) override;	// 三軸の位置設定
+	D3DXVECTOR3 GetVec3Position(void) const override;		// 三軸の位置取得
+	void SetVec3Rotation(const D3DXVECTOR3& rRot) override;	// 向き設定
+	D3DXVECTOR3 GetVec3Rotation(void) const override;		// 向き取得
+	int GetIndex(void) const override;						// インデックス取得
 
 	// 静的メンバ関数
 	static CSpawnPoint *Create	// 生成
@@ -45,6 +46,7 @@ public:
 		const D3DXVECTOR3& rPos,	// 位置
 		const D3DXVECTOR3& rRot		// 向き
 	);
+	static CObject *GetSavePoint(int Idx);
 
 private:
 	// オーバーライド関数
