@@ -26,8 +26,7 @@ public:
 	// 種類列挙
 	enum EType
 	{
-		TYPE_WOOD = 0,		// 木モデル
-		TYPE_CONIFER,		// 針葉樹モデル
+		TYPE_CONIFER = 0,	// 針葉樹モデル
 		TYPE_HARDWOOD,		// 広葉樹モデル
 		TYPE_ELDEN_JAR,		// 壺モデル(エルデンリング風)
 		TYPE_ZELDA_JAR,		// 壺モデル(ゼルダ風)

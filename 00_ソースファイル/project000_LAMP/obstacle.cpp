@@ -27,7 +27,6 @@ namespace
 CObstacle::SStatusInfo CObstacle::m_aStatusInfo[TYPE_MAX] = {};	// ステータス情報
 const char *CObstacle::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\OBSTACLE\\obstacle000.x",					// 木モデル
 	"data\\MODEL\\OBSTACLE\\Conifer000.x",					// 針葉樹モデル
 	"data\\MODEL\\OBSTACLE\\Hardwood000.x",					// 広葉樹モデル
 	"data\\MODEL\\OBSTACLE\\Jar000.x",						// 壺モデル(エルデンリング風)
@@ -57,7 +56,7 @@ CObstacle::CObstacle() : CObjectModel(CObject::LABEL_OBSTACLE, PRIORITY)
 {
 	// メンバ変数をクリア
 	memset(&m_status, 0, sizeof(m_status));	// ステータス
-	m_type	= TYPE_WOOD;	// 種類
+	m_type	= TYPE_CONIFER;	// 種類
 	m_nLife	= 0;			// 体力
 }
 
@@ -76,7 +75,7 @@ HRESULT CObstacle::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_status, 0, sizeof(m_status));	// ステータス
-	m_type	= TYPE_WOOD;	// 種類
+	m_type	= TYPE_CONIFER;	// 種類
 	m_nLife	= 0;			// 体力
 
 	// オブジェクトモデルの初期化

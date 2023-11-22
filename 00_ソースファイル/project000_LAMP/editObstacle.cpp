@@ -91,8 +91,8 @@ HRESULT CEditObstacle::Init(void)
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 
 	// メンバ変数を初期化
-	m_pObstacle		= NULL;					// 障害物情報
-	m_obstacle.type	= CObstacle::TYPE_WOOD;	// 障害物種類
+	m_pObstacle		= NULL;						// 障害物情報
+	m_obstacle.type	= CObstacle::TYPE_CONIFER;	// 障害物種類
 
 	// 障害物の生成
 	m_pObstacle = CObstacle::Create(m_obstacle.type, posEdit, rotEdit);
