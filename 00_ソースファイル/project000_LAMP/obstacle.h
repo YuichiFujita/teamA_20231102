@@ -26,8 +26,25 @@ public:
 	// 種類列挙
 	enum EType
 	{
-		TYPE_WOOD = 0,	// 木モデル
-		TYPE_MAX		// この列挙型の総数
+		TYPE_WOOD = 0,		// 木モデル
+		TYPE_CONIFER,		// 針葉樹モデル
+		TYPE_HARDWOOD,		// 広葉樹モデル
+		TYPE_ELDEN_JAR,		// 壺モデル(エルデンリング風)
+		TYPE_ZELDA_JAR,		// 壺モデル(ゼルダ風)
+		TYPE_ROCK1,			// 岩モデル
+		TYPE_ROCK2,			// ゆがんだ岩モデル	
+		TYPE_CRACKED_ROCK,	// ひび割れた岩モデル	
+		TYPE_STONEPILLER,	// 石レンガの柱
+		TYPE_WELL,			// 井戸モデル
+		TYPE_WALL1,			// 丸屋根の壁モデル
+		TYPE_WALL1_FLIMSY,	// もろい丸屋根の壁モデル
+		TYPE_WALL2,			// 三角屋根の壁モデル
+		TYPE_WALL2_FLIMSY,	// もろい三角屋根の壁モデル
+		TYPE_CASTLE,		// 城モデル
+		TYPE_MONTE_CASTLE,	// カステル・デル・モンテ風の城モデル
+		TYPE_CASTLE_FENCE1,	// 城の柵モデル1
+		TYPE_CASTLE_FENCE2,	// 城の柵モデル2
+		TYPE_MAX			// この列挙型の総数
 	};
 
 	// 破壊列挙

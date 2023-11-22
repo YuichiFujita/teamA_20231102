@@ -27,8 +27,25 @@ namespace
 CObstacle::SStatusInfo CObstacle::m_aStatusInfo[TYPE_MAX] = {};	// ステータス情報
 const char *CObstacle::mc_apModelFile[] =	// モデル定数
 {
-	"data\\MODEL\\OBSTACLE\\obstacle000.x",	// 木モデル
-};
+	"data\\MODEL\\OBSTACLE\\obstacle000.x",					// 木モデル
+	"data\\MODEL\\OBSTACLE\\Conifer000.x",					// 針葉樹モデル
+	"data\\MODEL\\OBSTACLE\\Hardwood000.x",					// 広葉樹モデル
+	"data\\MODEL\\OBSTACLE\\Jar000.x",						// 壺モデル(エルデンリング風)
+	"data\\MODEL\\OBSTACLE\\Jar001.x",						// 壺モデル(ゼルダ風)
+	"data\\MODEL\\OBSTACLE\\Rock000-V2.x",					// 岩モデル
+	"data\\MODEL\\OBSTACLE\\Rock001-V2.x",					// ゆがんだ岩モデル
+	"data\\MODEL\\OBSTACLE\\Rock(Cracked)000-V2.x",			// ひび割れた岩モデル
+	"data\\MODEL\\OBSTACLE\\StoneBrickPiller000(Other2).x",	// 石レンガの柱
+	"data\\MODEL\\OBSTACLE\\well000.x",						// 井戸モデル
+	"data\\MODEL\\OBSTACLE\\Wall000(Other).x",				// 丸屋根の壁モデル
+	"data\\MODEL\\OBSTACLE\\Wall000(Other)[Flimsy].x",		// もろい丸屋根の壁モデル
+	"data\\MODEL\\OBSTACLE\\Wall001(Other).x",				// 三角屋根の壁モデル
+	"data\\MODEL\\OBSTACLE\\Wall001(Other)[Flimsy].x",		// もろい三角屋根の壁モデル
+	"data\\MODEL\\OBSTACLE\\Castle000.x",					// 城モデル
+	"data\\MODEL\\OBSTACLE\\Castle001.x",					// カステル・デル・モンテ風の城モデル
+	"data\\MODEL\\OBSTACLE\\Castle-Fence000.x",				// 城の柵モデル1
+	"data\\MODEL\\OBSTACLE\\Castle-Fence001.x",				// 城の柵モデル2
+};															   
 
 //************************************************************
 //	子クラス [CObstacle] のメンバ関数
