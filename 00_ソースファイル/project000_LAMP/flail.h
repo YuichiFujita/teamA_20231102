@@ -15,7 +15,13 @@
 //************************************************************
 #include "main.h"
 #include "objectModel.h"
+#include "multiModel.h"
 #include "player.h"
+
+//************************************************************
+//	前方宣言
+//************************************************************
+class CMultiModel;	// モデルクラス
 
 //************************************************************
 //	クラス定義
@@ -37,6 +43,13 @@ public:
 
 	// デストラクタ
 	~CFlail();
+
+	// 鎖構造体
+	struct SChain
+	{
+		CMultiModel *multiModel;
+		D3DXVECTOR3 rotOld;
+	};
 	
 	// オーバーライド関数
 	HRESULT Init(void) override;	// 初期化
@@ -65,6 +78,7 @@ public:
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
 	( // 引数
+		const CPlayer& rPlayer,					// プレイヤー
 		const D3DXVECTOR3& rPos,				// 位置
 		const D3DXVECTOR3& rRot = VEC3_ZERO,	// 向き
 		const D3DXVECTOR3& rScale = VEC3_ONE	// 大きさ
@@ -75,13 +89,16 @@ private:
 	void Collision(D3DXVECTOR3& rPos);		// 長さ設定
 	void CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	void CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	void BindParent(const CPlayer& rPlayer);
+	void UpdateChain(void);		// 更新
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
+	SChain		m_chain[10];		// 鎖
 	D3DXVECTOR3 m_posOrg;			// 回転原点
-	D3DXVECTOR3 m_oldPos;			// 回転原点
+	D3DXVECTOR3 m_oldPos;			// 過去の位置
 	D3DXVECTOR3	m_move;				// 移動量
 	int			m_nPlayerID;		// プレイヤーID
 	float		m_fChainRot;		// 角度
