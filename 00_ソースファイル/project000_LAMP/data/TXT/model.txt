@@ -44,4 +44,5 @@ FILENAME = data\MODEL\OBSTACLE\Wall001(Other).x					#三角屋根の壁モデル
 FILENAME = data\MODEL\OBSTACLE\Wall001(Other)[Flimsy].x			#もろい三角屋根の壁モデル
 FILENAME = data\MODEL\OBSTACLE\well000.x						#井戸モデル
 FILENAME = data\MODEL\OBSTACLE\Fountain000.x					#噴水モデル
+FILENAME = data\MODEL\OBSTACLE\Tower000.x						#塔モデル
 
