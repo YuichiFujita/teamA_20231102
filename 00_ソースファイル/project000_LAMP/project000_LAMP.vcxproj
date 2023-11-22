@@ -225,6 +225,7 @@
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="sky.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="spawnPoint.cpp" />
     <ClCompile Include="stage.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="timerManager.cpp" />
@@ -308,6 +309,7 @@
     <ClInclude Include="shadow.h" />
     <ClInclude Include="sky.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="spawnPoint.h" />
     <ClInclude Include="stage.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="timerManager.h" />
