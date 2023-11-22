@@ -160,7 +160,7 @@ HRESULT CPlayer::Init(void)
 	}
 
 	// フレイルの生成
-	m_pFlail = CFlail::Create(VEC3_ZERO);
+	m_pFlail = CFlail::Create(*this,VEC3_ZERO);
 	if (m_pFlail == NULL)
 	{ // 非使用中の場合
 
@@ -228,10 +228,6 @@ void CPlayer::Update(void)
 	m_pShadow->Update();
 
 	// フレイルの更新
-	D3DXMATRIX partsMtx = GetMultiModel(MODEL_HAND_R)->GetMtxWorld();
-	D3DXVECTOR3 partsPos = D3DXVECTOR3(partsMtx._41, partsMtx._42, partsMtx._43);
-	m_pFlail->SetVec3PosOrg(partsPos);
-
 	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
 	{
 		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (m_pFlail->GetVec3PosOrg());
@@ -243,7 +239,7 @@ void CPlayer::Update(void)
 
 		m_pFlail->SetChainRot(chainRot);
 		m_pFlail->SetChainRotMove(chainRot);
-		m_pFlail->SetLengthChain(length - 1.0f);
+		m_pFlail->SetLengthChain(length);
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
@@ -719,7 +715,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// 溜めてる間鉄球を振り回す
-			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.01f * m_nCounterFlail));
+			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.006f * m_nCounterFlail));
 			m_pFlail->SetLengthChain(2.0f * m_nCounterFlail);
 
 			// 移動量を更新
@@ -795,6 +791,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 移動量を更新
 			m_move.x = 0.0f;
 			m_move.z = 0.0f;
+
+			m_nCounterFlail = 0;
 		}
 
 		// 投擲
@@ -827,7 +825,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_RIGHT, "[カウンター]：%d\n", m_nCounterFlail);
 
 	// 待機モーションを返す
 	return MOTION_IDOL;
