@@ -18,6 +18,10 @@ namespace
 {
 	const int PRIORITY = 0;	// 生成位置の優先順位
 }
+//************************************************************
+//	静的メンバ変数
+//************************************************************
+int CSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
 
 //************************************************************
 //	子クラス [CSpawnPoint] のメンバ関数
@@ -25,10 +29,14 @@ namespace
 //============================================================
 //	コンストラクタ
 //============================================================
-CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY)
+CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY), m_Idx(m_nNumIdx)
 {
-	// メンバ変数をクリア
+	// メンバ変数を初期化
+	m_pos = VEC3_ZERO;
+	m_rot = VEC3_ZERO;
 
+	// スポーン番号の個数を加算
+	m_nNumIdx++;
 }
 
 //============================================================
@@ -36,7 +44,8 @@ CSpawnPoint::CSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, PRIORITY)
 //============================================================
 CSpawnPoint::~CSpawnPoint()
 {
-
+	// スポーン番号の個数を減算
+	m_nNumIdx--;
 }
 
 //============================================================
@@ -45,7 +54,8 @@ CSpawnPoint::~CSpawnPoint()
 HRESULT CSpawnPoint::Init(void)
 {
 	// メンバ変数を初期化
-
+	m_pos = VEC3_ZERO;
+	m_rot = VEC3_ZERO;
 
 	// 成功を返す
 	return S_OK;
@@ -74,6 +84,46 @@ void CSpawnPoint::Update(void)
 void CSpawnPoint::Draw(void)
 {
 
+}
+
+//============================================================
+//	位置設定
+//============================================================
+void CSpawnPoint::SetVec3Position(const D3DXVECTOR3& rPos)
+{
+	m_pos = rPos;
+}
+
+//============================================================
+//	位置取得
+//============================================================
+D3DXVECTOR3 CSpawnPoint::GetVec3Position(void) const
+{
+	return m_pos;
+}
+
+//============================================================
+//	向き設定
+//============================================================
+void CSpawnPoint::SetVec3Rotation(const D3DXVECTOR3& rRot)
+{
+	m_rot = rRot;
+}
+
+//============================================================
+//	向き取得
+//============================================================
+D3DXVECTOR3 CSpawnPoint::GetVec3Rotation(void) const
+{
+	return m_rot;
+}
+
+//============================================================
+//	番号取得
+//============================================================
+int CSpawnPoint::GetIndex(void) const
+{
+	return m_Idx;
 }
 
 //============================================================
@@ -107,10 +157,69 @@ CSpawnPoint *CSpawnPoint::Create
 			return NULL;
 		}
 
+		// 位置を設定
+		pSpawnPoint->SetVec3Position(rPos);
+
+		// 向きを設定
+		pSpawnPoint->SetVec3Rotation(rRot);
+
 		// 確保したアドレスを返す
 		return pSpawnPoint;
 	}
 	else { assert(false); return NULL; }	// 確保失敗
+}
+
+//============================================================
+//	セーブポイント取得
+//============================================================
+CObject * CSpawnPoint::GetSavePoint(int Idx)
+{
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_SPAWNPOINT)
+				{ // オブジェクトラベルがスポーンポイントではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				if (pObjCheck->GetIndex() != Idx)
+				{ // 番号が引き数の番号ではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 現在のオブジェクトを返す
+				return pObjCheck;
+			}
+		}
+	}
+
+	// nullptrを返す
+	return nullptr;
 }
 
 //============================================================
