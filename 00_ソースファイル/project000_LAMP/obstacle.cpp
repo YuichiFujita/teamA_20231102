@@ -44,6 +44,7 @@ const char *CObstacle::mc_apModelFile[] =	// モデル定数
 	"data\\MODEL\\OBSTACLE\\Castle001.x",					// カステル・デル・モンテ風の城モデル
 	"data\\MODEL\\OBSTACLE\\Castle-Fence000.x",				// 城の柵モデル1
 	"data\\MODEL\\OBSTACLE\\Castle-Fence001.x",				// 城の柵モデル2
+	"data\\MODEL\\OBSTACLE\\Fountain000.x",					// 噴水モデル
 };															   
 
 //************************************************************

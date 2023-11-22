@@ -43,4 +43,5 @@ FILENAME = data\MODEL\OBSTACLE\Wall000(Other)[Flimsy].x			#‚à‚ë‚¢ŠÛ‰®ª‚Ì•Çƒ‚ƒfƒ
 FILENAME = data\MODEL\OBSTACLE\Wall001(Other).x					#ŽOŠp‰®ª‚Ì•Çƒ‚ƒfƒ‹
 FILENAME = data\MODEL\OBSTACLE\Wall001(Other)[Flimsy].x			#‚à‚ë‚¢ŽOŠp‰®ª‚Ì•Çƒ‚ƒfƒ‹
 FILENAME = data\MODEL\OBSTACLE\well000.x						#ˆäŒËƒ‚ƒfƒ‹
+FILENAME = data\MODEL\OBSTACLE\Fountain000.x					#•¬…ƒ‚ƒfƒ‹
 
