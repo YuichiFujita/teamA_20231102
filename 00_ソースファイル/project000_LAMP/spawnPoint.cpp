@@ -108,6 +108,7 @@ D3DXVECTOR3 CSpawnPoint::GetVec3Position(void) const
 void CSpawnPoint::SetVec3Rotation(const D3DXVECTOR3& rRot)
 {
 	m_rot = rRot;
+	useful::Vec3NormalizeRot(m_rot);	// å¸Ç´ÇÃê≥ãKâª
 }
 
 //============================================================
