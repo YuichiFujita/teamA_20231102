@@ -61,6 +61,9 @@ private:
 	ID3DXSprite * m_pSprite;	 //シャドウ用スプライト
 	CZTexture * m_pZTex;		//Zテクスチャ生成用
 	CDepthShadow * m_pDepthShadow;					//深度影
+	D3DXMATRIX CameraView, CameraProj;	// カメラビュー変換・射影変換
+	D3DXMATRIX LightView, LightProj;	// ライトビュー変換・射影変換
+
 	IDirect3DTexture9 * m_pZTexture;				//Zテクスチャ本体
 	LPDIRECT3DSURFACE9	m_pRenderTextureSurface;	// 描画サーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDepthStencilSurface;		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ

@@ -137,12 +137,24 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pDev = m_pD3DDevice;
 	D3DXCreateSprite(m_pD3DDevice, &m_pSprite);// スプライト作成
 	m_pZTex = new CZTexture;
-	m_pZTex->Init(*m_pDev, SCREEN_WIDTH, SCREEN_HEIGHT, D3DFMT_A8R8G8B8);
+	m_pZTex->Init(*m_pDev, SCREEN_WIDTH, SCREEN_WIDTH, D3DFMT_A16B16G16R16);
 	m_pZTex->GetZTex(*m_pZTexture);
 	// 深度バッファシャドウオブジェクトの生成と初期化
 	m_pDepthShadow = new CDepthShadow;
 	m_pDepthShadow->Init(*m_pDev);
 	m_pDepthShadow->SetShadowMap(*m_pZTexture);	// シャドウマップテクスチャを登録
+	D3DXMatrixPerspectiveFovLH(&CameraProj, D3DXToRadian(45), 1.777f, 10.0f, 50000.0f);
+	D3DXMatrixPerspectiveFovLH(&LightProj, D3DXToRadian(90), 1.0f, 30.0f, 50000.0f);
+	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(150.0f,500.0f,150.0f), &D3DXVECTOR3(0.0f, -10.0f, 0.0f), &D3DXVECTOR3(0, 1, 0));
+	// Z値テクスチャOBJへ登録
+	m_pZTex->SetViewMatrix(&LightView);
+	m_pZTex->SetProjMatrix(&LightProj);
+	// 深度バッファシャドウOBJへ登録
+	// カメラビューは毎回変わるので描画時に登録します
+	m_pDepthShadow->SetLightViewMatrix(&LightView);
+	m_pDepthShadow->SetLightProjMatrix(&LightProj);
+	m_pDepthShadow->SetCameraProjMatrix(&CameraProj);
+	
     // 成功を返す
     return S_OK;
 }
@@ -241,7 +253,15 @@ void CRenderer::Draw(void)
     // 変数を宣言
     HRESULT			hr;				// 異常終了の確認用
     D3DVIEWPORT9	viewportDef;	// カメラのビューポート保存用
-
+	//カメラのビュー行列作成
+	D3DXVECTOR3 posR = CManager::GetInstance()->GetCamera()->GetCamera(CCamera::TYPE_MAIN).posR;
+	D3DXVECTOR3 posV = CManager::GetInstance()->GetCamera()->GetCamera(CCamera::TYPE_MAIN).posV;
+	D3DXVECTOR3 cVec = posR - posV;
+	D3DXVec3Normalize(&cVec, &cVec);
+	cVec *= 5000.0f;
+	posR = cVec + posV;
+	D3DXMatrixLookAtLH(&CameraView, &posV, &posR, &D3DXVECTOR3(0, 1, 0));
+	m_pDepthShadow->SetCameraViewMatrix(&CameraView);//登録
     //--------------------------------------------------------
     //	テクスチャ作成用の描画
     //--------------------------------------------------------

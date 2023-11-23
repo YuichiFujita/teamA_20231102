@@ -30,18 +30,24 @@ bool CDepthShadow::Init(IDirect3DDevice9 &cpDev )
 {
 	// デバイスの登録とエフェクトハンドルの取得
 	if( &cpDev == NULL ) return false;
-
+	ID3DXBuffer* pError = NULL;
 
 	if(FAILED( D3DXCreateEffectFromFile(
 		&cpDev,
-		("DepthBufShadowEffect.fx"),
+		("data\\SHADER\\DepthBufShadowEffect.fx"),
 		NULL,
 		NULL,
 		0,
 		NULL,
 		&m_cpEffect,
-		NULL)))
-		return false;
+		&pError)))
+		if (pError)
+		{
+			OutputDebugStringA((LPCSTR)pError->GetBufferPointer());
+			//デバッグコンソールに表示する
+			MessageBoxA(NULL, (LPCSTR)pError->GetBufferPointer(), "Shader Error", MB_OK);
+			return false;
+		}
 
 
 	m_hWorldMat		 = m_cpEffect->GetParameterByName( NULL, "matWorld" );

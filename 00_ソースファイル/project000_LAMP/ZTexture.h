@@ -56,6 +56,8 @@ public:
 
 	// Z値テクスチャを取得する
 	bool GetZTex(IDirect3DTexture9 &cpTex);
+
+	bool GetbPass(void) { return m_bPass; }
 private:
 	// メンバ変数
 	IDirect3DDevice9 * m_cpDev;			// 描画デバイス
@@ -72,6 +74,7 @@ private:
 	D3DXHANDLE m_hViewMat;						// ビュー変換行列ハンドル
 	D3DXHANDLE m_hProjMat;						// 射影変換行列ハンドル
 	D3DXHANDLE m_hTechnique;					// テクニックへのハンドル
+	bool m_bPass;
 };
 
 #endif	// _ZTexture_H_
