@@ -445,10 +445,25 @@ void CPlayer::SetSpawn(void)
 {
 	// 変数を宣言
 	CObject *pSpawnPoint = CSpawnPoint::GetSavePoint(m_nPadID);
-	if (pSpawnPoint == NULL)
-	{ // スポーンポイントが無い場合
+	if (pSpawnPoint != NULL)
+	{ // スポーンポイントがある場合
 
-		assert(false);
+		// 位置を設定
+		SetVec3Position(pSpawnPoint->GetVec3Position());
+
+		// 向きを設定
+		SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
+		m_destRot = pSpawnPoint->GetVec3Rotation();
+	}
+	else
+	{ // スポーンポイントがない場合
+
+		// 位置を設定
+		SetVec3Position(VEC3_ZERO);
+
+		// 向きを設定
+		SetVec3Rotation(VEC3_ZERO);
+		m_destRot = VEC3_ZERO;
 	}
 
 	// 情報を初期化
@@ -457,13 +472,6 @@ void CPlayer::SetSpawn(void)
 
 	// カウンターを初期化
 	m_nCounterState = 0;	// 状態管理カウンター
-
-	// 位置を設定
-	SetVec3Position(pSpawnPoint->GetVec3Position());
-
-	// 向きを設定
-	SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
-	m_destRot = pSpawnPoint->GetVec3Rotation();
 
 	// 移動量を初期化
 	m_move = VEC3_ZERO;

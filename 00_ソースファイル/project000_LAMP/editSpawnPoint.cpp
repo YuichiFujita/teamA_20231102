@@ -26,8 +26,16 @@
 //************************************************************
 namespace
 {
-
+	const float	POS_EFFECT_RADIUS = 120.0f;	// 位置表示のエフェクト半径
+	const float	ROT_EFFECT_RADIUS = 60.0f;	// 向き表示のエフェクト半径
+	const float	EFFECT_ADDLENGTH = 100.0f;	// 向き表示のエフェクトベクトル加算量
+	const int	EFFECT_LIFE = 10;			// エフェクト寿命
 }
+
+//************************************************************
+//	静的メンバ変数宣言
+//************************************************************
+int CEditSpawnPoint::m_nSave = 0;	// 保存情報
 
 //************************************************************
 //	親クラス [CEditSpawnPoint] のメンバ関数
@@ -141,6 +149,9 @@ void CEditSpawnPoint::Update(void)
 	// 生成位置の生成
 	CreateSpawnPoint();
 
+	// インデックス変更の更新
+	UpdateChangeIdx();
+
 	// 生成位置の全表示
 	LookAllSpawnPoint();
 
@@ -178,7 +189,8 @@ void CEditSpawnPoint::DrawDebugInfo(void)
 //============================================================
 void CEditSpawnPoint::SaveInfo(void)
 {
-
+	// 現在の情報を保存
+	m_nSave = m_nIdxChange;
 }
 
 //============================================================
@@ -186,7 +198,8 @@ void CEditSpawnPoint::SaveInfo(void)
 //============================================================
 void CEditSpawnPoint::LoadInfo(void)
 {
-
+	// 保存情報を設定
+	m_nIdxChange = m_nSave;
 }
 
 //============================================================
@@ -268,8 +281,18 @@ void CEditSpawnPoint::LookEffect
 	const D3DXCOLOR& rCol		// 色
 )
 {
+	// 変数を宣言
+	D3DXVECTOR3 vecRot = VEC3_ZERO;	// 向きベクトル
+
+	// 向きベクトルを作成
+	vecRot.x = sinf(rRot.y + D3DX_PI) * EFFECT_ADDLENGTH;
+	vecRot.z = cosf(rRot.y + D3DX_PI) * EFFECT_ADDLENGTH;
+
 	// 生成位置にエフェクトを表示
-	CEffect3D::Create(rPos, 90.0f, CEffect3D::TYPE_NORMAL, 10, VEC3_ZERO, VEC3_ZERO, rCol);
+	CEffect3D::Create(rPos, POS_EFFECT_RADIUS, CEffect3D::TYPE_NORMAL, EFFECT_LIFE, VEC3_ZERO, VEC3_ZERO, rCol);
+
+	// 生成向きにエフェクトを表示
+	CEffect3D::Create(rPos + vecRot, ROT_EFFECT_RADIUS, CEffect3D::TYPE_NORMAL, EFFECT_LIFE);
 }
 
 //============================================================
@@ -301,6 +324,21 @@ void CEditSpawnPoint::CreateSpawnPoint(void)
 
 		// 未保存を設定
 		pEdit->UnSave();
+	}
+}
+
+//============================================================
+//	インデックス変更の更新処理
+//============================================================
+void CEditSpawnPoint::UpdateChangeIdx(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	if (m_pKeyboard->IsTrigger(KEY_CHANGE_IDX))
+	{
+		// インデックスを変更
+		m_nIdxChange = (m_nIdxChange + 1) % MAX_PLAYER;
 	}
 }
 
@@ -340,17 +378,25 @@ void CEditSpawnPoint::LookAllSpawnPoint(void)
 				// 変数を宣言
 				D3DXVECTOR3 posSpawn = pObjCheck->GetVec3Position();	// スポーンポイント位置
 				D3DXVECTOR3 rotSpawn = pObjCheck->GetVec3Rotation();	// スポーンポイント向き
-				int nIdxSpawn = pObjCheck->GetIndex();					// スポーンポイントインデックス
+				D3DXCOLOR colEffect = XCOL_CYAN;		// エフェクト色
+				int nIdxSpawn = pObjCheck->GetIndex();	// スポーンポイントインデックス
 
 				// 範囲外例外
 				assert(nIdxSpawn > NONE_IDX && nIdxSpawn < MAX_PLAYER);
+
+				if (nIdxSpawn == m_nIdxChange)
+				{ // スポーンポイントインデックスが現在選択中のインデックスの場合
+
+					// 色を緑に変更
+					colEffect = XCOL_GREEN;
+				}
 
 				// 生成位置のエフェクト表示
 				LookEffect
 				( // 引数
 					posSpawn,	// 位置
 					rotSpawn,	// 向き
-					XCOL_WHITE	// 色
+					colEffect	// 色
 				);
 
 				// 次のオブジェクトへのポインタを代入

@@ -25,47 +25,73 @@ STAGE_GROUNDSET
 		SIZE = 600.00 600.00 600.00
 	END_GROUNDSET
 
-	GROUNDSET
-		TYPE = 1
-		POS = 0.00 520.00 0.00
-		ROT = 0.00 0.00 0.00
-		SIZE = 100.00 100.00 100.00
-	END_GROUNDSET
-
 END_STAGE_GROUNDSET
 
 #------------------------------------------------------------------------------
-#	地盤の配置情報
+#	ブロックの配置情報
 #------------------------------------------------------------------------------
-STAGE_GROUNDSET
+STAGE_BLOCKSET
 
-	GROUNDSET
+	BLOCKSET
 		TYPE = 0
-		POS = 150.00 0.00 0.00
+		POS = -150.00 0.00 0.00
 		ROT = 0.00 0.00 0.00
-		SIZE = 600.00 600.00 600.00
-	END_GROUNDSET
+		SIZE = 50.00 50.00 50.00
+	END_BLOCKSET
 
-	GROUNDSET
+	BLOCKSET
 		TYPE = 0
-		POS = 1650.00 0.00 0.00
+		POS = -250.00 0.00 0.00
 		ROT = 0.00 0.00 0.00
-		SIZE = 600.00 600.00 600.00
-	END_GROUNDSET
+		SIZE = 50.00 50.00 50.00
+	END_BLOCKSET
 
-	GROUNDSET
-		TYPE = 1
-		POS = 0.00 520.00 0.00
-		ROT = 0.00 0.00 0.00
-		SIZE = 100.00 100.00 100.00
-	END_GROUNDSET
-
-	GROUNDSET
+	BLOCKSET
 		TYPE = 0
-		POS = 0.00 520.00 0.00
+		POS = -350.00 0.00 0.00
 		ROT = 0.00 0.00 0.00
-		SIZE = 100.00 100.00 100.00
-	END_GROUNDSET
+		SIZE = 50.00 50.00 50.00
+	END_BLOCKSET
 
-END_STAGE_GROUNDSET
+END_STAGE_BLOCKSET
+
+#------------------------------------------------------------------------------
+#	障害物の配置情報
+#------------------------------------------------------------------------------
+STAGE_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 0
+		POS = 0.00 0.00 0.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+END_STAGE_OBSTACLESET
+
+#------------------------------------------------------------------------------
+#	生成位置の配置情報
+#------------------------------------------------------------------------------
+STAGE_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 400.00 0.00 240.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 640.00 0.00 240.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 360.00 0.00 -80.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 640.00 0.00 0.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+END_STAGE_SPAWNPOINTSET
 
