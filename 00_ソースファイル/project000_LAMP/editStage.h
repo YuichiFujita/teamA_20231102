@@ -33,6 +33,7 @@ public:
 		THING_GROUND = 0,	// 地盤
 		THING_BLOCK,		// ブロック
 		THING_OBSTACLE,		// 障害物
+		THING_SPAWNPOINT,	// 生成位置
 		THING_MAX			// この列挙型の総数
 	};
 

@@ -621,8 +621,8 @@ void CEditStageManager::DrawDebugControl(void)
 void CEditStageManager::DrawDebugInfo(void)
 {
 	// ポインタを宣言
-	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
-	static char* apThing[] = { "地盤", "ブロック", "障害物" };		// 配置物
+	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();			// デバッグプロックの情報
+	static char* apThing[] = { "地盤", "ブロック", "障害物", "生成位置" };	// 配置物
 
 	// 配置物数の不一致
 	assert((sizeof(apThing) / sizeof(apThing[0])) == CEditStage::THING_MAX);
