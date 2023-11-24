@@ -27,10 +27,15 @@
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-const char *CFlail::mc_apModelFile[] =	// モデル定数
+const char *CFlail::mc_apModelFileFlail[] =	// モデル定数(フレイル)
 {
 	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
 	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
+};
+
+const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
+{
+	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
 };
 
 //************************************************************
@@ -71,15 +76,15 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel(mc_apModelFile[CFlail::MODEL_FLAIL]);
+	BindModel(mc_apModelFileFlail[FLAIL_NORMAL]);
 
-	for (int nCntChain = 0; nCntChain < 10; nCntChain++)
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		// モデルの生成
 		m_chain[nCntChain].multiModel = CMultiModel::Create(VEC3_ZERO, VEC3_ZERO);
 
 		// モデルを割当
-		m_chain[nCntChain].multiModel->BindModel(mc_apModelFile[CFlail::MODEL_FLAIL]);
+		m_chain[nCntChain].multiModel->BindModel(mc_apModelFileChain[CFlail::CHAIN_NORMAL]);
 	}
 
 	// 成功を返す
@@ -94,7 +99,7 @@ void CFlail::Uninit(void)
 	// オブジェクトモデルの終了
 	CObjectModel::Uninit();
 
-	for (int nCntChain = 0; nCntChain < 10; nCntChain++)
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		// モデルの終了
 		m_chain[nCntChain].multiModel->Uninit();
@@ -114,7 +119,7 @@ void CFlail::Update(void)
 	useful::NormalizeRot(m_fChainRotMove);
 
 	// 引っ張る時のみ角度調整
-	if (player->GetCounterFlail() < -1)
+	if (player->GetCounterFlail() < flail::FLAIL_DROP)
 	{
 		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
 	}
@@ -123,7 +128,7 @@ void CFlail::Update(void)
 	{
 		m_move.x = 0.0f;
 		m_move.z = 0.0f;
-	}			 
+	}
 	
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -137,6 +142,25 @@ void CFlail::Update(void)
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", player->GetCounterFlail());*/
 	}
 
+	// オブジェクトモデルの更新
+	CObjectModel::Update();
+
+	// 鎖の更新
+	UpdateChain();
+}
+
+//============================================================
+//	フレイル位置の更新処理
+//============================================================
+void CFlail::UpdateFlailPos(void)
+{
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
+	int partsNum = flail::FLAIL_NUM - 1;
+	D3DXMATRIX partsMtx = m_chain[partsNum].multiModel->GetMtxWorld();
+	D3DXVECTOR3 partsPos = D3DXVECTOR3(partsMtx._41, partsMtx._42, partsMtx._43);
+	SetVec3PosOrg(partsPos);
+
 	// 角度と長さから鉄球の位置決定
 	D3DXVECTOR3 pos = GetVec3Position();
 
@@ -145,7 +169,7 @@ void CFlail::Update(void)
 
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
-		if (player->GetCounterFlail() < 0)
+		if (player->GetCounterFlail() < flail::FLAIL_DEF)
 		{
 			if (pos.y > -13.0f)
 			{
@@ -162,7 +186,7 @@ void CFlail::Update(void)
 		}
 	}
 
-	if (player->GetCounterFlail() < 0)
+	if (player->GetCounterFlail() < flail::FLAIL_DEF)
 	{
 		// 移動量減衰
 		m_move.x += (0.0f - m_move.x) * 0.15f;
@@ -174,8 +198,8 @@ void CFlail::Update(void)
 		m_move.x += (0.0f - m_move.x) * 0.15f;
 		m_move.z += (0.0f - m_move.z) * 0.15f;
 	}
-	
-	if (player->GetCounterFlail() >= 0 && player->GetCounterFlail() <= 60)
+
+	if (player->GetCounterFlail() >= flail::FLAIL_DEF && player->GetCounterFlail() <= flail::FLAIL_CHARGE)
 	{
 		pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
 		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
@@ -189,22 +213,12 @@ void CFlail::Update(void)
 		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
 	}
 
-	if (player->GetCounterFlail() < 0 || player->GetCounterFlail() == 120)
+	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		Collision(pos);
 	}
 
 	SetVec3Position(pos);
-
-	// オブジェクトモデルの更新
-	CObjectModel::Update();
-
-	// 鎖の更新
-	UpdateChain();
-
-	D3DXMATRIX partsMtx = m_chain[9].multiModel->GetMtxWorld();
-	D3DXVECTOR3 partsPos = D3DXVECTOR3(partsMtx._41, partsMtx._42, partsMtx._43);
-	SetVec3PosOrg(partsPos);
 }
 
 //============================================================
@@ -214,7 +228,7 @@ void CFlail::UpdateChain(void)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	for (int nCntChain = 0; nCntChain < 10; nCntChain++)
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
 		m_chain[nCntChain].rotOld = m_chain[nCntChain].multiModel->GetVec3Rotation();
@@ -228,6 +242,10 @@ void CFlail::UpdateChain(void)
 			rot.x = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().x;
 			rot.y = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().y;
 			rot.z = m_fChainRot;
+
+			pos.x = -10.0f;
+			pos.y = 0.0f;
+			pos.z = 0.0f;
 		}
 		else
 		{
@@ -247,7 +265,31 @@ void CFlail::UpdateChain(void)
 				CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", rot.z);
 			}
 
-			pos.x = -GetModelData().fRadius;
+			if (player->GetCounterFlail() == flail::FLAIL_THROW)
+			{
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= m_chain[IDParent].multiModel->GetModelData().fRadius) || nCntChain == 1)
+				{
+					pos.x += 70.0f;
+
+					if (pos.x > m_chain[nCntChain].multiModel->GetModelData().fRadius)
+					{
+						pos.x = m_chain[nCntChain].multiModel->GetModelData().fRadius;
+					}
+				}
+			}
+
+			if (player->GetCounterFlail() < flail::FLAIL_DROP)
+			{
+				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
+				{
+					pos.x -= 20.0f;
+
+					if (pos.x < 0.0f)
+					{
+						pos.x = 0.0f;
+					}
+				}
+			}
 		}
 
 		m_chain[nCntChain].multiModel->SetVec3Position(pos);
@@ -263,6 +305,14 @@ void CFlail::UpdateChain(void)
 //============================================================
 void CFlail::Draw(void)
 {
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
+	{
+		// モデルの描画
+		m_chain[nCntChain].multiModel->Draw();
+	}
+
+	UpdateFlailPos();
+
 	// 変数を宣言
 	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
 
@@ -283,12 +333,6 @@ void CFlail::Draw(void)
 
 	// ビューポートを元に戻す
 	pDevice->SetViewport(&viewportDef);
-
-	for (int nCntChain = 0; nCntChain < 10; nCntChain++)
-	{
-		// モデルの描画
-		m_chain[nCntChain].multiModel->Draw();
-	}
 }
 
 //============================================================
@@ -654,7 +698,9 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 //============================================================
 void CFlail::BindParent(const CPlayer& rPlayer)
 {
-	for (int nCntChain = 0; nCntChain < 10; nCntChain++)
+	int parentID = 0;
+
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		if (nCntChain == 0)
 		{
@@ -663,12 +709,14 @@ void CFlail::BindParent(const CPlayer& rPlayer)
 		}
 		else
 		{
-			int parentID = nCntChain - 1;
+			parentID = nCntChain - 1;
 
 			// NULLを設定
 			m_chain[nCntChain].multiModel->SetParentModel(m_chain[parentID].multiModel);
 		}
 	}
+	
+	parentID = flail::FLAIL_NUM - 1;
 }
 
 //============================================================

@@ -749,26 +749,29 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
 		}
+
+		// 目標向きを設定
+		m_destRot.y = atan2f(-m_move.x, -m_move.z);
 	}
 
 	// カウンターの値によって挙動を変更
-	if (m_nCounterFlail > 0)
+	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
 
-		if ((CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= 60)
+		if ((CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= flail::FLAIL_CHARGE)
 		{// 投げるボタンが押されている時
 		 // カウンターアップ
 			m_nCounterFlail++;
 
 			// 一定値でカウンターを止める
-			if (m_nCounterFlail > 60)
+			if (m_nCounterFlail > flail::FLAIL_CHARGE)
 			{
-				m_nCounterFlail = 60;
+				m_nCounterFlail = flail::FLAIL_CHARGE;
 			}
 
 			// 溜めてる間鉄球を振り回す
-			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.006f * m_nCounterFlail));
-			m_pFlail->SetLengthChain(2.0f * m_nCounterFlail);
+			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.002f * m_nCounterFlail));
+			m_pFlail->SetLengthChain(1.0f * m_nCounterFlail);
 
 			// 移動量を更新
 			m_move.x *= 0.5f;
@@ -776,7 +779,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		}
 
 		// 投擲
-		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != 120)
+		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != flail::FLAIL_THROW)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
@@ -785,13 +788,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_pFlail->SetMove(move);
 
 			// 目標角度に合わせる
-			m_pFlail->SetChainRot(m_pFlail->GetChainRotMove());
+			//m_pFlail->SetChainRot(m_destRot.y);
 
 			// カウンターの設定
-			m_nCounterFlail = 120;
+			m_nCounterFlail = flail::FLAIL_THROW;
 		}
 
-		if (m_nCounterFlail == 120)
+		if (m_nCounterFlail == flail::FLAIL_THROW)
 		{
 			// 移動量を更新
 			m_move.x = 0.0f;
@@ -800,11 +803,11 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// フレイルが止まったらカウンターを次の段階へ
 			if (D3DXVec3Length(&m_pFlail->GetMove()) < 1.0f)
 			{
-				m_nCounterFlail = -1;
+				m_nCounterFlail = flail::FLAIL_DROP;
 			}
 		}
 	}
-	else if (m_nCounterFlail == 0)
+	else if (m_nCounterFlail == flail::FLAIL_DEF)
 	{
 		// カウンターアップ開始
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
@@ -817,7 +820,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() < 50.0f)
+		if (m_pFlail->GetLengthChain() < 5.0f)
 		{
 			m_nCounterFlail = 1;
 			m_pFlail->SetMove(VEC3_ZERO);
@@ -833,7 +836,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				m_nCounterFlail = -50;
 			}
-
+			
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
 			move.x = (sinf(m_pFlail->GetChainRotMove()) * (m_nCounterFlail * -m_nCounterFlail));
@@ -844,13 +847,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x = 0.0f;
 			m_move.z = 0.0f;
 
-			m_nCounterFlail = 0;
+			//m_nCounterFlail = flail::FLAIL_DEF;
 		}
 
 		// 投擲
 		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
 		{
-			m_nCounterFlail = -1;
+			m_nCounterFlail = flail::FLAIL_DEF;
 		}
 	}
 
@@ -871,9 +874,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	{
 		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
 	}
-
-	// 目標向きを設定
-	m_destRot.y = atan2f(-m_move.x, -m_move.z);
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
