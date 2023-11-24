@@ -55,7 +55,7 @@ public:
 	bool SetParamToEffect();
 
 	// Z値テクスチャを取得する
-	bool GetZTex(IDirect3DTexture9 &cpTex);
+	bool GetZTex(IDirect3DTexture9 **cpTex);
 
 	bool GetbPass(void) { return m_bPass; }
 private:

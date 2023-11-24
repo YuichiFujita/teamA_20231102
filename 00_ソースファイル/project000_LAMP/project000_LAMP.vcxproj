@@ -324,11 +324,11 @@
     <ClInclude Include="ZTexture.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DepthBufShadowEffect.fx">
+    <FxCompile Include="data\SHADER\DepthBufShadowEffect.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="ZTexCreator.fx">
+    <FxCompile Include="data\SHADER\ZTexCreator.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>

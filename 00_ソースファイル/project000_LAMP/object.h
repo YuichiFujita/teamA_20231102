@@ -136,6 +136,7 @@ public:
 	virtual void SetEnableUpdate(const bool bUpdate);		// 更新状況設定
 	virtual void SetEnableDraw(const bool bDraw);			// 描画状況設定
 	virtual void SetEnableDepthShadow(const bool bShadow);	// 影表示状況設定
+	virtual void SetEnableZTex(const bool bZTex);	// 影表示状況設定
 	virtual D3DXMATRIX *GetPtrMtxWorld(void);				// マトリックスポインタ取得
 	virtual D3DXMATRIX GetMtxWorld(void) const;				// マトリックス取得
 
@@ -157,6 +158,7 @@ public:
 	bool	IsDraw(void) const;			// 描画状況取得
 	bool	IsDeath(void) const;		// 死亡フラグ取得
 	bool	IsShadow(void) const;		// 影表示状況取得
+	bool	IsZTex(void) const;		// Z描画状況取得
 	CObject	*GetObject(void);			// オブジェクト取得
 	CObject	*GetPrev(void) const;		// 前オブジェクト取得
 	CObject	*GetNext(void) const;		// 次オブジェクト取得
@@ -178,6 +180,7 @@ private:
 	bool	m_bUpdate;		// 自身の更新状況
 	bool	m_bDraw;		// 自身の描画状況
 	bool	m_bDeath;		// 自身の死亡フラグ
+	bool	m_bZTex;		// 自身がZテクスチャに書き込まれるか
 	bool	m_bDepthShadow;	// 自身の影表示状況
 	CObject	*m_pPrev;		// 前のオブジェクトへのポインタ
 	CObject	*m_pNext;		// 次のオブジェクトへのポインタ

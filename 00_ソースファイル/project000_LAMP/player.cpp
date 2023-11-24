@@ -174,7 +174,8 @@ HRESULT CPlayer::Init(void)
 
 	// ƒƒCƒ“ƒJƒ‰[‚ğİ’è
 	SetMainMaterial();
-
+	SetEnableDepthShadow(true);
+	SetEnableZTex(true);
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

@@ -30,6 +30,7 @@ bool CDepthShadow::Init(IDirect3DDevice9 &cpDev )
 {
 	// デバイスの登録とエフェクトハンドルの取得
 	if( &cpDev == NULL ) return false;
+
 	ID3DXBuffer* pError = NULL;
 
 	if(FAILED( D3DXCreateEffectFromFile(
@@ -48,8 +49,7 @@ bool CDepthShadow::Init(IDirect3DDevice9 &cpDev )
 			MessageBoxA(NULL, (LPCSTR)pError->GetBufferPointer(), "Shader Error", MB_OK);
 			return false;
 		}
-
-
+	
 	m_hWorldMat		 = m_cpEffect->GetParameterByName( NULL, "matWorld" );
 	m_hCameraViewMat = m_cpEffect->GetParameterByName( NULL, "matCameraView" );
 	m_hCameraProjMat = m_cpEffect->GetParameterByName( NULL, "matCameraProj" );
@@ -57,23 +57,24 @@ bool CDepthShadow::Init(IDirect3DDevice9 &cpDev )
 	m_hLightProjMat  = m_cpEffect->GetParameterByName( NULL, "matLightProj" );
 	m_hShadowMapTex  = m_cpEffect->GetParameterByName( NULL, "texShadowMap" );
 	m_hTechnique = m_cpEffect->GetTechniqueByName( "DepthBufShadowTec" );
-
+	m_hAmbient = m_cpEffect->GetParameterByName(NULL, "m_Ambient");
 	if( !m_hWorldMat || !m_hCameraViewMat || !m_hCameraProjMat
 		|| !m_hLightViewMat || !m_hLightProjMat || !m_hShadowMapTex || !m_hTechnique )
 		return false;
 	
 	m_cpDev = &cpDev;
+	m_bPass = false;
 	return true;
 }
 
 
 // シャドウマップを設定
-bool CDepthShadow::SetShadowMap(IDirect3DTexture9 &cpShadowMap )
+bool CDepthShadow::SetShadowMap(IDirect3DTexture9 **cpShadowMap )
 {
 	if( &cpShadowMap == NULL )
 		return false;
 
-	m_cpShadowMapTex = &cpShadowMap;
+	m_cpShadowMapTex = *cpShadowMap;
 	return true;
 }
 
@@ -124,7 +125,7 @@ HRESULT CDepthShadow::Begin()
 	// 開始宣言
 	UINT Pass;
 	m_cpEffect->Begin(&Pass, 0);
-
+	m_bPass = true;
 	return S_OK;
 }
 
@@ -137,7 +138,7 @@ HRESULT CDepthShadow::End()
 	// 固定機能に戻す
 	m_cpDev->SetVertexShader( NULL );
 	m_cpDev->SetPixelShader( NULL );
-
+	m_bPass = false;
 	return S_OK;
 }
 
@@ -166,6 +167,7 @@ bool CDepthShadow::SetParamToEffect()
 	m_cpEffect->SetMatrix( m_hCameraProjMat, &m_matCameraProj );
 	m_cpEffect->SetMatrix( m_hLightViewMat, &m_matLightView );
 	m_cpEffect->SetMatrix( m_hLightProjMat, &m_matLightProj );
+	m_cpEffect->SetVector(m_hAmbient, &m_AmbientCol);
 	HRESULT hr = m_cpEffect->SetTexture( m_hShadowMapTex, m_cpShadowMapTex);
 
 	return true;

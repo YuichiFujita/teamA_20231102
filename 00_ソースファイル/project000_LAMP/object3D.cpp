@@ -12,7 +12,8 @@
 #include "renderer.h"
 #include "texture.h"
 #include "collision.h"
-
+#include "ZTexture.h"
+#include "DepthShadow.h"
 //************************************************************
 //	マクロ定義
 //************************************************************
@@ -133,7 +134,8 @@ HRESULT CObject3D::Init(void)
 
 	// 頂点情報の設定
 	SetVtx();
-
+	SetEnableZTex(true);
+	SetEnableDepthShadow(true);
 	// 成功を返す
 	return S_OK;
 }
@@ -218,8 +220,30 @@ void CObject3D::Draw(void)
 	// テクスチャの設定
 	pDevice->SetTexture(0, pTexture->GetTexture(m_nTextureID));
 
+	if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+	{
+		CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_mtxWorld);
+		CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+		CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+	}
+	else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+	{
+		CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_mtxWorld);
+		CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&m_col);
+		CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+		CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+	}
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+	{
+		CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+	}
+	else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+	{
+		CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+	}
+
 
 	// ポリゴンの表面のみを表示状態にする
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);

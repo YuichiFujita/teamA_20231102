@@ -11,6 +11,8 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
+#include "ZTexture.h"
+#include "DepthShadow.h"
 
 //************************************************************
 //	子クラス [CMultiModel] のメンバ関数
@@ -74,6 +76,8 @@ HRESULT CMultiModel::Init(void)
 	SetEnableUpdate(false);
 	SetEnableDraw(false);
 
+	SetEnableZTex(true);
+	SetEnableDepthShadow(true);
 	// 成功を返す
 	return S_OK;
 }
@@ -171,9 +175,29 @@ void CMultiModel::Draw(void)
 			// 頂点法線の自動正規化を有効にする
 			pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 		}
-
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&(D3DXCOLOR)GetMaterial(nCntMat).MatD3D.Diffuse);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+		}
 		// モデルの描画
 		m_modelData.pMesh->DrawSubset(nCntMat);
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+		}
 
 		// 頂点法線の自動正規化を無効にする
 		pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);

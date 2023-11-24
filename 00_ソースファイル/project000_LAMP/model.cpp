@@ -328,7 +328,6 @@ HRESULT CModel::LoadTextureModel(const int nID)
 
 		if (pMat[nCntMat].pTextureFilename != NULL)
 		{ // テクスチャファイルが存在する場合
-
 			// テクスチャを登録
 			m_aModel[nID].pTextureID[nCntMat] = pTexture->Regist(pMat[nCntMat].pTextureFilename);
 		}

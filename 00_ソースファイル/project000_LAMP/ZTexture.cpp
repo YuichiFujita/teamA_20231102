@@ -155,7 +155,7 @@ HRESULT CZTexture::Begin()
 	// シェーダの開始を宣言
 	UINT Tmp;
 	m_cpEffect->Begin(&Tmp, 0);
-
+	m_bPass = true;
 	return S_OK;
 }
 
@@ -204,14 +204,14 @@ HRESULT CZTexture::End()
 	// 固定機能に戻す
 	m_cpDev->SetVertexShader(NULL);
 	m_cpDev->SetPixelShader(NULL);
-
+	m_bPass = false;
 	return S_OK;
 }
 
 
 // Z値テクスチャを取得する
-bool CZTexture::GetZTex(IDirect3DTexture9 &cpTex)
+bool CZTexture::GetZTex(IDirect3DTexture9 **cpTex)
 {
-	cpTex = *m_cpZTex;
+	*cpTex = m_cpZTex;
 	return true;
 }
