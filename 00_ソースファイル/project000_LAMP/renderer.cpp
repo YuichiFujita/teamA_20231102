@@ -346,7 +346,7 @@ HRESULT CRenderer::CreateRenderTexture(void)
     m_nRenderTextureID = pTexture->Regist(CTexture::SInfo
     ( // 引数
         SCREEN_WIDTH,			// テクスチャ横幅
-        SCREEN_HEIGHT,			// テクスチャ縦幅						
+        SCREEN_HEIGHT,			// テクスチャ縦幅
         0,						// ミップマップレベル
 		D3DUSAGE_RENDERTARGET,	// 性質・確保オプション
 		D3DFMT_X8R8G8B8,		// ピクセルフォーマット

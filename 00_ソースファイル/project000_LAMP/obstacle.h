@@ -44,6 +44,7 @@ public:
 		TYPE_CASTLE_FENCE1,	// 城の柵モデル1
 		TYPE_CASTLE_FENCE2,	// 城の柵モデル2
 		TYPE_FOUNTAIN,		// 噴水モデル
+		TYPE_TOWER,			// 塔モデル
 		TYPE_MAX			// この列挙型の総数
 	};
 

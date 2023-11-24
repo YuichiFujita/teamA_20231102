@@ -34,6 +34,8 @@
 
 #include "flail.h"
 
+#include "spawnpoint.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -442,7 +444,27 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 void CPlayer::SetSpawn(void)
 {
 	// 変数を宣言
-	D3DXVECTOR3 set = VEC3_ZERO;	// 引数設定用
+	CObject *pSpawnPoint = CSpawnPoint::GetSavePoint(m_nPadID);
+	if (pSpawnPoint != NULL)
+	{ // スポーンポイントがある場合
+
+		// 位置を設定
+		SetVec3Position(pSpawnPoint->GetVec3Position());
+
+		// 向きを設定
+		SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
+		m_destRot = pSpawnPoint->GetVec3Rotation();
+	}
+	else
+	{ // スポーンポイントがない場合
+
+		// 位置を設定
+		SetVec3Position(VEC3_ZERO);
+
+		// 向きを設定
+		SetVec3Rotation(VEC3_ZERO);
+		m_destRot = VEC3_ZERO;
+	}
 
 	// 情報を初期化
 	SetState(STATE_SPAWN);		// スポーン状態の設定
@@ -450,13 +472,6 @@ void CPlayer::SetSpawn(void)
 
 	// カウンターを初期化
 	m_nCounterState = 0;	// 状態管理カウンター
-
-	// 位置を設定
-	SetVec3Position(set + D3DXVECTOR3(200.0f, 0.0f, 0.0f) - (D3DXVECTOR3(100.0f, 0.0f, 0.0f) * (float)m_nPadID));
-
-	// 向きを設定
-	SetVec3Rotation(set);
-	m_destRot = set;
 
 	// 移動量を初期化
 	m_move = VEC3_ZERO;
