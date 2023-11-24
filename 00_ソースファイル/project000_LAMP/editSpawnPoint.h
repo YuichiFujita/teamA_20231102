@@ -56,8 +56,12 @@ private:
 	);
 
 	void CreateSpawnPoint(void);	// 生成位置生成
+	void UpdateChangeIdx(void);		// インデックス変更の更新
 	void LookAllSpawnPoint(void);	// 生成位置の全表示
 	void CheckUseSpawnPoint(const int nMaxPoint, CObject **ppAllSpawnPoint);	// 生成位置の使用確認
+
+	// 静的メンバ変数
+	static int m_nSave;	// 保存情報
 
 	// メンバ変数
 	CObject *m_apSpawnPoint[MAX_PLAYER];	// 生成位置情報

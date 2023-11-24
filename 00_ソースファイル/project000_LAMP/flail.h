@@ -18,6 +18,16 @@
 #include "multiModel.h"
 #include "player.h"
 
+namespace flail
+{
+	const int	FLAIL_CHARGE = 120;		// フレイル溜め状態
+	const int	FLAIL_THROW = 240;		// フレイル投げ状態
+	const int	FLAIL_DROP = -1;		// フレイル落下状態
+	const int	FLAIL_DEF = 0;			// フレイル取得状態
+
+	const int	FLAIL_NUM = 20;			// フレイル取得状態
+}
+
 //************************************************************
 //	前方宣言
 //************************************************************
@@ -31,11 +41,17 @@ class CFlail : public CObjectModel
 {
 public:
 	// モデル列挙
-	enum EModel
+	enum EModelFlail
 	{
-		MODEL_FLAIL = 0,	// 鉄球
-		MODEL_PREFABHUT,	// プレハブ小屋
-		MODEL_MAX			// この列挙型の総数
+		FLAIL_NORMAL = 0,	// 鉄球
+		FLAIL_PREFABHUT,	// プレハブ小屋
+		FLAIL_MAX			// この列挙型の総数
+	};
+
+	enum EModelChain
+	{
+		CHAIN_NORMAL = 0,	// 鉄球
+		CHAIN_MAX			// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -91,19 +107,21 @@ private:
 	void CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	void BindParent(const CPlayer& rPlayer);
 	void UpdateChain(void);		// 更新
+	void UpdateFlailPos(void);	// 更新
 
 	// 静的メンバ変数
-	static const char *mc_apModelFile[];	// モデル定数
+	static const char *mc_apModelFileFlail[];	// モデル定数
+	static const char *mc_apModelFileChain[];	// モデル定数
 
 	// メンバ変数
-	SChain		m_chain[10];		// 鎖
-	D3DXVECTOR3 m_posOrg;			// 回転原点
-	D3DXVECTOR3 m_oldPos;			// 過去の位置
-	D3DXVECTOR3	m_move;				// 移動量
-	int			m_nPlayerID;		// プレイヤーID
-	float		m_fChainRot;		// 角度
-	float		m_fChainRotMove;	// 目標角度
-	float		m_fLengthChain;		// 鎖の長さ
+	SChain		m_chain[flail::FLAIL_NUM];		// 鎖
+	D3DXVECTOR3 m_posOrg;						// 回転原点
+	D3DXVECTOR3 m_oldPos;						// 過去の位置
+	D3DXVECTOR3	m_move;							// 移動量
+	int			m_nPlayerID;					// プレイヤーID
+	float		m_fChainRot;					// 角度
+	float		m_fChainRotMove;				// 目標角度
+	float		m_fLengthChain;					// 鎖の長さ
 
 };
 
