@@ -143,7 +143,7 @@ HRESULT CSceneGame::Init(void)
 		return E_FAIL;
 	}
 
-#if 1
+#if 0
 
 	// TODOÅFíºÇ™Ç´Ç‚ÇﬂÇÊÇ§ÇÀ
 	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));

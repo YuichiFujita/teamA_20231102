@@ -39,6 +39,7 @@ public:
 	struct SInfo
 	{
 		CGround::EType type;	// 地盤種類
+		D3DXVECTOR3 size;		// 大きさ
 		D3DXVECTOR2 partX, partY, partZ;	// テクスチャ分割数
 	};
 
@@ -54,6 +55,7 @@ public:
 
 private:
 	// メンバ関数
+	void UpdateSizing(void);		// 大きさ更新
 	void UpdateChangeType(void);	// 種類変更の更新
 	void UpdateTexPart(void);		// テクスチャ分割の更新
 	void CreateGround(void);		// 地盤生成

@@ -49,18 +49,18 @@
 #define KEY_ROTA_LEFT	(DIK_C)	// 左回転キー
 #define NAME_ROTA_LEFT	("C")	// 左回転表示
 
-#define KEY_UP_SCALE_X		(DIK_R)	// X軸拡大キー
-#define NAME_UP_SCALE_X		("R")	// X軸拡大表示
-#define KEY_DOWN_SCALE_X	(DIK_F)	// X軸縮小キー
-#define NAME_DOWN_SCALE_X	("F")	// X軸縮小表示
-#define KEY_UP_SCALE_Y		(DIK_T)	// Y軸拡大キー
-#define NAME_UP_SCALE_Y		("T")	// Y軸拡大表示
-#define KEY_DOWN_SCALE_Y	(DIK_G)	// Y軸縮小キー
-#define NAME_DOWN_SCALE_Y	("G")	// Y軸縮小表示
-#define KEY_UP_SCALE_Z		(DIK_Y)	// Z軸拡大キー
-#define NAME_UP_SCALE_Z		("Y")	// Z軸拡大表示
-#define KEY_DOWN_SCALE_Z	(DIK_H)	// Z軸縮小キー
-#define NAME_DOWN_SCALE_Z	("H")	// Z軸縮小表示
+//#define KEY_UP_SCALE_X		(DIK_R)	// X軸拡大キー
+//#define NAME_UP_SCALE_X		("R")	// X軸拡大表示
+//#define KEY_DOWN_SCALE_X	(DIK_F)	// X軸縮小キー
+//#define NAME_DOWN_SCALE_X	("F")	// X軸縮小表示
+//#define KEY_UP_SCALE_Y		(DIK_T)	// Y軸拡大キー
+//#define NAME_UP_SCALE_Y		("T")	// Y軸拡大表示
+//#define KEY_DOWN_SCALE_Y	(DIK_G)	// Y軸縮小キー
+//#define NAME_DOWN_SCALE_Y	("G")	// Y軸縮小表示
+//#define KEY_UP_SCALE_Z		(DIK_Y)	// Z軸拡大キー
+//#define NAME_UP_SCALE_Z		("Y")	// Z軸拡大表示
+//#define KEY_DOWN_SCALE_Z	(DIK_H)	// Z軸縮小キー
+//#define NAME_DOWN_SCALE_Z	("H")	// Z軸縮小表示
 
 //************************************************************
 //	定数宣言
@@ -69,7 +69,7 @@ namespace
 {
 	const char* SAVE_TXT	= "data\\TXT\\save_stage.txt";	// ステージセーブテキスト
 
-	const D3DXVECTOR3 INIT_SIZE = D3DXVECTOR3(100.0f, 100.0f, 100.0f);	// 大きさ
+	const D3DXVECTOR3 INIT_SIZE = D3DXVECTOR3(50.0f, 50.0f, 50.0f);	// 大きさ
 
 	const float INIT_MOVE	= 40.0f;	// 配置物の初期移動量
 	const float CHANGE_MOVE = 10.0f;	// 配置物の移動量の変動量
@@ -125,16 +125,6 @@ HRESULT CEditStageManager::Init(void)
 	m_fMove		= INIT_MOVE;				// 位置移動量
 	m_bSave		= false;					// 保存状況
 	m_bEdit		= false;					// エディット状況
-
-	// エディットステージの生成
-	m_pStage = CEditStage::Create(this, m_thing);
-	if (m_pStage == NULL)
-	{ // 生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
 
 	// 成功を返す
 	return S_OK;
@@ -379,6 +369,9 @@ void CEditStageManager::UpdateChangeThing(void)
 	{
 		if (m_pKeyboard->IsTrigger(KEY_CHANGE_THING))
 		{
+			// 情報保存
+			m_pStage->SaveInfo();
+
 			// エディットステージの破棄
 			if (m_pStage != NULL)
 			{ // エディットステージが使用されている場合
@@ -397,6 +390,9 @@ void CEditStageManager::UpdateChangeThing(void)
 				m_pStage = CEditStage::Create(this, m_thing);
 				assert(m_pStage != NULL);	// 生成失敗
 			}
+
+			// 情報読込
+			m_pStage->LoadInfo();
 		}
 	}
 }
@@ -532,6 +528,7 @@ void CEditStageManager::UpdateSizing(void)
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
+#if 0
 	// 大きさを変更
 	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
 	{
@@ -587,6 +584,7 @@ void CEditStageManager::UpdateSizing(void)
 			m_size.z -= m_fMove;
 		}
 	}
+#endif
 }
 
 //============================================================
@@ -604,7 +602,6 @@ void CEditStageManager::DrawDebugControl(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "移動：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_FAR, NAME_LEFT, NAME_NEAR, NAME_RIGHT, NAME_UP, NAME_DOWN, NAME_TRIGGER);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "移動量変更：[%s/%s]\n", NAME_MOVE_UP, NAME_MOVE_DOWN);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "回転：[%s/%s]\n", NAME_ROTA_RIGHT, NAME_ROTA_LEFT);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "大きさ：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Y, NAME_DOWN_SCALE_Y, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "配置物変更：[%s]\n", NAME_CHANGE_THING);
 
 	if (m_pStage != NULL)
