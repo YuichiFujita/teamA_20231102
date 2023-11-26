@@ -124,12 +124,16 @@ public:
 private:
 	// 静的メンバ関数
 	static HRESULT LoadSetup(CStage *pStage, const ELoad load);	// セットアップ
-	static HRESULT LoadLimit(const char* pString, FILE *pFile, CStage *pStage);		// 範囲情報の読込
-	static HRESULT LoadField(const char* pString, FILE *pFile, CStage *pStage);		// 地面情報の読込
-	static HRESULT LoadWall(const char* pString, FILE *pFile, CStage *pStage);		// 壁情報の読込
-	static HRESULT LoadScenery(const char* pString, FILE *pFile, CStage *pStage);	// 景色情報の読込
-	static HRESULT LoadSky(const char* pString, FILE *pFile, CStage *pStage);		// 空情報の読込
-	static HRESULT LoadLiquid(const char* pString, FILE *pFile, CStage *pStage);	// 液体情報の読込
+	static HRESULT LoadLimit(const char* pString, FILE *pFile, CStage *pStage);			// 範囲情報の読込
+	static HRESULT LoadField(const char* pString, FILE *pFile, CStage *pStage);			// 地面情報の読込
+	static HRESULT LoadWall(const char* pString, FILE *pFile, CStage *pStage);			// 壁情報の読込
+	static HRESULT LoadScenery(const char* pString, FILE *pFile, CStage *pStage);		// 景色情報の読込
+	static HRESULT LoadSky(const char* pString, FILE *pFile, CStage *pStage);			// 空情報の読込
+	static HRESULT LoadLiquid(const char* pString, FILE *pFile, CStage *pStage);		// 液体情報の読込
+	static HRESULT LoadGround(const char* pString, FILE *pFile, CStage *pStage);		// 地盤情報の読込
+	static HRESULT LoadBlock(const char* pString, FILE *pFile, CStage *pStage);			// ブロック情報の読込
+	static HRESULT LoadObstacle(const char* pString, FILE *pFile, CStage *pStage);		// 障害物情報の読込
+	static HRESULT LoadSpawnPoint(const char* pString, FILE *pFile, CStage *pStage);	// 生成位置情報の読込
 
 	// メンバ変数
 	SStageLimit	m_stageLimit;	// 範囲情報

@@ -18,6 +18,11 @@
 #include "sky.h"
 #include "liquid.h"
 
+#include "ground.h"
+#include "block.h"
+#include "obstacle.h"
+#include "spawnPoint.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -381,6 +386,10 @@ CStage *CStage::Create(const ELoad load)
 		if (FAILED(pStage->Init()))
 		{ // 初期化に失敗した場合
 
+			// メモリ開放
+			delete pStage;
+			pStage = nullptr;
+
 			// 失敗を返す
 			assert(false);
 			return NULL;
@@ -389,6 +398,10 @@ CStage *CStage::Create(const ELoad load)
 		// セットアップの読込
 		if (FAILED(LoadSetup(pStage, load)))
 		{ // 読み込みに失敗した場合
+
+			// メモリ開放
+			delete pStage;
+			pStage = nullptr;
 
 			// 失敗を返す
 			assert(false);
@@ -501,6 +514,42 @@ HRESULT CStage::LoadSetup(CStage *pStage, const ELoad load)
 
 			// 液体の読込
 			else if (FAILED(LoadLiquid(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// 地盤の読込
+			else if (FAILED(LoadGround(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// ブロックの読込
+			else if (FAILED(LoadBlock(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// 障害物の読込
+			else if (FAILED(LoadObstacle(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// 生成位置の読込
+			else if (FAILED(LoadSpawnPoint(&aString[0], pFile, pStage)))
 			{ // 読み込みに失敗した場合
 
 				// 失敗を返す
@@ -1497,6 +1546,385 @@ HRESULT CStage::LoadLiquid(const char* pString, FILE *pFile, CStage *pStage)
 
 		// 読込総数の不一致
 		assert(nCurrentID == pStage->m_liquid.nNum);
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	地盤情報の読込処理
+//============================================================
+HRESULT CStage::LoadGround(const char* pString, FILE *pFile, CStage *pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;		// 位置の代入用
+	D3DXVECTOR3 rot = VEC3_ZERO;		// 向きの代入用
+	D3DXVECTOR3 size = VEC3_ZERO;		// 大きさの代入用
+	D3DXVECTOR2 partTexX = VEC2_ZERO;	// テクスチャ分割数Xの代入用
+	D3DXVECTOR2 partTexY = VEC2_ZERO;	// テクスチャ分割数Yの代入用
+	D3DXVECTOR2 partTexZ = VEC2_ZERO;	// テクスチャ分割数Zの代入用
+	int nTypeID = 0;					// 種類インデックスの代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 地盤の設定
+	if (strcmp(pString, "STAGE_GROUNDSET") == 0)
+	{ // 読み込んだ文字列が STAGE_GROUNDSET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_GROUNDSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "GROUNDSET") == 0)
+			{ // 読み込んだ文字列が GROUNDSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_GROUNDSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "TYPE") == 0)
+					{ // 読み込んだ文字列が TYPE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &nTypeID);		// 種類を読み込む
+					}
+					else if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &rot.x);		// 向きXを読み込む
+						fscanf(pFile, "%f", &rot.y);		// 向きYを読み込む
+						fscanf(pFile, "%f", &rot.z);		// 向きZを読み込む
+					}
+					else if (strcmp(&aString[0], "SIZE") == 0)
+					{ // 読み込んだ文字列が SIZE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &size.x);		// 大きさXを読み込む
+						fscanf(pFile, "%f", &size.y);		// 大きさYを読み込む
+						fscanf(pFile, "%f", &size.z);		// 大きさZを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTX") == 0)
+					{ // 読み込んだ文字列が PARTX の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexX.x);	// Xテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexX.y);	// Xテクスチャ分割数Yを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTY") == 0)
+					{ // 読み込んだ文字列が PARTY の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexY.x);	// Yテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexY.y);	// Yテクスチャ分割数Yを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTZ") == 0)
+					{ // 読み込んだ文字列が PARTZ の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexZ.x);	// Zテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexZ.y);	// Zテクスチャ分割数Yを読み込む
+					}
+				} while (strcmp(&aString[0], "END_GROUNDSET") != 0);	// 読み込んだ文字列が END_GROUNDSET ではない場合ループ
+
+				// 地盤オブジェクトの生成
+				if (CGround::Create((CGround::EType)nTypeID, pos, rot, size, partTexX, partTexY, partTexZ) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_GROUNDSET") != 0);	// 読み込んだ文字列が END_STAGE_GROUNDSET ではない場合ループ
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	ブロック情報の読込処理
+//============================================================
+HRESULT CStage::LoadBlock(const char* pString, FILE *pFile, CStage *pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;		// 位置の代入用
+	D3DXVECTOR3 rot = VEC3_ZERO;		// 向きの代入用
+	D3DXVECTOR3 size = VEC3_ZERO;		// 大きさの代入用
+	D3DXVECTOR2 partTexX = VEC2_ZERO;	// テクスチャ分割数Xの代入用
+	D3DXVECTOR2 partTexY = VEC2_ZERO;	// テクスチャ分割数Yの代入用
+	D3DXVECTOR2 partTexZ = VEC2_ZERO;	// テクスチャ分割数Zの代入用
+	int nTypeID = 0;					// 種類インデックスの代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// ブロックの設定
+	if (strcmp(pString, "STAGE_BLOCKSET") == 0)
+	{ // 読み込んだ文字列が STAGE_BLOCKSET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_BLOCKSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "BLOCKSET") == 0)
+			{ // 読み込んだ文字列が BLOCKSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_BLOCKSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "TYPE") == 0)
+					{ // 読み込んだ文字列が TYPE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &nTypeID);		// 種類を読み込む
+					}
+					else if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &rot.x);		// 向きXを読み込む
+						fscanf(pFile, "%f", &rot.y);		// 向きYを読み込む
+						fscanf(pFile, "%f", &rot.z);		// 向きZを読み込む
+					}
+					else if (strcmp(&aString[0], "SIZE") == 0)
+					{ // 読み込んだ文字列が SIZE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &size.x);		// 大きさXを読み込む
+						fscanf(pFile, "%f", &size.y);		// 大きさYを読み込む
+						fscanf(pFile, "%f", &size.z);		// 大きさZを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTX") == 0)
+					{ // 読み込んだ文字列が PARTX の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexX.x);	// Xテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexX.y);	// Xテクスチャ分割数Yを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTY") == 0)
+					{ // 読み込んだ文字列が PARTY の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexY.x);	// Yテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexY.y);	// Yテクスチャ分割数Yを読み込む
+					}
+					else if (strcmp(&aString[0], "PARTZ") == 0)
+					{ // 読み込んだ文字列が PARTZ の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &partTexZ.x);	// Zテクスチャ分割数Xを読み込む
+						fscanf(pFile, "%f", &partTexZ.y);	// Zテクスチャ分割数Yを読み込む
+					}
+				} while (strcmp(&aString[0], "END_BLOCKSET") != 0);	// 読み込んだ文字列が END_BLOCKSET ではない場合ループ
+
+				// ブロックオブジェクトの生成
+				if (CBlock::Create((CBlock::EType)nTypeID, pos, rot, size, partTexX, partTexY, partTexZ) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_BLOCKSET") != 0);	// 読み込んだ文字列が END_STAGE_BLOCKSET ではない場合ループ
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	障害物情報の読込処理
+//============================================================
+HRESULT CStage::LoadObstacle(const char* pString, FILE *pFile, CStage *pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
+	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
+	int nTypeID = 0;				// 種類インデックスの代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 障害物の設定
+	if (strcmp(pString, "STAGE_OBSTACLESET") == 0)
+	{ // 読み込んだ文字列が STAGE_OBSTACLESET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_OBSTACLESET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "OBSTACLESET") == 0)
+			{ // 読み込んだ文字列が OBSTACLESET の場合
+
+				do
+				{ // 読み込んだ文字列が END_OBSTACLESET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "TYPE") == 0)
+					{ // 読み込んだ文字列が TYPE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%d", &nTypeID);		// 種類を読み込む
+					}
+					else if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &rot.x);		// 向きXを読み込む
+						fscanf(pFile, "%f", &rot.y);		// 向きYを読み込む
+						fscanf(pFile, "%f", &rot.z);		// 向きZを読み込む
+					}
+				} while (strcmp(&aString[0], "END_OBSTACLESET") != 0);	// 読み込んだ文字列が END_OBSTACLESET ではない場合ループ
+
+				// 障害物オブジェクトの生成
+				if (CObstacle::Create((CObstacle::EType)nTypeID, pos, rot) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_OBSTACLESET") != 0);	// 読み込んだ文字列が END_STAGE_OBSTACLESET ではない場合ループ
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	生成位置情報の読込処理
+//============================================================
+HRESULT CStage::LoadSpawnPoint(const char* pString, FILE *pFile, CStage *pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
+	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 生成位置の設定
+	if (strcmp(pString, "STAGE_SPAWNPOINTSET") == 0)
+	{ // 読み込んだ文字列が STAGE_SPAWNPOINTSET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_SPAWNPOINTSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "SPAWNPOINTSET") == 0)
+			{ // 読み込んだ文字列が SPAWNPOINTSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_SPAWNPOINTSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "ROT") == 0)
+					{ // 読み込んだ文字列が ROT の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &rot.x);		// 向きXを読み込む
+						fscanf(pFile, "%f", &rot.y);		// 向きYを読み込む
+						fscanf(pFile, "%f", &rot.z);		// 向きZを読み込む
+					}
+				} while (strcmp(&aString[0], "END_SPAWNPOINTSET") != 0);	// 読み込んだ文字列が END_SPAWNPOINTSET ではない場合ループ
+
+				// 生成位置オブジェクトの生成
+				if (CSpawnPoint::Create(pos, rot) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_SPAWNPOINTSET") != 0);	// 読み込んだ文字列が END_STAGE_SPAWNPOINTSET ではない場合ループ
 	}
 
 	// 成功を返す
