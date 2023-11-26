@@ -472,6 +472,69 @@ D3DXMATRIX *CObjectMeshCube::GetPtrMtxWorld(void)
 }
 
 //============================================================
+//	テクスチャの分割数Xの設定処理
+//============================================================
+void CObjectMeshCube::SetTexturePatternX(const D3DXVECTOR2& rTexPart)
+{
+	// 引数のテクスチャの分割数Xを設定
+	m_meshCube.aTexPart[CUBEPART_X] = rTexPart;
+
+	// 頂点情報の設定
+	SetVtx();
+}
+
+//============================================================
+//	テクスチャ分割数X取得処理
+//============================================================
+D3DXVECTOR2 CObjectMeshCube::GetTexturePatternX(void) const
+{
+	// テクスチャの分割数Xを返す
+	return m_meshCube.aTexPart[CUBEPART_X];
+}
+
+//============================================================
+//	テクスチャの分割数Yの設定処理
+//============================================================
+void CObjectMeshCube::SetTexturePatternY(const D3DXVECTOR2& rTexPart)
+{
+	// 引数のテクスチャの分割数Yを設定
+	m_meshCube.aTexPart[CUBEPART_Y] = rTexPart;
+
+	// 頂点情報の設定
+	SetVtx();
+}
+
+//============================================================
+//	テクスチャ分割数Y取得処理
+//============================================================
+D3DXVECTOR2 CObjectMeshCube::GetTexturePatternY(void) const
+{
+	// テクスチャの分割数Yを返す
+	return m_meshCube.aTexPart[CUBEPART_Y];
+}
+
+//============================================================
+//	テクスチャの分割数Zの設定処理
+//============================================================
+void CObjectMeshCube::SetTexturePatternZ(const D3DXVECTOR2& rTexPart)
+{
+	// 引数のテクスチャの分割数Zを設定
+	m_meshCube.aTexPart[CUBEPART_Z] = rTexPart;
+
+	// 頂点情報の設定
+	SetVtx();
+}
+
+//============================================================
+//	テクスチャ分割数Z取得処理
+//============================================================
+D3DXVECTOR2 CObjectMeshCube::GetTexturePatternZ(void) const
+{
+	// テクスチャの分割数Zを返す
+	return m_meshCube.aTexPart[CUBEPART_Z];
+}
+
+//============================================================
 //	生成処理
 //============================================================
 CObjectMeshCube *CObjectMeshCube::Create
@@ -738,69 +801,6 @@ CObjectMeshCube::ETexState CObjectMeshCube::GetTextureState(void) const
 {
 	// テクスチャの状態を返す
 	return m_meshCube.texState;
-}
-
-//============================================================
-//	テクスチャの分割数Xの設定処理
-//============================================================
-void CObjectMeshCube::SetTexturePatternX(const D3DXVECTOR2& rTexPart)
-{
-	// 引数のテクスチャの分割数Xを設定
-	m_meshCube.aTexPart[CUBEPART_X] = rTexPart;
-
-	// 頂点情報の設定
-	SetVtx();
-}
-
-//============================================================
-//	テクスチャ分割数X取得処理
-//============================================================
-D3DXVECTOR2 CObjectMeshCube::GetTexturePatternX(void) const
-{
-	// テクスチャの分割数Xを返す
-	return m_meshCube.aTexPart[CUBEPART_X];
-}
-
-//============================================================
-//	テクスチャの分割数Yの設定処理
-//============================================================
-void CObjectMeshCube::SetTexturePatternY(const D3DXVECTOR2& rTexPart)
-{
-	// 引数のテクスチャの分割数Yを設定
-	m_meshCube.aTexPart[CUBEPART_Y] = rTexPart;
-
-	// 頂点情報の設定
-	SetVtx();
-}
-
-//============================================================
-//	テクスチャ分割数Y取得処理
-//============================================================
-D3DXVECTOR2 CObjectMeshCube::GetTexturePatternY(void) const
-{
-	// テクスチャの分割数Yを返す
-	return m_meshCube.aTexPart[CUBEPART_Y];
-}
-
-//============================================================
-//	テクスチャの分割数Zの設定処理
-//============================================================
-void CObjectMeshCube::SetTexturePatternZ(const D3DXVECTOR2& rTexPart)
-{
-	// 引数のテクスチャの分割数Zを設定
-	m_meshCube.aTexPart[CUBEPART_Z] = rTexPart;
-
-	// 頂点情報の設定
-	SetVtx();
-}
-
-//============================================================
-//	テクスチャ分割数Z取得処理
-//============================================================
-D3DXVECTOR2 CObjectMeshCube::GetTexturePatternZ(void) const
-{
-	// テクスチャの分割数Zを返す
-	return m_meshCube.aTexPart[CUBEPART_Z];
 }
 
 //============================================================
