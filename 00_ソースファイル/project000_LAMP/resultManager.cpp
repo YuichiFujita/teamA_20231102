@@ -241,6 +241,7 @@ HRESULT CResultManager::Init(void)
 	// 描画をしない設定にする
 	m_pTime->SetEnableDraw(false);
 
+#if 0
 	// タイムを設定
 	if (!m_pTime->SetMSec(CManager::GetInstance()->GetRetentionManager()->GetTime()))
 	{ // 設定に失敗した場合
@@ -248,6 +249,7 @@ HRESULT CResultManager::Init(void)
 		// 失敗を返す
 		return E_FAIL;
 	}
+#endif
 
 	//--------------------------------------------------------
 	//	コンテニューロゴ表示の生成・設定
@@ -615,6 +617,7 @@ void CResultManager::UpdateResult(void)
 			m_apResult[nCntResult]->SetVec3Sizing(SIZE_RESULT);
 		}
 
+#if 0
 		switch (CManager::GetInstance()->GetRetentionManager()->GetResult())
 		{ // リザルトごとの処理
 		case CRetentionManager::RESULT_FAILED:
@@ -641,6 +644,7 @@ void CResultManager::UpdateResult(void)
 
 			break;
 		}
+#endif
 
 		// サウンドの再生
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
@@ -841,6 +845,7 @@ void CResultManager::SkipStaging(void)
 		m_apResult[nCntResult]->SetVec3Sizing(SIZE_RESULT);
 	}
 
+#if 0
 	if (CManager::GetInstance()->GetRetentionManager()->GetResult() == CRetentionManager::RESULT_CLEAR)
 	{ // クリアしている場合
 
@@ -853,6 +858,7 @@ void CResultManager::SkipStaging(void)
 		m_pTime->SetScalingValue(SIZE_TIME_VAL);
 		m_pTime->SetScalingPart(SIZE_TIME_PART);
 	}
+#endif
 
 	// コンテニューロゴ表示の描画開始
 	m_pContLogo->SetEnableDraw(true);
@@ -888,6 +894,7 @@ void CResultManager::SetTexResult(void)
 	// MISSIONテクスチャを登録・割当
 	m_apResult[0]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_MISSION]));
 
+#if 0
 	// RESULTテクスチャを登録・割当
 	switch (CManager::GetInstance()->GetRetentionManager()->GetResult())
 	{ // リザルトごとの処理
@@ -912,6 +919,7 @@ void CResultManager::SetTexResult(void)
 
 		break;
 	}
+#endif
 }
 
 //============================================================

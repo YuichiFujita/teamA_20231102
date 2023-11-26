@@ -23,13 +23,19 @@
 class CRetentionManager
 {
 public:
-	// リザルト列挙
-	enum EResult
+	// 討伐条件列挙
+	enum EKill
 	{
-		RESULT_NONE,	// 無し
-		RESULT_FAILED,	// クリア失敗
-		RESULT_CLEAR,	// クリア成功
-		RESULT_MAX		// この列挙型の総数
+		KILL_LIFE = 0,	// 体力制
+		KILL_BLOWAWAY,	// ふっとばし制
+		KILL_MAX		// この列挙型の総数
+	};
+
+	// 勝利条件列挙
+	enum EWin
+	{
+		WIN_SURVIVE = 0,	// 生き残り勝利
+		WIN_MAX				// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -42,25 +48,25 @@ public:
 	HRESULT Init(void);	// 初期化
 	void Uninit(void);	// 終了
 
-	// 静的メンバ関数
-	static CRetentionManager *Create(void);	// 生成
-	static HRESULT Release(CRetentionManager *&prRetentionManager);	// 破棄
-
-	// メンバ関数
-	void SetResult(const EResult result);	// クリア状況設定
-	EResult GetResult(void) const;			// クリア状況取得
-	void SetTime(const long nTime);			// 経過タイム設定
-	long GetTime(void) const;				// 経過タイム取得
+	void SetKillState(const EKill kill);	// 討伐条件設定
+	EKill GetKillState(void) const;			// 討伐条件取得
+	void SetWinState(const EWin win);		// 勝利条件設定
+	EWin GetWinState(void) const;			// 勝利条件取得
 	void SetNumPlayer(const int nNum);		// プレイ人数設定
 	int GetNumPlayer(void) const;			// プレイ人数取得
+
 	void AllSetEnableEntry(const bool bEntry);				// 全エントリー状況設定
 	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
 	bool IsEntry(const int nID) const;						// エントリー状況取得
 
+	// 静的メンバ関数
+	static CRetentionManager *Create(void);	// 生成
+	static HRESULT Release(CRetentionManager *&prRetentionManager);	// 破棄
+
 private:
 	// メンバ変数
-	EResult m_result;	// クリア状況
-	long m_nTime;		// 経過タイム
+	EKill m_stateKill;	// 討伐条件
+	EWin m_stateWin;	// 勝利条件
 	int m_nNumPlayer;	// プレイヤー数
 	bool m_aEntry[MAX_PLAYER];	// エントリー状況
 };
