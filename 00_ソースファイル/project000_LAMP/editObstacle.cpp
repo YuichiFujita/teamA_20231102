@@ -536,8 +536,12 @@ void CEditObstacle::InitAllColorObstacle(void)
 					continue;
 				}
 
-				// マテリアルを再設定
-				pObjCheck->ResetMaterial();
+				if (!pObjCheck->IsDeath())
+				{ // 死亡していない場合
+
+					// マテリアルを再設定
+					pObjCheck->ResetMaterial();
+				}
 
 				// 次のオブジェクトへのポインタを代入
 				pObjCheck = pObjectNext;

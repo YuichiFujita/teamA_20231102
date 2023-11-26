@@ -23,6 +23,24 @@
 class CEditStageManager
 {
 public:
+	// 角度列挙
+	enum EAngle
+	{
+		ANGLE_0 = 0,	// 角度：0度
+		ANGLE_90,		// 角度：90度
+		ANGLE_180,		// 角度：180度
+		ANGLE_270,		// 角度：270度
+		ANGLE_MAX		// この列挙型の総数
+	};
+
+	// 向き変更列挙
+	enum EState
+	{
+		STATE_PRESS = 0,	// プレス変更
+		STATE_TRIGGER,		// トリガー変更
+		STATE_MAX			// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CEditStageManager();
 
@@ -60,6 +78,8 @@ private:
 	CEditStage::EThing m_thing;	// 配置物
 	D3DXVECTOR3	m_pos;	// 位置
 	D3DXVECTOR3	m_rot;	// 向き
+	EAngle m_angle;		// 角度
+	EState m_state;		// 向き変更状態
 	float m_fMove;		// 位置移動量
 	bool m_bSave;		// 保存状況
 	bool m_bEdit;		// エディット状況

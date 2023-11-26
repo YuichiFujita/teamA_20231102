@@ -207,7 +207,8 @@ void CObjectModel::BindModel(const int nModelID)
 		m_modelData = *pModel->GetModel(nModelID);
 
 		// 元マテリアルの設定
-		SetOriginMaterial(m_modelData.pBuffMat, (int)m_modelData.dwNumMat);
+		if (FAILED(SetOriginMaterial(m_modelData.pBuffMat, (int)m_modelData.dwNumMat)))
+		{ assert(false); }	// 設定失敗
 	}
 	else { assert(false); }	// 範囲外
 }
@@ -237,7 +238,8 @@ void CObjectModel::BindModel(const char *pModelPass)
 		m_modelData = *pModel->GetModel(m_nModelID);
 
 		// 元マテリアルの設定
-		SetOriginMaterial(m_modelData.pBuffMat, (int)m_modelData.dwNumMat);
+		if (FAILED(SetOriginMaterial(m_modelData.pBuffMat, (int)m_modelData.dwNumMat)))
+		{ assert(false); }	// 設定失敗
 	}
 	else { assert(false); }	// モデルパス無し
 }
@@ -333,11 +335,16 @@ void CObjectModel::ResetMaterial(void)
 	pOriginMat = (D3DXMATERIAL*)m_modelData.pBuffMat->GetBufferPointer();
 
 	// 全マテリアルに初期マテリアルを再設定
-	for (int nCntMat = 0; nCntMat < (int)m_modelData.dwNumMat; nCntMat++)
-	{ // マテリアルの数分繰り返す
+	if (m_pMat != nullptr)
+	{ // 使用されている場合
 
-		m_pMat[nCntMat] = pOriginMat[nCntMat];
+		for (int nCntMat = 0; nCntMat < (int)m_modelData.dwNumMat; nCntMat++)
+		{ // マテリアルの数分繰り返す
+
+			m_pMat[nCntMat] = pOriginMat[nCntMat];
+		}
 	}
+	else { assert(false); }	// 非使用中
 }
 
 //============================================================

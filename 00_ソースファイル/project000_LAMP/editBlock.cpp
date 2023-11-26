@@ -103,7 +103,6 @@ HRESULT CEditBlock::Init(void)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 
 	// メンバ変数を初期化
 	m_pBlock		= NULL;					// ブロック情報
@@ -118,7 +117,7 @@ HRESULT CEditBlock::Init(void)
 	( // 引数
 		m_block.type,	// 種類
 		posEdit,		// 位置
-		rotEdit,		// 向き
+		VEC3_ZERO,		// 向き
 		m_block.size,	// 大きさ
 		m_block.partX,	// テクスチャ分割数X
 		m_block.partY,	// テクスチャ分割数Y
@@ -201,9 +200,6 @@ void CEditBlock::Update(void)
 
 	// 位置を反映
 	m_pBlock->SetVec3Position(pEdit->GetVec3Position());
-
-	// 向きを反映
-	m_pBlock->SetVec3Rotation(pEdit->GetVec3Rotation());
 
 #endif	// _DEBUG
 }
@@ -480,7 +476,6 @@ void CEditBlock::CreateBlock(void)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 	D3DXCOLOR colBlock = XCOL_WHITE;	// 色保存用
 
 	// ブロックを配置
@@ -508,7 +503,7 @@ void CEditBlock::CreateBlock(void)
 		( // 引数
 			m_block.type,	// 種類
 			posEdit,		// 位置
-			rotEdit,		// 向き
+			VEC3_ZERO,		// 向き
 			m_block.size,	// 大きさ
 			m_block.partX,	// テクスチャ分割数X
 			m_block.partY,	// テクスチャ分割数Y

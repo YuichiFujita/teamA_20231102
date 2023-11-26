@@ -104,7 +104,6 @@ HRESULT CEditGround::Init(void)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 
 	// メンバ変数を初期化
 	m_pGround		= NULL;					// 地盤情報
@@ -119,7 +118,7 @@ HRESULT CEditGround::Init(void)
 	( // 引数
 		m_ground.type,	// 種類
 		posEdit,		// 位置
-		rotEdit,		// 向き
+		VEC3_ZERO,		// 向き
 		m_ground.size,	// 大きさ
 		m_ground.partX,	// テクスチャ分割数X
 		m_ground.partY,	// テクスチャ分割数Y
@@ -202,9 +201,6 @@ void CEditGround::Update(void)
 
 	// 位置を反映
 	m_pGround->SetVec3Position(pEdit->GetVec3Position());
-
-	// 向きを反映
-	m_pGround->SetVec3Rotation(pEdit->GetVec3Rotation());
 
 #endif	// _DEBUG
 }
@@ -481,7 +477,6 @@ void CEditGround::CreateGround(void)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
 	D3DXCOLOR colGround = XCOL_WHITE;	// 色保存用
 
 	// 地盤を配置
@@ -509,7 +504,7 @@ void CEditGround::CreateGround(void)
 		( // 引数
 			m_ground.type,	// 種類
 			posEdit,		// 位置
-			rotEdit,		// 向き
+			VEC3_ZERO,		// 向き
 			m_ground.size,	// 大きさ
 			m_ground.partX,	// テクスチャ分割数X
 			m_ground.partY,	// テクスチャ分割数Y

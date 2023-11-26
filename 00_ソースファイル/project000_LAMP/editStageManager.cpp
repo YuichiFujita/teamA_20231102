@@ -60,6 +60,7 @@ namespace
 	const float CHANGE_MOVE = 10.0f;	// 配置物の移動量の変動量
 	const float MIN_MOVE	= 10.0f;	// 配置物の最小移動量
 	const float MAX_MOVE	= 200.0f;	// 配置物の最大移動量
+	const float ADDROT		= 0.05f;	// 配置物の回転量
 }
 
 //************************************************************
@@ -77,6 +78,8 @@ CEditStageManager::CEditStageManager()
 	m_thing		= CEditStage::THING_GROUND;	// 配置物
 	m_pos		= VEC3_ZERO;				// 位置
 	m_rot		= VEC3_ZERO;				// 向き
+	m_angle		= ANGLE_0;					// 角度
+	m_state		= STATE_PRESS;				// 向き変更状態
 	m_fMove		= 0.0f;						// 位置移動量
 	m_bSave		= false;					// 保存状況
 	m_bEdit		= false;					// エディット状況
@@ -105,6 +108,8 @@ HRESULT CEditStageManager::Init(void)
 	m_thing		= CEditStage::THING_GROUND;	// 配置物
 	m_pos		= VEC3_ZERO;				// 位置
 	m_rot		= VEC3_ZERO;				// 向き
+	m_angle		= ANGLE_0;					// 角度
+	m_state		= STATE_PRESS;				// 向き変更状態
 	m_fMove		= INIT_MOVE;				// 位置移動量
 	m_bSave		= false;					// 保存状況
 	m_bEdit		= false;					// エディット状況
@@ -516,13 +521,49 @@ void CEditStageManager::UpdateRotation(void)
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
 	// 向きを変更
-	if (m_pKeyboard->IsTrigger(KEY_ROTA_RIGHT))
+	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
 	{
-		m_rot.y += HALF_PI;
+		if (m_pKeyboard->IsPress(KEY_ROTA_RIGHT))
+		{
+			m_rot.y += ADDROT;
+
+			// 向き変更状態をPress状態にする
+			m_state = STATE_PRESS;
+		}
+		if (m_pKeyboard->IsPress(KEY_ROTA_LEFT))
+		{
+			m_rot.y -= ADDROT;
+
+			// 向き変更状態をPress状態にする
+			m_state = STATE_PRESS;
+		}
 	}
-	if (m_pKeyboard->IsTrigger(KEY_ROTA_LEFT))
+	else
 	{
-		m_rot.y -= HALF_PI;
+		if (m_pKeyboard->IsTrigger(KEY_ROTA_RIGHT))
+		{
+			// 角度を左回転
+			m_angle = (EAngle)((m_angle + (ANGLE_MAX - 1)) % ANGLE_MAX);
+
+			// 現在の角度から向きを計算
+			int nTemp = ((m_angle - 1) + (ANGLE_MAX - 1)) % ANGLE_MAX;
+			m_rot.y = ((float)nTemp * HALF_PI) - D3DX_PI;
+
+			// 向き変更状態をTrigger状態にする
+			m_state = STATE_TRIGGER;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_ROTA_LEFT))
+		{
+			// 角度を右回転
+			m_angle = (EAngle)((m_angle + 1) % ANGLE_MAX);
+
+			// 現在の角度から向きを計算
+			int nTemp = ((m_angle - 1) + (ANGLE_MAX - 1)) % ANGLE_MAX;
+			m_rot.y = ((float)nTemp * HALF_PI) - D3DX_PI;
+
+			// 向き変更状態をTrigger状態にする
+			m_state = STATE_TRIGGER;
+		}
 	}
 
 	// 向きを正規化
