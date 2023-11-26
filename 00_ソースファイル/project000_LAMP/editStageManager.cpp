@@ -193,6 +193,44 @@ void CEditStageManager::UnSave(void)
 }
 
 //============================================================
+//	エディット状況の切替処理
+//============================================================
+void CEditStageManager::SwitchEnableEdit(void)
+{
+	// エディット状況を反転
+	m_bEdit = !m_bEdit;
+
+	if (m_bEdit)
+	{ // エディットONの場合
+
+		// エディットステージの生成
+		if (m_pStage == NULL)
+		{ // エディットステージが使用されていない場合
+
+			m_pStage = CEditStage::Create(this, m_thing);
+			assert(m_pStage != NULL);	// 生成失敗
+		}
+
+		// 情報読込
+		m_pStage->LoadInfo();
+	}
+	else
+	{ // エディットOFFの場合
+
+		// 情報保存
+		m_pStage->SaveInfo();
+
+		// エディットステージの破棄
+		if (m_pStage != NULL)
+		{ // エディットステージが使用されている場合
+
+			HRESULT hr = CEditStage::Release(m_pStage);
+			assert(hr != E_FAIL);	// 破棄失敗
+		}
+	}
+}
+
+//============================================================
 //	エディット状況の設定処理
 //============================================================
 void CEditStageManager::SetEnableEdit(const bool bEdit)

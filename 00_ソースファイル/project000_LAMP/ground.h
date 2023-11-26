@@ -51,7 +51,10 @@ public:
 		const EType type,			// 種類
 		const D3DXVECTOR3& rPos,	// 位置
 		const D3DXVECTOR3& rRot,	// 向き
-		const D3DXVECTOR3& rSize	// 大きさ
+		const D3DXVECTOR3& rSize,	// 大きさ
+		const D3DXVECTOR2& rTexPartX = VEC2_ONE,	// テクスチャ分割数X
+		const D3DXVECTOR2& rTexPartY = VEC2_ONE,	// テクスチャ分割数Y
+		const D3DXVECTOR2& rTexPartZ = VEC2_ONE		// テクスチャ分割数Z
 	);
 
 private:

@@ -115,7 +115,16 @@ HRESULT CEditGround::Init(void)
 	m_ground.partZ	= VEC2_ONE;				// テクスチャ分割数Z
 
 	// 地盤の生成
-	m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, m_ground.size);
+	m_pGround = CGround::Create
+	( // 引数
+		m_ground.type,	// 種類
+		posEdit,		// 位置
+		rotEdit,		// 向き
+		m_ground.size,	// 大きさ
+		m_ground.partX,	// テクスチャ分割数X
+		m_ground.partY,	// テクスチャ分割数Y
+		m_ground.partZ	// テクスチャ分割数Z
+	);
 	if (m_pGround == NULL)
 	{ // 生成に失敗した場合
 
@@ -307,6 +316,9 @@ void CEditGround::Save(FILE *pFile)
 					D3DXVECTOR3 posGround = pObjCheck->GetVec3Position();	// 位置
 					D3DXVECTOR3 rotGround = pObjCheck->GetVec3Rotation();	// 向き
 					D3DXVECTOR3 sizeGround = pObjCheck->GetVec3Sizing();	// 大きさ
+					D3DXVECTOR2 partTexXGround = pObjCheck->GetTexturePatternX();	// テクスチャ分割X
+					D3DXVECTOR2 partTexYGround = pObjCheck->GetTexturePatternY();	// テクスチャ分割Y
+					D3DXVECTOR2 partTexZGround = pObjCheck->GetTexturePatternZ();	// テクスチャ分割Z
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
@@ -315,6 +327,9 @@ void CEditGround::Save(FILE *pFile)
 					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posGround.x, posGround.y, posGround.z);
 					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotGround.x, rotGround.y, rotGround.z);
 					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeGround.x, sizeGround.y, sizeGround.z);
+					fprintf(pFile, "		PARTX = %.2f %.2f \n", partTexXGround.x, partTexXGround.y);
+					fprintf(pFile, "		PARTY = %.2f %.2f \n", partTexYGround.x, partTexYGround.y);
+					fprintf(pFile, "		PARTZ = %.2f %.2f \n", partTexZGround.x, partTexZGround.y);
 					fprintf(pFile, "	END_GROUNDSET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
@@ -490,7 +505,16 @@ void CEditGround::CreateGround(void)
 		//	新しい地盤の生成
 		//----------------------------------------------------
 		// 地盤の生成
-		m_pGround = CGround::Create(m_ground.type, posEdit, rotEdit, m_ground.size);
+		m_pGround = m_pGround = CGround::Create
+		( // 引数
+			m_ground.type,	// 種類
+			posEdit,		// 位置
+			rotEdit,		// 向き
+			m_ground.size,	// 大きさ
+			m_ground.partX,	// テクスチャ分割数X
+			m_ground.partY,	// テクスチャ分割数Y
+			m_ground.partZ	// テクスチャ分割数Z
+		);
 		assert(m_pGround != NULL);
 
 		// 色を設定

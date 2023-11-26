@@ -34,6 +34,7 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void UnSave(void);	// 未保存設定
+	void SwitchEnableEdit(void);				// エディット状況切替
 	void SetEnableEdit(const bool bEdit);		// エディット状況設定
 	bool IsEdit(void) const;					// エディット状況取得
 	D3DXVECTOR3 GetVec3Position(void) const;	// 位置取得

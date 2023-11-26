@@ -123,6 +123,7 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+
 	void SetVec3Position(const D3DXVECTOR3& rPos) override;	// 位置設定
 	D3DXVECTOR3 GetVec3Position(void) const override;		// 位置取得
 	void SetVec3Rotation(const D3DXVECTOR3& rRot) override;	// 向き設定
@@ -132,6 +133,13 @@ public:
 	void SetColor(const D3DXCOLOR& rCol) override;			// キューブ色設定
 	D3DXCOLOR GetColor(void) const override;				// キューブ色取得
 	D3DXMATRIX *GetPtrMtxWorld(void) override;				// マトリックスポインタ取得
+
+	void SetTexturePatternX(const D3DXVECTOR2& rTexPart) override;	// テクスチャ分割数X設定
+	D3DXVECTOR2 GetTexturePatternX(void) const override;			// テクスチャ分割数X取得
+	void SetTexturePatternY(const D3DXVECTOR2& rTexPart) override;	// テクスチャ分割数Y設定
+	D3DXVECTOR2 GetTexturePatternY(void) const override;			// テクスチャ分割数Y取得
+	void SetTexturePatternZ(const D3DXVECTOR2& rTexPart) override;	// テクスチャ分割数Z設定
+	D3DXVECTOR2 GetTexturePatternZ(void) const override;			// テクスチャ分割数Z取得
 
 	// 静的メンバ関数
 	static CObjectMeshCube *Create		// 生成
@@ -146,9 +154,9 @@ public:
 		const ETexState texState,		// テクスチャ状態
 		const SFaceTex& rTexID,			// テクスチャ種類
 		const EOrigin origin = ORIGIN_CENTER,		// 原点
-		const D3DXVECTOR2& rTexPartX = VEC2_ONE,	// テクスチャ分割数 x
-		const D3DXVECTOR2& rTexPartY = VEC2_ONE,	// テクスチャ分割数 y
-		const D3DXVECTOR2& rTexPartZ = VEC2_ONE,	// テクスチャ分割数 z
+		const D3DXVECTOR2& rTexPartX = VEC2_ONE,	// テクスチャ分割数X
+		const D3DXVECTOR2& rTexPartY = VEC2_ONE,	// テクスチャ分割数Y
+		const D3DXVECTOR2& rTexPartZ = VEC2_ONE,	// テクスチャ分割数Z
 		const D3DCULL cull = D3DCULL_CCW,			// カリング状況
 		const bool bLight = true					// ライティング状況
 	);
@@ -163,13 +171,6 @@ public:
 	float GetBorderThick(void) const;					// 縁取り太さ取得
 	void SetTextureState(const ETexState texState);		// テクスチャ状態設定
 	ETexState GetTextureState(void) const;				// テクスチャ状態取得
-
-	void SetTexturePatternX(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数 x設定
-	D3DXVECTOR2 GetTexturePatternX(void) const;				// テクスチャ分割数 x取得
-	void SetTexturePatternY(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数 y設定
-	D3DXVECTOR2 GetTexturePatternY(void) const;				// テクスチャ分割数 y取得
-	void SetTexturePatternZ(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数 z設定
-	D3DXVECTOR2 GetTexturePatternZ(void) const;				// テクスチャ分割数 z取得
 
 	void SetOrigin(const EOrigin origin);	// 原点設定
 	EOrigin GetOrigin(void) const;			// 原点取得

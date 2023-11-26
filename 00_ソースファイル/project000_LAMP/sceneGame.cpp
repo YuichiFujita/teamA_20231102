@@ -236,8 +236,8 @@ void CSceneGame::Update(void)
 
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
 	{
-		// エディット状況を反転
-		CGameManager::GetEditStage()->SetEnableEdit(!CGameManager::GetEditStage()->IsEdit());
+		// エディット状況の切替
+		CGameManager::GetEditStage()->SwitchEnableEdit();
 	}
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F3))
 	{

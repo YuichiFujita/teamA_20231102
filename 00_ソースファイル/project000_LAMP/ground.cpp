@@ -102,15 +102,6 @@ HRESULT CGround::Init(void)
 	// テクスチャの状態を設定
 	SetTextureState(CObjectMeshCube::TEXSTATE_SELECT);
 
-	// テクスチャの分割数Xを設定
-	SetTexturePatternX(VEC2_ONE);
-
-	// テクスチャの分割数Yを設定
-	SetTexturePatternY(VEC2_ONE);
-
-	// テクスチャの分割数Zを設定
-	SetTexturePatternZ(VEC2_ONE);
-
 	// カリングを設定
 	SetCulling(D3DCULL_CCW);
 
@@ -201,10 +192,13 @@ int CGround::GetType(void) const
 //============================================================
 CGround *CGround::Create
 (
-	const EType type,			// 種類
-	const D3DXVECTOR3& rPos,	// 位置
-	const D3DXVECTOR3& rRot,	// 向き
-	const D3DXVECTOR3& rSize	// 大きさ
+	const EType type,				// 種類
+	const D3DXVECTOR3& rPos,		// 位置
+	const D3DXVECTOR3& rRot,		// 向き
+	const D3DXVECTOR3& rSize,		// 大きさ
+	const D3DXVECTOR2& rTexPartX,	// テクスチャ分割数X
+	const D3DXVECTOR2& rTexPartY,	// テクスチャ分割数Y
+	const D3DXVECTOR2& rTexPartZ	// テクスチャ分割数Z
 )
 {
 	// ポインタを宣言
@@ -244,6 +238,15 @@ CGround *CGround::Create
 
 		// 大きさを設定
 		pGround->SetVec3Sizing(rSize);
+
+		// テクスチャの分割数Xを設定
+		pGround->SetTexturePatternX(rTexPartX);
+
+		// テクスチャの分割数Yを設定
+		pGround->SetTexturePatternY(rTexPartY);
+
+		// テクスチャの分割数Zを設定
+		pGround->SetTexturePatternZ(rTexPartZ);
 
 		// 確保したアドレスを返す
 		return pGround;

@@ -96,24 +96,25 @@ public:
 	virtual void BindTexture(const char *pTexturePass);	// テクスチャ割当 (パス)
 	virtual void BindModel(const int nModelID);			// モデル割当 (インデックス)
 	virtual void BindModel(const char *pModelPass);		// モデル割当 (パス)
-	virtual void SetIndex(const int nIndex);			// インデックス設定
-	virtual int GetIndex(void) const;					// インデックス取得
-	virtual void SetState(const int nState);			// 状態設定
-	virtual int GetState(void) const;					// 状態取得
-	virtual void SetType(const int nType);				// 種類設定
-	virtual int GetType(void) const;					// 種類取得
-	virtual void SetDodge(const int nDodge);			// 回避法設定
-	virtual int GetDodge(void) const;					// 回避法取得
-	virtual void SetAngle(const float fAngle);			// 角度設定
-	virtual float GetAngle(void) const;					// 角度取得
-	virtual void SetLength(const float fLength);		// 長さ設定
-	virtual float GetLength(void) const;				// 長さ取得
-	virtual void SetRadius(const float fRadius);		// 半径設定
-	virtual float GetRadius(void) const;				// 半径取得
-	virtual void SetHeight(const float fHeight);		// 縦幅設定
-	virtual float GetHeight(void) const;				// 縦幅取得
-	virtual void SetScale(const float fScale);			// 拡大率設定
-	virtual float GetScale(void) const;					// 拡大率取得
+
+	virtual void SetIndex(const int nIndex);		// インデックス設定
+	virtual int GetIndex(void) const;				// インデックス取得
+	virtual void SetState(const int nState);		// 状態設定
+	virtual int GetState(void) const;				// 状態取得
+	virtual void SetType(const int nType);			// 種類設定
+	virtual int GetType(void) const;				// 種類取得
+	virtual void SetDodge(const int nDodge);		// 回避法設定
+	virtual int GetDodge(void) const;				// 回避法取得
+	virtual void SetAngle(const float fAngle);		// 角度設定
+	virtual float GetAngle(void) const;				// 角度取得
+	virtual void SetLength(const float fLength);	// 長さ設定
+	virtual float GetLength(void) const;			// 長さ取得
+	virtual void SetRadius(const float fRadius);	// 半径設定
+	virtual float GetRadius(void) const;			// 半径取得
+	virtual void SetHeight(const float fHeight);	// 縦幅設定
+	virtual float GetHeight(void) const;			// 縦幅取得
+	virtual void SetScale(const float fScale);		// 拡大率設定
+	virtual float GetScale(void) const;				// 拡大率取得
 
 	virtual void SetVec2Position(const D3DXVECTOR2& rPos);	// 二軸の位置設定
 	virtual D3DXVECTOR2 GetVec2Position(void) const;		// 二軸の位置取得
@@ -132,11 +133,18 @@ public:
 	virtual void SetAllMaterial(const D3DXMATERIAL& rMat);	// マテリアル全設定
 	virtual void ResetMaterial(void);						// マテリアル再設定
 
+	virtual void SetTexturePatternX(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数X設定
+	virtual D3DXVECTOR2 GetTexturePatternX(void) const;				// テクスチャ分割数X取得
+	virtual void SetTexturePatternY(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数Y設定
+	virtual D3DXVECTOR2 GetTexturePatternY(void) const;				// テクスチャ分割数Y取得
+	virtual void SetTexturePatternZ(const D3DXVECTOR2& rTexPart);	// テクスチャ分割数Z設定
+	virtual D3DXVECTOR2 GetTexturePatternZ(void) const;				// テクスチャ分割数Z取得
+
 	virtual void SetPriority(const int nPriority);			// 優先順位設定
 	virtual void SetEnableUpdate(const bool bUpdate);		// 更新状況設定
 	virtual void SetEnableDraw(const bool bDraw);			// 描画状況設定
 	virtual void SetEnableDepthShadow(const bool bShadow);	// 影表示状況設定
-	virtual void SetEnableZTex(const bool bZTex);	// 影表示状況設定
+	virtual void SetEnableZTex(const bool bZTex);			// Zテクスチャ書込設定
 	virtual D3DXMATRIX *GetPtrMtxWorld(void);				// マトリックスポインタ取得
 	virtual D3DXMATRIX GetMtxWorld(void) const;				// マトリックス取得
 
@@ -158,7 +166,7 @@ public:
 	bool	IsDraw(void) const;			// 描画状況取得
 	bool	IsDeath(void) const;		// 死亡フラグ取得
 	bool	IsShadow(void) const;		// 影表示状況取得
-	bool	IsZTex(void) const;		// Z描画状況取得
+	bool	IsZTex(void) const;			// Z描画状況取得
 	CObject	*GetObject(void);			// オブジェクト取得
 	CObject	*GetPrev(void) const;		// 前オブジェクト取得
 	CObject	*GetNext(void) const;		// 次オブジェクト取得

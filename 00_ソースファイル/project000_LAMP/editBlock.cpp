@@ -114,7 +114,16 @@ HRESULT CEditBlock::Init(void)
 	m_block.partZ	= VEC2_ONE;				// テクスチャ分割数Z
 
 	// ブロックの生成
-	m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, m_block.size);
+	m_pBlock = CBlock::Create
+	( // 引数
+		m_block.type,	// 種類
+		posEdit,		// 位置
+		rotEdit,		// 向き
+		m_block.size,	// 大きさ
+		m_block.partX,	// テクスチャ分割数X
+		m_block.partY,	// テクスチャ分割数Y
+		m_block.partZ	// テクスチャ分割数Z
+	);
 	if (m_pBlock == NULL)
 	{ // 生成に失敗した場合
 
@@ -303,9 +312,12 @@ void CEditBlock::Save(FILE *pFile)
 					}
 
 					// ブロックの情報を取得
-					D3DXVECTOR3 posBlock = pObjCheck->GetVec3Position();	// 位置
-					D3DXVECTOR3 rotBlock = pObjCheck->GetVec3Rotation();	// 向き
-					D3DXVECTOR3 sizeBlock = pObjCheck->GetVec3Sizing();		// 大きさ
+					D3DXVECTOR3 posBlock		= pObjCheck->GetVec3Position();		// 位置
+					D3DXVECTOR3 rotBlock		= pObjCheck->GetVec3Rotation();		// 向き
+					D3DXVECTOR3 sizeBlock		= pObjCheck->GetVec3Sizing();		// 大きさ
+					D3DXVECTOR2 partTexXBlock	= pObjCheck->GetTexturePatternX();	// テクスチャ分割X
+					D3DXVECTOR2 partTexYBlock	= pObjCheck->GetTexturePatternY();	// テクスチャ分割Y
+					D3DXVECTOR2 partTexZBlock	= pObjCheck->GetTexturePatternZ();	// テクスチャ分割Z
 					int nType = pObjCheck->GetType();	// 種類
 	
 					// 情報を書き出し
@@ -314,6 +326,9 @@ void CEditBlock::Save(FILE *pFile)
 					fprintf(pFile, "		POS = %.2f %.2f %.2f\n", posBlock.x, posBlock.y, posBlock.z);
 					fprintf(pFile, "		ROT = %.2f %.2f %.2f\n", rotBlock.x, rotBlock.y, rotBlock.z);
 					fprintf(pFile, "		SIZE = %.2f %.2f %.2f\n", sizeBlock.x, sizeBlock.y, sizeBlock.z);
+					fprintf(pFile, "		PARTX = %.2f %.2f \n", partTexXBlock.x, partTexXBlock.y);
+					fprintf(pFile, "		PARTY = %.2f %.2f \n", partTexYBlock.x, partTexYBlock.y);
+					fprintf(pFile, "		PARTZ = %.2f %.2f \n", partTexZBlock.x, partTexZBlock.y);
 					fprintf(pFile, "	END_BLOCKSET\n\n");
 
 					// 次のオブジェクトへのポインタを代入
@@ -489,7 +504,16 @@ void CEditBlock::CreateBlock(void)
 		//	新しいブロックの生成
 		//----------------------------------------------------
 		// ブロックの生成
-		m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, m_block.size);
+		m_pBlock = m_pBlock = CBlock::Create
+		( // 引数
+			m_block.type,	// 種類
+			posEdit,		// 位置
+			rotEdit,		// 向き
+			m_block.size,	// 大きさ
+			m_block.partX,	// テクスチャ分割数X
+			m_block.partY,	// テクスチャ分割数Y
+			m_block.partZ	// テクスチャ分割数Z
+		);
 		assert(m_pBlock != NULL);
 
 		// 色を設定
