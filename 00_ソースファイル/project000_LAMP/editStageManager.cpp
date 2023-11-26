@@ -49,27 +49,12 @@
 #define KEY_ROTA_LEFT	(DIK_C)	// 左回転キー
 #define NAME_ROTA_LEFT	("C")	// 左回転表示
 
-//#define KEY_UP_SCALE_X		(DIK_R)	// X軸拡大キー
-//#define NAME_UP_SCALE_X		("R")	// X軸拡大表示
-//#define KEY_DOWN_SCALE_X	(DIK_F)	// X軸縮小キー
-//#define NAME_DOWN_SCALE_X	("F")	// X軸縮小表示
-//#define KEY_UP_SCALE_Y		(DIK_T)	// Y軸拡大キー
-//#define NAME_UP_SCALE_Y		("T")	// Y軸拡大表示
-//#define KEY_DOWN_SCALE_Y	(DIK_G)	// Y軸縮小キー
-//#define NAME_DOWN_SCALE_Y	("G")	// Y軸縮小表示
-//#define KEY_UP_SCALE_Z		(DIK_Y)	// Z軸拡大キー
-//#define NAME_UP_SCALE_Z		("Y")	// Z軸拡大表示
-//#define KEY_DOWN_SCALE_Z	(DIK_H)	// Z軸縮小キー
-//#define NAME_DOWN_SCALE_Z	("H")	// Z軸縮小表示
-
 //************************************************************
 //	定数宣言
 //************************************************************
 namespace
 {
 	const char* SAVE_TXT	= "data\\TXT\\save_stage.txt";	// ステージセーブテキスト
-
-	const D3DXVECTOR3 INIT_SIZE = D3DXVECTOR3(50.0f, 50.0f, 50.0f);	// 大きさ
 
 	const float INIT_MOVE	= 40.0f;	// 配置物の初期移動量
 	const float CHANGE_MOVE = 10.0f;	// 配置物の移動量の変動量
@@ -92,7 +77,6 @@ CEditStageManager::CEditStageManager()
 	m_thing		= CEditStage::THING_GROUND;	// 配置物
 	m_pos		= VEC3_ZERO;				// 位置
 	m_rot		= VEC3_ZERO;				// 向き
-	m_size		= VEC3_ZERO;				// 大きさ
 	m_fMove		= 0.0f;						// 位置移動量
 	m_bSave		= false;					// 保存状況
 	m_bEdit		= false;					// エディット状況
@@ -121,7 +105,6 @@ HRESULT CEditStageManager::Init(void)
 	m_thing		= CEditStage::THING_GROUND;	// 配置物
 	m_pos		= VEC3_ZERO;				// 位置
 	m_rot		= VEC3_ZERO;				// 向き
-	m_size		= INIT_SIZE;				// 大きさ
 	m_fMove		= INIT_MOVE;				// 位置移動量
 	m_bSave		= false;					// 保存状況
 	m_bEdit		= false;					// エディット状況
@@ -179,9 +162,6 @@ void CEditStageManager::Update(void)
 
 	// 向きの更新
 	UpdateRotation();
-
-	// 大きさの更新
-	UpdateSizing();
 
 	if (m_pStage != NULL)
 	{ // エディットステージが使用されている場合
@@ -269,15 +249,6 @@ D3DXVECTOR3 CEditStageManager::GetVec3Rotation(void) const
 {
 	// 向きを返す
 	return m_rot;
-}
-
-//============================================================
-//	大きさ取得処理
-//============================================================
-D3DXVECTOR3 CEditStageManager::GetVec3Sizing(void) const
-{
-	// 大きさを返す
-	return m_size;
 }
 
 //============================================================
@@ -521,73 +492,6 @@ void CEditStageManager::UpdateRotation(void)
 }
 
 //============================================================
-//	大きさの更新処理
-//============================================================
-void CEditStageManager::UpdateSizing(void)
-{
-	// ポインタを宣言
-	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
-
-#if 0
-	// 大きさを変更
-	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
-	{
-		if (m_pKeyboard->IsPress(KEY_UP_SCALE_X))
-		{
-			m_size.x += m_fMove;
-		}
-		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_X))
-		{
-			m_size.x -= m_fMove;
-		}
-		if (m_pKeyboard->IsPress(KEY_UP_SCALE_Y))
-		{
-			m_size.y += m_fMove;
-		}
-		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_Y))
-		{
-			m_size.y -= m_fMove;
-		}
-		if (m_pKeyboard->IsPress(KEY_UP_SCALE_Z))
-		{
-			m_size.z += m_fMove;
-		}
-		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_Z))
-		{
-			m_size.z -= m_fMove;
-		}
-	}
-	else
-	{
-		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_X))
-		{
-			m_size.x += m_fMove;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_X))
-		{
-			m_size.x -= m_fMove;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_Y))
-		{
-			m_size.y += m_fMove;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_Y))
-		{
-			m_size.y -= m_fMove;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_Z))
-		{
-			m_size.z += m_fMove;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_Z))
-		{
-			m_size.z -= m_fMove;
-		}
-	}
-#endif
-}
-
-//============================================================
 //	操作表示の描画処理
 //============================================================
 void CEditStageManager::DrawDebugControl(void)
@@ -629,10 +533,9 @@ void CEditStageManager::DrawDebugInfo(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "======================================\n");
 	pDebug->Print(CDebugProc::POINT_RIGHT, (m_bSave) ? "保存済：[保存状況]\n" : "未保存：[保存状況]\n");
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%s：[配置物]\n", apThing[m_thing]);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f：[移動量]\n", m_fMove);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[位置]\n", m_pos.x, m_pos.y, m_pos.z);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[向き]\n", m_rot.x, m_rot.y, m_rot.z);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[大きさ]\n", m_size.x, m_size.y, m_size.z);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f：[移動量]\n", m_fMove);
 
 	if (m_pStage != NULL)
 	{ // エディットステージが使用されている場合

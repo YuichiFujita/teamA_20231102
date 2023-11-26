@@ -179,11 +179,11 @@ void CEditGround::Update(void)
 	// 大きさの更新
 	UpdateSizing();
 
-	// 種類変更の更新
-	UpdateChangeType();
-
 	// テクスチャ分割の更新
 	UpdateTexPart();
+
+	// 種類変更の更新
+	UpdateChangeType();
 
 	// 地盤の生成
 	CreateGround();
@@ -404,24 +404,6 @@ void CEditGround::UpdateSizing(void)
 }
 
 //============================================================
-//	種類変更の更新処理
-//============================================================
-void CEditGround::UpdateChangeType(void)
-{
-	// ポインタを宣言
-	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
-
-	// 種類を変更
-	if (m_pKeyboard->IsTrigger(KEY_TYPE))
-	{
-		m_ground.type = (CGround::EType)((m_ground.type + 1) % CGround::TYPE_MAX);
-	}
-
-	// 種類を反映
-	m_pGround->SetType(m_ground.type);
-}
-
-//============================================================
 //	テクスチャ分割の更新処理
 //============================================================
 void CEditGround::UpdateTexPart(void)
@@ -446,6 +428,24 @@ void CEditGround::UpdateTexPart(void)
 	m_pGround->SetTexturePatternX(m_ground.partX);
 	m_pGround->SetTexturePatternY(m_ground.partY);
 	m_pGround->SetTexturePatternZ(m_ground.partZ);
+}
+
+//============================================================
+//	種類変更の更新処理
+//============================================================
+void CEditGround::UpdateChangeType(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 種類を変更
+	if (m_pKeyboard->IsTrigger(KEY_TYPE))
+	{
+		m_ground.type = (CGround::EType)((m_ground.type + 1) % CGround::TYPE_MAX);
+	}
+
+	// 種類を反映
+	m_pGround->SetType(m_ground.type);
 }
 
 //============================================================

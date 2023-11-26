@@ -30,25 +30,27 @@
 #define KEY_TYPE		(DIK_2)	// 種類変更キー
 #define NAME_TYPE		("2")	// 種類変更表示
 
-#define KEY_UP_TEXPART_X	(DIK_U)	// テクスチャ分割X拡大キー
-#define NAME_UP_TEXPART_X	("U")	// テクスチャ分割X拡大表示
-#define KEY_DOWN_TEXPART_X	(DIK_J)	// テクスチャ分割X縮小キー
-#define NAME_DOWN_TEXPART_X	("J")	// テクスチャ分割X縮小表示
-#define KEY_UP_TEXPART_Y	(DIK_I)	// テクスチャ分割Y拡大キー
-#define NAME_UP_TEXPART_Y	("I")	// テクスチャ分割Y拡大表示
-#define KEY_DOWN_TEXPART_Y	(DIK_K)	// テクスチャ分割Y縮小キー
-#define NAME_DOWN_TEXPART_Y	("K")	// テクスチャ分割Y縮小表示
-#define KEY_UP_TEXPART_Z	(DIK_O)	// テクスチャ分割Z拡大キー
-#define NAME_UP_TEXPART_Z	("O")	// テクスチャ分割Z拡大表示
-#define KEY_DOWN_TEXPART_Z	(DIK_L)	// テクスチャ分割Z縮小キー
-#define NAME_DOWN_TEXPART_Z	("L")	// テクスチャ分割Z縮小表示
+#define KEY_UP_SCALE_X		(DIK_T)	// X軸拡大キー
+#define NAME_UP_SCALE_X		("T")	// X軸拡大表示
+#define KEY_DOWN_SCALE_X	(DIK_G)	// X軸縮小キー
+#define NAME_DOWN_SCALE_X	("G")	// X軸縮小表示
+#define KEY_UP_SCALE_Y		(DIK_Y)	// Y軸拡大キー
+#define NAME_UP_SCALE_Y		("Y")	// Y軸拡大表示
+#define KEY_DOWN_SCALE_Y	(DIK_H)	// Y軸縮小キー
+#define NAME_DOWN_SCALE_Y	("H")	// Y軸縮小表示
+#define KEY_UP_SCALE_Z		(DIK_U)	// Z軸拡大キー
+#define NAME_UP_SCALE_Z		("U")	// Z軸拡大表示
+#define KEY_DOWN_SCALE_Z	(DIK_J)	// Z軸縮小キー
+#define NAME_DOWN_SCALE_Z	("J")	// Z軸縮小表示
 
 //************************************************************
 //	定数宣言
 //************************************************************
 namespace
 {
-	const float	INIT_ALPHA = 0.5f;	// 配置前のα値
+	const D3DXVECTOR3 INIT_SIZE = D3DXVECTOR3(50.0f, 50.0f, 50.0f);	// 大きさ
+	const float	MAX_SIZE	= 10000.0f;	// 最大の大きさ
+	const float	INIT_ALPHA	= 0.5f;		// 配置前のα値
 }
 
 //************************************************************
@@ -102,17 +104,17 @@ HRESULT CEditBlock::Init(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	// メンバ変数を初期化
 	m_pBlock		= NULL;					// ブロック情報
 	m_block.type	= CBlock::TYPE_STONE;	// ブロック種類
+	m_block.size	= INIT_SIZE;			// 大きさ
 	m_block.partX	= VEC2_ONE;				// テクスチャ分割数X
 	m_block.partY	= VEC2_ONE;				// テクスチャ分割数Y
 	m_block.partZ	= VEC2_ONE;				// テクスチャ分割数Z
 
 	// ブロックの生成
-	m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, sizeEdit);
+	m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, m_block.size);
 	if (m_pBlock == NULL)
 	{ // 生成に失敗した場合
 
@@ -173,11 +175,14 @@ void CEditBlock::Update(void)
 		return;
 	}
 
-	// 種類変更の更新
-	UpdateChangeType();
+	// 大きさの更新
+	UpdateSizing();
 
 	// テクスチャ分割の更新
 	UpdateTexPart();
+
+	// 種類変更の更新
+	UpdateChangeType();
 
 	// ブロックの生成
 	CreateBlock();
@@ -191,9 +196,6 @@ void CEditBlock::Update(void)
 	// 向きを反映
 	m_pBlock->SetVec3Rotation(pEdit->GetVec3Rotation());
 
-	// 大きさを反映
-	m_pBlock->SetVec3Sizing(pEdit->GetVec3Sizing());
-
 #endif	// _DEBUG
 }
 
@@ -205,8 +207,8 @@ void CEditBlock::DrawDebugControl(void)
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
+	pDebug->Print(CDebugProc::POINT_RIGHT, "大きさ：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Y, NAME_DOWN_SCALE_Y, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s]\n", NAME_TYPE);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "テクスチャ分割：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_UP_TEXPART_X, NAME_DOWN_TEXPART_X, NAME_UP_TEXPART_Y, NAME_DOWN_TEXPART_Y, NAME_UP_TEXPART_Z, NAME_DOWN_TEXPART_Z, NAME_REVERSE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "削除：[%s]\n", NAME_RELEASE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "設置：[%s]\n", NAME_CREATE);
 }
@@ -220,6 +222,7 @@ void CEditBlock::DrawDebugInfo(void)
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_block.type);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[大きさ]\n", m_block.size.x, m_block.size.y, m_block.size.z);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割X]\n", m_block.partX.x, m_block.partX.y);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Y]\n", m_block.partY.x, m_block.partY.y);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f：[テクスチャ分割Z]\n", m_block.partZ.x, m_block.partZ.y);
@@ -327,6 +330,106 @@ void CEditBlock::Save(FILE *pFile)
 }
 
 //============================================================
+//	大きさの更新処理
+//============================================================
+void CEditBlock::UpdateSizing(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 大きさを変更
+	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
+	{
+		if (m_pKeyboard->IsPress(KEY_UP_SCALE_X))
+		{
+			m_block.size.x += INIT_SIZE.x;
+		}
+		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_X))
+		{
+			m_block.size.x -= INIT_SIZE.x;
+		}
+		if (m_pKeyboard->IsPress(KEY_UP_SCALE_Y))
+		{
+			m_block.size.y += INIT_SIZE.y;
+		}
+		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_Y))
+		{
+			m_block.size.y -= INIT_SIZE.y;
+		}
+		if (m_pKeyboard->IsPress(KEY_UP_SCALE_Z))
+		{
+			m_block.size.z += INIT_SIZE.z;
+		}
+		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_Z))
+		{
+			m_block.size.z -= INIT_SIZE.z;
+		}
+	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_X))
+		{
+			m_block.size.x += INIT_SIZE.x;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_X))
+		{
+			m_block.size.x -= INIT_SIZE.x;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_Y))
+		{
+			m_block.size.y += INIT_SIZE.y;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_Y))
+		{
+			m_block.size.y -= INIT_SIZE.y;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_Z))
+		{
+			m_block.size.z += INIT_SIZE.z;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_Z))
+		{
+			m_block.size.z -= INIT_SIZE.z;
+		}
+	}
+
+	// 大きさを補正
+	useful::LimitNum(m_block.size.x, INIT_SIZE.x, MAX_SIZE);
+	useful::LimitNum(m_block.size.y, INIT_SIZE.y, MAX_SIZE);
+	useful::LimitNum(m_block.size.z, INIT_SIZE.z, MAX_SIZE);
+
+	// 大きさを反映
+	m_pBlock->SetVec3Sizing(m_block.size);
+}
+
+//============================================================
+//	テクスチャ分割の更新処理
+//============================================================
+void CEditBlock::UpdateTexPart(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 partTex = VEC3_ZERO;	// テクスチャ分割数
+
+	// 分割数を設定
+	partTex.x = m_block.size.x / INIT_SIZE.x;
+	partTex.y = m_block.size.y / INIT_SIZE.y;
+	partTex.z = m_block.size.z / INIT_SIZE.z;
+
+	// テクスチャ分割数を設定
+	m_block.partX.x = partTex.z;
+	m_block.partX.y = partTex.y;
+	m_block.partY.x = partTex.x;
+	m_block.partY.y = partTex.z;
+	m_block.partZ.x = partTex.x;
+	m_block.partZ.y = partTex.y;
+
+	// テクスチャ分割数を割当
+	m_pBlock->SetTexturePatternX(m_block.partX);
+	m_pBlock->SetTexturePatternY(m_block.partY);
+	m_pBlock->SetTexturePatternZ(m_block.partZ);
+}
+
+//============================================================
 //	種類変更の更新処理
 //============================================================
 void CEditBlock::UpdateChangeType(void)
@@ -342,76 +445,6 @@ void CEditBlock::UpdateChangeType(void)
 
 	// 種類を反映
 	m_pBlock->SetType(m_block.type);
-}
-
-//============================================================
-//	テクスチャ分割の更新処理
-//============================================================
-void CEditBlock::UpdateTexPart(void)
-{
-	// ポインタを宣言
-	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
-
-	// テクスチャ分割を変更
-	if (!m_pKeyboard->IsPress(KEY_REVERSE))
-	{
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
-		{
-			m_block.partX.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
-		{
-			m_block.partX.y += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
-		{
-			m_block.partY.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
-		{
-			m_block.partY.y += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
-		{
-			m_block.partZ.x += 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
-		{
-			m_block.partZ.y += 1.0f;
-		}
-	}
-	else
-	{
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_X))
-		{
-			m_block.partX.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_X))
-		{
-			m_block.partX.y -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Y))
-		{
-			m_block.partY.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Y))
-		{
-			m_block.partY.y -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_UP_TEXPART_Z))
-		{
-			m_block.partZ.x -= 1.0f;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_DOWN_TEXPART_Z))
-		{
-			m_block.partZ.y -= 1.0f;
-		}
-	}
-
-	// テクスチャ分割数を割当
-	m_pBlock->SetTexturePatternX(m_block.partX);
-	m_pBlock->SetTexturePatternY(m_block.partY);
-	m_pBlock->SetTexturePatternZ(m_block.partZ);
 }
 
 //============================================================
@@ -433,7 +466,6 @@ void CEditBlock::CreateBlock(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 	D3DXCOLOR colBlock = XCOL_WHITE;	// 色保存用
 
 	// ブロックを配置
@@ -457,7 +489,7 @@ void CEditBlock::CreateBlock(void)
 		//	新しいブロックの生成
 		//----------------------------------------------------
 		// ブロックの生成
-		m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, sizeEdit);
+		m_pBlock = CBlock::Create(m_block.type, posEdit, rotEdit, m_block.size);
 		assert(m_pBlock != NULL);
 
 		// 色を設定
@@ -505,7 +537,6 @@ void CEditBlock::DeleteCollisionBlock(const bool bRelase)
 
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 sizeEdit = pEdit->GetVec3Sizing();	// エディットの大きさ
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -558,10 +589,10 @@ void CEditBlock::DeleteCollisionBlock(const bool bRelase)
 				// 球体の当たり判定
 				if (collision::Circle3D
 				( // 引数
-					posEdit,							// 判定位置
-					posBlock,							// 判定目標位置
-					(sizeBlock.x + sizeBlock.z) * 0.5f,	// 判定半径
-					(sizeEdit.x + sizeEdit.z) * 0.5f	// 判定目標半径
+					posEdit,	// 判定位置
+					posBlock,	// 判定目標位置
+					(sizeBlock.x + sizeBlock.z) * 0.5f,			// 判定半径
+					(m_block.size.x + m_block.size.z) * 0.5f	// 判定目標半径
 				))
 				{ // 判定内だった場合
 
