@@ -11,7 +11,8 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-
+#include "ZTexture.h"
+#include "DepthShadow.h"
 //************************************************************
 //	マクロ定義
 //************************************************************
@@ -142,6 +143,8 @@ HRESULT CObjectMeshCube::Init(void)
 	m_meshCube.cull   = D3DCULL_CCW;	// カリング状況
 	m_meshCube.bLight = true;			// ライティング状況
 
+	SetEnableDepthShadow(true);
+	SetEnableZTex(true);
 	// 成功を返す
 	return S_OK;
 }
@@ -233,6 +236,19 @@ void CObjectMeshCube::Draw(void)
 		// テクスチャの設定
 		pDevice->SetTexture(0, pTexture->GetTexture(m_meshCube.texID.All));
 
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&m_meshCube.aCol[0]);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+		}
 		// ポリゴンの描画
 		pDevice->DrawIndexedPrimitive
 		( // 引数
@@ -244,6 +260,15 @@ void CObjectMeshCube::Draw(void)
 			NEED_VTX_CUBE - 2		// プリミティブ (ポリゴン) 数
 		);
 
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+		}
+		
 		// 処理を抜ける
 		break;
 
@@ -262,7 +287,19 @@ void CObjectMeshCube::Draw(void)
 
 			// テクスチャの設定
 			pDevice->SetTexture(0, pTexture->GetTexture(aTexType[nCntFace]));
-
+			if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+			{
+				CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+				CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+				CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+			}
+			else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+			{
+				CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+				CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&m_meshCube.aCol[0]);
+				CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+				CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+			}
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
 			( // 引数
@@ -273,6 +310,14 @@ void CObjectMeshCube::Draw(void)
 				nCntFace * NUM_VTX_FACE,	// インデックスバッファの開始地点
 				NUM_VTX_FACE - 2			// プリミティブ (ポリゴン) 数
 			);
+			if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+			{
+				CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+			}
+			else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+			{
+				CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+			}
 		}
 
 		// 処理を抜ける
@@ -297,7 +342,19 @@ void CObjectMeshCube::Draw(void)
 
 		// ライティングを無効にする
 		pDevice->SetRenderState(D3DRS_LIGHTING, false);
-
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&m_meshCube.aCol[0]);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+		}
 		// ポリゴンの描画
 		pDevice->DrawIndexedPrimitive
 		( // 引数
@@ -308,7 +365,14 @@ void CObjectMeshCube::Draw(void)
 			NEED_VTX_CUBE,			// インデックスバッファの開始地点
 			NEED_VTX_CUBE - 2		// プリミティブ (ポリゴン) 数
 		);
-
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+		}
 		// ポリゴンの表面のみを表示状態にする
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 

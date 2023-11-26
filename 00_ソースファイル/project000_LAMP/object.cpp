@@ -9,7 +9,9 @@
 //************************************************************
 #include "object.h"
 #include "manager.h"
-
+#include "renderer.h"
+#include "ZTexture.h"
+#include "DepthShadow.h"
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
@@ -117,7 +119,7 @@ CObject::CObject(const ELabel label, const int nPriority)
 	m_bDraw			= true;			// 自身の描画状況
 	m_bDeath		= false;		// 自身の死亡フラグ
 	m_bDepthShadow	= false;		// 自身の影表示状況
-
+	m_bZTex			= false;
 	// ユニークIDを加算
 	m_dwNextID++;
 
@@ -674,7 +676,14 @@ void CObject::SetEnableDepthShadow(const bool bShadow)
 	// 引数の影表示状況を設定
 	m_bDepthShadow = bShadow;
 }
-
+//============================================================
+//	Z書き込みの設定処理
+//============================================================
+void CObject::SetEnableZTex(const bool bZTex)
+{
+	// 引数の影表示状況を設定
+	m_bZTex = bZTex;
+}
 //============================================================
 //	マトリックスポインタ取得処理
 //============================================================
@@ -828,9 +837,21 @@ void CObject::DrawAll(void)
 
 					if (!pObject->m_bDeath)
 					{ // 死亡していない場合
-
-						// オブジェクトの描画
-						pObject->Draw();
+						if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+						{// オブジェクトの描画
+							if (pObject->m_bZTex)
+								pObject->Draw();
+						}
+						else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+						{// オブジェクトの描画
+							if (pObject->m_bDepthShadow)
+								pObject->Draw();
+						}
+						else
+						{
+							if (!pObject->m_bDepthShadow)
+							pObject->Draw();
+						}
 					}
 				}
 
@@ -1017,7 +1038,14 @@ bool CObject::IsShadow(void) const
 	// 影表示状況を返す
 	return m_bDepthShadow;
 }
-
+//============================================================
+//	Zテクスチャ書き込み状況取得処理
+//============================================================
+bool CObject::IsZTex(void) const
+{
+	// 影表示状況を返す
+	return m_bZTex;
+}
 //============================================================
 //	オブジェクト取得処理
 //============================================================

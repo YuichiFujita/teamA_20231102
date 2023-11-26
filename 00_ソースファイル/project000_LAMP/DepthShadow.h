@@ -31,7 +31,7 @@ public:
 	bool Init(IDirect3DDevice9 &cpDev);
 
 	// シャドウマップを設定
-	bool SetShadowMap(IDirect3DTexture9 &cpShadowMap);
+	bool SetShadowMap(IDirect3DTexture9 **cpShadowMap);
 
 	// 描画対象オブジェクトのワールド変換行列を設定
 	void SetWorldMatrix(D3DXMATRIX *pMat);
@@ -48,6 +48,8 @@ public:
 	// ライトの射影変換行列を設定
 	void SetLightProjMatrix(D3DXMATRIX *pMat);
 
+	void SetAmbient(D3DXCOLOR * pCol) { m_AmbientCol = D3DXVECTOR4(pCol->r, pCol->g, pCol->b, pCol->a); }
+
 	// 描画の開始を宣言する
 	HRESULT Begin();
 
@@ -62,11 +64,14 @@ public:
 
 	// 登録されているパラメータ情報をエフェクトにセット
 	bool SetParamToEffect();
+
+	bool GetbPass(void) { return m_bPass; }
 private:
 	// メンバ変数
 	IDirect3DDevice9 * m_cpDev;			// 描画デバイス
 	IDirect3DTexture9 * m_cpShadowMapTex;	// シャドウマップテクスチャ
 	ID3DXEffect * m_cpEffect;			// 深度バッファシャドウエフェクト
+	D3DXVECTOR4 m_AmbientCol;
 	D3DXMATRIX m_matWorld;						// ワールド変換行列
 	D3DXMATRIX m_matCameraView;					// カメラのビュー変換行列
 	D3DXMATRIX m_matCameraProj;					// カメラの射影変換行列
@@ -78,7 +83,9 @@ private:
 	D3DXHANDLE m_hLightViewMat;					// ビュー変換行列ハンドル
 	D3DXHANDLE m_hLightProjMat;					// 射影変換行列ハンドル
 	D3DXHANDLE m_hShadowMapTex;					// シャドウマップテクスチャハンドル
+	D3DXHANDLE m_hAmbient;						// 色ハンドル
 	D3DXHANDLE m_hTechnique;					// テクニックへのハンドル
+	bool m_bPass;
 };
 
 #endif	// _DepthShadow_H_

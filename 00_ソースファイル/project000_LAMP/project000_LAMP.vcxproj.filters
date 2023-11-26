@@ -523,10 +523,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DepthBufShadowEffect.fx">
+    <FxCompile Include="data\SHADER\DepthBufShadowEffect.fx">
       <Filter>エフェクトファイル</Filter>
     </FxCompile>
-    <FxCompile Include="ZTexCreator.fx">
+    <FxCompile Include="data\SHADER\ZTexCreator.fx">
       <Filter>エフェクトファイル</Filter>
     </FxCompile>
   </ItemGroup>

@@ -11,7 +11,8 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-
+#include "ZTexture.h"
+#include "DepthShadow.h"
 //************************************************************
 //	子クラス [CObjectModel] のメンバ関数
 //************************************************************
@@ -66,7 +67,8 @@ HRESULT CObjectModel::Init(void)
 	m_rot	= VEC3_ZERO;	// 向き
 	m_scale	= VEC3_ONE;		// 拡大率
 	m_nModelID = NONE_IDX;	// モデルインデックス
-
+	SetEnableZTex(true);
+	SetEnableDepthShadow(true);
 	// 成功を返す
 	return S_OK;
 }
@@ -148,7 +150,29 @@ void CObjectModel::Draw(void)
 		}
 
 		// モデルの描画
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetZShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetZShader()->BeginPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetWorldMatrix(&m_mtxWorld);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetAmbient(&(D3DXCOLOR)GetMaterial(nCntMat).MatD3D.Diffuse);
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
+		}
+		// モデルの描画
 		m_modelData.pMesh->DrawSubset(nCntMat);
+		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
+		}
+		else if (CManager::GetInstance()->GetRenderer()->GetDepthShader()->GetbPass())
+		{
+			CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
+		}
 
 		// 頂点法線の自動正規化を無効にする
 		pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);

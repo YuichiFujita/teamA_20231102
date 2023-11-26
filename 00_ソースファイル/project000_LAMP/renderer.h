@@ -41,12 +41,16 @@ public:
 	void Draw(void);	// 描画
 
 	HRESULT CreateRenderTexture(void);			// レンダーテクスチャー生成
+	HRESULT CreateShadowRenderTexture(void);
 	LPDIRECT3DDEVICE9 GetDevice(void) const;	// デバイス取得
 
 	// 静的メンバ関数
 	static CRenderer *Create(HWND hWnd, BOOL bWindow);	// 生成
 	static HRESULT Release(CRenderer *&prRenderer);		// 破棄
 
+
+	CZTexture * GetZShader(void) { return m_pZTex; }
+	CDepthShadow * GetDepthShader(void) { return m_pDepthShadow; }
 private:
 	// メンバ関数
 	HRESULT CRenderer::CreateDevice(HWND hWnd, D3DPRESENT_PARAMETERS d3dpp);	// デバイス生成
@@ -57,15 +61,22 @@ private:
 	IDirect3DDevice9 * m_pDev; //描画デバイス
 
 	int m_nRenderTextureID;		// レンダーテクスチャのインデックス
+	int m_nShadowTextureID;
 	CObject2D *m_pDrawScreen;	// 画面描画用の2Dポリゴン
+	CObject2D *m_pShadowScreen;	// 影描画用の2Dポリゴン
+
 	ID3DXSprite * m_pSprite;	 //シャドウ用スプライト
 	CZTexture * m_pZTex;		//Zテクスチャ生成用
 	CDepthShadow * m_pDepthShadow;					//深度影
+	D3DXMATRIX CameraView, CameraProj;	// カメラビュー変換・射影変換
+	D3DXMATRIX LightView, LightProj;	// ライトビュー変換・射影変換
+
 	IDirect3DTexture9 * m_pZTexture;				//Zテクスチャ本体
 	LPDIRECT3DSURFACE9	m_pRenderTextureSurface;	// 描画サーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDepthStencilSurface;		// Zバッファ・ステンシルバッファのサーフェイスへのポインタ
 	LPDIRECT3DSURFACE9	m_pDefRenderTextureSurface;	// 元の描画サーフェイス保存用
 	LPDIRECT3DSURFACE9	m_pDefDepthStencilSurface;	// 元のZバッファ・ステンシルバッファのサーフェイス保存用
+
 };
 
 #endif	// _RENDERER_H_

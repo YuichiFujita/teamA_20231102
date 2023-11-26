@@ -42,18 +42,25 @@ bool CZTexture::Init(IDirect3DDevice9 &cpDev, UINT ZTexWidth, UINT ZTexHeight, D
 	if (ZTexWidth == 0 || ZTexHeight == 0) return false;
 
 	HRESULT hr;
-
-	// リソースにあるZ値プロットシェーダプログラムを読み込む
+	ID3DXBuffer* pError = NULL;
+	// Z値プロットシェーダプログラムを読み込む
 	if (FAILED(D3DXCreateEffectFromFile(
 		&cpDev,
-		("ZTexCreator.fx"),
+		("data\\SHADER\\ZTexCreator.fx"),
 		NULL,
 		NULL,
 		0,
 		NULL,
 		&m_cpEffect,
-		NULL)))
-		return false;
+		&pError)))
+		if (pError)
+		{
+			OutputDebugStringA((LPCSTR)pError->GetBufferPointer());
+			//デバッグコンソールに表示する
+			MessageBoxA(NULL, (LPCSTR)pError->GetBufferPointer(), "Shader Error", MB_OK);
+			return false;
+		}
+	
 
 	// エフェクト内の各種パラメータハンドルを取得
 	m_hWorldMat = m_cpEffect->GetParameterByName(NULL, "matWorld");
@@ -98,7 +105,7 @@ bool CZTexture::Init(IDirect3DDevice9 &cpDev, UINT ZTexWidth, UINT ZTexHeight, D
 		return false;
 
 	m_cpDev = &cpDev;
-
+	m_bPass = false;
 	return true;
 }
 
@@ -148,7 +155,7 @@ HRESULT CZTexture::Begin()
 	// シェーダの開始を宣言
 	UINT Tmp;
 	m_cpEffect->Begin(&Tmp, 0);
-
+	m_bPass = true;
 	return S_OK;
 }
 
@@ -197,14 +204,14 @@ HRESULT CZTexture::End()
 	// 固定機能に戻す
 	m_cpDev->SetVertexShader(NULL);
 	m_cpDev->SetPixelShader(NULL);
-
+	m_bPass = false;
 	return S_OK;
 }
 
 
 // Z値テクスチャを取得する
-bool CZTexture::GetZTex(IDirect3DTexture9 &cpTex)
+bool CZTexture::GetZTex(IDirect3DTexture9 **cpTex)
 {
-	cpTex = *m_cpZTex;
+	*cpTex = m_cpZTex;
 	return true;
 }
