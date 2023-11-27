@@ -111,9 +111,9 @@ void CDebugProc::Draw(void)
 	{//デバックモードがオンの時
 
 		//テキストの描画
-		m_pFont->DrawText(NULL, &m_aStr[POINT_CENTER][0], NONE_IDX, &rect, DT_CENTER, D3DCOLOR_RGBA(0, 0, 0, 255));
-		m_pFont->DrawText(NULL, &m_aStr[POINT_LEFT][0],   NONE_IDX, &rect, DT_LEFT,   D3DCOLOR_RGBA(0, 0, 0, 255));
-		m_pFont->DrawText(NULL, &m_aStr[POINT_RIGHT][0],  NONE_IDX, &rect, DT_RIGHT,  D3DCOLOR_RGBA(0, 0, 0, 255));
+		m_pFont->DrawText(NULL, &m_aStr[POINT_CENTER][0], NONE_IDX, &rect, DT_CENTER, D3DCOLOR_RGBA(255, 255, 255, 255));
+		m_pFont->DrawText(NULL, &m_aStr[POINT_LEFT][0],   NONE_IDX, &rect, DT_LEFT,   D3DCOLOR_RGBA(255, 255, 255, 255));
+		m_pFont->DrawText(NULL, &m_aStr[POINT_RIGHT][0],  NONE_IDX, &rect, DT_RIGHT,  D3DCOLOR_RGBA(255, 255, 255, 255));
 	}
 
 	//デバッグ表示情報のクリア

@@ -22,7 +22,6 @@
 
 #include "multiModel.h"
 #include "objectOrbit.h"
-#include "shadow.h"
 #include "object2D.h"
 #include "timerManager.h"
 #include "rankingManager.h"
@@ -32,8 +31,8 @@
 #include "effect3D.h"
 #include "particle3D.h"
 
+#include "statusManager.h"
 #include "flail.h"
-
 #include "spawnpoint.h"
 
 //************************************************************
@@ -59,13 +58,7 @@ namespace
 	const float	STICK_REV	= 0.00015f;	// スティックの傾き量の補正係数
 
 	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
-	const float	SPAWN_ADD_ALPHA		= 0.03f;			// スポーン状態時の透明度の加算量
-
-	// 影クラス情報
-	namespace shadow
-	{
-		const D3DXVECTOR3 SIZE = D3DXVECTOR3(80.0f, 0.0f, 80.0f);	// 影の大きさ
-	}
+	const float	SPAWN_ADD_ALPHA		= 0.02f;			// スポーン状態時の透明度の加算量
 }
 
 //************************************************************
@@ -97,17 +90,18 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPadID(nPad)
 {
 	// メンバ変数をクリア
-	m_pShadow			= NULL;			// 影の情報
-	m_oldPos			= VEC3_ZERO;	// 過去位置
-	m_move				= VEC3_ZERO;	// 移動量
-	m_destRot			= VEC3_ZERO;	// 目標向き
-	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
-	m_state				= STATE_NONE;	// 状態
-	m_nCounterState		= 0;			// 状態管理カウンター
-	m_nCounterFlail		= 0;			// フレイル管理カウンター
-	m_fPlusMove			= 0.0f;			// プラス移動量
-	m_bDash				= false;		// ダッシュ状況
-	m_bJump				= false;		// ジャンプ状況
+	m_pStatus		= NULL;			// ステータスの情報
+	m_pFlail		= NULL;			// フレイルの情報
+	m_oldPos		= VEC3_ZERO;	// 過去位置
+	m_move			= VEC3_ZERO;	// 移動量
+	m_destRot		= VEC3_ZERO;	// 目標向き
+	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
+	m_state			= STATE_NONE;	// 状態
+	m_nCounterState	= 0;			// 状態管理カウンター
+	m_nCounterFlail	= 0;			// フレイル管理カウンター
+	m_fPlusMove		= 0.0f;			// プラス移動量
+	m_bDash			= false;		// ダッシュ状況
+	m_bJump			= false;		// ジャンプ状況
 }
 
 //============================================================
@@ -124,17 +118,18 @@ CPlayer::~CPlayer()
 HRESULT CPlayer::Init(void)
 {
 	// メンバ変数を初期化
-	m_pShadow			= NULL;			// 影の情報
-	m_oldPos			= VEC3_ZERO;	// 過去位置
-	m_move				= VEC3_ZERO;	// 移動量
-	m_destRot			= VEC3_ZERO;	// 目標向き
-	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
-	m_state				= STATE_NONE;	// 状態
-	m_nCounterState		= 0;			// 状態管理カウンター
-	m_nCounterFlail		= 0;			// フレイル管理カウンター
-	m_fPlusMove			= 0.0f;			// プラス移動量
-	m_bDash				= false;		// ダッシュ状況
-	m_bJump				= true;			// ジャンプ状況
+	m_pStatus		= NULL;			// ステータスの情報
+	m_pFlail		= NULL;			// フレイルの情報
+	m_oldPos		= VEC3_ZERO;	// 過去位置
+	m_move			= VEC3_ZERO;	// 移動量
+	m_destRot		= VEC3_ZERO;	// 目標向き
+	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
+	m_state			= STATE_NONE;	// 状態
+	m_nCounterState	= 0;			// 状態管理カウンター
+	m_nCounterFlail	= 0;			// フレイル管理カウンター
+	m_fPlusMove		= 0.0f;			// プラス移動量
+	m_bDash			= false;		// ダッシュ状況
+	m_bJump			= true;			// ジャンプ状況
 
 	// オブジェクトキャラクターの初期化
 	if (FAILED(CObjectChara::Init()))
@@ -151,9 +146,9 @@ HRESULT CPlayer::Init(void)
 	// モデル情報の設定
 	SetModelInfo();
 
-	// 影の生成
-	m_pShadow = CShadow::Create(CShadow::TEXTURE_NORMAL, shadow::SIZE, this);
-	if (m_pShadow == NULL)
+	// ステータス情報の生成
+	m_pStatus = CStatusManager::Create();
+	if (m_pStatus == NULL)
 	{ // 非使用中の場合
 
 		// 失敗を返す
@@ -176,6 +171,11 @@ HRESULT CPlayer::Init(void)
 	SetMainMaterial();
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
+
+	// TODO：後で消す
+	// UIの自動描画をOFFにする
+	SetEnableDrawUI(false);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -185,8 +185,9 @@ HRESULT CPlayer::Init(void)
 //============================================================
 void CPlayer::Uninit(void)
 {
-	// 影の終了
-	m_pShadow->Uninit();
+	// ステータス情報の破棄
+	if (FAILED(m_pStatus->Release(m_pStatus)))
+	{ assert(false); }	// 破棄失敗
 
 	// フレイルの終了
 	m_pFlail->Uninit();
@@ -208,30 +209,44 @@ void CPlayer::Update(void)
 
 	switch (m_state)
 	{ // 状態ごとの処理
-	case STATE_NONE:
+	case STATE_NONE:	// 何もしない状態
 		break;
 
-	case STATE_SPAWN:
+	case STATE_SPAWN:	// スポーン状態
 
 		// スポーン状態時の更新
 		currentMotion = UpdateSpawn();
 
 		break;
 
-	case STATE_NORMAL:
+	case STATE_NORMAL:	// 通常状態
 
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
 		break;
 
+	case STATE_KNOCK:	// ノック状態
+
+		// ノック状態の更新
+		currentMotion = UpdateKnock();
+
+		break;
+
+	case STATE_INVULN:	// 無敵状態
+
+		// 無敵状態時の更新
+		currentMotion = UpdateInvuln();
+
+		break;
+
+	case STATE_DEATH:	// 死亡状態
+		break;
+
 	default:
 		assert(false);
 		break;
 	}
-
-	// 影の更新
-	m_pShadow->Update();
 
 	// フレイルの更新
 	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
@@ -249,7 +264,11 @@ void CPlayer::Update(void)
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
+	// フレイルの更新
 	m_pFlail->Update();
+
+	// ステータス情報の更新
+	m_pStatus->Update();
 
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
@@ -260,6 +279,9 @@ void CPlayer::Update(void)
 //============================================================
 void CPlayer::Draw(void)
 {
+	// ステータス情報の描画
+	m_pStatus->Draw();
+
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
 }
@@ -345,9 +367,8 @@ float CPlayer::GetHeight(void) const
 void CPlayer::SetEnableUpdate(const bool bUpdate)
 {
 	// 引数の更新状況を設定
-	CObject::SetEnableUpdate(bUpdate);		// 自身
-	m_pShadow->SetEnableUpdate(bUpdate);	// 影
-	m_pFlail->SetEnableUpdate(bUpdate);		// フレイル
+	CObject::SetEnableUpdate(bUpdate);	// 自身
+	m_pFlail->SetEnableUpdate(bUpdate);	// フレイル
 }
 
 //============================================================
@@ -356,9 +377,18 @@ void CPlayer::SetEnableUpdate(const bool bUpdate)
 void CPlayer::SetEnableDraw(const bool bDraw)
 {
 	// 引数の描画状況を設定
-	CObject::SetEnableDraw(bDraw);		// 自身
-	m_pShadow->SetEnableDraw(bDraw);	// 影
-	m_pFlail->SetEnableDraw(bDraw);		// フレイル
+	CObject::SetEnableDraw(bDraw);	// 自身
+	m_pFlail->SetEnableDraw(bDraw);	// フレイル
+}
+
+//============================================================
+//	UI描画状況の設定処理
+//============================================================
+void CPlayer::SetEnableDrawUI(const bool bDraw)
+{
+	// 引数の描画状況を設定
+	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
+	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 }
 
 //============================================================
@@ -636,6 +666,9 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 着地判定
 	UpdateLanding(posPlayer);
 
+	// キルY座標との当たり判定
+	pStage->CollisionKillY(posPlayer);
+
 	// ダッシュ更新
 	UpdateDash();
 
@@ -653,6 +686,24 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	// 現在のモーションを返す
 	return currentMotion;
+}
+
+//============================================================
+//	ノック状態時の更新処理
+//============================================================
+CPlayer::EMotion CPlayer::UpdateKnock(void)
+{
+	// 吹っ飛びモーションを返す
+	return MOTION_KNOCK;
+}
+
+//============================================================
+//	無敵状態時の更新処理
+//============================================================
+CPlayer::EMotion CPlayer::UpdateInvuln(void)
+{
+	// 通常状態の処理を行い、その返り値のモーションを返す
+	return UpdateNormal();
 }
 
 //============================================================
@@ -993,9 +1044,8 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 		m_bJump = false;
 	}
 
-	// 地面・制限位置の着地判定
-	if (CScene::GetStage()->LandFieldPosition(rPos, m_move)
-	||  CScene::GetStage()->LandLimitPosition(rPos, m_move, 0.0f))
+	// 地面の着地判定
+	if (CScene::GetStage()->LandFieldPosition(rPos, m_move))
 	{ // プレイヤーが着地していた場合
 
 		// 着地している状態にする
