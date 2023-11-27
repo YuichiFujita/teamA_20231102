@@ -276,7 +276,7 @@ D3DXVECTOR3 CObjectGauge2D::GetVec3Position(void) const
 //============================================================
 CObjectGauge2D *CObjectGauge2D::Create
 (
-	const CObject::ELabel label,		// オブジェクトラベル
+	const CObject::ELabel label,	// オブジェクトラベル
 	const int nMax,					// 最大表示値
 	const int nFrame,				// 表示値変動フレーム
 	const D3DXVECTOR3& rPos,		// 位置
@@ -425,7 +425,7 @@ void CObjectGauge2D::BindTexture(const int nPolygonID, const int nTextureID)
 	if (nPolygonID < POLYGON_MAX)
 	{ // インデックスが使用する四角形ポリゴン数より小さい場合
 
-		if (nTextureID > NONE_IDX)
+		if (nTextureID >= NONE_IDX)
 		{ // テクスチャインデックスが使用可能な場合
 
 			// テクスチャインデックスを代入

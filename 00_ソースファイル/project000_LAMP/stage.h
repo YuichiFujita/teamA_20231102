@@ -109,11 +109,11 @@ public:
 	SStageLimit GetStageLimit(void) const;			// ステージ範囲取得
 
 	void LimitPosition(D3DXVECTOR3& rPos, const float fRadius);	// 位置補正
-	bool LandLimitPosition(D3DXVECTOR3& rPos, D3DXVECTOR3& rMove, const float fHeight);	// 範囲外着地
+	bool CollisionKillY(const D3DXVECTOR3& rPos);				// キルY座標との当たり判定
 
 	bool LandFieldPosition(D3DXVECTOR3& rPos, D3DXVECTOR3& rMove);	// 地面着地
-	bool IsFieldPositionRange(const D3DXVECTOR3&rPos);		// メッシュの範囲内取得 (回転考慮)
-	float GetFieldPositionHeight(const D3DXVECTOR3&rPos);	// メッシュの着地位置取得 (回転考慮)
+	bool IsFieldPositionRange(const D3DXVECTOR3&rPos);				// メッシュの範囲内取得 (回転考慮)
+	float GetFieldPositionHeight(const D3DXVECTOR3&rPos);			// メッシュの着地位置取得 (回転考慮)
 
 	CLiquid *GetLiquid(void);	// 液体取得
 

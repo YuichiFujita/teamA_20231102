@@ -146,6 +146,7 @@ void CPlayerEntry::SetEntry(void)
 	SetAlpha(1.0f);
 
 	// プレイヤーの付属品の自動描画を停止
+	CPlayer::SetEnableDrawUI(false);
 	CPlayer::SetEnableDraw(false);
 	CObject::SetEnableDraw(true);	// プレイヤーは描画ON
 }

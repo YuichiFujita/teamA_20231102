@@ -201,8 +201,7 @@ int CTexture::Regist(const char *pFileName)
 	else
 	{ // ポインタが使用されていない場合
 
-		// 失敗を返す
-		assert(false);
+		// テクスチャ非使用を返す
 		return NONE_IDX;
 	}
 }
