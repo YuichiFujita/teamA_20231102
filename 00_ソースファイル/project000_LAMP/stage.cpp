@@ -210,24 +210,18 @@ void CStage::LimitPosition(D3DXVECTOR3& rPos, const float fRadius)
 }
 
 //============================================================
-//	範囲外の着地処理
+//	キルY座標との当たり判定
 //============================================================
-bool CStage::LandLimitPosition(D3DXVECTOR3& rPos, D3DXVECTOR3& rMove, const float fHeight)
+bool CStage::CollisionKillY(const D3DXVECTOR3& rPos)
 {
-	if (rPos.y - fHeight < m_stageLimit.fField)
-	{ // 位置が地面より下の場合
+	if (rPos.y  < m_stageLimit.fField)
+	{ // 位置が地面の制限位置より下の場合
 
-		// 位置を補正
-		rPos.y = m_stageLimit.fField + fHeight;
-
-		// 移動量を初期化
-		rMove.y = 0.0f;
-
-		// 着地している状況を返す
+		// 死亡している状況を返す
 		return true;
 	}
 
-	// 着地していない状況を返す
+	// 死亡していない状況を返す
 	return false;
 }
 

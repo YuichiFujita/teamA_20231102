@@ -349,7 +349,7 @@ D3DXVECTOR3 CObjectGauge3D::GetVec3Position(void) const
 //============================================================
 CObjectGauge3D *CObjectGauge3D::Create
 (
-	const CObject::ELabel label,		// オブジェクトラベル
+	const CObject::ELabel label,	// オブジェクトラベル
 	CObject *pObject,				// ゲージ表示オブジェクト
 	const int nMax,					// 最大表示値
 	const int nFrame,				// 表示値変動フレーム
@@ -511,7 +511,7 @@ void CObjectGauge3D::BindTexture(const int nPolygonID, const int nTextureID)
 	if (nPolygonID < POLYGON_MAX)
 	{ // インデックスが使用する四角形ポリゴン数より小さい場合
 
-		if (nTextureID > NONE_IDX)
+		if (nTextureID >= NONE_IDX)
 		{ // テクスチャインデックスが使用可能な場合
 
 			// テクスチャインデックスを代入

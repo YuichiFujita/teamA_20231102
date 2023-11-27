@@ -20,8 +20,8 @@
 //************************************************************
 //	前方宣言
 //************************************************************
-class CShadow;	// 影クラス
-class CFlail;	// フレイルクラス
+class CStatusManager;	// ステータスマネージャークラス
+class CFlail;			// フレイルクラス
 
 //************************************************************
 //	クラス定義
@@ -53,6 +53,8 @@ public:
 	enum EMotion
 	{
 		MOTION_IDOL = 0,	// 待機モーション
+		MOTION_MOVE,		// 移動モーション
+		MOTION_KNOCK,		// 吹っ飛びモーション
 		MOTION_MAX			// この列挙型の総数
 	};
 
@@ -72,6 +74,9 @@ public:
 		STATE_NONE = 0,	// 何もしない状態
 		STATE_SPAWN,	// スポーン状態
 		STATE_NORMAL,	// 通常状態
+		STATE_KNOCK,	// ノック状態
+		STATE_INVULN,	// 無敵状態
+		STATE_DEATH,	// 死亡状態
 		STATE_MAX		// この列挙型の総数
 	};
 
@@ -104,6 +109,7 @@ public:
 
 	void SetEnableUpdate(const bool bUpdate) override;	// 更新状況設定
 	void SetEnableDraw(const bool bDraw) override;		// 描画状況設定
+	void SetEnableDrawUI(const bool bDraw);				// UI描画状況設定
 	D3DXMATRIX GetMtxWorld(void) const override;		// マトリックス取得
 
 	// 静的メンバ関数
@@ -125,6 +131,8 @@ private:
 	void LoadSetup(void);		// セットアップ
 	EMotion UpdateSpawn(void);	// スポーン状態時の更新
 	EMotion UpdateNormal(void);	// 通常状態時の更新
+	EMotion UpdateKnock(void);	// ノック状態時の更新
+	EMotion UpdateInvuln(void);	// 無敵状態時の更新
 
 	void UpdateOldPosition(void);			// 過去位置の更新
 	EMotion UpdateMove(D3DXVECTOR3& rPos);	// 移動量・目標向きの更新
@@ -143,7 +151,7 @@ private:
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
-	CShadow		*m_pShadow;			// 影の情報
+	CStatusManager *m_pStatus;		// ステータスの情報
 	CFlail		*m_pFlail;			// フレイルの情報
 	D3DXVECTOR3	m_oldPos;			// 過去位置
 	D3DXVECTOR3	m_move;				// 移動量

@@ -30,9 +30,7 @@ public:
 	// ロゴ列挙
 	enum ELogo
 	{
-		LOGO_NEVER = 0,	// NEVERロゴ
-		LOGO_GIVE,		// GIVEロゴ
-		LOGO_UP,		// UP!ロゴ
+		LOGO_TITLE = 0,	// ロゴ
 		LOGO_MAX		// この列挙型の総数
 	};
 
@@ -40,7 +38,6 @@ public:
 	enum ESelect
 	{
 		SELECT_GAME = 0,	// ゲーム選択
-		SELECT_TUTORIAL,	// チュートリアル選択
 		SELECT_MAX			// この列挙型の総数
 	};
 
