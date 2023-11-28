@@ -46,7 +46,7 @@ public:
 		MODEL_LEG_R,		// ‰E‘«
 		MODEL_THIGH_L,		// ¶‚à‚à
 		MODEL_LEG_L,		// ¶‘«
-		MODEL_STICK,		// ¶‘«
+		MODEL_STICK,		// –_
 		MODEL_MAX			// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 
