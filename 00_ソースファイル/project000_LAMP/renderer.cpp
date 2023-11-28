@@ -137,7 +137,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pDev = m_pD3DDevice;
 	D3DXCreateSprite(m_pD3DDevice, &m_pSprite);// スプライト作成
 	m_pZTex = new CZTexture;
-	m_pZTex->Init(*m_pDev, SCREEN_WIDTH, SCREEN_WIDTH, D3DFMT_A16B16G16R16);
+	m_pZTex->Init(*m_pDev, SCREEN_WIDTH * 2.0f, SCREEN_WIDTH * 2.0f, D3DFMT_A32B32G32R32F);
 	m_pZTex->GetZTex(&m_pZTexture);
 	// 深度バッファシャドウオブジェクトの生成と初期化
 	m_pDepthShadow = new CDepthShadow;
@@ -145,7 +145,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pDepthShadow->SetShadowMap(&m_pZTexture);	// シャドウマップテクスチャを登録
 	D3DXMatrixPerspectiveFovLH(&CameraProj, D3DXToRadian(45), 1.777f, 10.0f, 50000.0f);
 	D3DXMatrixPerspectiveFovLH(&LightProj, D3DXToRadian(90), 1.0f, 30.0f, 50000.0f);
-	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(300.0f,750.0f,150.0f), &D3DXVECTOR3(0.0f, -10.0f, 0.0f), &D3DXVECTOR3(0, 1, 0));
+	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(300.0f, 2000.0f, -600.0f), &D3DXVECTOR3(0.0f, -10.0f, 0.0f), &D3DXVECTOR3(0, 1, 0));
 	// Z値テクスチャOBJへ登録
 	m_pZTex->SetViewMatrix(&LightView);
 	m_pZTex->SetProjMatrix(&LightProj);
@@ -339,7 +339,7 @@ void CRenderer::Draw(void)
 		m_pDrawScreen->Draw();
 
 		D3DXMATRIX SpriteScaleMat;
-		D3DXMatrixScaling(&SpriteScaleMat, 0.25f, 0.25f, 1.0f);
+		D3DXMatrixScaling(&SpriteScaleMat, 0.125f, 0.125f, 1.0f);
 		m_pSprite->SetTransform(&SpriteScaleMat);
 		m_pSprite->Begin(0);
 		//m_pSprite->Draw(m_pZTexture, NULL, NULL, NULL, 0xffffffff);
