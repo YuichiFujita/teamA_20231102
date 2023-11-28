@@ -115,12 +115,13 @@ private:
 
 	// メンバ変数
 	SChain		m_chain[flail::FLAIL_NUM];		// 鎖
+	CMultiModel *m_parentDef;
 	D3DXVECTOR3 m_posOrg;						// 回転原点
 	D3DXVECTOR3 m_oldPos;						// 過去の位置
 	D3DXVECTOR3	m_move;							// 移動量
 	int			m_nPlayerID;					// プレイヤーID
 	float		m_fChainRot;					// 角度
-	float		m_fChainRotMove;				// 目標角度
+	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
 
 };

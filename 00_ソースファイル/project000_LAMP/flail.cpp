@@ -47,6 +47,7 @@ const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
 CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, MODEL_UI_PRIO)
 {
 	memset(&m_chain[0], 0, sizeof(m_chain));	// モデルの情報
+	m_parentDef = NULL;
 	m_oldPos = VEC3_ZERO;
 	m_move = VEC3_ZERO;
 	m_fChainRot = 0.0f;
@@ -236,14 +237,21 @@ void CFlail::UpdateChain(void)
 		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 		rot.x = 0.0f;
 		rot.y = 0.0f;
-
+		
 		if (nCntChain == 0)
 		{
-			rot.x = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().x;
-			rot.y = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().y;
-			rot.z = m_fChainRot;
+			m_parentDef = player->GetMultiModel(CPlayer::MODEL_HAND_R);
 
-			pos.x = -10.0f;
+			m_parentDef->SetVec3Rotation(VEC3_ZERO);
+
+			// 親を設定
+			m_chain[nCntChain].multiModel->SetParentModel(m_parentDef);
+
+			rot.x = 0.0f;
+			rot.y = m_fChainRot;
+			rot.z = 0.0f;
+
+			pos.x = 0.0f;
 			pos.y = 0.0f;
 			pos.z = 0.0f;
 		}
@@ -257,7 +265,7 @@ void CFlail::UpdateChain(void)
 			}
 			else
 			{
-				rot = m_chain[IDParent].rotOld;
+				rot = m_chain[IDParent].rotOld * 0.85f;
 			}
 
 			if (m_nPlayerID == 0)
@@ -704,14 +712,18 @@ void CFlail::BindParent(const CPlayer& rPlayer)
 	{
 		if (nCntChain == 0)
 		{
-			// NULLを設定
-			m_chain[nCntChain].multiModel->SetParentModel(rPlayer.GetMultiModel(CPlayer::MODEL_HAND_R));
+			m_parentDef = rPlayer.GetMultiModel(CPlayer::MODEL_HAND_R);
+
+			m_parentDef->SetVec3Rotation(VEC3_ZERO);
+
+			// 親を設定
+			m_chain[nCntChain].multiModel->SetParentModel(m_parentDef);
 		}
 		else
 		{
 			parentID = nCntChain - 1;
 
-			// NULLを設定
+			// 親を設定
 			m_chain[nCntChain].multiModel->SetParentModel(m_chain[parentID].multiModel);
 		}
 	}
