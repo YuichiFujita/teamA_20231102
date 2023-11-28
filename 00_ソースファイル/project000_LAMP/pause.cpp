@@ -162,9 +162,6 @@ void CPause::Update(void)
 			// ポーズ状況を切り替え
 			m_bPause = (!m_bPause) ? true : false;
 
-			// タイムの計測状況を切り替え
-			CSceneGame::GetTimerManager()->EnableStop(m_bPause);
-
 			// 現在の選択を初期化
 			m_nSelect = SELECT_RESUME;
 
@@ -352,9 +349,6 @@ void CPause::Select(void)
 
 				// ポーズを終了する
 				m_bPause = false;
-
-				// タイムの計測を再開する
-				CSceneGame::GetTimerManager()->EnableStop(m_bPause);
 
 				// 描画状況の設定
 				SetEnableDraw(m_bPause);
