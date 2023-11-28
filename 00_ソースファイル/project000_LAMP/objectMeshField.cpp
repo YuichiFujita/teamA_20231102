@@ -98,7 +98,7 @@ HRESULT CObjectMeshField::Init(void)
 		// ¸”s‚ğ•Ô‚·
 		return E_FAIL;
 	}
-	SetEnableZTex(true);
+	SetEnableZTex(false);
 	SetEnableDepthShadow(true);
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
