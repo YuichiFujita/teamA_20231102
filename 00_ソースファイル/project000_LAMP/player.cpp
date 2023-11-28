@@ -57,8 +57,11 @@ namespace
 	const float	KNOCK_SIDE	= 35.0f;	// ノック横移動量
 	const int	DMG_KILLY	= 50;		// キルY座標のダメージ量
 
-	const float	INVULN_ALPHA	= 0.5f;	// 無敵状態の透明度
-	const int	INVULN_CNT		= 60;	// 無敵時間のフレーム数
+	const float MAX_KNOCK_RATE	= 4.0f;		// 最大吹っ飛び倍率
+	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
+	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
+	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
 	const float	NORMAL_JUMP_REV	= 0.16f;	// 通常状態時の空中の移動量の減衰係数
 	const float	NORMAL_LAND_REV	= 0.16f;	// 通常状態時の地上の移動量の減衰係数
@@ -183,10 +186,6 @@ HRESULT CPlayer::Init(void)
 	SetMainMaterial();
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
-
-	// TODO：後で消す
-	// UIの自動描画をOFFにする
-	SetEnableDrawUI(false);
 
 	// 成功を返す
 	return S_OK;
@@ -359,9 +358,6 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 		// 変数を宣言
 		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 
-		// 吹っ飛び率を加算
-		m_pStatus->AddNumRate(100);
-
 		// カウンターを初期化
 		m_nCounterState = 0;
 
@@ -380,8 +376,9 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 		else
 		{ // 死亡していない場合
 
+			// NAKAMURA：ふっとび量の決め方きもければ変えて
 			// 変数を宣言
-			float fKnockRate = (4.0f / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate();	// 吹っ飛ばし率
+			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
 
 			// ノックバック移動量を設定
 			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
@@ -404,6 +401,10 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 		// サウンドの再生
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
 	}
+
+	// NAKAMURA：吹っ飛び率の決め方は任せます
+	// 吹っ飛び率を加算
+	m_pStatus->AddNumRate(100);
 }
 
 //============================================================
@@ -592,6 +593,8 @@ void CPlayer::SetSpawn(void)
 
 	// 移動量を初期化
 	m_move = VEC3_ZERO;
+
+	// NAKAMURA：ここにフレイルを強制的に所持状態にする処理お願い
 
 	// マテリアルを再設定
 	ResetMaterial();
@@ -961,13 +964,18 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 //============================================================
 CPlayer::EMotion CPlayer::UpdateInvuln(void)
 {
+	// 変数を宣言
+	float fAddAlpha = 0.0f;	// 透明度の加算量
+
 	// 透明度を上げる
-	m_fSinAlpha += 0.25f;
-	useful::NormalizeRot(m_fSinAlpha);
-	float f = (0.25f / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
+	m_fSinAlpha += ADD_SINROT;
+	useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
+
+	// 透明度加算量を求める
+	fAddAlpha = (MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
 
 	// 透明度を設定
-	SetAlpha(INVULN_ALPHA + f);
+	SetAlpha(INVULN_ALPHA + fAddAlpha);
 
 	// カウンターを加算
 	m_nCounterState++;
