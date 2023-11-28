@@ -25,7 +25,7 @@ namespace flail
 	const int	FLAIL_DROP = -1;		// フレイル落下状態
 	const int	FLAIL_DEF = 0;			// フレイル取得状態
 
-	const int	FLAIL_NUM = 20;			// フレイル取得状態
+	const int	FLAIL_NUM = 25;			// フレイル取得状態
 }
 
 //************************************************************

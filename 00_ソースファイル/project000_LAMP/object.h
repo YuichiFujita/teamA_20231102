@@ -90,7 +90,7 @@ public:
 	// 仮想関数
 	virtual void Hit(void);	// ヒット
 	virtual void Hit(const int nDmg);	// ダメージヒット
-	virtual void HitKnockBack(const int nDmg, const D3DXVECTOR3& vec);	// ノックバックヒット
+	virtual void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock);	// ノックバックヒット
 
 	virtual void BindTexture(const int nTextureID);		// テクスチャ割当 (インデックス)
 	virtual void BindTexture(const char *pTexturePass);	// テクスチャ割当 (パス)

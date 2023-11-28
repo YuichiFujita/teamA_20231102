@@ -55,6 +55,7 @@ public:
 		MOTION_IDOL = 0,	// 待機モーション
 		MOTION_MOVE,		// 移動モーション
 		MOTION_KNOCK,		// 吹っ飛びモーション
+		MOTION_DEATH,		// 死亡モーション
 		MOTION_MAX			// この列挙型の総数
 	};
 
@@ -100,7 +101,7 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
-	void Hit(void) override;		// ヒット
+	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock) override;	// ノックバックヒット
 
 	void SetState(const int nState) override;	// 状態設定
 	int GetState(void) const override;			// 状態取得
@@ -116,7 +117,10 @@ public:
 	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
-	void SetSpawn(void);				// 出現設定
+	void SetSpawn(void);	// 出現設定
+	void SetInvuln(void);	// 無敵設定
+
+	void HitKillY(const int nDmg);		// キルY座標ヒット
 	int GetPadID(void) const;			// パッドインデックス取得
 	int GetCounterFlail(void) const;	// フレイルカウンター取得
 
@@ -161,6 +165,7 @@ private:
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター
 	float		m_fPlusMove;		// プラス移動量
+	float		m_fSinAlpha;		// 透明向き
 	bool		m_bDash;			// ダッシュ状況
 	bool		m_bJump;			// ジャンプ状況
 	const int	m_nPadID;			// パッドインデックス

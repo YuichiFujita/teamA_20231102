@@ -43,10 +43,12 @@ public:
 	void AddNumLife(const int nAdd);			// ‘Ì—Í‰ÁZ
 	void SetNumLife(const int nSet);			// ‘Ì—Íİ’è
 	int  GetNumLife(void) const;				// ‘Ì—Íæ“¾
+	int  GetNumMaxLife(void) const;				// Å‘å‘Ì—Íæ“¾
 	void SetEnableDrawLife(const bool bDraw);	// ‘Ì—Í‚Ì•`‰æİ’è
 	void AddNumRate(const int nAdd);			// ‚Á”ò‚Ñ—¦‰ÁZ
 	void SetNumRate(const int nSet);			// ‚Á”ò‚Ñ—¦İ’è
 	int  GetNumRate(void) const;				// ‚Á”ò‚Ñ—¦æ“¾
+	int  GetNumMaxRate(void) const;				// Å‘å‚Á”ò‚Ñ—¦æ“¾
 	void SetEnableDrawRate(const bool bDraw);	// ‚Á”ò‚Ñ—¦‚Ì•`‰æİ’è
 
 	// Ã“Iƒƒ“ƒoŠÖ”

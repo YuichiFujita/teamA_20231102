@@ -35,7 +35,8 @@ namespace
 	{
 		const char* TITLE_TEX_PASS = "data\\TEXTURE\\continue001.png";	// タイトルテクスチャ
 
-		const int MAX_DIG = 3;	// 数字桁数
+		const int	MAX_DIG = 3;	// 数字桁数
+		const int	MAX_NUM = 100;	// 数字最大
 
 		const D3DXVECTOR3 POS			= D3DXVECTOR3(200.0f, 400.0f, 0.0f);	// UI位置
 		const D3DXVECTOR3 SPACE_TITLE	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// タイトル空白
@@ -118,6 +119,9 @@ HRESULT CStatusManager::Init(void)
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
 
+	// 吹っ飛び率の最大値を設定
+	m_pKnockRate->GetMultiValue()->SetMax(knockrate::MAX_NUM);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -185,6 +189,15 @@ int CStatusManager::GetNumLife(void) const
 }
 
 //============================================================
+//	最大体力取得処理
+//============================================================
+int CStatusManager::GetNumMaxLife(void) const
+{
+	// 最大体力を返す
+	return m_pLife->GetMaxNum();
+}
+
+//============================================================
 //	体力の描画状況の設定処理
 //============================================================
 void CStatusManager::SetEnableDrawLife(const bool bDraw)
@@ -217,6 +230,15 @@ void CStatusManager::SetNumRate(const int nSet)
 int CStatusManager::GetNumRate(void) const
 {
 	// 吹っ飛び率を返す
+	return m_pKnockRate->GetMultiValue()->GetNum();
+}
+
+//============================================================
+//	吹っ飛び率取得処理
+//============================================================
+int CStatusManager::GetNumMaxRate(void) const
+{
+	// 最大吹っ飛び率を返す
 	return m_pKnockRate->GetMultiValue()->GetNum();
 }
 
