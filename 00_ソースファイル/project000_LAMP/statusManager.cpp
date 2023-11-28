@@ -52,7 +52,7 @@ namespace
 //============================================================
 //	コンストラクタ
 //============================================================
-CStatusManager::CStatusManager()
+CStatusManager::CStatusManager(const int nPadID) : m_nPadID(nPadID)
 {
 	// メンバ変数をクリア
 	m_pLife = NULL;			// 体力の情報
@@ -258,7 +258,7 @@ void CStatusManager::SetEnableDrawRate(const bool bDraw)
 //============================================================
 //	生成処理
 //============================================================
-CStatusManager *CStatusManager::Create(void)
+CStatusManager *CStatusManager::Create(const int nPadID)
 {
 	// ポインタを宣言
 	CStatusManager *pStatusManager = NULL;		// ステータスマネージャー生成用
@@ -267,7 +267,7 @@ CStatusManager *CStatusManager::Create(void)
 	{ // 使用されていない場合
 
 		// メモリ確保
-		pStatusManager = new CStatusManager;	// ステータスマネージャー
+		pStatusManager = new CStatusManager(nPadID);	// ステータスマネージャー
 	}
 	else { assert(false); return NULL; }		// 使用中
 

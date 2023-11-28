@@ -29,7 +29,7 @@ class CStatusManager
 {
 public:
 	// コンストラクタ
-	CStatusManager();
+	explicit CStatusManager(const int nPadID);
 
 	// デストラクタ
 	~CStatusManager();
@@ -52,13 +52,15 @@ public:
 	void SetEnableDrawRate(const bool bDraw);	// 吹っ飛び率の描画設定
 
 	// 静的メンバ関数
-	static CStatusManager *Create(void);	// 生成
+	static CStatusManager *Create(const int nPadID);	// 生成
 	static HRESULT Release(CStatusManager *&prStatusManager);	// 破棄
 
 private:
 	// メンバ変数
 	CObjectGauge2D	*m_pLife;		// 体力の情報
 	CValueUI		*m_pKnockRate;	// 吹っ飛び率の情報
+
+	const int m_nPadID;	// パッドID定数
 };
 
 #endif	// _STATUS_MANAGER_H_

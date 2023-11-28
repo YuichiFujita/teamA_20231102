@@ -162,7 +162,7 @@ HRESULT CPlayer::Init(void)
 	SetModelInfo();
 
 	// ステータス情報の生成
-	m_pStatus = CStatusManager::Create();
+	m_pStatus = CStatusManager::Create(m_nPadID);
 	if (m_pStatus == NULL)
 	{ // 非使用中の場合
 
