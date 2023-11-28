@@ -36,16 +36,17 @@ public:
 		MODEL_WAIST = 0,	// 腰
 		MODEL_BODY,			// 体
 		MODEL_HEAD,			// 頭
-		MODEL_SHOULDER_R,	// 左上腕
-		MODEL_ARM_R,		// 右上腕
-		MODEL_HAND_R,		// 左下腕
-		MODEL_SHOULDER_L,	// 右下腕
-		MODEL_ARM_L,		// 左手
-		MODEL_HAND_L,		// 右手
-		MODEL_THIGH_R,		// 左太もも
-		MODEL_LEG_R,		// 右太もも
-		MODEL_THIGH_L,		// 左脛
-		MODEL_LEG_L,		// 右脛
+		MODEL_SHOULDER_R,	// 右肩
+		MODEL_ARM_R,		// 右腕
+		MODEL_HAND_R,		// 右手
+		MODEL_SHOULDER_L,	// 左肩
+		MODEL_ARM_L,		// 左腕
+		MODEL_HAND_L,		// 左手
+		MODEL_THIGH_R,		// 右もも
+		MODEL_LEG_R,		// 右足
+		MODEL_THIGH_L,		// 左もも
+		MODEL_LEG_L,		// 左足
+		MODEL_STICK,		// 左足
 		MODEL_MAX			// この列挙型の総数
 	};
 

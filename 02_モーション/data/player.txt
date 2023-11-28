@@ -9,7 +9,7 @@ SCRIPT			# この行は絶対消さないこと！
 #------------------------------------------------------------------------------
 # モデル数
 #------------------------------------------------------------------------------
-NUM_MODEL = 14
+NUM_MODEL = 15
 
 #------------------------------------------------------------------------------
 # モデルファイル名
@@ -28,13 +28,14 @@ MODEL_FILENAME = data/model/player/10_leg_R.x		# [10]右足
 MODEL_FILENAME = data/model/player/11_thigh_L.x		# [11]左腿
 MODEL_FILENAME = data/model/player/12_leg_L.x		# [12]左足
 MODEL_FILENAME = data/model/player/13_ironBall.x	# [13]棒
+MODEL_FILENAME = data/model/player/14_ironBall.x	# [14]鉄球
 
 #------------------------------------------------------------------------------
 # キャラクター情報
 #------------------------------------------------------------------------------
 CHARACTERSET
 	MOVE = 3.0						# 移動量
-	NUM_PARTS = 14					# パーツ数
+	NUM_PARTS = 15					# パーツ数
 
 	PARTSSET						# [0]腰
 		INDEX = 0
@@ -132,6 +133,13 @@ CHARACTERSET
 		PARENT = 5					# (親)右手
 		POS = 0.0 0.0 -4.0
 		ROT = 1.5 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET						# [13]棒
+		INDEX = 14
+		PARENT = 13					# (親)右手
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 END_CHARACTERSET
