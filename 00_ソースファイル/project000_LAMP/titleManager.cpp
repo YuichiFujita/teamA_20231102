@@ -22,11 +22,11 @@
 //************************************************************
 #define TITLE_PRIO	(14)	// タイトルの優先順位
 
-#define POS_LOGO_NEVER	(D3DXVECTOR3(340.0f,  140.0f, 0.0f))	// タイトルロゴの位置 (NEVER)
+#define POS_LOGO_NEVER	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f,  300.0f, 0.0f))	// タイトルロゴの位置 (NEVER)
 #define POS_LOGO_GIVE	(D3DXVECTOR3(710.0f,  310.0f, 0.0f))	// タイトルロゴの位置 (GIVE)
 #define POS_LOGO_UP		(D3DXVECTOR3(1050.0f, 320.0f, 0.0f))	// タイトルロゴの位置 (UP!)
 
-#define SIZE_TITLE	(D3DXVECTOR3(666.0f, 290.0f, 0.0f) * 0.8f)	// タイトルロゴの大きさ
+#define SIZE_TITLE	(D3DXVECTOR3(769.0f, 158.0f, 0.0f) * 1.2f)	// タイトルロゴの大きさ
 #define INIT_SCALE	(15.0f)	// タイトルロゴの初期拡大率
 #define SUB_SCALE	(0.65f)	// タイトルロゴ拡大率の減算量
 
@@ -37,9 +37,9 @@
 #define SIZE_SELECTBG	(D3DXVECTOR3((float)SCREEN_WIDTH, 120.0f, 0.0f))	// 選択背景の大きさ
 #define COL_SELECTBG	(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f))					// 選択背景の色
 
-#define POS_SELECT		(D3DXVECTOR3(350.0f, 560.0f, 0.0f))	// 選択の位置
+#define POS_SELECT		(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 560.0f, 0.0f))	// 選択の位置
 #define SPACE_SELECT	(D3DXVECTOR3(560.0f, 0.0f, 0.0f))	// 選択の空間
-#define SIZE_SELECT		(D3DXVECTOR3(420.0f, 140.0f, 0.0f))	// 選択の大きさ
+#define SIZE_SELECT		(D3DXVECTOR3(466.0f, 64.0f, 0.0f))	// 選択の大きさ
 
 #define CHOICE_COL	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 選択中カラー
 #define DEFAULT_COL	(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))	// 非選択中カラー
@@ -49,13 +49,11 @@
 //************************************************************
 const char *CTitleManager::mc_apLogoTextureFile[] =	// ロゴテクスチャ定数
 {
-	"data\\TEXTURE\\title000.png",	// NEVERテクスチャ
-	"data\\TEXTURE\\title001.png",	// GIVEテクスチャ
-	"data\\TEXTURE\\title002.png",	// UP!テクスチャ
+	"data\\TEXTURE\\Chain_and_Star.png",	// NEVERテクスチャ
 };
 const char *CTitleManager::mc_apSelectTextureFile[] =	// 選択テクスチャ定数
 {
-	"data\\TEXTURE\\title003.png",	// STARTテクスチャ
+	"data\\TEXTURE\\Press_Start.png",	// STARTテクスチャ
 	"data\\TEXTURE\\title004.png",	// MANUALテクスチャ
 };
 
@@ -500,12 +498,12 @@ void CTitleManager::UpdateStart(void)
 
 					break;
 
-				case SELECT_TUTORIAL:
+				//case SELECT_TUTORIAL:
 
-					// シーンの設定
-					CManager::GetInstance()->SetScene(CScene::MODE_TUTORIAL);	// チュートリアル画面
+				//	// シーンの設定
+				//	CManager::GetInstance()->SetScene(CScene::MODE_TUTORIAL);	// チュートリアル画面
 
-					break;
+				//	break;
 
 				default:
 					assert(false);

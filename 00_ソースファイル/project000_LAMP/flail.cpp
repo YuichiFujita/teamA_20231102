@@ -268,7 +268,7 @@ void CFlail::UpdateChain(void)
 
 			if (m_nPlayerID == 0)
 			{
-				CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "½Šp“x %f\n", rot.z);
+				//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "½Šp“x %f\n", rot.z);
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
