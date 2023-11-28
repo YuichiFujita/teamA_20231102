@@ -40,7 +40,7 @@ HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
-	m_stateKill		= KILL_LIFE;	// 討伐条件
+	m_stateKill		= KILL_KNOCK;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
 
