@@ -60,7 +60,7 @@ namespace
 		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.45f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
 		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
 		const float MUL_DIS		= 1.2f;		// 加算距離の乗算量
-		const float REV_POS		= 0.25f;	// カメラ位置の補正係数
+		const float REV_POS		= 0.05f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数
 	}
 

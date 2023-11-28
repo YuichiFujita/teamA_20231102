@@ -24,8 +24,7 @@ namespace flail
 	const int	FLAIL_THROW = 240;		// フレイル投げ状態
 	const int	FLAIL_DROP = -1;		// フレイル落下状態
 	const int	FLAIL_DEF = 0;			// フレイル取得状態
-
-	const int	FLAIL_NUM = 20;			// フレイル取得状態
+	const int	FLAIL_NUM = 20;			// フレイルの数
 }
 
 //************************************************************
@@ -36,7 +35,7 @@ class CMultiModel;	// モデルクラス
 //************************************************************
 //	クラス定義
 //************************************************************
-// モデルUIクラス
+// フレイルクラス
 class CFlail : public CObjectModel
 {
 public:

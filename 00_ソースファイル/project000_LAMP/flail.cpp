@@ -20,9 +20,15 @@
 #include "collision.h"
 
 //************************************************************
-//	マクロ定義
+//	定数宣言
 //************************************************************
-#define MODEL_UI_PRIO	(14)	// モデルUI表示の優先順位
+namespace
+{
+	const int	PRIORITY	= 3;	// フレイルの優先順位
+
+	const float	RADIUS		= 50.0f;	// 半径
+	const int	HIT_DAMAGE	= 10;		// ダメージ量
+}
 
 //************************************************************
 //	静的メンバ変数宣言
@@ -35,7 +41,7 @@ const char *CFlail::mc_apModelFileFlail[] =	// モデル定数(フレイル)
 
 const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
 {
-	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
+	"data\\MODEL\\PLAYER\\14_chain.x",	// 鎖
 };
 
 //************************************************************
@@ -44,7 +50,7 @@ const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
 //============================================================
 //	コンストラクタ
 //============================================================
-CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, MODEL_UI_PRIO)
+CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 {
 	memset(&m_chain[0], 0, sizeof(m_chain));	// モデルの情報
 	m_oldPos = VEC3_ZERO;
@@ -262,7 +268,7 @@ void CFlail::UpdateChain(void)
 
 			if (m_nPlayerID == 0)
 			{
-				CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", rot.z);
+				//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", rot.z);
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
@@ -404,15 +410,20 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			D3DXVECTOR3 vec;
 			float length;
 
+			// プレイヤーとフレイルのベクトルを求める
 			vec = player->GetVec3Position() - GetVec3Position();
-			vec.y = 0.0f;
-			length = D3DXVec3Length(&vec);
-			
-			if (length < GetModelData().fRadius + player->GetRadius())
-			{
-				D3DXVECTOR3 pos = player->GetVec3Position();
+			vec.y = 0.0f;	// Yは無視
 
-				player->SetVec3Position(D3DXVECTOR3(pos.x, pos.y + 30.0f, pos.z));
+			// 距離を求める
+			length = D3DXVec3Length(&vec);
+
+			// 吹っ飛びベクトルを正規化
+			D3DXVec3Normalize(&vec, &vec);
+			
+			if (length < RADIUS + player->GetRadius())
+			{
+				// ダメージヒット処理
+				player->HitKnockBack(HIT_DAMAGE, vec);
 			}
 		}
 	}

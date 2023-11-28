@@ -35,7 +35,8 @@ namespace
 	{
 		const char* TITLE_TEX_PASS = "data\\TEXTURE\\continue001.png";	// タイトルテクスチャ
 
-		const int MAX_DIG = 3;	// 数字桁数
+		const int	MAX_DIG = 3;	// 数字桁数
+		const int	MAX_NUM = 100;	// 数字最大
 
 		const D3DXVECTOR3 POS			= D3DXVECTOR3(200.0f, 400.0f, 0.0f);	// UI位置
 		const D3DXVECTOR3 SPACE_TITLE	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// タイトル空白
@@ -51,7 +52,7 @@ namespace
 //============================================================
 //	コンストラクタ
 //============================================================
-CStatusManager::CStatusManager()
+CStatusManager::CStatusManager(const int nPadID) : m_nPadID(nPadID)
 {
 	// メンバ変数をクリア
 	m_pLife = NULL;			// 体力の情報
@@ -117,6 +118,13 @@ HRESULT CStatusManager::Init(void)
 
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
+
+	// 吹っ飛び率の最大値を設定
+	m_pKnockRate->GetMultiValue()->SetMax(knockrate::MAX_NUM);
+
+	// TODO：後で消す
+	SetEnableDrawLife(false);
+	SetEnableDrawRate(false);
 
 	// 成功を返す
 	return S_OK;
@@ -185,6 +193,15 @@ int CStatusManager::GetNumLife(void) const
 }
 
 //============================================================
+//	最大体力取得処理
+//============================================================
+int CStatusManager::GetNumMaxLife(void) const
+{
+	// 最大体力を返す
+	return m_pLife->GetMaxNum();
+}
+
+//============================================================
 //	体力の描画状況の設定処理
 //============================================================
 void CStatusManager::SetEnableDrawLife(const bool bDraw)
@@ -221,6 +238,15 @@ int CStatusManager::GetNumRate(void) const
 }
 
 //============================================================
+//	吹っ飛び率取得処理
+//============================================================
+int CStatusManager::GetNumMaxRate(void) const
+{
+	// 最大吹っ飛び率を返す
+	return m_pKnockRate->GetMultiValue()->GetNum();
+}
+
+//============================================================
 //	吹っ飛び率の描画状況の設定処理
 //============================================================
 void CStatusManager::SetEnableDrawRate(const bool bDraw)
@@ -232,7 +258,7 @@ void CStatusManager::SetEnableDrawRate(const bool bDraw)
 //============================================================
 //	生成処理
 //============================================================
-CStatusManager *CStatusManager::Create(void)
+CStatusManager *CStatusManager::Create(const int nPadID)
 {
 	// ポインタを宣言
 	CStatusManager *pStatusManager = NULL;		// ステータスマネージャー生成用
@@ -241,7 +267,7 @@ CStatusManager *CStatusManager::Create(void)
 	{ // 使用されていない場合
 
 		// メモリ確保
-		pStatusManager = new CStatusManager;	// ステータスマネージャー
+		pStatusManager = new CStatusManager(nPadID);	// ステータスマネージャー
 	}
 	else { assert(false); return NULL; }		// 使用中
 

@@ -23,10 +23,6 @@
 #include "gameManager.h"
 #include "editStageManager.h"
 
-// TODO：いらないインクルード削除
-#include "ground.h"
-#include "spawnPoint.h"
-
 //************************************************************
 //	マクロ定義
 //************************************************************
@@ -143,25 +139,6 @@ HRESULT CSceneGame::Init(void)
 		return E_FAIL;
 	}
 
-#if 0
-
-	// TODO：直がきやめようね
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
-	CGround::Create(CGround::TYPE_GRASS, D3DXVECTOR3(1650.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(600.0f, 600.0f, 600.0f));
-
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-150.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-250.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-	CBlock::Create(CBlock::TYPE_STONE, D3DXVECTOR3(-350.0f, 0.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(50.0f, 50.0f, 50.0f));
-
-	CObstacle::Create(CObstacle::TYPE_CONIFER, VEC3_ZERO, VEC3_ZERO);
-
-	CSpawnPoint::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXToRadian(D3DXVECTOR3(0.0f, 0.0f, 0.0f)));
-	CSpawnPoint::Create(D3DXVECTOR3(500.0f, 0.0f, 0.0f), D3DXToRadian(D3DXVECTOR3(0.0f, 90.0f, 0.0f)));
-	CSpawnPoint::Create(D3DXVECTOR3(1000.0f, 0.0f, 0.0f), D3DXToRadian(D3DXVECTOR3(0.0f, 180.0f, 0.0f)));
-	CSpawnPoint::Create(D3DXVECTOR3(1500.0f, 0.0f, 0.0f), D3DXToRadian(D3DXVECTOR3(0.0f, 270.0f, 0.0f)));
-
-#endif
-
 	//--------------------------------------------------------
 	//	初期設定
 	//--------------------------------------------------------
@@ -174,6 +151,9 @@ HRESULT CSceneGame::Init(void)
 		// プレイヤーを出現
 		CScene::GetPlayer(nCntPlayer)->SetSpawn();
 	}
+
+	// 見下ろしカメラの目標位置の設定
+	CManager::GetInstance()->GetCamera()->SetDestLookDown();
 
 	// UIの描画状況を設定
 	SetEnableDrawUI(m_bDrawUI);

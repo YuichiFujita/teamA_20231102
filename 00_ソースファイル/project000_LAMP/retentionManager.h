@@ -27,7 +27,7 @@ public:
 	enum EKill
 	{
 		KILL_LIFE = 0,	// ‘Ì—Í§
-		KILL_BLOWAWAY,	// ‚Ó‚Á‚Æ‚Î‚µ§
+		KILL_KNOCK,		// ‚Á”ò‚Î‚µ§
 		KILL_MAX		// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 
