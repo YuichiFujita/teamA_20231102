@@ -92,7 +92,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 	"data\\MODEL\\PLAYER\\10_leg_R.x",		// 右太もも
 	"data\\MODEL\\PLAYER\\11_thigh_L.x",	// 左脛
 	"data\\MODEL\\PLAYER\\12_leg_L.x",		// 右脛
-	"data\\MODEL\\PLAYER\\13_flail_stick.x",// フレイル持ち手
+	"data\\MODEL\\PLAYER\\13_stick.x",		// フレイル持ち手
 };
 
 //************************************************************
@@ -1132,6 +1132,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
+
+			// 目標向きを設定
+			m_destRot.y = m_pFlail->GetChainRotMove();
 		}
 
 		// 投擲
@@ -1144,7 +1147,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_pFlail->SetMove(move);
 
 			// 目標角度に合わせる
-			//m_pFlail->SetChainRot(m_destRot.y);
+			m_pFlail->SetChainRot(m_destRot.y);
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;

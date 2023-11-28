@@ -373,33 +373,37 @@ void CCamera::SetDestLookDown(void)
 			if (pPlayer != NULL)
 			{ // プレイヤーが使用されている場合
 
-				D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
+				if (pPlayer->GetState() != CPlayer::STATE_DEATH)
+				{ // 死んでいない場合
 
-				// プレイヤーの位置を加算
-				posLook += posPlayer;
+					D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
 
-				// 最小位置の更新
-				if (posPlayer.x < posMin.x)
-				{ // 現在の最小位置より小さい場合
+					// プレイヤーの位置を加算
+					posLook += posPlayer;
 
-					posMin.x = posPlayer.x;
-				}
-				if (posPlayer.z < posMin.z)
-				{ // 現在の最小位置より小さい場合
+					// 最小位置の更新
+					if (posPlayer.x < posMin.x)
+					{ // 現在の最小位置より小さい場合
 
-					posMin.z = posPlayer.z;
-				}
+						posMin.x = posPlayer.x;
+					}
+					if (posPlayer.z < posMin.z)
+					{ // 現在の最小位置より小さい場合
 
-				// 最大位置の更新
-				if (posPlayer.x > posMax.x)
-				{ // 現在の最大位置より大きい場合
+						posMin.z = posPlayer.z;
+					}
 
-					posMax.x = posPlayer.x;
-				}
-				if (posPlayer.z > posMax.z)
-				{ // 現在の最大位置より大きい場合
+					// 最大位置の更新
+					if (posPlayer.x > posMax.x)
+					{ // 現在の最大位置より大きい場合
 
-					posMax.z = posPlayer.z;
+						posMax.x = posPlayer.x;
+					}
+					if (posPlayer.z > posMax.z)
+					{ // 現在の最大位置より大きい場合
+
+						posMax.z = posPlayer.z;
+					}
 				}
 			}
 			else { assert(false); }	// 非使用中
@@ -658,33 +662,37 @@ void CCamera::LookDown(void)
 		if (pPlayer != NULL)
 		{ // プレイヤーが使用されている場合
 
-			D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
+			if (pPlayer->GetState() != CPlayer::STATE_DEATH)
+			{ // 死んでいない場合
 
-			// プレイヤーの位置を加算
-			posLook += posPlayer;
+				D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
 
-			// 最小位置の更新
-			if (posPlayer.x < posMin.x)
-			{ // 現在の最小位置より小さい場合
+				// プレイヤーの位置を加算
+				posLook += posPlayer;
 
-				posMin.x = posPlayer.x;
-			}
-			if (posPlayer.z < posMin.z)
-			{ // 現在の最小位置より小さい場合
+				// 最小位置の更新
+				if (posPlayer.x < posMin.x)
+				{ // 現在の最小位置より小さい場合
 
-				posMin.z = posPlayer.z;
-			}
+					posMin.x = posPlayer.x;
+				}
+				if (posPlayer.z < posMin.z)
+				{ // 現在の最小位置より小さい場合
 
-			// 最大位置の更新
-			if (posPlayer.x > posMax.x)
-			{ // 現在の最大位置より大きい場合
+					posMin.z = posPlayer.z;
+				}
 
-				posMax.x = posPlayer.x;
-			}
-			if (posPlayer.z > posMax.z)
-			{ // 現在の最大位置より大きい場合
+				// 最大位置の更新
+				if (posPlayer.x > posMax.x)
+				{ // 現在の最大位置より大きい場合
 
-				posMax.z = posPlayer.z;
+					posMax.x = posPlayer.x;
+				}
+				if (posPlayer.z > posMax.z)
+				{ // 現在の最大位置より大きい場合
+
+					posMax.z = posPlayer.z;
+				}
 			}
 		}
 		else { assert(false); }	// 非使用中

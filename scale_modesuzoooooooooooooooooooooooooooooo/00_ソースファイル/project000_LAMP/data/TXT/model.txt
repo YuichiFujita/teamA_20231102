@@ -1,0 +1,48 @@
+#==============================================================================
+#
+#	モデルのセットアップ [model.txt]
+#	Author : you
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+#	モデル情報
+#------------------------------------------------------------------------------
+#	プレイヤー
+#------------------------------------------------------------------------------
+FILENAME = data\MODEL\PLAYER\00_waist.x							# プレイヤー：腰
+FILENAME = data\MODEL\PLAYER\01_body.x							# プレイヤー：体
+FILENAME = data\MODEL\PLAYER\02_head.x							# プレイヤー：頭
+FILENAME = data\MODEL\PLAYER\03_shoulder_R.x					# プレイヤー：左上腕
+FILENAME = data\MODEL\PLAYER\04_arm_R.x							# プレイヤー：右上腕
+FILENAME = data\MODEL\PLAYER\05_hand_R.x						# プレイヤー：左下腕
+FILENAME = data\MODEL\PLAYER\06_shoulder_L.x					# プレイヤー：右下腕
+FILENAME = data\MODEL\PLAYER\07_arm_L.x							# プレイヤー：左手
+FILENAME = data\MODEL\PLAYER\08_hand_L.x						# プレイヤー：右手
+FILENAME = data\MODEL\PLAYER\09_thigh_R.x						# プレイヤー：左太もも
+FILENAME = data\MODEL\PLAYER\10_leg_R.x							# プレイヤー：右太もも
+FILENAME = data\MODEL\PLAYER\11_thigh_L.x						# プレイヤー：左脛
+FILENAME = data\MODEL\PLAYER\12_leg_L.x							# プレイヤー：右脛
+
+#------------------------------------------------------------------------------
+#	障害物
+#------------------------------------------------------------------------------
+FILENAME = data\MODEL\OBSTACLE\Castle000.x						#城モデル
+FILENAME = data\MODEL\OBSTACLE\Castle001.x						#カステル・デル・モンテ風の城モデル
+FILENAME = data\MODEL\OBSTACLE\Castle-Fence000.x				#城柵モデル1
+FILENAME = data\MODEL\OBSTACLE\Castle-Fence001.x				#城柵モデル2
+FILENAME = data\MODEL\OBSTACLE\Conifer000.x						#針葉樹モデル
+FILENAME = data\MODEL\OBSTACLE\Hardwood000.x					#広葉樹モデル
+FILENAME = data\MODEL\OBSTACLE\Jar000.x							#エルデンリング風の壺モデル
+FILENAME = data\MODEL\OBSTACLE\Jar001.x							#ゼルダの伝説風の壺モデル
+FILENAME = data\MODEL\OBSTACLE\Rock000-V2.x						#岩モデル
+FILENAME = data\MODEL\OBSTACLE\Rock001-V2.x						#ゆがんだ岩モデル
+FILENAME = data\MODEL\OBSTACLE\Rock(Cracked)000-V2.x			#ひび割れた岩モデル
+FILENAME = data\MODEL\OBSTACLE\StoneBrickPiller000(Other2).x	#石レンガの柱モデル
+FILENAME = data\MODEL\OBSTACLE\Wall000(Other).x					#丸屋根の壁モデル
+FILENAME = data\MODEL\OBSTACLE\Wall000(Other)[Flimsy].x			#もろい丸屋根の壁モデル
+FILENAME = data\MODEL\OBSTACLE\Wall001(Other).x					#三角屋根の壁モデル
+FILENAME = data\MODEL\OBSTACLE\Wall001(Other)[Flimsy].x			#もろい三角屋根の壁モデル
+FILENAME = data\MODEL\OBSTACLE\well000.x						#井戸モデル
+FILENAME = data\MODEL\OBSTACLE\Fountain000.x					#噴水モデル
+FILENAME = data\MODEL\OBSTACLE\Tower000.x						#塔モデル
+

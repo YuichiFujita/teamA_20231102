@@ -122,10 +122,6 @@ HRESULT CStatusManager::Init(void)
 	// ‚Á”ò‚Ñ—¦‚ÌÅ‘å’l‚ğİ’è
 	m_pKnockRate->GetMultiValue()->SetMax(knockrate::MAX_NUM);
 
-	// TODOFŒã‚ÅÁ‚·
-	SetEnableDrawLife(false);
-	SetEnableDrawRate(false);
-
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

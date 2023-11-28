@@ -242,14 +242,14 @@ void CFlail::UpdateChain(void)
 		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 		rot.x = 0.0f;
 		rot.y = 0.0f;
-
+		
 		if (nCntChain == 0)
 		{
-			rot.x = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().x;
-			rot.y = player->GetMultiModel(CPlayer::MODEL_HAND_R)->GetVec3Rotation().y;
-			rot.z = m_fChainRot;
+			rot.x = 0.0f;
+			rot.y = m_fChainRot;
+			rot.z = 0.0f;
 
-			pos.x = -10.0f;
+			pos.x = -1.0f;
 			pos.y = 0.0f;
 			pos.z = 0.0f;
 		}
@@ -263,23 +263,18 @@ void CFlail::UpdateChain(void)
 			}
 			else
 			{
-				rot = m_chain[IDParent].rotOld;
-			}
-
-			if (m_nPlayerID == 0)
-			{
-				//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", rot.z);
+				rot = m_chain[IDParent].rotOld * 0.85f;
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= m_chain[IDParent].multiModel->GetModelData().fRadius) || nCntChain == 1)
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 100.0f) || nCntChain == 1)
 				{
 					pos.x += 70.0f;
 
-					if (pos.x > m_chain[nCntChain].multiModel->GetModelData().fRadius)
+					if (pos.x > 100.0f)
 					{
-						pos.x = m_chain[nCntChain].multiModel->GetModelData().fRadius;
+						pos.x = 100.0f;
 					}
 				}
 			}
@@ -294,6 +289,14 @@ void CFlail::UpdateChain(void)
 					{
 						pos.x = 0.0f;
 					}
+				}
+			}
+
+			if (m_nPlayerID == 0)
+			{
+				if (nCntChain < 10)
+				{
+					CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖位置 %f\n", pos.x);
 				}
 			}
 		}
@@ -311,34 +314,85 @@ void CFlail::UpdateChain(void)
 //============================================================
 void CFlail::Draw(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
+	D3DXMATRIX mtx;
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&mtx);
+
+	mtx._41 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_41;
+	mtx._42 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_42;
+	mtx._43 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_43;
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtx);
+
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
-		// モデルの描画
-		m_chain[nCntChain].multiModel->Draw();
+		int IDParent = nCntChain - 1;
+
+		if (m_chain[nCntChain].multiModel->GetVec3Position().x == 0.0f)
+		{
+			// 変数を宣言
+			D3DXMATRIX   mtxScale, mtxRot, mtxTrans, *mtxOrg;	// 計算用マトリックス
+			D3DXMATRIX   mtxParent;	// 親のマトリックス
+			D3DXVECTOR3 pos, rot, scale;
+
+			pos = m_chain[nCntChain].multiModel->GetVec3Position();
+			rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
+			scale = m_chain[nCntChain].multiModel->GetVec3Scaling();
+			mtxOrg = m_chain[nCntChain].multiModel->GetPtrMtxWorld();
+
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(mtxOrg);
+
+			// 拡大率を反映
+			D3DXMatrixScaling(&mtxScale, scale.x, scale.y, scale.z);
+			D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxScale);
+
+			// 向きを反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
+			D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxRot);
+
+			// 位置を反映
+			D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y, pos.z);
+			D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxTrans);
+
+			// 親マトリックスを設定
+			if (nCntChain == 0)
+			{ // 親が存在しない場合
+
+			  // 現在のマトリックスを取得
+				pDevice->GetTransform(D3DTS_WORLD, &mtxParent);	// 設定された最新のマトリックス (実体のマトリックス)
+			}
+			else
+			{ // 親が存在する場合
+
+			  // 親のマトリックスを設定
+				mtxParent = m_chain[IDParent].multiModel->GetMtxWorld();
+			}
+
+			// ワールドマトリックスと親マトリックスを掛け合わせる
+			D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxParent);
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, mtxOrg);
+		}
+		else
+		{
+			// モデルの描画
+			m_chain[nCntChain].multiModel->Draw();
+		}
 	}
 
 	UpdateFlailPos();
 
-	// 変数を宣言
-	D3DVIEWPORT9 viewportDef;	// カメラのビューポート保存用
-
-	// ポインタを宣言
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
-
-	// 現在のビューポートを取得
-	pDevice->GetViewport(&viewportDef);
-
-	// カメラの設定
-	CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
-
 	// オブジェクトモデルの描画
 	CObjectModel::Draw();
-
-	// カメラの設定を元に戻す
-	CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
-
-	// ビューポートを元に戻す
-	pDevice->SetViewport(&viewportDef);
 }
 
 //============================================================
@@ -715,14 +769,14 @@ void CFlail::BindParent(const CPlayer& rPlayer)
 	{
 		if (nCntChain == 0)
 		{
-			// NULLを設定
-			m_chain[nCntChain].multiModel->SetParentModel(rPlayer.GetMultiModel(CPlayer::MODEL_HAND_R));
+			// 親を設定
+			m_chain[nCntChain].multiModel->SetParentModel(NULL);
 		}
 		else
 		{
 			parentID = nCntChain - 1;
 
-			// NULLを設定
+			// 親を設定
 			m_chain[nCntChain].multiModel->SetParentModel(m_chain[parentID].multiModel);
 		}
 	}
