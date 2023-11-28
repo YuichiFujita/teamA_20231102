@@ -114,7 +114,6 @@ private:
 
 	// ƒƒ“ƒo•Ï”
 	SChain		m_chain[flail::FLAIL_NUM];		// ½
-	CMultiModel *m_parentDef;
 	D3DXVECTOR3 m_posOrg;						// ‰ñ“]Œ´“_
 	D3DXVECTOR3 m_oldPos;						// ‰ß‹‚ÌˆÊ’u
 	D3DXVECTOR3	m_move;							// ˆÚ“®—Ê
