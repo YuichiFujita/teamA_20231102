@@ -27,7 +27,7 @@ MODEL_FILENAME = data/model/player/09_thigh_R.x		# [9]âEë⁄
 MODEL_FILENAME = data/model/player/10_leg_R.x		# [10]âEë´
 MODEL_FILENAME = data/model/player/11_thigh_L.x		# [11]ç∂ë⁄
 MODEL_FILENAME = data/model/player/12_leg_L.x		# [12]ç∂ë´
-MODEL_FILENAME = data/model/player/13_ironBall.x	# [13]ñ_
+MODEL_FILENAME = data/model/player/13_stick.x		# [13]ñ_
 MODEL_FILENAME = data/model/player/14_ironBall.x	# [14]ìSãÖ
 
 #------------------------------------------------------------------------------
@@ -137,8 +137,8 @@ CHARACTERSET
 
 	PARTSSET						# [13]ñ_
 		INDEX = 14
-		PARENT = 13					# (êe)âEéË
-		POS = 0.0 0.0 0.0
+		PARENT = 13					# (êe)ìSãÖ
+		POS = 0.0 -5.0 2.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 

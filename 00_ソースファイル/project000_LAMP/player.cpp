@@ -92,7 +92,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 	"data\\MODEL\\PLAYER\\10_leg_R.x",		// 右太もも
 	"data\\MODEL\\PLAYER\\11_thigh_L.x",	// 左脛
 	"data\\MODEL\\PLAYER\\12_leg_L.x",		// 右脛
-	"data\\MODEL\\PLAYER\\13_flail_stick.x",// フレイル持ち手
+	"data\\MODEL\\PLAYER\\13_stick.x",		// フレイル持ち手
 };
 
 //************************************************************
