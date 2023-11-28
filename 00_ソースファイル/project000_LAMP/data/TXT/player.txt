@@ -8,7 +8,7 @@
 # キャラクター情報
 #------------------------------------------------------------------------------
 CHARACTERSET
-	NUM_PARTS = 13					# パーツ数
+	NUM_PARTS = 14					# パーツ数
 
 	PARTSSET						# [0]腰
 		INDEX = 0
@@ -99,6 +99,13 @@ CHARACTERSET
 		PARENT = 11					# (親)左腿
 		POS = 0.0 -20.0 -0.1
 		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET						# [13]棒
+		INDEX = 13
+		PARENT = 5					# (親)右手
+		POS = 0.0 0.0 -4.0
+		ROT = 1.5 0.0 0.0
 	END_PARTSSET
 
 END_CHARACTERSET
