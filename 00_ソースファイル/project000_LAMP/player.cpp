@@ -416,8 +416,19 @@ void CPlayer::SetState(const int nState)
 	if (nState > NONE_IDX && nState < STATE_MAX)
 	{ // ”ÍˆÍ“à‚Ìê‡
 
-		// ˆø”‚Ìó‘Ô‚ðÝ’è
-		m_state = (EState)nState;
+		if (m_state != STATE_DEATH)
+		{ // Ž€–Só‘Ô‚¶‚á‚È‚¢ê‡
+
+			// ˆø”‚Ìó‘Ô‚ðÝ’è
+			m_state = (EState)nState;
+
+			if (m_state == STATE_DEATH)
+			{ // Ž€–Só‘Ô‚Ìê‡
+
+				// ¶‘¶ƒ‰ƒ“ƒLƒ“ƒO‚ðXV
+				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+			}
+		}
 	}
 	else { assert(false); }
 }

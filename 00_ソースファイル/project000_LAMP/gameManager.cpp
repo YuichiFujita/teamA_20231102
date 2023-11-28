@@ -13,6 +13,7 @@
 #include "sceneGame.h"
 #include "camera.h"
 #include "player.h"
+#include "retentionManager.h"
 #include "editStageManager.h"
 
 //************************************************************
@@ -47,6 +48,9 @@ HRESULT CGameManager::Init(void)
 {
 	// ƒƒ“ƒo•Ï”‚ð‰Šú‰»
 	m_state = STATE_NORMAL;	// ó‘Ô
+
+	// ¶‘¶ƒ‰ƒ“ƒLƒ“ƒO‚ð‰Šú‰»
+	CManager::GetInstance()->GetRetentionManager()->InitSurvivalRank();
 
 #if _DEBUG
 

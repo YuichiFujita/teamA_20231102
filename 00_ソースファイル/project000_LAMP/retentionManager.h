@@ -38,6 +38,16 @@ public:
 		WIN_MAX				// この列挙型の総数
 	};
 
+	// 生存ランキング列挙
+	enum ERank
+	{
+		RANK_4TH = 0,	// 生存ランキング：四位
+		RANK_3RD,		// 生存ランキング：三位
+		RANK_2ND,		// 生存ランキング：二位
+		RANK_1ST,		// 生存ランキング：一位
+		RANK_MAX		// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CRetentionManager();
 
@@ -59,16 +69,22 @@ public:
 	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
 	bool IsEntry(const int nID) const;						// エントリー状況取得
 
+	void InitSurvivalRank(void);				// 生存ランキング初期化
+	void SetSurvivalRank(const int nPlayerID);	// 生存ランキング設定
+	ERank GetSurvivalRank(const int nID) const;	// 生存ランキング取得
+
 	// 静的メンバ関数
 	static CRetentionManager *Create(void);	// 生成
 	static HRESULT Release(CRetentionManager *&prRetentionManager);	// 破棄
 
 private:
 	// メンバ変数
-	EKill m_stateKill;	// 討伐条件
-	EWin m_stateWin;	// 勝利条件
-	int m_nNumPlayer;	// プレイヤー数
-	bool m_aEntry[MAX_PLAYER];	// エントリー状況
+	EKill	m_stateKill;	// 討伐条件
+	EWin	m_stateWin;		// 勝利条件
+	int		m_nNumPlayer;	// プレイヤー数
+
+	int		m_aSurvivalRank[MAX_PLAYER];	// 昇順の生存ランキング
+	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 };
 
 #endif	// _RETENTION_MANAGER_H_

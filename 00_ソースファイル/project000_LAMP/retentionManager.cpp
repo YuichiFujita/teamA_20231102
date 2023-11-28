@@ -19,6 +19,7 @@
 CRetentionManager::CRetentionManager()
 {
 	// メンバ変数をクリア
+	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 昇順の生存ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
@@ -39,8 +40,9 @@ CRetentionManager::~CRetentionManager()
 HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
+	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 昇順の生存ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
-	m_stateKill		= KILL_KNOCK;	// 討伐条件
+	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
 
@@ -214,4 +216,58 @@ bool CRetentionManager::IsEntry(const int nID) const
 {
 	// 引数インデックスのエントリー状況を返す
 	return m_aEntry[nID];
+}
+
+//============================================================
+//	生存ランキング初期化処理
+//============================================================
+void CRetentionManager::InitSurvivalRank(void)
+{
+	// 生存ランキングを初期化
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		m_aSurvivalRank[nCntPlayer] = NONE_IDX;
+	}
+}
+
+//============================================================
+//	生存ランキング設定処理
+//============================================================
+void CRetentionManager::SetSurvivalRank(const int nPlayerID)
+{
+	// 生存ランキングを更新
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (m_aSurvivalRank[nCntPlayer] != NONE_IDX)
+		{ // ランキングが設定されていない場合
+
+			// 引数のプレイヤーインデックスを設定
+			m_aSurvivalRank[nCntPlayer] = nPlayerID;
+		}
+	}
+}
+
+//============================================================
+//	生存ランキング取得処理
+//============================================================
+CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
+{
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (m_aSurvivalRank[nCntPlayer] == nID)
+		{ // ランキングが設定されていない場合
+
+			// 引数のプレイヤーインデックスを設定
+			return (ERank)nCntPlayer;
+		}
+	}
+
+	// 使用できないインデックスを返す
+	assert(false);
+	return RANK_4TH;
+
+	// TODO：降順に変更後なんか設定できてない
 }
