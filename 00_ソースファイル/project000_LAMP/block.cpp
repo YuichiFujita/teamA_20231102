@@ -28,6 +28,24 @@ CBlock::SStatusInfo CBlock::m_aStatusInfo[TYPE_MAX] = {};	// ステータス情報
 const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 {
 	{ // 石テクスチャ
+		"data\\TEXTURE\\block000.png",	// 左テクスチャ
+		"data\\TEXTURE\\block000.png",	// 右テクスチャ
+		"data\\TEXTURE\\block000.png",	// 下テクスチャ
+		"data\\TEXTURE\\block000.png",	// 上テクスチャ
+		"data\\TEXTURE\\block000.png",	// 前テクスチャ
+		"data\\TEXTURE\\block000.png",	// 後テクスチャ
+	},
+
+	{ // 箱テクスチャ
+		"data\\TEXTURE\\block001.png",	// 左テクスチャ
+		"data\\TEXTURE\\block001.png",	// 右テクスチャ
+		"data\\TEXTURE\\block001.png",	// 下テクスチャ
+		"data\\TEXTURE\\block001.png",	// 上テクスチャ
+		"data\\TEXTURE\\block001.png",	// 前テクスチャ
+		"data\\TEXTURE\\block001.png",	// 後テクスチャ
+	},
+
+	{ // レンガテクスチャ
 		"data\\TEXTURE\\Brick000.png",	// 左テクスチャ
 		"data\\TEXTURE\\Brick000.png",	// 右テクスチャ
 		"data\\TEXTURE\\Brick000.png",	// 下テクスチャ
@@ -36,7 +54,7 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 		"data\\TEXTURE\\Brick000.png",	// 後テクスチャ
 	},
 
-	{ // 箱テクスチャ
+	{ // コンクリートテクスチャ
 		"data\\TEXTURE\\Concrete000.png",	// 左テクスチャ
 		"data\\TEXTURE\\Concrete000.png",	// 右テクスチャ
 		"data\\TEXTURE\\Concrete000.png",	// 下テクスチャ
