@@ -178,6 +178,7 @@
     <ClCompile Include="liquid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
+    <ClCompile Include="middleResultManager.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modelUI.cpp" />
     <ClCompile Include="motion.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="liquid.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
+    <ClInclude Include="middleResultManager.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modelUI.h" />
     <ClInclude Include="motion.h" />
