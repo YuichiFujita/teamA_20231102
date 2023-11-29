@@ -14,12 +14,22 @@
 #include "camera.h"
 #include "player.h"
 #include "retentionManager.h"
+#include "middleResultManager.h"
 #include "editStageManager.h"
+
+//************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	const int	WAIT_RESULT_FRAME = 120;	// ゲーム画面からゲーム内リザルト画面に移動する際の余韻フレーム
+}
 
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-CEditStageManager *CGameManager::m_pEditStage = NULL;	// エディットステージの情報
+CMiddleResultManager	*CGameManager::m_pMiddleResult	= NULL;	// 中間リザルトの情報
+CEditStageManager		*CGameManager::m_pEditStage		= NULL;	// エディットステージの情報
 
 //************************************************************
 //	親クラス [CGameManager] のメンバ関数
@@ -31,6 +41,7 @@ CGameManager::CGameManager()
 {
 	// メンバ変数をクリア
 	m_state = STATE_NONE;	// 状態
+	m_nCounterState = 0;	// 状態管理カウンター
 }
 
 //============================================================
@@ -48,12 +59,27 @@ HRESULT CGameManager::Init(void)
 {
 	// メンバ変数を初期化
 	m_state = STATE_NORMAL;	// 状態
+	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 生存人数を初期化
 	CManager::GetInstance()->GetRetentionManager()->InitNumSurvival();
 
 	// 生存ランキングを初期化
 	CManager::GetInstance()->GetRetentionManager()->InitSurvivalRank();
+
+	if (m_pMiddleResult == NULL)
+	{ // 中間リザルトが使用されていない場合
+
+		// 中間リザルトの生成
+		m_pMiddleResult = CMiddleResultManager::Create();
+		if (m_pMiddleResult == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			return E_FAIL;
+		}
+	}
+	else { assert(false); }	// 使用済み
 
 #if _DEBUG
 
@@ -82,6 +108,13 @@ HRESULT CGameManager::Init(void)
 //============================================================
 void CGameManager::Uninit(void)
 {
+	if (m_pMiddleResult != NULL)
+	{ // 中間リザルトが使用されている場合
+
+		// 中間リザルトの破棄
+		CMiddleResultManager::Release(m_pMiddleResult);
+	}
+
 	if (m_pEditStage != NULL)
 	{ // エディットステージが使用されている場合
 
@@ -98,21 +131,41 @@ void CGameManager::Update(void)
 	switch (m_state)
 	{ // 状態ごとの処理
 	case STATE_NONE:
-
-		// 無し
-
 		break;
 
 	case STATE_NORMAL:
 
-		// 無し
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
+		{ // 生き残りがいない場合
+
+			// カウンターを加算
+			m_nCounterState++;
+
+			if (m_nCounterState >= WAIT_RESULT_FRAME)
+			{ // 余韻が経過した場合
+
+				// カウンターを初期化
+				m_nCounterState = 0;
+
+				// リザルトに移行
+				//m_state = STATE_RESULT;	// TODO：遷移直す
+			}
+		}
+
+		break;
+
+	case STATE_RESULT:
+
+		if (m_pMiddleResult != NULL)
+		{ // 中間リザルトが使用されている場合
+
+			// 中間リザルトの更新
+			m_pMiddleResult->Update();
+		}
 
 		break;
 
 	case STATE_END:
-
-		// 無し
-
 		break;
 
 	default:	// 例外処理

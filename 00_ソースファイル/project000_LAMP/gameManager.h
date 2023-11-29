@@ -18,6 +18,7 @@
 //************************************************************
 //	前方宣言
 //************************************************************
+class CMiddleResultManager;	// 中間リザルトマネージャークラス
 class CEditStageManager;	// エディットステージマネージャークラス
 
 //************************************************************
@@ -32,6 +33,7 @@ public:
 	{
 		STATE_NONE = 0,	// 何もしない状態
 		STATE_NORMAL,	// 通常状態
+		STATE_RESULT,	// リザルト状態
 		STATE_END,		// 終了状態
 		STATE_MAX		// この列挙型の総数
 	};
@@ -52,14 +54,18 @@ public:
 	// 静的メンバ関数
 	static CGameManager *Create(void);	// 生成
 	static HRESULT Release(CGameManager *&prGameManager);	// 破棄
-	static CEditStageManager *GetEditStage(void);	// エディットステージ取得
+
+	static CMiddleResultManager	*GetMiddleResult(void);	// 中間リザルト取得
+	static CEditStageManager	*GetEditStage(void);	// エディットステージ取得
 
 private:
 	// 静的メンバ変数
-	static CEditStageManager *m_pEditStage;	// エディットステージの情報
+	static CMiddleResultManager	*m_pMiddleResult;	// 中間リザルトの情報
+	static CEditStageManager	*m_pEditStage;		// エディットステージの情報
 
 	// メンバ変数
-	EState m_state;	// 状態
+	EState m_state;			// 状態
+	int m_nCounterState;	// 状態管理カウンター
 };
 
 #endif	// _GAMEMANAGER_H_
