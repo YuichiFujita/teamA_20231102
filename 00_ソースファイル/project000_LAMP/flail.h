@@ -72,23 +72,26 @@ public:
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
 
-	void SetVec3PosOrg(const D3DXVECTOR3& rPosOrg);		// 回転原点設定
-	D3DXVECTOR3 GetVec3PosOrg(void);					// 回転原点取得
+	void SetVec3PosOrg(const D3DXVECTOR3& rPosOrg);			// 回転原点設定
+	D3DXVECTOR3 GetVec3PosOrg(void);						// 回転原点取得
 
-	void SetPlayerID(const int& rPlayerID);				// プレイヤー番号設定
-	int GetPlayerID(void);								// プレイヤー番号取得
+	void SetPlayerID(const int& rPlayerID);					// プレイヤー番号設定
+	int GetPlayerID(void);									// プレイヤー番号取得
 
-	void SetMove(const D3DXVECTOR3& rMove);				// 位置設定
-	D3DXVECTOR3 GetMove(void);							// 位置取得
+	void SetMove(const D3DXVECTOR3& rMove);					// 位置設定
+	D3DXVECTOR3 GetMove(void);								// 位置取得
 
-	void SetChainRot(const float& rChainRot);			// 角度設定
-	float GetChainRot(void);							// 角度取得
+	void SetChainRot(const float& rChainRot);				// 角度設定
+	float GetChainRot(void);								// 角度取得
 
-	void SetChainRotMove(const float& rChainRotMove);	// 目標角度設定
-	float GetChainRotMove(void);						// 目標角度取得
+	void SetChainRotTarget(const float& rChainRotTarget);	// 目標角度設定
+	float GetChainRotTarget(void);							// 目標角度取得
 
-	void SetLengthChain(const float& rLengthChain);		// 長さ設定
-	float GetLengthChain(void);							// 長さ取得
+	void SetChainRotMove(const float& rChainRotMove);		// 目標角度設定
+	float GetChainRotMove(void);							// 目標角度取得
+
+	void SetLengthChain(const float& rLengthChain);			// 長さ設定
+	float GetLengthChain(void);								// 長さ取得
 
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
@@ -119,6 +122,7 @@ private:
 	D3DXVECTOR3	m_move;							// 移動量
 	int			m_nPlayerID;					// プレイヤーID
 	float		m_fChainRot;					// 角度
+	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
 
