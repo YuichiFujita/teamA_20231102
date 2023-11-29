@@ -279,7 +279,8 @@ void CPlayer::Update(void)
 	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
 	{ // 残り人数が1人の場合
 
-		int a = 0;
+		// 生存ランキングを更新 (一位を設定)
+		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 	}
 
 	// フレイルの更新

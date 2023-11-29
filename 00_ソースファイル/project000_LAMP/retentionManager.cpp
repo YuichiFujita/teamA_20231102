@@ -266,6 +266,9 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 			// 引数のプレイヤーインデックスを設定
 			m_aSurvivalRank[nCntPlayer] = nPlayerID;
 
+			// 生存人数を減算
+			m_nNumSurvival--;
+
 			// 処理を抜ける
 			break;
 		}
