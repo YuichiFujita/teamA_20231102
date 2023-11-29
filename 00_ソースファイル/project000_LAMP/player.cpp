@@ -276,6 +276,12 @@ void CPlayer::Update(void)
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
+	{ // 残り人数が1人の場合
+
+		int a = 0;
+	}
+
 	// フレイルの更新
 	m_pFlail->Update();
 
