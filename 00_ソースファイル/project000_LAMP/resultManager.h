@@ -103,6 +103,9 @@ private:
 	void SkipStaging(void);			// 演出スキップ
 	void SetTexResult(void);		// リザルト表示のテクスチャ設定
 	bool UpdateDrawWait(const int nWait);	// 表示待機
+	void UpdateWin(void);
+	void UpdateBigFrame(void);
+	void UpdateFrame(void);
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
@@ -113,6 +116,7 @@ private:
 	CObject2D *m_apFrame[NUM_FRAME];	// フレーム
 	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
 	CObject2D *m_pFade;					// フェードの情報
+	CObject2D *m_pCover;
 	EState m_state;						// 状態
 	D3DXVECTOR3 m_arPos[OBJ_MAX];		// サイズ
 	D3DXVECTOR3 m_arSize[OBJ_MAX];		// 位置

@@ -488,16 +488,6 @@ void CPlayer::SetEnableDraw(const bool bDraw)
 }
 
 //============================================================
-//	UI描画状況の設定処理
-//============================================================
-void CPlayer::SetEnableDrawUI(const bool bDraw)
-{
-	// 引数の描画状況を設定
-	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
-	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
-}
-
-//============================================================
 //	マトリックス取得処理
 //============================================================
 D3DXMATRIX CPlayer::GetMtxWorld(void) const
@@ -656,6 +646,16 @@ void CPlayer::SetInvuln(void)
 
 	// サウンドの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// 生成音
+}
+
+//============================================================
+//	UI描画状況の設定処理
+//============================================================
+void CPlayer::SetEnableDrawUI(const bool bDraw)
+{
+	// 引数の描画状況を設定
+	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
+	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 }
 
 //============================================================
