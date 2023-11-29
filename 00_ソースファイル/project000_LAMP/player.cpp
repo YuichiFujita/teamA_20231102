@@ -271,7 +271,7 @@ void CPlayer::Update(void)
 		chainRot = atan2f(vecFlail.x, vecFlail.z);
 
 		m_pFlail->SetChainRot(chainRot);
-		m_pFlail->SetChainRotMove(chainRot);
+		m_pFlail->SetChainRotTarget(chainRot);
 		m_pFlail->SetLengthChain(length);
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
@@ -1128,6 +1128,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		m_destRot.y = atan2f(-m_move.x, -m_move.z);
 	}
 
+	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
+
 	// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
@@ -1144,14 +1147,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// 溜めてる間鉄球を振り回す
-			//m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.003f * m_nCounterFlail));
+			m_pFlail->SetChainRotMove(-0.003f * m_nCounterFlail);
 
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
 
 			// 目標向きを設定
-			m_destRot.y = m_pFlail->GetChainRotMove() + D3DX_PI;
+			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
 		}
 
 		// 投擲
@@ -1159,12 +1162,16 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
-			move.x = (sinf(m_pFlail->GetChainRotMove()) * 5.0f * m_nCounterFlail);
-			move.z = (cosf(m_pFlail->GetChainRotMove()) * 5.0f * m_nCounterFlail);
+			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
+			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
 
-			// 目標角度に合わせる
-			m_pFlail->SetChainRot(m_pFlail->GetChainRotMove() - D3DX_PI * 0.5f);
+			if (m_nCounterFlail < 30)
+			{
+				// 目標角度に合わせる
+				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
+				m_pFlail->SetChainRotMove(0.0f);
+			}
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
@@ -1209,11 +1216,40 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				m_nCounterFlail = -60;
 			}
+
+			if (m_nCounterFlail == -2)
+			{
+				float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
+				float rot2 = m_destRot.y;
+				float rot3 = rot2 - rot1;
+
+				useful::NormalizeRot(rot3);
+
+				if (DEAD_ZONE < fStick)
+				{ // デッドゾーン以上の場合
+
+					if (rot3 > 0.0f)
+					{
+						// 溜めてる間鉄球を振り回す
+						m_pFlail->SetChainRotMove(0.1f);
+					}
+					else
+					{
+						// 溜めてる間鉄球を振り回す
+						m_pFlail->SetChainRotMove(-0.1f);
+					}
+				}
+				else
+				{
+					// 溜めてる間鉄球を振り回す
+					m_pFlail->SetChainRotMove(0.0f);
+				}
+			}
 			
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
-			move.x = (sinf(m_pFlail->GetChainRotMove()) * (m_nCounterFlail * -m_nCounterFlail));
-			move.z = (cosf(m_pFlail->GetChainRotMove()) * (m_nCounterFlail * -m_nCounterFlail));
+			move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
+			move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
 			m_pFlail->SetMove(move);
 
 			// 移動量を更新
@@ -1228,22 +1264,19 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		}
 	}
 
-	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
-	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
-
 	if (DEAD_ZONE < fStick)
 	{ // デッドゾーン以上の場合
-		m_pFlail->SetChainRotMove(CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f);
+		m_pFlail->SetChainRotTarget(CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f);
 	}
 
 	// 目標角度変更処理
 	if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
 	{
-		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() - 0.015f);
+		m_pFlail->SetChainRotTarget(m_pFlail->GetChainRotTarget() - 0.015f);
 	}
 	else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
 	{
-		m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() + 0.015f);
+		m_pFlail->SetChainRotTarget(m_pFlail->GetChainRotTarget() + 0.015f);
 	}
 
 	// 位置を表示

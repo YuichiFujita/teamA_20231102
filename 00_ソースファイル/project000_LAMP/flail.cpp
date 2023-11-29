@@ -57,6 +57,7 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	m_move = VEC3_ZERO;
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
+	m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
 }
 
@@ -123,12 +124,14 @@ void CFlail::Update(void)
 
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
-	useful::NormalizeRot(m_fChainRotMove);
+	useful::NormalizeRot(m_fChainRotTarget);
 
 	// 引っ張る時のみ角度調整
-	if (player->GetCounterFlail() < flail::FLAIL_DROP)
+	m_fChainRot += m_fChainRotMove;
+
+	if (player->GetCounterFlail() == flail::FLAIL_DROP)
 	{
-		m_fChainRot += (m_fChainRotMove - m_fChainRot) * 0.008f;
+		m_fChainRotMove += (0.0f - m_fChainRotMove) * 0.1f;
 	}
 
 	if (D3DXVec3Length(&m_move) > 0.0f && D3DXVec3Length(&m_move) < 5.0f)
@@ -139,14 +142,15 @@ void CFlail::Update(void)
 	
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
-	useful::NormalizeRot(m_fChainRotMove);
+	useful::NormalizeRot(m_fChainRotTarget);
 
 	if (m_nPlayerID == 0)
 	{
-		/*CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖目標角度 %f\n", m_fChainRotMove);
+		/*CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖目標角度 %f\n", m_fChainRotTarget);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", m_fChainRot);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖長さ %f\n", m_fLengthChain);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", player->GetCounterFlail());*/
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角速度]：%f\n", m_fChainRotMove);
 	}
 
 	// オブジェクトモデルの更新
@@ -173,9 +177,9 @@ void CFlail::UpdateFlailPos(void)
 
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
-		if (player->GetCounterFlail() == flail::FLAIL_DROP)
+		if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove >= -0.1f && m_fChainRotMove <= 0.1f)
 		{
-			if (pos.y > -13.0f)
+			if (pos.y > -64.0f)
 			{
 				pos.y -= 3.0f;
 			}
@@ -183,6 +187,13 @@ void CFlail::UpdateFlailPos(void)
 			{
 				pos.y = CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetScrollMeshField(0)->GetPositionHeight(pos);
 			}
+		}
+		else if (player->GetCounterFlail() < flail::FLAIL_DROP)
+		{
+			D3DXMATRIX chainMtx = m_chain[0].multiModel->GetMtxWorld();
+			D3DXVECTOR3 chainPos = D3DXVECTOR3(chainMtx._41, chainMtx._42, chainMtx._43);
+
+			pos.y = chainPos.y;
 		}
 		else
 		{
@@ -251,11 +262,24 @@ void CFlail::UpdateChain(void)
 				rot.y = m_chain[IDParent].rotOld.y * 0.8f;
 			}
 
+			if (player->GetCounterFlail() <= flail::FLAIL_CHARGE && player->GetCounterFlail() > flail::FLAIL_DEF)
+			{
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f && m_fLengthChain <= 60.0f) || nCntChain == 1)
+				{
+					pos.x += 5.0f;
+
+					if (pos.x > 20.0f)
+					{
+						pos.x = 20.0f;
+					}
+				}
+			}
+
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
 				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f) || nCntChain == 1)
 				{
-					pos.x += 19.0f;
+					pos.x += 10.0f;
 
 					if (pos.x > 20.0f)
 					{
@@ -268,7 +292,7 @@ void CFlail::UpdateChain(void)
 			{
 				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
 				{
-					pos.x -= -0.2f * player->GetCounterFlail();
+					pos.x -= -0.3f * player->GetCounterFlail();
 					
 					if (pos.x < 0.0f)
 					{
@@ -911,6 +935,24 @@ float CFlail::GetChainRot(void)
 //============================================================
 //	目標角度の設定処理
 //============================================================
+void CFlail::SetChainRotTarget(const float& rChainRotTarget)
+{
+	// 引数の目標角度を設定
+	m_fChainRotTarget = rChainRotTarget;
+}
+
+//============================================================
+//	目標角度の取得処理
+//============================================================
+float CFlail::GetChainRotTarget(void)
+{
+	// 目標角度を返す
+	return m_fChainRotTarget;
+}
+
+//============================================================
+//	角速度の設定処理
+//============================================================
 void CFlail::SetChainRotMove(const float& rChainRotMove)
 {
 	// 引数の目標角度を設定
@@ -918,7 +960,7 @@ void CFlail::SetChainRotMove(const float& rChainRotMove)
 }
 
 //============================================================
-//	目標角度の取得処理
+//	角速度の取得処理
 //============================================================
 float CFlail::GetChainRotMove(void)
 {
