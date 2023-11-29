@@ -1126,15 +1126,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// 溜めてる間鉄球を振り回す
-			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.002f * m_nCounterFlail));
-			m_pFlail->SetLengthChain(1.0f * m_nCounterFlail);
+			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.003f * m_nCounterFlail));
 
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
 
 			// 目標向きを設定
-			m_destRot.y = m_pFlail->GetChainRotMove();
+			m_destRot.y = m_pFlail->GetChainRotMove() + D3DX_PI * 0.5f;
 		}
 
 		// 投擲
@@ -1147,7 +1146,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_pFlail->SetMove(move);
 
 			// 目標角度に合わせる
-			m_pFlail->SetChainRot(m_destRot.y);
+			//m_pFlail->SetChainRot(m_destRot.y);
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
@@ -1160,7 +1159,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (D3DXVec3Length(&m_pFlail->GetMove()) < 1.0f)
+			if (m_pFlail->GetLengthChain() == 4.0f * (flail::FLAIL_NUM - 1))
 			{
 				m_nCounterFlail = flail::FLAIL_DROP;
 			}
@@ -1173,17 +1172,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			m_nCounterFlail++;
 		}
-
-		m_pFlail->SetLengthChain(0.0f);
 	}
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() < 5.0f)
+		if (m_pFlail->GetLengthChain() == 0.0f)
 		{
 			m_nCounterFlail = 1;
 			m_pFlail->SetMove(VEC3_ZERO);
-			m_pFlail->SetLengthChain(0.0f);
 		}
 
 		// 引き戻す
@@ -1191,9 +1187,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			m_nCounterFlail -= 1;
 
-			if (m_nCounterFlail < -50)
+			if (m_nCounterFlail < -60)
 			{
-				m_nCounterFlail = -50;
+				m_nCounterFlail = -60;
 			}
 			
 			// 溜めた時間に応じて飛距離増加
@@ -1205,14 +1201,12 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 移動量を更新
 			m_move.x = 0.0f;
 			m_move.z = 0.0f;
-
-			//m_nCounterFlail = flail::FLAIL_DEF;
 		}
 
 		// 投擲
 		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
 		{
-			m_nCounterFlail = flail::FLAIL_DEF;
+			m_nCounterFlail = flail::FLAIL_DROP;
 		}
 	}
 
@@ -1236,6 +1230,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", m_nCounterFlail);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖長さ]：%f\n", m_pFlail->GetLengthChain());
 
 	// 待機モーションを返す
 	return MOTION_IDOL;

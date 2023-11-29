@@ -119,6 +119,7 @@ void CFlail::Update(void)
 {
 	m_oldPos = GetVec3Position();
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+	m_fLengthChain = 0.0f;
 
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -170,16 +171,13 @@ void CFlail::UpdateFlailPos(void)
 	// 角度と長さから鉄球の位置決定
 	D3DXVECTOR3 pos = GetVec3Position();
 
-	pos.x += m_move.x;
-	pos.z += m_move.z;
-
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
 		if (player->GetCounterFlail() < flail::FLAIL_DEF)
 		{
 			if (pos.y > -13.0f)
 			{
-				pos.y -= 5.0f;
+				pos.y -= 0.5f;
 			}
 			else
 			{
@@ -205,19 +203,8 @@ void CFlail::UpdateFlailPos(void)
 		m_move.z += (0.0f - m_move.z) * 0.15f;
 	}
 
-	if (player->GetCounterFlail() >= flail::FLAIL_DEF && player->GetCounterFlail() <= flail::FLAIL_CHARGE)
-	{
-		pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
-		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
-	}
-
-	// 一定の長さを超えたら止める
-	if (m_fLengthChain > 1000.0f)
-	{
-		m_fLengthChain = 1000.0f;
-		pos.x = m_posOrg.x + (sinf(m_fChainRot) * m_fLengthChain);
-		pos.z = m_posOrg.z + (cosf(m_fChainRot) * m_fLengthChain);
-	}
+	pos.x = m_posOrg.x + (sinf(m_fChainRot) * 1.0f);
+	pos.z = m_posOrg.z + (cosf(m_fChainRot) * 1.0f);
 
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
@@ -240,9 +227,7 @@ void CFlail::UpdateChain(void)
 		m_chain[nCntChain].rotOld = m_chain[nCntChain].multiModel->GetVec3Rotation();
 		pos = m_chain[nCntChain].multiModel->GetVec3Position();
 		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
-		rot.x = 0.0f;
-		rot.y = 0.0f;
-		
+
 		if (nCntChain == 0)
 		{
 			rot.x = 0.0f;
@@ -259,22 +244,22 @@ void CFlail::UpdateChain(void)
 
 			if (nCntChain == 1)
 			{
-				rot = m_chain[IDParent].rotOld - m_chain[IDParent].multiModel->GetVec3Rotation();
+				rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
 			}
 			else
 			{
-				rot = m_chain[IDParent].rotOld * 0.85f;
+				rot.y = m_chain[IDParent].rotOld.y * 0.80f;
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 100.0f) || nCntChain == 1)
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 4.0f) || nCntChain == 1)
 				{
-					pos.x += 70.0f;
+					pos.x += 3.9f;
 
-					if (pos.x > 100.0f)
+					if (pos.x > 4.0f)
 					{
-						pos.x = 100.0f;
+						pos.x = 4.0f;
 					}
 				}
 			}
@@ -283,8 +268,8 @@ void CFlail::UpdateChain(void)
 			{
 				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
 				{
-					pos.x -= 20.0f;
-
+					pos.x -= -0.04f * player->GetCounterFlail();
+					
 					if (pos.x < 0.0f)
 					{
 						pos.x = 0.0f;
@@ -294,15 +279,17 @@ void CFlail::UpdateChain(void)
 
 			if (m_nPlayerID == 0)
 			{
-				if (nCntChain < 10)
-				{
-					CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖位置 %f\n", pos.x);
-				}
+				//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖位置[%d] %f %f %f\n", nCntChain, rot.x, rot.y, rot.z);
 			}
 		}
 
 		m_chain[nCntChain].multiModel->SetVec3Position(pos);
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
+
+		if (nCntChain != 0)
+		{
+			m_fLengthChain += pos.x;
+		}
 
 		// モデルの更新
 		m_chain[nCntChain].multiModel->Update();
@@ -324,9 +311,9 @@ void CFlail::Draw(void)
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtx);
 
-	mtx._41 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_41;
-	mtx._42 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_42;
-	mtx._43 = player->GetMultiModel(CPlayer::MODEL_HAND_L)->GetPtrMtxWorld()->_43;
+	mtx._41 = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41;
+	mtx._42 = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_42;
+	mtx._43 = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43;
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
@@ -334,6 +321,26 @@ void CFlail::Draw(void)
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		int IDParent = nCntChain - 1;
+		D3DXVECTOR3 rotOld = m_chain[nCntChain].multiModel->GetVec3Rotation();
+		D3DXVECTOR3 rotNow = m_chain[nCntChain].multiModel->GetVec3Rotation();
+
+		if (nCntChain != 0)
+		{
+			if (nCntChain % 2 == 0)
+			{
+				rotNow.x = -D3DX_PI * 0.5f;
+				rotNow.y = 0.0f;
+				rotNow.z = 0.0f;
+			}
+			else if (nCntChain % 2 == 1)
+			{
+				rotNow.x = D3DX_PI * 0.5f;
+				rotNow.y = rotOld.y;
+				rotNow.z = 0.0f;
+			}
+
+			m_chain[nCntChain].multiModel->SetVec3Rotation(rotNow);
+		}
 
 		if (m_chain[nCntChain].multiModel->GetVec3Position().x == 0.0f)
 		{
@@ -386,6 +393,11 @@ void CFlail::Draw(void)
 		{
 			// モデルの描画
 			m_chain[nCntChain].multiModel->Draw();
+		}
+
+		if (nCntChain != 0)
+		{
+			m_chain[nCntChain].multiModel->SetVec3Rotation(rotOld);
 		}
 	}
 
@@ -495,8 +507,8 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
-	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最小大きさ
-	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最大大きさ
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最大大きさ
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報
@@ -628,8 +640,8 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
-	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最小大きさ
-	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(GetModelData().fRadius, GetModelData().fRadius, GetModelData().fRadius);		// プレイヤー最大大きさ
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最大大きさ
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報
