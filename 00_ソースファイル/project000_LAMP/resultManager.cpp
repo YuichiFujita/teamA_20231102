@@ -22,54 +22,75 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define RESULT_PRIO	(14)	// リザルトの優先順位
-
-#define SETCOL_FADE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f))	// α値の停止値
-#define SIZE_FADE		(SCREEN_SIZE * 0.95f)	// フェードの大きさ
-#define INITCOL_FADE	(XCOL_AWHITE)	// α値の初期値
-#define ADD_ALPHA		(0.008f)		// α値の加算量
-
-#define POS_RESULT_MISSION	(D3DXVECTOR3(380.0f, 150.0f, 0.0f))	// リザルト表示の遅刻回避の位置
-#define POS_RESULT_RESULT	(D3DXVECTOR3(960.0f, 150.0f, 0.0f))	// リザルト表示の成功失敗の位置
-#define SIZE_RESULT			(D3DXVECTOR3(632.7f, 203.5f, 0.0f))	// リザルト表示の大きさ
-#define SET_RESULT_SCALE	(15.0f)	// リザルト表示の初期拡大率
-#define SUB_RESULT_SCALE	(0.65f)	// リザルト表示拡大率の減算量
-
-#define POS_TIME_LOGO	(D3DXVECTOR3(290.0f, 330.0f, 0.0f))	// タイムロゴ位置
-#define SIZE_TIME_LOGO	(D3DXVECTOR3(487.5f, 154.7f, 0.0f))	// タイムロゴ大きさ
-#define POS_TIME		(D3DXVECTOR3(555.0f, 330.0f, 0.0f))	// タイム位置
-#define SIZE_TIME_VAL	(D3DXVECTOR3(98.0f, 117.0f, 0.0f))	// タイム数字大きさ
-#define SIZE_TIME_PART	(D3DXVECTOR3(50.0f, 117.0f, 0.0f))	// タイム区切り大きさ
-#define SPACE_TIME_VAL	(D3DXVECTOR3(SIZE_TIME_VAL.x  * 0.85f, 0.0f, 0.0f))	// タイム数字空白
-#define SPACE_TIME_PART	(D3DXVECTOR3(SIZE_TIME_PART.x * 0.85f, 0.0f, 0.0f))	// タイム区切り空白
-#define SET_TIME_SCALE	(8.0f)	// タイム表示の初期拡大率
-#define SUB_TIME_SCALE	(0.3f)	// タイム表示拡大率の減算量
-#define TIME_WAIT_CNT	(3)		// タイム表示状態への変更待機フレーム数
-
-#define POS_CONT_LOGO	(D3DXVECTOR3(SCREEN_CENT.x, 490.0f, 0.0f))	// コンテニューロゴ位置
-#define SIZE_CONT_LOGO	(D3DXVECTOR3(576.0f, 172.0f, 0.0f))	// コンテニューロゴ大きさ
-#define POS_CONT_YES	(D3DXVECTOR3(400.0f, 610.0f, 0.0f))	// コンテニュー表示のYESの位置
-#define POS_CONT_NO		(D3DXVECTOR3(880.0f, 610.0f, 0.0f))	// コンテニュー表示のNOの位置
-#define SIZE_CONT		(D3DXVECTOR3(222.0f, 94.0f, 0.0f))	// コンテニュー表示の大きさ
-#define SET_CONT_SCALE	(8.0f)	// コンテニュー表示の初期拡大率
-#define SUB_CONT_SCALE	(0.3f)	// コンテニュー表示拡大率の減算量
-#define CONT_WAIT_CNT	(3)		// コンテニュー表示状態への変更待機フレーム数
-
 #define CHOICE_COL	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 選択中カラー
 #define DEFAULT_COL	(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))	// 非選択中カラー
+
+//***********************************************************
+//ネームスペースの定義
+//***********************************************************
+//フェード関連
+namespace Fade
+{
+	const D3DXCOLOR SETCOL_FADE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f));	// α値の停止値
+	const D3DXVECTOR3 SIZE_FADE		(SCREEN_SIZE * 0.95f);					// フェードの大きさ
+	const D3DXCOLOR INITCOL_FADE	(XCOL_AWHITE);							// α値の初期値
+	const float ADD_ALPHA			(0.008f);								// α値の加算量
+
+}
+//勝利ロゴ関連
+namespace Win
+{
+	//番号の列挙型
+	enum Number
+	{
+		NUMBER_ZERO = 0,	//０番目
+		NUMBER_ONE,			//１番目
+		NUMBER_MAX
+	};
+
+	//定数の定義
+	const D3DXVECTOR3	POS							= D3DXVECTOR3(425.0f, 350.0f, 0.0f);	// 位置
+	const D3DXVECTOR3	DESTPOS						= D3DXVECTOR3(150.0f, 50.0f, 0.0f);		// 位置
+	const float			DISTANCE[NUMBER_MAX]		= { 440.0f,100.0f};						// 間隔
+	const D3DXVECTOR3	INIT_SIZE					= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
+	const float			DESTSIZE[NUMBER_MAX]		= { 500.0f,100.0f};						// 目的の位置
+	const int			MAX_WAIT					= 150;									// 待機時間の最大値
+	const float			VALUE_INERTIA[NUMBER_MAX]	= {0.015f,0.05f};						// 慣性の値
+}
+//巨大フレーム関連
+namespace BigFrame
+{
+	//定数の定義
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(230.0f, 400.0f, 0.0f);			// 位置
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(400.0f, 640.0f, 0.0f);			// 目的の位置
+	const int			MAX_WAIT		= 100;											// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.015f;										// 慣性の値
+
+}
+//フレーム関連
+namespace Frame
+{
+	//定数の定義
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(860.0f, 90.0f, 0.0f);				// 位置
+	const float			DISTANCE		= 170.0f;										// 間隔
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f,0.0f, 0.0f);					// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 180.0f, 0.0f);			// 目的の位置
+	const int			NUM				= 3;											// 表示させる数
+	const int			MAX_WAIT		= 25;											// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.025f;										// 慣性の値
+}
 
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
 const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\result000.png",		// 遅刻回避テクスチャ
-	"data\\TEXTURE\\result001.png",		// 成功テクスチャ
-	"data\\TEXTURE\\result002.png",		// 失敗テクスチャ
-	"data\\TEXTURE\\result003.png",		// タイム表示テクスチャ
-	"data\\TEXTURE\\continue000.png",	// コンテニュー表示テクスチャ
-	"data\\TEXTURE\\continue001.png",	// YESテクスチャ
-	"data\\TEXTURE\\continue002.png",	// NOテクスチャ
+	"data\\TEXTURE\\Who.png",			// 誰が
+	"data\\TEXTURE\\Win.png",			// 勝った
+	"data\\TEXTURE\\entry_flame.png",	// フレーム
+	"data\\TEXTURE\\continue001.png",	// 再戦
+	"data\\TEXTURE\\continue002.png",	// 戻る
 };
 
 //************************************************************
@@ -81,17 +102,12 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 CResultManager::CResultManager()
 {
 	// メンバ変数をクリア
-	memset(&m_apResult[0], 0, sizeof(m_apResult));		// リザルト表示の情報
-	memset(&m_apContinue[0], 0, sizeof(m_apContinue));	// コンテニュー表示の情報
-	m_pContLogo		= NULL;			// コンテニューロゴの情報
-	m_pTimeLogo		= NULL;			// タイムロゴの情報
+	m_pBigFrame		= nullptr;		// 巨大フレーム
 	m_pFade			= NULL;			// フェードの情報
-	m_pTime			= NULL;			// タイムの情報
 	m_state			= STATE_NONE;	// 状態
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nSelect		= SELECT_YES;	// 現在の選択
 	m_nOldSelect	= SELECT_YES;	// 前回の選択
-	m_fScale		= 0.0f;			// ポリゴン拡大率
 }
 
 //============================================================
@@ -107,33 +123,25 @@ CResultManager::~CResultManager()
 //============================================================
 HRESULT CResultManager::Init(void)
 {
-	// 変数配列を宣言
-	static D3DXVECTOR3 aPosResult[] =	// リザルトの位置
+	//オブジェクトの数分初期化を行う
+	for (int nCnt = 0; nCnt < OBJ_MAX; nCnt++)
 	{
-		POS_RESULT_MISSION,	// MISSION位置
-		POS_RESULT_RESULT,	// RESULT位置
-	};
-	static D3DXVECTOR3 aPosContinue[] =	// コンテニューの位置
-	{
-		POS_CONT_YES,	// YES位置
-		POS_CONT_NO	,	// NO位置
-	};
-
-	// ポインタを宣言
-	CTexture *pTexture = CManager::GetInstance()->GetTexture();	// テクスチャへのポインタ
+		m_arPos[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	//位置
+		m_arSize[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	//サイズ
+		m_anNum[nCnt] = 0;									// 現在の番号
+		m_anWaitTime[nCnt] = 0;								// 待機時間
+	}
 
 	// メンバ変数を初期化
-	memset(&m_apResult[0], 0, sizeof(m_apResult));		// リザルト表示の情報
-	memset(&m_apContinue[0], 0, sizeof(m_apContinue));	// コンテニュー表示の情報
-	m_pContLogo		= NULL;			// コンテニューロゴの情報
-	m_pTimeLogo		= NULL;			// タイムロゴの情報
+	memset(&m_apWinLog[0], 0, sizeof(&m_apWinLog));
+	memset(&m_apFrame[0], 0, sizeof(&m_apFrame));
+	memset(&m_apSelect[0], 0, sizeof(&m_apSelect));
+	m_pBigFrame		= nullptr;		//巨大フレーム		
 	m_pFade			= NULL;			// フェードの情報
-	m_pTime			= NULL;			// タイムの情報
 	m_state			= STATE_FADEIN;	// 状態
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nSelect		= SELECT_YES;	// 現在の選択
 	m_nOldSelect	= SELECT_YES;	// 前回の選択
-	m_fScale		= 0.0f;			// ポリゴン拡大率
 
 	//--------------------------------------------------------
 	//	フェードの生成・設定
@@ -142,9 +150,9 @@ HRESULT CResultManager::Init(void)
 	m_pFade = CObject2D::Create
 	( // 引数
 		SCREEN_CENT,	// 位置
-		SIZE_FADE,		// 大きさ
+		Fade::SIZE_FADE,		// 大きさ
 		VEC3_ZERO,		// 向き
-		INITCOL_FADE	// 色
+		Fade::INITCOL_FADE	// 色
 	);
 	if (m_pFade == NULL)
 	{ // 生成に失敗した場合
@@ -153,163 +161,105 @@ HRESULT CResultManager::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
-
 	// 優先順位を設定
 	m_pFade->SetPriority(RESULT_PRIO);
 
 	//--------------------------------------------------------
-	//	リザルト表示の生成・設定
+	//	巨大フレーム生成・設定
 	//--------------------------------------------------------
-	for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-	{ // リザルト表示の総数分繰り返す
+	m_pBigFrame = CObject2D::Create
+	(
+		D3DXVECTOR3(BigFrame::POS.x, BigFrame::POS.y, BigFrame::POS.z),
+		Win::INIT_SIZE
+	);
 
-		// リザルト表示の生成
-		m_apResult[nCntResult] = CObject2D::Create
-		( // 引数
-			aPosResult[nCntResult],			// 位置
-			SIZE_RESULT * SET_RESULT_SCALE	// 大きさ
+	// テクスチャを設定
+	m_pBigFrame->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+
+	// 優先順位を設定
+	m_pBigFrame->SetPriority(RESULT_PRIO);
+
+	//--------------------------------------------------------
+	//	勝利ロゴ生成・設定
+	//--------------------------------------------------------
+	for (int nCnt = 0; nCnt < NUM_WIN; nCnt++)
+	{
+		m_apWinLog[nCnt] = CObject2D::Create
+		(
+			D3DXVECTOR3(Win::POS.x + Win::DISTANCE[Win::NUMBER_ZERO] * nCnt , Win::POS.y, Win::POS.z),
+			Win::INIT_SIZE
 		);
-		if (m_apResult[nCntResult] == NULL)
+		
+		if (m_apWinLog[nCnt] == NULL)
 		{ // 生成に失敗した場合
 
-			// 失敗を返す
+		  // 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを設定
+		m_apWinLog[nCnt]->BindTexture(mc_apTextureFile[nCnt]);
+
+		// 優先順位を設定
+		m_apWinLog[nCnt]->SetPriority(RESULT_PRIO);
+	}
+
+	//--------------------------------------------------------
+	//	フレーム生成・設定
+	//--------------------------------------------------------
+	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
+	{
+		m_apFrame[nCnt] = CObject2D::Create
+		(
+			D3DXVECTOR3(Frame::POS.x, Frame::POS.y + Frame::DISTANCE * nCnt, Frame::POS.z),
+			Frame::INIT_SIZE
+		);
+
+		if (m_apWinLog[nCnt] == NULL)
+		{ // 生成に失敗した場合
+
+		  // 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを設定
+		m_apFrame[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+
+		// 優先順位を設定
+		m_apFrame[nCnt]->SetPriority(RESULT_PRIO);
+	}
+
+	//--------------------------------------------------------
+	//	選択肢生成・設定
+	//--------------------------------------------------------
+	for (int nCnt = 0; nCnt < SELECT_MAX; nCnt++)
+	{
+		m_apSelect[nCnt] = CObject2D::Create
+		(
+			D3DXVECTOR3(450.0f + 300.0f * nCnt,650.0f, 0.0f),
+			D3DXVECTOR3(150.0f, 150.0f, 0.0f)
+		);
+
+		if (m_apSelect[nCnt] == NULL)
+		{ // 生成に失敗した場合
+
+		  // 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
 
 		// 優先順位を設定
-		m_apResult[nCntResult]->SetPriority(RESULT_PRIO);
+		m_apSelect[nCnt]->SetPriority(RESULT_PRIO);
 
-		// 描画をしない設定にする
-		m_apResult[nCntResult]->SetEnableDraw(false);
+		m_apSelect[nCnt]->SetEnableDraw(false);
 	}
 
-	// リザルト表示のテクスチャを設定
-	SetTexResult();
 
-	//--------------------------------------------------------
-	//	タイムロゴ表示の生成・設定
-	//--------------------------------------------------------
-	// タイムロゴ表示の生成
-	m_pTimeLogo = CObject2D::Create
-	( // 引数
-		POS_TIME_LOGO,					// 位置
-		SIZE_TIME_LOGO * SET_TIME_SCALE	// 大きさ
-	);
-	if (m_pTimeLogo == NULL)
-	{ // 生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// テクスチャを登録・割当
-	m_pTimeLogo->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_TIME]));
-
-	// 優先順位を設定
-	m_pTimeLogo->SetPriority(RESULT_PRIO);
-
-	// 描画をしない設定にする
-	m_pTimeLogo->SetEnableDraw(false);
-
-	//--------------------------------------------------------
-	//	タイム表示の生成・設定
-	//--------------------------------------------------------
-	// タイマーマネージャーの生成
-	m_pTime = CTimerManager::Create
-	( // 引数
-		CTimerManager::TIME_SEC,			// 設定タイム
-		0,									// 制限時間
-		POS_TIME,							// 位置
-		SIZE_TIME_VAL * SET_TIME_SCALE,		// 数字の大きさ
-		SIZE_TIME_PART * SET_TIME_SCALE,	// 区切りの大きさ
-		SPACE_TIME_VAL,						// 数字の空白
-		SPACE_TIME_PART						// 区切りの空白
-	);
-	if (m_pTime == NULL)
-	{ // 非使用中の場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 優先順位を設定
-	m_pTime->SetPriority(RESULT_PRIO);
-
-	// 描画をしない設定にする
-	m_pTime->SetEnableDraw(false);
-
-#if 0
-	// タイムを設定
-	if (!m_pTime->SetMSec(CManager::GetInstance()->GetRetentionManager()->GetTime()))
-	{ // 設定に失敗した場合
-
-		// 失敗を返す
-		return E_FAIL;
-	}
-#endif
-
-	//--------------------------------------------------------
-	//	コンテニューロゴ表示の生成・設定
-	//--------------------------------------------------------
-	// コンテニューロゴ表示の生成
-	m_pContLogo = CObject2D::Create
-	( // 引数
-		POS_CONT_LOGO,					// 位置
-		SIZE_CONT_LOGO * SET_CONT_SCALE	// 大きさ
-	);
-	if (m_pContLogo == NULL)
-	{ // 生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// テクスチャを登録・割当
-	m_pContLogo->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_CONTINUE]));
-
-	// 優先順位を設定
-	m_pContLogo->SetPriority(RESULT_PRIO);
-
-	// 描画をしない設定にする
-	m_pContLogo->SetEnableDraw(false);
-
-	//--------------------------------------------------------
-	//	コンテニュー表示の生成・設定
-	//--------------------------------------------------------
-	for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-	{ // 選択肢の総数分繰り返す
-
-		// コンテニュー表示の生成
-		m_apContinue[nCntResult] = CObject2D::Create
-		( // 引数
-			aPosContinue[nCntResult],	// 位置
-			SIZE_CONT * SET_CONT_SCALE	// 大きさ
-		);
-		if (m_apContinue[nCntResult] == NULL)
-		{ // 生成に失敗した場合
-
-			// 失敗を返す
-			assert(false);
-			return E_FAIL;
-		}
-
-		// 優先順位を設定
-		m_apContinue[nCntResult]->SetPriority(RESULT_PRIO);
-
-		// 描画をしない設定にする
-		m_apContinue[nCntResult]->SetEnableDraw(false);
-
-		// 色を設定
-		m_apContinue[nCntResult]->SetColor(DEFAULT_COL);
-	}
-
-	// テクスチャを登録・割当
-	m_apContinue[SELECT_YES]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_YES]));
-	m_apContinue[SELECT_NO]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_NO]));
+	// テクスチャを設定
+	m_apSelect[SELECT_YES]->BindTexture(mc_apTextureFile[TEXTURE_RESTART]);
+	m_apSelect[SELECT_NO]->BindTexture(mc_apTextureFile[TEXTURE_BACK]);
 
 	// 成功を返す
 	return S_OK;
@@ -320,34 +270,42 @@ HRESULT CResultManager::Init(void)
 //============================================================
 HRESULT CResultManager::Uninit(void)
 {
-	// タイムの破棄
-	if (FAILED(CTimerManager::Release(m_pTime)))
-	{ // 破棄に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
+	//巨大フレームの終了処理
+	if (m_pBigFrame != nullptr)
+	{	
+		m_pBigFrame->Uninit();
+		m_pBigFrame = nullptr;
 	}
 
-	for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-	{ // リザルト表示の総数分繰り返す
+	//勝利ロゴの終了処理
+	for (int nCnt = 0; nCnt < NUM_WIN; nCnt++)
+	{
+		if (m_apWinLog[nCnt] != nullptr)
+		{
+			m_apWinLog[nCnt]->Uninit();
+			m_apWinLog[nCnt] = nullptr;
+		}
+	}
+	//フレームの終了処理
+	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
+	{
+		if (m_apFrame[nCnt] != nullptr)
+		{
+			m_apFrame[nCnt]->Uninit();
+			m_apFrame[nCnt] = nullptr;
+		}
 
-		// リザルト表示の終了
-		m_apResult[nCntResult]->Uninit();
 	}
 
-	for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-	{ // 選択肢の総数分繰り返す
-
-		// コンテニュー表示の終了
-		m_apContinue[nCntResult]->Uninit();
+	//選択肢の終了処理
+	for (int nCnt = 0; nCnt < SELECT_MAX; nCnt++)
+	{
+		if (m_apSelect[nCnt] != nullptr)
+		{
+			m_apSelect[nCnt]->Uninit();
+			m_apSelect[nCnt] = nullptr;
+		}
 	}
-
-	// コンテニューロゴ表示の終了
-	m_pContLogo->Uninit();
-
-	// タイムロゴ表示の終了
-	m_pTimeLogo->Uninit();
 
 	// フェードの終了
 	m_pFade->Uninit();
@@ -376,74 +334,243 @@ void CResultManager::Update(void)
 
 		break;
 
-	case STATE_RESULT:	// リザルト表示状態
+		//勝利ロゴ
+	case STATE_WIN:
 
-		// リザルト表示の更新
-		UpdateResult();
+		//勝利ロゴの数だけ回す
+		for (int nCnt = 0; nCnt < NUM_WIN; nCnt++)
+		{
+			//中身チェック
+			if (m_apWinLog[nCnt] != nullptr)
+			{
+				m_apWinLog[nCnt]->Update();
 
-		break;
+				//目的の位置に到着するまで加算し続ける
+				m_arSize[EObj::OBJ_WIN].x += (Win::DESTSIZE[Win::NUMBER_ZERO] + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
-	case STATE_TIME_WAIT:	// タイム表示待機状態
+				//そのサイズを超えそうになったら
+				if (m_arSize[EObj::OBJ_WIN].x >= Win::DESTSIZE[Win::NUMBER_ZERO])
+				{
+					//値を固定する
+					m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE[Win::NUMBER_ZERO];
+				}
 
-		// 表示待機の更新
-		if (UpdateDrawWait(TIME_WAIT_CNT))
-		{ // 待機完了の場合
+				//目的の位置に到着するまで加算し続ける
 
-			// タイム表示の拡大率を設定
-			m_fScale = SET_TIME_SCALE;
+				m_arSize[EObj::OBJ_WIN].y += (Win::DESTSIZE[Win::NUMBER_ZERO] + m_arSize[EObj::OBJ_WIN].y) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
-			// タイム表示の描画開始
-			m_pTimeLogo->SetEnableDraw(true);
-			m_pTime->SetEnableDraw(true);
+				//そのサイズを超えそうになったら
+				if (m_arSize[EObj::OBJ_WIN].y >= Win::DESTSIZE[Win::NUMBER_ZERO])
+				{//値を固定する
+					m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE[Win::NUMBER_ZERO];
+				}
 
-			// 状態を変更
-			m_state = STATE_TIME;	// タイム表示状態
-		}
+				//サイズの設定を行う
+				m_apWinLog[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
 
-		break;
+				//どちらも目的の位置に到着していたら
+				if (m_arSize[EObj::OBJ_WIN].x == Win::DESTSIZE[Win::NUMBER_ZERO] &&
+					m_arSize[EObj::OBJ_WIN].y == Win::DESTSIZE[Win::NUMBER_ZERO])
+				{
+					m_anWaitTime[EObj::OBJ_WIN]++;
+				}
 
-	case STATE_TIME:	// タイム表示状態
+				if (m_anWaitTime[EObj::OBJ_WIN] >= Win::MAX_WAIT)
+				{
+					m_anWaitTime[EObj::OBJ_WIN] = Win::MAX_WAIT;
 
-		// タイム表示の更新
-		UpdateTime();
+					//目的の位置に到着するまで加算し続ける
+					m_arPos[EObj::OBJ_WIN].x -= (Win::DESTPOS.x - m_arPos[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
+					
+					//そのサイズを超えそうになったら
+					if (m_arPos[EObj::OBJ_WIN].x <= Win::DESTPOS.x)
+					{
+						//値を固定する
+						m_arPos[EObj::OBJ_WIN].x = Win::DESTPOS.x;
+					}
 
-		break;
+					//目的の位置に到着するまで加算し続ける
 
-	case STATE_CONTINUE_WAIT:	// コンテニュー表示待機状態
+					m_arPos[EObj::OBJ_WIN].y -= (Win::DESTPOS.y + m_arPos[EObj::OBJ_WIN].y) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
 
-		// 表示待機の更新
-		if (UpdateDrawWait(CONT_WAIT_CNT))
-		{ // 待機完了の場合
+					//そのサイズを超えそうになったら
+					if (m_arPos[EObj::OBJ_WIN].y <= Win::DESTPOS.y)
+					{//値を固定する
+						m_arPos[EObj::OBJ_WIN].y = Win::DESTPOS.y;
+					}
 
-			// コンテニュー表示の拡大率を設定
-			m_fScale = SET_CONT_SCALE;
+					//目的の位置に到着するまで加算し続ける
+					m_arSize[EObj::OBJ_WIN].x -= (Win::DESTSIZE[Win::NUMBER_ONE] + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
 
-			// コンテニューロゴ表示の描画開始
-			m_pContLogo->SetEnableDraw(true);
-			
-			for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-			{ // 選択肢の総数分繰り返す
+					//そのサイズを超えそうになったら
+					if (m_arSize[EObj::OBJ_WIN].x <= Win::DESTSIZE[Win::NUMBER_ONE])
+					{
+						//値を固定する
+						m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE[Win::NUMBER_ONE];
+					}
 
-				// コンテニュー表示の描画開始
-				m_apContinue[nCntResult]->SetEnableDraw(true);
+					//目的の位置に到着するまで加算し続ける
+
+					m_arSize[EObj::OBJ_WIN].y -= (Win::DESTSIZE[Win::NUMBER_ONE] + m_arSize[EObj::OBJ_WIN].y)* Win::VALUE_INERTIA[Win::NUMBER_ONE];
+
+					//そのサイズを超えそうになったら
+					if (m_arSize[EObj::OBJ_WIN].y <= Win::DESTSIZE[Win::NUMBER_ONE])
+					{//値を固定する
+						m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE[Win::NUMBER_ONE];
+					}
+
+					//サイズの設定を行う
+					m_apWinLog[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+					m_apWinLog[nCnt]->SetVec3Position(D3DXVECTOR3(
+						m_arPos[EObj::OBJ_WIN].x+ Win::DISTANCE[Win::NUMBER_ONE] * nCnt, 
+						m_arPos[EObj::OBJ_WIN].y,
+						m_arPos[EObj::OBJ_WIN].z));
+
+					//どちらも目的の位置に到着していたら
+					if (m_arSize[EObj::OBJ_WIN].x == Win::DESTSIZE[Win::NUMBER_ONE]&&
+						m_arSize[EObj::OBJ_WIN].y == Win::DESTSIZE[Win::NUMBER_ONE]&&
+						m_arPos[EObj::OBJ_WIN].x == Win::DESTPOS.x&&
+						m_arPos[EObj::OBJ_WIN].y == Win::DESTPOS.y)
+					{
+						m_anWaitTime[EObj::OBJ_WIN] = 0;
+						m_state = STATE_BIG_FRAME;
+					}
+				}
 			}
 
-			// 状態を変更
-			m_state = STATE_CONTINUE;	// コンテニュー表示状態
 		}
 
 		break;
 
-	case STATE_CONTINUE:	// コンテニュー表示待機状態表示状態
+		//巨大フレーム
+	case STATE_BIG_FRAME:
 
-		// コンテニュー表示の更新
-		UpdateContinue();
+		if (m_pBigFrame != nullptr)
+		{
+			m_pBigFrame->Update();
+
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_BIGFRAME].x += (BigFrame::DESTSIZE.x + m_arSize[EObj::OBJ_BIGFRAME].x) * BigFrame::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_BIGFRAME].x >= BigFrame::DESTSIZE.x)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_BIGFRAME].x = BigFrame::DESTSIZE.x;
+			}
+
+			//目的の位置に到着するまで加算し続ける
+
+			m_arSize[EObj::OBJ_BIGFRAME].y += (BigFrame::DESTSIZE.y + m_arSize[EObj::OBJ_BIGFRAME].y) * BigFrame::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_BIGFRAME].y >= BigFrame::DESTSIZE.y)
+			{//値を固定する
+				m_arSize[EObj::OBJ_BIGFRAME].y = BigFrame::DESTSIZE.y;
+			}
+
+			//サイズの設定を行う
+			m_pBigFrame->SetVec3Sizing(m_arSize[EObj::OBJ_BIGFRAME]);
+
+			if (m_arSize[EObj::OBJ_BIGFRAME].x == BigFrame::DESTSIZE.x
+				&&m_arSize[EObj::OBJ_BIGFRAME].y == BigFrame::DESTSIZE.y)
+			{
+				m_anWaitTime[EObj::OBJ_BIGFRAME]++;
+
+				if (m_anWaitTime[EObj::OBJ_BIGFRAME] == BigFrame::MAX_WAIT)
+				{
+					m_anWaitTime[EObj::OBJ_BIGFRAME] = 0;
+					m_state = STATE_FRAME;
+				}
+			}
+		}
+
+		break;
+
+		//フレーム
+	case STATE_FRAME:
+
+		//中身チェック
+		if (m_apFrame[m_anNum[EObj::OBJ_FRAME]] != nullptr)
+		{
+			//描画をするようにする
+			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetEnableDraw(true);
+			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->Update();
+
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_FRAME].x += (Frame::DESTSIZE.x + m_arSize[EObj::OBJ_FRAME].x) * Frame::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_FRAME].x >= Frame::DESTSIZE.x)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_FRAME].x = Frame::DESTSIZE.x;
+			}
+
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_FRAME].y += (Frame::DESTSIZE.y + m_arSize[EObj::OBJ_FRAME].y) * Frame::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_FRAME].y>= Frame::DESTSIZE.y)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_FRAME].y= Frame::DESTSIZE.y;
+			}
+
+			//サイズを設定する
+			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetVec3Sizing(m_arSize[EObj::OBJ_FRAME]);
+
+			//もしフレームの拡大率がその値になっていたら
+			if (m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x
+				&&m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
+			{
+				//範囲外にいかないようにする
+				if (m_anNum[EObj::OBJ_FRAME] >= Frame::NUM)
+				{
+					m_anNum[EObj::OBJ_FRAME] = Frame::NUM;
+				}
+				//範囲外にいっていなければ
+				else if (!(m_anNum[EObj::OBJ_FRAME] >= Frame::NUM))
+				{
+					//待機時間を加算する
+					m_anWaitTime[EObj::OBJ_FRAME]++;
+
+					//待機時間の最大値を超えそうになったら
+					if (m_anWaitTime[EObj::OBJ_FRAME] >= Frame::MAX_WAIT)
+					{
+						//値のリセットを行う
+						m_anWaitTime[EObj::OBJ_FRAME] = 0;
+						m_anNum[EObj::OBJ_FRAME]++;
+						m_arSize[EObj::OBJ_FRAME].x = Frame::INIT_SIZE.x;
+						m_arSize[EObj::OBJ_FRAME].y = Frame::INIT_SIZE.y;
+					}
+				}
+			}
+			//番号・Xサイズ・Yサイズがその値になっていたら
+			if (m_anNum[EObj::OBJ_FRAME] == Frame::NUM &&
+				m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x&&
+				m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
+			{
+				//遷移待機状態に移行する
+				m_state = STATE_WAIT;
+			}
+		}
 
 		break;
 
 	case STATE_WAIT:	// 遷移待機状態
 
-		// 選択の更新
+		for (int nCnt = 0; nCnt < SELECT_MAX; nCnt++)
+		{
+			if (m_apSelect[nCnt] != nullptr)
+			{
+				m_apSelect[nCnt]->SetEnableDraw(true);
+				m_apSelect[nCnt]->Update();
+			}
+
+		}
+
+		//選択の更新
 		UpdateSelect();
 
 		break;
@@ -456,31 +583,9 @@ void CResultManager::Update(void)
 	// 遷移決定の更新
 	UpdateTransition();
 
-	for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-	{ // リザルト表示の総数分繰り返す
-
-		// リザルト表示の更新
-		m_apResult[nCntResult]->Update();
-	}
-
-	for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-	{ // 選択肢の総数分繰り返す
-
-		// コンテニュー表示の更新
-		m_apContinue[nCntResult]->Update();
-	}
-
-	// コンテニューロゴ表示の更新
-	m_pContLogo->Update();
-
-	// タイムロゴ表示の更新
-	m_pTimeLogo->Update();
-
-	// タイムの更新
-	m_pTime->Update();
-
 	// フェードの更新
 	m_pFade->Update();
+
 }
 
 //============================================================
@@ -559,30 +664,20 @@ void CResultManager::UpdateFade(void)
 	// 変数を宣言
 	D3DXCOLOR colFade = m_pFade->GetColor();	// フェードの色
 
-	if (colFade.a < SETCOL_FADE.a)
+	if (colFade.a < Fade::SETCOL_FADE.a)
 	{ // 透明量が設定値未満の場合
 
 		// 透明度を加算
-		colFade.a += ADD_ALPHA;
+		colFade.a += Fade::ADD_ALPHA;
 	}
 	else
 	{ // 透明量が設定値以上の場合
 
 		// 透明度を補正
-		colFade.a = SETCOL_FADE.a;
-
-		for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-		{ // リザルト表示の総数分繰り返す
-
-			// リザルト表示の描画開始
-			m_apResult[nCntResult]->SetEnableDraw(true);
-		}
-
-		// リザルト表示の拡大率を設定
-		m_fScale = SET_RESULT_SCALE;
+		colFade.a = Fade::SETCOL_FADE.a;
 
 		// 状態を変更
-		m_state = STATE_RESULT;	// リザルト表示状態
+		m_state = STATE_WIN;	// 待機状態
 	}
 
 	// 透明度を反映
@@ -590,152 +685,11 @@ void CResultManager::UpdateFade(void)
 }
 
 //============================================================
-//	リザルト表示の更新処理
-//============================================================
-void CResultManager::UpdateResult(void)
-{
-	if (m_fScale > 1.0f)
-	{ // 拡大率が最小値より大きい場合
-
-		// 拡大率を減算
-		m_fScale -= SUB_RESULT_SCALE;
-
-		for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-		{ // リザルト表示の総数分繰り返す
-
-			// リザルト表示の大きさを設定
-			m_apResult[nCntResult]->SetVec3Sizing(SIZE_RESULT * m_fScale);
-		}
-	}
-	else
-	{ // 拡大率が最小値以下の場合
-
-		for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-		{ // リザルト表示の総数分繰り返す
-
-			// リザルト表示の大きさを設定
-			m_apResult[nCntResult]->SetVec3Sizing(SIZE_RESULT);
-		}
-
-#if 0
-		switch (CManager::GetInstance()->GetRetentionManager()->GetResult())
-		{ // リザルトごとの処理
-		case CRetentionManager::RESULT_FAILED:
-
-			// 状態を変更
-			m_state = STATE_CONTINUE_WAIT;	// コンテニュー表示待機状態
-
-			break;
-
-		case CRetentionManager::RESULT_CLEAR:
-
-			// 状態を変更
-			m_state = STATE_TIME_WAIT;	// タイム表示待機状態
-
-			break;
-
-		default:
-
-			// エラーメッセージボックス
-			MessageBox(NULL, "リザルトなしが設定されています", "警告！", MB_ICONWARNING);
-
-			// 状態を変更
-			m_state = STATE_TIME_WAIT;	// タイム表示待機状態
-
-			break;
-		}
-#endif
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
-	}
-}
-
-//============================================================
-//	タイム表示処理
-//============================================================
-void CResultManager::UpdateTime(void)
-{
-	if (m_fScale > 1.0f)
-	{ // 拡大率が最小値より大きい場合
-
-		// 拡大率を減算
-		m_fScale -= SUB_TIME_SCALE;
-
-		// タイム表示の大きさを設定
-		m_pTimeLogo->SetVec3Sizing(SIZE_TIME_LOGO * m_fScale);
-		m_pTime->SetScalingValue(SIZE_TIME_VAL * m_fScale);
-		m_pTime->SetScalingPart(SIZE_TIME_PART * m_fScale);
-	}
-	else
-	{ // 拡大率が最小値以下の場合
-
-		// 拡大率を補正
-		m_fScale = 1.0f;
-
-		// タイム表示の大きさを設定
-		m_pTimeLogo->SetVec3Sizing(SIZE_TIME_LOGO);
-		m_pTime->SetScalingValue(SIZE_TIME_VAL);
-		m_pTime->SetScalingPart(SIZE_TIME_PART);
-
-		// 状態を変更
-		m_state = STATE_CONTINUE_WAIT;	// コンテニュー表示待機状態
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
-	}
-}
-
-//============================================================
-//	コンテニュー表示処理
-//============================================================
-void CResultManager::UpdateContinue(void)
-{
-	if (m_fScale > 1.0f)
-	{ // 拡大率が最小値より大きい場合
-
-		// 拡大率を減算
-		m_fScale -= SUB_CONT_SCALE;
-
-		// コンテニューロゴ表示の大きさを設定
-		m_pContLogo->SetVec3Sizing(SIZE_CONT_LOGO * m_fScale);
-
-		for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-		{ // 選択肢の総数分繰り返す
-
-			// コンテニュー表示の大きさを設定
-			m_apContinue[nCntResult]->SetVec3Sizing(SIZE_CONT * m_fScale);
-		}
-	}
-	else
-	{ // 拡大率が最小値以下の場合
-
-		// 拡大率を補正
-		m_fScale = 1.0f;
-
-		// コンテニューロゴ表示の大きさを設定
-		m_pContLogo->SetVec3Sizing(SIZE_CONT_LOGO);
-
-		for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-		{ // 選択肢の総数分繰り返す
-
-			// コンテニュー表示の大きさを設定
-			m_apContinue[nCntResult]->SetVec3Sizing(SIZE_CONT);
-		}
-
-		// 状態を変更
-		m_state = STATE_WAIT;	// 遷移待機状態
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
-	}
-}
-
-//============================================================
 //	選択の更新処理
 //============================================================
 void CResultManager::UpdateSelect(void)
 {
+#if 1
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
@@ -764,13 +718,15 @@ void CResultManager::UpdateSelect(void)
 	}
 
 	// 前回の選択要素の色を黒に設定
-	m_apContinue[m_nOldSelect]->SetColor(DEFAULT_COL);
+	m_apSelect[m_nOldSelect]->SetColor(DEFAULT_COL);
 
 	// 現在の選択要素の色を白に設定
-	m_apContinue[m_nSelect]->SetColor(CHOICE_COL);
+	m_apSelect[m_nSelect]->SetColor(CHOICE_COL);
 
 	// 現在の選択要素を代入
 	m_nOldSelect = m_nSelect;
+
+#endif
 }
 
 //============================================================
@@ -794,7 +750,7 @@ void CResultManager::UpdateTransition(void)
 		{ // 遷移待機状態ではない場合
 
 			// 演出スキップ
-			SkipStaging();
+			/*SkipStaging();*/
 
 			// サウンドの再生
 			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
@@ -810,14 +766,14 @@ void CResultManager::UpdateTransition(void)
 				case SELECT_YES:
 
 					// シーンの設定
-					CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
+					CManager::GetInstance()->SetScene(CScene::MODE_ENTRY);	// ゲーム画面
 
 					break;
 
 				case SELECT_NO:
 
 					// シーンの設定
-					CManager::GetInstance()->SetScene(CScene::MODE_RANKING);	// ランキング画面
+					CManager::GetInstance()->SetScene(CScene::MODE_TITLE);	// ランキング画面
 
 					break;
 				}
@@ -834,115 +790,9 @@ void CResultManager::UpdateTransition(void)
 //============================================================
 void CResultManager::SkipStaging(void)
 {
-	// リザルト表示の描画をONにし、大きさを設定
-	for (int nCntResult = 0; nCntResult < NUM_RESULT; nCntResult++)
-	{ // リザルト表示の総数分繰り返す
-
-		// リザルト表示の描画開始
-		m_apResult[nCntResult]->SetEnableDraw(true);
-
-		// リザルト表示の大きさを設定
-		m_apResult[nCntResult]->SetVec3Sizing(SIZE_RESULT);
-	}
-
-#if 0
-	if (CManager::GetInstance()->GetRetentionManager()->GetResult() == CRetentionManager::RESULT_CLEAR)
-	{ // クリアしている場合
-
-		// タイム表示をONにする
-		m_pTimeLogo->SetEnableDraw(true);
-		m_pTime->SetEnableDraw(true);
-
-		// タイム表示の大きさを設定
-		m_pTimeLogo->SetVec3Sizing(SIZE_TIME_LOGO);
-		m_pTime->SetScalingValue(SIZE_TIME_VAL);
-		m_pTime->SetScalingPart(SIZE_TIME_PART);
-	}
-#endif
-
-	// コンテニューロゴ表示の描画開始
-	m_pContLogo->SetEnableDraw(true);
-
-	// コンテニューロゴ表示の大きさを設定
-	m_pContLogo->SetVec3Sizing(SIZE_CONT_LOGO);
-
-	for (int nCntResult = 0; nCntResult < SELECT_MAX; nCntResult++)
-	{ // 選択肢の総数分繰り返す
-
-		// コンテニュー表示の描画開始
-		m_apContinue[nCntResult]->SetEnableDraw(true);
-
-		// コンテニュー表示の大きさを設定
-		m_apContinue[nCntResult]->SetVec3Sizing(SIZE_CONT);
-	}
-
 	// フェードの透明度を設定
-	m_pFade->SetColor(SETCOL_FADE);
+	m_pFade->SetColor(Fade::SETCOL_FADE);
 
 	// 状態を変更
 	m_state = STATE_WAIT;	// 遷移待機状態
-}
-
-//============================================================
-//	リザルト表示のテクスチャの設定処理
-//============================================================
-void CResultManager::SetTexResult(void)
-{
-	// ポインタを宣言
-	CTexture *pTexture = CManager::GetInstance()->GetTexture();	// テクスチャへのポインタ
-
-	// MISSIONテクスチャを登録・割当
-	m_apResult[0]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_MISSION]));
-
-#if 0
-	// RESULTテクスチャを登録・割当
-	switch (CManager::GetInstance()->GetRetentionManager()->GetResult())
-	{ // リザルトごとの処理
-	case CRetentionManager::RESULT_FAILED:
-
-		// FAILEDテクスチャ
-		m_apResult[1]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_FAILED]));
-
-		break;
-
-	case CRetentionManager::RESULT_CLEAR:
-
-		// CLEARテクスチャ
-		m_apResult[1]->BindTexture(pTexture->Regist(mc_apTextureFile[TEXTURE_CLEAR]));
-
-		break;
-
-	default:
-
-		// エラーメッセージボックス
-		MessageBox(NULL, "リザルトなしが設定されています", "警告！", MB_ICONWARNING);
-
-		break;
-	}
-#endif
-}
-
-//============================================================
-//	表示待機処理
-//============================================================
-bool CResultManager::UpdateDrawWait(const int nWait)
-{
-	if (m_nCounterState < nWait)
-	{ // カウンターが待機カウントまで達していない場合
-
-		// カウンターを加算
-		m_nCounterState++;
-
-		// 待機未完了を返す
-		return false;
-	}
-	else
-	{ // カウンターが待機完了した場合
-
-		// カウンターを初期化
-		m_nCounterState = 0;
-
-		// 待機完了を返す
-		return true;
-	}
 }

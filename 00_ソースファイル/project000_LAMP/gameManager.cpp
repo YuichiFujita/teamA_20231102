@@ -13,6 +13,7 @@
 #include "sceneGame.h"
 #include "camera.h"
 #include "player.h"
+#include "retentionManager.h"
 #include "editStageManager.h"
 
 //************************************************************
@@ -47,6 +48,12 @@ HRESULT CGameManager::Init(void)
 {
 	// メンバ変数を初期化
 	m_state = STATE_NORMAL;	// 状態
+
+	// 生存人数を初期化
+	CManager::GetInstance()->GetRetentionManager()->InitNumSurvival();
+
+	// 生存ランキングを初期化
+	CManager::GetInstance()->GetRetentionManager()->InitSurvivalRank();
 
 #if _DEBUG
 

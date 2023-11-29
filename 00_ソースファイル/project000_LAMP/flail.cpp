@@ -35,7 +35,7 @@ namespace
 //************************************************************
 const char *CFlail::mc_apModelFileFlail[] =	// モデル定数(フレイル)
 {
-	"data\\MODEL\\PLAYER\\ironBall_Resize.x",	// 鉄球
+	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
 	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
 };
 

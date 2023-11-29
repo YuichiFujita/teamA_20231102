@@ -69,7 +69,8 @@ HRESULT CObjectChara::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
-
+	SetEnableDepthShadow(true);
+	SetEnableZTex(true);
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

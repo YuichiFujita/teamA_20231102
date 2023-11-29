@@ -18,7 +18,9 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define NUM_RESULT	(2)	// リザルト表示に必要なポリゴン数
+#define	RESULT_PRIO	(14)		// リザルトの優先順位
+#define	NUM_WIN		(2)			//勝利ロゴの数
+#define	NUM_FRAME	(4)			//フレームの数
 
 //************************************************************
 //	前方宣言
@@ -36,13 +38,12 @@ public:
 	// テクスチャ列挙
 	enum ETexture
 	{
-		TEXTURE_MISSION = 0,	// 遅刻回避テクスチャ
-		TEXTURE_CLEAR,			// 成功テクスチャ
-		TEXTURE_FAILED,			// 失敗テクスチャ
-		TEXTURE_TIME,			// タイム表示テクスチャ
-		TEXTURE_CONTINUE,		// コンテニュー表示テクスチャ
-		TEXTURE_YES,			// YESテクスチャ
-		TEXTURE_NO,				// NOテクスチャ
+
+		TEXTURE_WHO = 0,
+		TEXTURE_WIN,
+		TEXTURE_FRAME,
+		TEXTURE_RESTART,
+		TEXTURE_BACK,
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -51,13 +52,21 @@ public:
 	{
 		STATE_NONE = 0,			// 何もしない状態
 		STATE_FADEIN,			// フェードイン状態
-		STATE_RESULT,			// リザルト表示状態
-		STATE_TIME_WAIT,		// タイム表示待機状態
-		STATE_TIME,				// タイム表示状態
-		STATE_CONTINUE_WAIT,	// コンテニュー表示待機状態
-		STATE_CONTINUE,			// コンテニュー表示状態
+		STATE_WIN,
+		STATE_BIG_FRAME,
+		STATE_FRAME,
 		STATE_WAIT,				// 遷移待機状態
 		STATE_MAX				// この列挙型の総数
+	};
+
+	//ここの処理で使っているオブジェクトの列挙型
+	enum EObj
+	{
+		OBJ_WIN = 0,	//勝利ロゴ
+		OBJ_BIGFRAME,
+		OBJ_FRAME,		//フレーム
+		OBJ_SELECT,		//セレクト
+		OBJ_MAX
 	};
 
 	// 選択列挙
@@ -99,17 +108,19 @@ private:
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
-	CObject2D *m_apResult[NUM_RESULT];		// リザルト表示の情報
-	CObject2D *m_apContinue[SELECT_MAX];	// コンテニュー表示の情報
-	CObject2D *m_pContLogo;	// コンテニューロゴの情報
-	CObject2D *m_pTimeLogo;	// タイムロゴの情報
-	CObject2D *m_pFade;		// フェードの情報
-	CTimerManager *m_pTime;	// タイムの情報
-	EState m_state;			// 状態
-	int m_nCounterState;	// 状態管理カウンター
-	int m_nSelect;			// 現在の選択
-	int m_nOldSelect;		// 前回の選択
-	float m_fScale;			// ポリゴン拡大率
+	CObject2D *m_apWinLog[NUM_WIN];		// 勝利ロゴ
+	CObject2D *m_pBigFrame;				// 巨大フレーム
+	CObject2D *m_apFrame[NUM_FRAME];	// フレーム
+	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
+	CObject2D *m_pFade;					// フェードの情報
+	EState m_state;						// 状態
+	D3DXVECTOR3 m_arPos[OBJ_MAX];		// サイズ
+	D3DXVECTOR3 m_arSize[OBJ_MAX];		// 位置
+	int m_nCounterState;				// 状態管理カウンター
+	int m_nSelect;						// 現在の選択
+	int m_nOldSelect;					// 前回の選択
+	int m_anNum[OBJ_MAX];				//　数
+	int m_anWaitTime[OBJ_MAX];			//　待機時間
 };
 
 #endif	// _RESULTMANAGER_H_

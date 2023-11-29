@@ -29,8 +29,15 @@ VS_OUTPUT ZBufferCalc_VS( float4 Pos : POSITION )
 // ピクセルシェーダ
 float4 ZBufferPlot_PS( float4 ShadowMapTex : TEXCOORD0 ) : COLOR
 {
-   // Z値算出
-   return ShadowMapTex.z / ShadowMapTex.w;
+// 深度算出
+float depth = ShadowMapTex.z / ShadowMapTex.w;
+float4 unpacked_depth = float4(0, 0, 256.0f, 256.0f);
+unpacked_depth.g = modf(depth*256.0f, unpacked_depth.r);
+unpacked_depth.b *= modf(unpacked_depth.g*256.0f, unpacked_depth.g);
+unpacked_depth /= 256.0f;
+unpacked_depth.w = depth;
+
+return unpacked_depth;  // 標準化
 }
 
 technique ZValuePlotTec

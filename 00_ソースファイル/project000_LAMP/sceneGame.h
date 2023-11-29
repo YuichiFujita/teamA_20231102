@@ -21,7 +21,6 @@
 //	前方宣言
 //************************************************************
 class CGameManager;		// ゲームマネージャークラス
-class CTimerManager;	// タイマーマネージャークラス
 class CPause;			// ポーズクラス
 
 //************************************************************
@@ -44,9 +43,8 @@ public:
 	void Draw(void) override;		// 描画
 
 	// 静的メンバ関数
-	static CGameManager		*GetGameManager(void);		// ゲームマネージャー取得
-	static CTimerManager	*GetTimerManager(void);		// タイマーマネージャー取得
-	static CPause			*GetPause(void);			// ポーズ取得
+	static CGameManager	*GetGameManager(void);	// ゲームマネージャー取得
+	static CPause		*GetPause(void);		// ポーズ取得
 
 	static void SetEnableDrawUI(const bool bDraw);		// UIの描画状況設定
 	static bool IsDrawUI(void);							// UIの描画状況取得
@@ -56,9 +54,8 @@ public:
 
 private:
 	// 静的メンバ変数
-	static CGameManager		*m_pGameManager;	// ゲームマネージャー
-	static CTimerManager	*m_pTimerManager;	// タイマーマネージャー
-	static CPause			*m_pPause;			// ポーズ
+	static CGameManager	*m_pGameManager;	// ゲームマネージャー
+	static CPause		*m_pPause;			// ポーズ
 
 	static bool m_bControlCamera;	// カメラの操作状況
 	static bool m_bDrawUI;			// UIの描画状況

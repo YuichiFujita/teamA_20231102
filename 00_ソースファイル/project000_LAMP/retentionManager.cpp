@@ -19,10 +19,12 @@
 CRetentionManager::CRetentionManager()
 {
 	// メンバ変数をクリア
+	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
+	m_nNumSurvival	= 0;			// 生存プレイヤー数
 }
 
 //============================================================
@@ -39,10 +41,12 @@ CRetentionManager::~CRetentionManager()
 HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
+	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
+	m_nNumSurvival	= 0;			// 生存プレイヤー数
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -186,6 +190,24 @@ int CRetentionManager::GetNumPlayer(void) const
 }
 
 //============================================================
+//	生存人数の初期化処理
+//============================================================
+void CRetentionManager::InitNumSurvival(void)
+{
+	// プレイヤー人数分を生存人数に設定
+	m_nNumSurvival = m_nNumPlayer;
+}
+
+//============================================================
+//	生存人数取得処理
+//============================================================
+int CRetentionManager::GetNumSurvival(void) const
+{
+	// 生存人数を返す
+	return m_nNumSurvival;
+}
+
+//============================================================
 //	全エントリー状況の設定処理
 //============================================================
 void CRetentionManager::AllSetEnableEntry(const bool bEntry)
@@ -214,4 +236,62 @@ bool CRetentionManager::IsEntry(const int nID) const
 {
 	// 引数インデックスのエントリー状況を返す
 	return m_aEntry[nID];
+}
+
+//============================================================
+//	生存ランキング初期化処理
+//============================================================
+void CRetentionManager::InitSurvivalRank(void)
+{
+	// 生存ランキングを初期化
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		m_aSurvivalRank[nCntPlayer] = NONE_IDX;
+	}
+}
+
+//============================================================
+//	生存ランキング設定処理
+//============================================================
+void CRetentionManager::SetSurvivalRank(const int nPlayerID)
+{
+	// 生存ランキングを更新
+	for (int nCntPlayer = m_nNumPlayer - 1; nCntPlayer >= 0; nCntPlayer--)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (m_aSurvivalRank[nCntPlayer] == NONE_IDX)
+		{ // ランキングが設定されていない場合
+
+			// 引数のプレイヤーインデックスを設定
+			m_aSurvivalRank[nCntPlayer] = nPlayerID;
+
+			// 生存人数を減算
+			m_nNumSurvival--;
+
+			// 処理を抜ける
+			break;
+		}
+	}
+}
+
+//============================================================
+//	生存ランキング取得処理
+//============================================================
+CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
+{
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (m_aSurvivalRank[nCntPlayer] == nID)
+		{ // ランキングが設定されていない場合
+
+			// 引数のプレイヤーインデックスを設定
+			return (ERank)nCntPlayer;
+		}
+	}
+
+	// 使用できないインデックスを返す
+	assert(false);
+	return RANK_4TH;
 }

@@ -92,7 +92,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 	"data\\MODEL\\PLAYER\\10_leg_R.x",		// 右太もも
 	"data\\MODEL\\PLAYER\\11_thigh_L.x",	// 左脛
 	"data\\MODEL\\PLAYER\\12_leg_L.x",		// 右脛
-	"data\\MODEL\\PLAYER\\13_flail_stick.x",// フレイル持ち手
+	"data\\MODEL\\PLAYER\\13_stick.x",		// フレイル持ち手
 };
 
 //************************************************************
@@ -276,6 +276,13 @@ void CPlayer::Update(void)
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
+	{ // 残り人数が1人の場合
+
+		// 生存ランキングを更新 (一位を設定)
+		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+	}
+
 	// フレイルの更新
 	m_pFlail->Update();
 
@@ -416,8 +423,19 @@ void CPlayer::SetState(const int nState)
 	if (nState > NONE_IDX && nState < STATE_MAX)
 	{ // 範囲内の場合
 
-		// 引数の状態を設定
-		m_state = (EState)nState;
+		if (m_state != STATE_DEATH)
+		{ // 死亡状態じゃない場合
+
+			// 引数の状態を設定
+			m_state = (EState)nState;
+
+			if (m_state == STATE_DEATH)
+			{ // 死亡状態の場合
+
+				// 生存ランキングを更新
+				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+			}
+		}
 	}
 	else { assert(false); }
 }

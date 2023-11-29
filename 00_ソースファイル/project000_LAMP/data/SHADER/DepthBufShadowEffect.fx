@@ -65,22 +65,26 @@ float4 DepthBufShadow_PS( float4 Col : COLOR, float4 ZCalcTex : TEXCOORD1 , VS_O
    // ライト目線によるZ値の再算出
    float ZValue = ZCalcTex.z / ZCalcTex.w;
 
-if ((tex2D(tex0, In.Tex).r + tex2D(tex0, In.Tex).g + tex2D(tex0, In.Tex).b) != 0.0f)
+	if ((tex2D(tex0, In.Tex).r + tex2D(tex0, In.Tex).g + tex2D(tex0, In.Tex).b) != 0.0f)
 {
 	Col = (Col * tex2D(tex0, In.Tex));
-}
+	}
 
 	
    // テクスチャ座標に変換
    float2 TransTexCoord;
    TransTexCoord.x = (1.0f + ZCalcTex.x/ZCalcTex.w)*0.5f;
    TransTexCoord.y = (1.0f - ZCalcTex.y/ZCalcTex.w)*0.5f;
-   
+   if (TransTexCoord.x >1.0f || TransTexCoord.x < 0.0f || TransTexCoord.y >1.0f || TransTexCoord.y < 0.0f)
+   {
+	   return Col;
+   }
+   float4 TexCol = tex2D(DefSampler, TransTexCoord);
    // 同じ座標のZ値を抽出
-   float SM_Z = tex2D( DefSampler, TransTexCoord ).x;
-   
+   float SM_Z = (TexCol.x + (TexCol.y +(TexCol.z /256.0f)/256.0f) /256.0f);
+  // color.r + (color.g + (color.b + color.a / 256.0f) / 256.0f) / 256.0f;
    // 算出点がシャドウマップのZ値よりも大きければ影と判断
-   if( ZValue > SM_Z+0.005f ){
+   if( ZValue > SM_Z+0.00005f ){
      Col.rgb = Col.rgb * 0.5f; 
     }
 
