@@ -248,18 +248,18 @@ void CFlail::UpdateChain(void)
 			}
 			else
 			{
-				rot.y = m_chain[IDParent].rotOld.y * 0.80f;
+				rot.y = m_chain[IDParent].rotOld.y * 0.8f;
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 4.0f) || nCntChain == 1)
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f) || nCntChain == 1)
 				{
-					pos.x += 3.9f;
+					pos.x += 15.0f;
 
-					if (pos.x > 4.0f)
+					if (pos.x > 20.0f)
 					{
-						pos.x = 4.0f;
+						pos.x = 20.0f;
 					}
 				}
 			}
@@ -268,7 +268,7 @@ void CFlail::UpdateChain(void)
 			{
 				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
 				{
-					pos.x -= -0.04f * player->GetCounterFlail();
+					pos.x -= -0.4f * player->GetCounterFlail();
 					
 					if (pos.x < 0.0f)
 					{
@@ -507,8 +507,8 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
-	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最小大きさ
-	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最大大きさ
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最大大きさ
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報
@@ -640,8 +640,8 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
-	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最小大きさ
-	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(8.0f, 8.0f, 8.0f);		// プレイヤー最大大きさ
+	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最小大きさ
+	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最大大きさ
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報

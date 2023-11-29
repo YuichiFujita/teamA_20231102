@@ -1177,7 +1177,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetLengthChain() == 4.0f * (flail::FLAIL_NUM - 1))
+			if (m_pFlail->GetLengthChain() == 20.0f * (flail::FLAIL_NUM - 1))
 			{
 				m_nCounterFlail = flail::FLAIL_DROP;
 			}
