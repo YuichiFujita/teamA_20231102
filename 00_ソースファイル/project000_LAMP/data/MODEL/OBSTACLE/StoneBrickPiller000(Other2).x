@@ -1098,7 +1098,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\フォルダ集\\MyFolder\\MetasequiaLE専用\\2023\\Team\\data\\MODEL\\TEXTURE\\DarkBrick.png";
+    "data\\MODEL\\TEXTURE\\DarkBrick.png";
    }
   }
   Material {
