@@ -15,7 +15,7 @@
 #include "player.h"
 #include "stage.h"
 #include "retentionManager.h"
-
+#include "DepthShadow.h"
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -37,7 +37,7 @@ namespace
 	namespace entry
 	{
 		const D3DXVECTOR3 INIT_VECU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトルの初期値
-		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(360.0f, 100.0f, -200.0f);	// 視点の初期値
+		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(360.0f, 100.0f, -700.0f);	// 視点の初期値
 		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(360.0f, 100.0f, 0.0f);	// 注視点の初期値
 
 		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.75f;		// 画面の横幅
@@ -303,6 +303,17 @@ void CCamera::SetCamera(const EType type)
 
 	// ビューマトリックスの設定
 	pDevice->SetTransform(D3DTS_VIEW, &m_aCamera[type].mtxView);
+	D3DXVECTOR3 posR = m_aCamera[type].posR;
+	D3DXVECTOR3 posV = m_aCamera[type].posV;
+	D3DXVECTOR3 cVec = posR - posV;
+	D3DXVec3Normalize(&cVec, &cVec);
+	cVec *= -5000.0f;
+	posR = cVec + posV;
+	D3DXMATRIX CameraView;
+	D3DXMatrixLookAtLH(&CameraView, &posV, &posR, &D3DXVECTOR3(0, 1, 0));
+
+	CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetCameraViewMatrix(&m_aCamera[type].mtxView);
+//	CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
 }
 
 //============================================================
