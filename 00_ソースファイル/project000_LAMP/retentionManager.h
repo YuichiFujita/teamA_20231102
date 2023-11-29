@@ -41,10 +41,10 @@ public:
 	// 生存ランキング列挙
 	enum ERank
 	{
-		RANK_4TH = 0,	// 生存ランキング：四位
-		RANK_3RD,		// 生存ランキング：三位
+		RANK_1ST = 0,	// 生存ランキング：一位
 		RANK_2ND,		// 生存ランキング：二位
-		RANK_1ST,		// 生存ランキング：一位
+		RANK_3RD,		// 生存ランキング：三位
+		RANK_4TH,		// 生存ランキング：四位
 		RANK_MAX		// この列挙型の総数
 	};
 
@@ -83,7 +83,7 @@ private:
 	EWin	m_stateWin;		// 勝利条件
 	int		m_nNumPlayer;	// プレイヤー数
 
-	int		m_aSurvivalRank[MAX_PLAYER];	// 昇順の生存ランキング
+	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 };
 
