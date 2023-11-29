@@ -194,7 +194,8 @@ int CRetentionManager::GetNumPlayer(void) const
 //============================================================
 void CRetentionManager::InitNumSurvival(void)
 {
-	// TODO：ここ記述
+	// プレイヤー人数分を生存人数に設定
+	m_nNumSurvival = m_nNumPlayer;
 }
 
 //============================================================
@@ -202,7 +203,8 @@ void CRetentionManager::InitNumSurvival(void)
 //============================================================
 int CRetentionManager::GetNumSurvival(void) const
 {
-	return 0;
+	// 生存人数を返す
+	return m_nNumSurvival;
 }
 
 //============================================================
@@ -263,6 +265,9 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 
 			// 引数のプレイヤーインデックスを設定
 			m_aSurvivalRank[nCntPlayer] = nPlayerID;
+
+			// 生存人数を減算
+			m_nNumSurvival--;
 
 			// 処理を抜ける
 			break;
