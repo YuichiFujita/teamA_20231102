@@ -32,6 +32,7 @@ public:
 	{
 		STATE_NONE = 0,	// 何もしない状態
 		STATE_NORMAL,	// 通常状態
+		STATE_RESULT,	// リザルト状態
 		STATE_END,		// 終了状態
 		STATE_MAX		// この列挙型の総数
 	};
@@ -59,7 +60,8 @@ private:
 	static CEditStageManager *m_pEditStage;	// エディットステージの情報
 
 	// メンバ変数
-	EState m_state;	// 状態
+	EState m_state;			// 状態
+	int m_nCounterState;	// 状態管理カウンター
 };
 
 #endif	// _GAMEMANAGER_H_

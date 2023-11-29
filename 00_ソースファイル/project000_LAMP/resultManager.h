@@ -55,6 +55,8 @@ public:
 		STATE_WIN,
 		STATE_BIG_FRAME,
 		STATE_FRAME,
+		STATE_HOLD,
+		STATE_SELECT,
 		STATE_WAIT,				// 遷移待機状態
 		STATE_MAX				// この列挙型の総数
 	};
@@ -65,6 +67,7 @@ public:
 		OBJ_WIN = 0,	//勝利ロゴ
 		OBJ_BIGFRAME,
 		OBJ_FRAME,		//フレーム
+		OBJ_COVER,
 		OBJ_SELECT,		//セレクト
 		OBJ_MAX
 	};
@@ -95,17 +98,13 @@ public:
 private:
 	// メンバ関数
 	void UpdateFade(void);			// フェードイン
-	void UpdateResult(void);		// リザルト表示
-	void UpdateTime(void);			// タイム表示
-	void UpdateContinue(void);		// コンテニュー表示
 	void UpdateSelect(void);		// 選択更新
 	void UpdateTransition(void);	// 遷移決定
 	void SkipStaging(void);			// 演出スキップ
-	void SetTexResult(void);		// リザルト表示のテクスチャ設定
-	bool UpdateDrawWait(const int nWait);	// 表示待機
-	void UpdateWin(void);
-	void UpdateBigFrame(void);
-	void UpdateFrame(void);
+	void UpdateWin(void);			// 勝利ロゴ
+	void UpdateBigFrame(void);		// 巨大フレーム
+	void UpdateFrame(void);			// フレーム
+	void UpdateCover(void);			// カバー
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
@@ -125,6 +124,7 @@ private:
 	int m_nOldSelect;					// 前回の選択
 	int m_anNum[OBJ_MAX];				//　数
 	int m_anWaitTime[OBJ_MAX];			//　待機時間
+	bool m_bSkiped;
 };
 
 #endif	// _RESULTMANAGER_H_

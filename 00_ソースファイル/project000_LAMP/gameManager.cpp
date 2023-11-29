@@ -17,6 +17,14 @@
 #include "editStageManager.h"
 
 //************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	const int	WAIT_RESULT_FRAME = 120;	// ゲーム画面からゲーム内リザルト画面に移動する際の余韻フレーム
+}
+
+//************************************************************
 //	静的メンバ変数宣言
 //************************************************************
 CEditStageManager *CGameManager::m_pEditStage = NULL;	// エディットステージの情報
@@ -31,6 +39,7 @@ CGameManager::CGameManager()
 {
 	// メンバ変数をクリア
 	m_state = STATE_NONE;	// 状態
+	m_nCounterState = 0;	// 状態管理カウンター
 }
 
 //============================================================
@@ -48,6 +57,7 @@ HRESULT CGameManager::Init(void)
 {
 	// メンバ変数を初期化
 	m_state = STATE_NORMAL;	// 状態
+	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 生存人数を初期化
 	CManager::GetInstance()->GetRetentionManager()->InitNumSurvival();
@@ -98,21 +108,36 @@ void CGameManager::Update(void)
 	switch (m_state)
 	{ // 状態ごとの処理
 	case STATE_NONE:
-
-		// 無し
-
 		break;
 
 	case STATE_NORMAL:
+
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
+		{ // 生き残りがいない場合
+
+			// カウンターを加算
+			m_nCounterState++;
+
+			if (m_nCounterState >= WAIT_RESULT_FRAME)
+			{ // 余韻が経過した場合
+
+				// カウンターを初期化
+				m_nCounterState = 0;
+
+				// リザルトに移行
+				//m_state = STATE_RESULT;	// TODO：遷移直す
+			}
+		}
+
+		break;
+
+	case STATE_RESULT:
 
 		// 無し
 
 		break;
 
 	case STATE_END:
-
-		// 無し
-
 		break;
 
 	default:	// 例外処理
