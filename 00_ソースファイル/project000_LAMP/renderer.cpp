@@ -254,14 +254,7 @@ void CRenderer::Draw(void)
     HRESULT			hr;				// 異常終了の確認用
     D3DVIEWPORT9	viewportDef;	// カメラのビューポート保存用
 	//カメラのビュー行列作成
-	D3DXVECTOR3 posR = CManager::GetInstance()->GetCamera()->GetCamera(CCamera::TYPE_MAIN).posR;
-	D3DXVECTOR3 posV = CManager::GetInstance()->GetCamera()->GetCamera(CCamera::TYPE_MAIN).posV;
-	D3DXVECTOR3 cVec = posR - posV;
-	D3DXVec3Normalize(&cVec, &cVec);
-	cVec *= 5000.0f;
-	posR = cVec + posV;
-	D3DXMatrixLookAtLH(&CameraView, &posV, &posR, &D3DXVECTOR3(0, 1, 0));
-	m_pDepthShadow->SetCameraViewMatrix(&CameraView);//登録
+
     //--------------------------------------------------------
     //	テクスチャ作成用の描画
     //--------------------------------------------------------
