@@ -19,7 +19,7 @@
 
 #if _DEBUG
 
-#define INIT_SCENE	(CScene::MODE_RESULT)	// 初期シーン
+#define INIT_SCENE	(CScene::MODE_ENTRY)	// 初期シーン
 
 #else
 

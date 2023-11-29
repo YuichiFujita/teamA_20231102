@@ -111,7 +111,6 @@ public:
 
 	void SetEnableUpdate(const bool bUpdate) override;	// 更新状況設定
 	void SetEnableDraw(const bool bDraw) override;		// 描画状況設定
-	void SetEnableDrawUI(const bool bDraw);				// UI描画状況設定
 	D3DXMATRIX GetMtxWorld(void) const override;		// マトリックス取得
 
 	// 静的メンバ関数
@@ -121,15 +120,16 @@ public:
 	void SetSpawn(void);	// 出現設定
 	void SetInvuln(void);	// 無敵設定
 
-	void HitKillY(const int nDmg);		// キルY座標ヒット
-	int GetPadID(void) const;			// パッドインデックス取得
-	int GetCounterFlail(void) const;	// フレイルカウンター取得
+	void SetEnableDrawUI(const bool bDraw);	// UI描画状況設定
+	void HitKillY(const int nDmg);			// キルY座標ヒット
+	int GetPadID(void) const;				// パッドインデックス取得
+	int GetCounterFlail(void) const;		// フレイルカウンター取得
 
 protected:
 	// メンバ関数
-	void UpdateMotion(int nMotion);		// モーション・オブジェクトキャラクターの更新
-	void SetMainMaterial(void);			// 自身のメインカラーマテリアル設定
-	D3DXMATERIAL GetMainMaterial(void);	// 自身のメインカラーマテリアル取得
+	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
+	void SetMainMaterial(void);				// 自身のメインカラーマテリアル設定
+	D3DXMATERIAL GetMainMaterial(void);		// 自身のメインカラーマテリアル取得
 
 private:
 	// メンバ関数

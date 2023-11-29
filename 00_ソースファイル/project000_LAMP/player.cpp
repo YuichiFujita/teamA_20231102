@@ -276,6 +276,13 @@ void CPlayer::Update(void)
 		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
+	{ // 残り人数が1人の場合
+
+		// 生存ランキングを更新 (一位を設定)
+		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+	}
+
 	// フレイルの更新
 	m_pFlail->Update();
 
@@ -481,16 +488,6 @@ void CPlayer::SetEnableDraw(const bool bDraw)
 }
 
 //============================================================
-//	UI描画状況の設定処理
-//============================================================
-void CPlayer::SetEnableDrawUI(const bool bDraw)
-{
-	// 引数の描画状況を設定
-	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
-	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
-}
-
-//============================================================
 //	マトリックス取得処理
 //============================================================
 D3DXMATRIX CPlayer::GetMtxWorld(void) const
@@ -649,6 +646,16 @@ void CPlayer::SetInvuln(void)
 
 	// サウンドの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// 生成音
+}
+
+//============================================================
+//	UI描画状況の設定処理
+//============================================================
+void CPlayer::SetEnableDrawUI(const bool bDraw)
+{
+	// 引数の描画状況を設定
+	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
+	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 }
 
 //============================================================
