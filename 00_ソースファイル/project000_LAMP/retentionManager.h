@@ -64,6 +64,8 @@ public:
 	EWin GetWinState(void) const;			// 勝利条件取得
 	void SetNumPlayer(const int nNum);		// プレイ人数設定
 	int GetNumPlayer(void) const;			// プレイ人数取得
+	void InitNumSurvival(void);				// 生存人数初期化
+	int GetNumSurvival(void) const;			// 生存人数取得
 
 	void AllSetEnableEntry(const bool bEntry);				// 全エントリー状況設定
 	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
@@ -82,6 +84,7 @@ private:
 	EKill	m_stateKill;	// 討伐条件
 	EWin	m_stateWin;		// 勝利条件
 	int		m_nNumPlayer;	// プレイヤー数
+	int		m_nNumSurvival;	// 生存プレイヤー数
 
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況

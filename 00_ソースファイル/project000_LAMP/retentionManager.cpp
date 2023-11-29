@@ -24,6 +24,7 @@ CRetentionManager::CRetentionManager()
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
+	m_nNumSurvival	= 0;			// 生存プレイヤー数
 }
 
 //============================================================
@@ -45,6 +46,7 @@ HRESULT CRetentionManager::Init(void)
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
+	m_nNumSurvival	= 0;			// 生存プレイヤー数
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -185,6 +187,22 @@ int CRetentionManager::GetNumPlayer(void) const
 {
 	// プレイ人数を返す
 	return m_nNumPlayer;
+}
+
+//============================================================
+//	生存人数の初期化処理
+//============================================================
+void CRetentionManager::InitNumSurvival(void)
+{
+	// TODO：ここ記述
+}
+
+//============================================================
+//	生存人数取得処理
+//============================================================
+int CRetentionManager::GetNumSurvival(void) const
+{
+	return 0;
 }
 
 //============================================================
