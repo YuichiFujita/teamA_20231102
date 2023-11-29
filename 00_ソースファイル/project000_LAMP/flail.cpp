@@ -173,11 +173,11 @@ void CFlail::UpdateFlailPos(void)
 
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
-		if (player->GetCounterFlail() < flail::FLAIL_DEF)
+		if (player->GetCounterFlail() == flail::FLAIL_DROP)
 		{
 			if (pos.y > -13.0f)
 			{
-				pos.y -= 0.5f;
+				pos.y -= 3.0f;
 			}
 			else
 			{
@@ -255,7 +255,7 @@ void CFlail::UpdateChain(void)
 			{
 				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f) || nCntChain == 1)
 				{
-					pos.x += 15.0f;
+					pos.x += 19.0f;
 
 					if (pos.x > 20.0f)
 					{
@@ -268,7 +268,7 @@ void CFlail::UpdateChain(void)
 			{
 				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
 				{
-					pos.x -= -0.4f * player->GetCounterFlail();
+					pos.x -= -0.2f * player->GetCounterFlail();
 					
 					if (pos.x < 0.0f)
 					{
@@ -306,7 +306,12 @@ void CFlail::Draw(void)
 
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	D3DXMATRIX mtx;
+	D3DXMATRIX mtx, mtxChain;
+
+	// 変数を宣言
+	D3DXMATRIX   mtxScale, mtxRot, mtxTrans, *mtxOrg;	// 計算用マトリックス
+	D3DXMATRIX   mtxParent;	// 親のマトリックス
+	D3DXVECTOR3 pos, rot, scale;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtx);
@@ -317,6 +322,40 @@ void CFlail::Draw(void)
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
+
+	//pos = m_chain[0].multiModel->GetVec3Position();
+	//rot = m_chain[0].multiModel->GetVec3Rotation();
+	//scale = m_chain[0].multiModel->GetVec3Scaling();
+	//mtxOrg = m_chain[0].multiModel->GetPtrMtxWorld();
+
+	//// ワールドマトリックスの初期化
+	//D3DXMatrixIdentity(mtxOrg);
+	//D3DXMatrixIdentity(&mtxChain);
+
+	//// 拡大率を反映
+	//D3DXMatrixScaling(&mtxScale, scale.x, scale.y, scale.z);
+	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxScale);
+
+	//// 向きを反映
+	//D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
+	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxRot);
+
+	//// 位置を反映
+	//D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y, pos.z);
+	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxTrans);
+
+	//// 親のマトリックスを設定
+	//mtxParent = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld();
+
+	//// ワールドマトリックスと親マトリックスを掛け合わせる
+	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxParent);
+
+	//mtxChain._41 = mtxOrg->_41;
+	//mtxChain._42 = mtxOrg->_42;
+	//mtxChain._43 = mtxOrg->_43;
+
+	//// ワールドマトリックスの設定
+	//pDevice->SetTransform(D3DTS_WORLD, &mtxChain);
 
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
@@ -341,14 +380,18 @@ void CFlail::Draw(void)
 
 			m_chain[nCntChain].multiModel->SetVec3Rotation(rotNow);
 		}
+		else
+		{
+			if (m_fLengthChain != 0)
+			{
+				rotNow.z = -(D3DX_PI * 0.5f) + acosf((m_chain[nCntChain].multiModel->GetMtxWorld()._42 - GetVec3Position().y) / m_fLengthChain);
+			}
+
+			m_chain[nCntChain].multiModel->SetVec3Rotation(rotNow);
+		}
 
 		if (m_chain[nCntChain].multiModel->GetVec3Position().x == 0.0f)
 		{
-			// 変数を宣言
-			D3DXMATRIX   mtxScale, mtxRot, mtxTrans, *mtxOrg;	// 計算用マトリックス
-			D3DXMATRIX   mtxParent;	// 親のマトリックス
-			D3DXVECTOR3 pos, rot, scale;
-
 			pos = m_chain[nCntChain].multiModel->GetVec3Position();
 			rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 			scale = m_chain[nCntChain].multiModel->GetVec3Scaling();
@@ -395,10 +438,7 @@ void CFlail::Draw(void)
 			m_chain[nCntChain].multiModel->Draw();
 		}
 
-		if (nCntChain != 0)
-		{
-			m_chain[nCntChain].multiModel->SetVec3Rotation(rotOld);
-		}
+		m_chain[nCntChain].multiModel->SetVec3Rotation(rotOld);
 	}
 
 	UpdateFlailPos();

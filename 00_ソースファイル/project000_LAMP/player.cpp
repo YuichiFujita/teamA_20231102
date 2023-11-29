@@ -1144,14 +1144,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// 溜めてる間鉄球を振り回す
-			m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.003f * m_nCounterFlail));
+			//m_pFlail->SetChainRot(m_pFlail->GetChainRot() - (0.003f * m_nCounterFlail));
 
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
 
 			// 目標向きを設定
-			m_destRot.y = m_pFlail->GetChainRotMove() + D3DX_PI * 0.5f;
+			m_destRot.y = m_pFlail->GetChainRotMove() + D3DX_PI;
 		}
 
 		// 投擲
@@ -1164,7 +1164,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_pFlail->SetMove(move);
 
 			// 目標角度に合わせる
-			//m_pFlail->SetChainRot(m_destRot.y);
+			m_pFlail->SetChainRot(m_pFlail->GetChainRotMove() - D3DX_PI * 0.5f);
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
