@@ -25,8 +25,16 @@ namespace
 	// フェード基本情報
 	namespace fade
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, -120.0f, 0.0f);	// フェード位置
+		const D3DXVECTOR3 UP_POS	= D3DXVECTOR3(SCREEN_CENT.x, -900.0f, 0.0f);					// フェード上位置
+		const D3DXVECTOR3 CENT_POS	= D3DXVECTOR3(SCREEN_CENT.x, SCREEN_CENT.y, 0.0f);				// フェード中央位置
+		const D3DXVECTOR3 DOWN_POS	= D3DXVECTOR3(SCREEN_CENT.x, SCREEN_HEIGHT + 900.0f, 0.0f);		// フェード下位置
+		const D3DXVECTOR3 UP_MIDDLE_POS		= D3DXVECTOR3(CENT_POS.x, UP_POS.y + 300.0f, 0.0f);		// フェード上中央位置
+		const D3DXVECTOR3 DOWN_MIDDLE_POS	= D3DXVECTOR3(CENT_POS.x, DOWN_POS.y - 300.0f, 0.0f);	// フェード下中央位置
+
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(SCREEN_SIZE.x, 1770.0f, 0.0f);	// フェード大きさ
+
+		const float	ADD_MOVE = 0.4f;		// フェード移動量
+		const float	ADD_ACCEL_MOVE = 1.75f;	// フェード加速移動量
 	}
 }
 
@@ -47,7 +55,10 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 CMiddleResultManager::CMiddleResultManager()
 {
 	// メンバ変数をクリア
-	m_pFade = NULL;	// フェードの情報
+	m_pFade		= NULL;			// フェードの情報
+	m_state		= STATE_FADEIN;	// 状態
+	m_fMoveY	= 0.0f;			// 縦移動量
+	m_nCounterState = 0;		// 状態管理カウンター
 }
 
 //============================================================
@@ -64,13 +75,16 @@ CMiddleResultManager::~CMiddleResultManager()
 HRESULT CMiddleResultManager::Init(void)
 {
 	// メンバ変数を初期化
-	m_pFade = NULL;	// フェードの情報
+	m_pFade		= NULL;			// フェードの情報
+	m_state		= STATE_FADEIN;	// 状態
+	m_fMoveY	= 0.0f;			// 縦移動量
+	m_nCounterState = 0;		// 状態管理カウンター
 
 	// フェードの生成
 	m_pFade = CObject2D::Create
 	( // 引数
-		fade::POS,	// 位置
-		fade::SIZE	// 大きさ
+		fade::UP_POS,	// 位置
+		fade::SIZE		// 大きさ
 	);
 	if (m_pFade == NULL)
 	{ // 生成に失敗した場合
@@ -107,6 +121,82 @@ HRESULT CMiddleResultManager::Uninit(void)
 //============================================================
 void CMiddleResultManager::Update(void)
 {
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_FADEIN:
+
+		// フェードインの更新
+		UpdateFadeIn();
+
+		break;
+
+	case STATE_FADEIN_WAIT:
+
+		// TODO：仮の処理
+		m_nCounterState++;
+		if (m_nCounterState >= 8)
+		{ // カウンター
+
+			m_nCounterState = 0;
+			m_state = STATE_FADEIN_ADD;
+		}
+
+		break;
+
+	case STATE_FADEIN_ADD:
+
+		// フェードイン加速の更新
+		UpdateFadeInAdd();
+
+		break;
+
+	case STATE_WAIT:
+
+		// TODO：仮の処理
+		m_nCounterState++;
+		if (m_nCounterState == 60)
+		{
+			m_nCounterState = 0;
+			m_state = STATE_FADEOUT;
+		}
+
+		break;
+
+	case STATE_FADEOUT:
+
+		// フェードアウトの更新
+		UpdateFadeOut();
+
+		break;
+
+	case STATE_FADEOUT_WAIT:
+
+		// TODO：仮の処理
+		m_nCounterState++;
+		if (m_nCounterState >= 8)
+		{ // カウンター
+
+			m_nCounterState = 0;
+			m_state = STATE_FADEOUT_ADD;
+		}
+
+		break;
+
+	case STATE_FADEOUT_ADD:
+
+		// フェードアウト加速の更新
+		UpdateFadeOutAdd();
+
+		break;
+
+	case STATE_END:
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
 	// フェードの更新
 	m_pFade->Update();
 }
@@ -177,4 +267,128 @@ HRESULT CMiddleResultManager::Release(CMiddleResultManager *&prMiddleResultManag
 		return S_OK;
 	}
 	else { assert(false); return E_FAIL; }	// 非使用中
+}
+
+//============================================================
+//	フェードインの更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeIn(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置
+
+	// 移動量を加算
+	m_fMoveY += fade::ADD_MOVE;
+
+	// フェードの位置を加算
+	posFade.y += m_fMoveY;
+
+	if (posFade.y > fade::UP_MIDDLE_POS.y)
+	{ // 現在位置が停止位置を超えた場合
+
+		// フェードを停止位置に補正
+		posFade.y = fade::UP_MIDDLE_POS.y;
+
+		// 移動量を初期化
+		m_fMoveY = 0.0f;
+
+		// フェードイン待機状態にする
+		m_state = STATE_FADEIN_WAIT;
+	}
+
+	// フェード位置を反映
+	m_pFade->SetVec3Position(posFade);
+}
+
+//============================================================
+//	フェードイン加速の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeInAdd(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置
+
+	// 移動量を加算
+	m_fMoveY += fade::ADD_ACCEL_MOVE;
+
+	// フェードの位置を加算
+	posFade.y += m_fMoveY;
+
+	if (posFade.y > fade::CENT_POS.y)
+	{ // 現在位置が停止位置を超えた場合
+
+		// フェードを停止位置に補正
+		posFade.y = fade::CENT_POS.y;
+
+		// 移動量を初期化
+		m_fMoveY = 0.0f;
+
+		// 待機状態にする
+		m_state = STATE_WAIT;
+	}
+
+	// フェード位置を反映
+	m_pFade->SetVec3Position(posFade);
+}
+
+//============================================================
+//	フェードアウトの更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeOut(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置
+
+	// 移動量を加算
+	m_fMoveY += fade::ADD_MOVE;
+
+	// フェードの位置を加算
+	posFade.y += m_fMoveY;
+
+	if (posFade.y > fade::DOWN_MIDDLE_POS.y)
+	{ // 現在位置が停止位置を超えた場合
+
+		// フェードを停止位置に補正
+		posFade.y = fade::DOWN_MIDDLE_POS.y;
+
+		// 移動量を初期化
+		m_fMoveY = 0.0f;
+
+		// フェードアウト待機状態にする
+		m_state = STATE_FADEOUT_WAIT;
+	}
+
+	// フェード位置を反映
+	m_pFade->SetVec3Position(posFade);
+}
+
+//============================================================
+//	フェードアウト加速の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeOutAdd(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置
+
+	// 移動量を加算
+	m_fMoveY += fade::ADD_ACCEL_MOVE;
+
+	// フェードの位置を加算
+	posFade.y += m_fMoveY;
+
+	if (posFade.y > fade::DOWN_POS.y)
+	{ // 現在位置が停止位置を超えた場合
+
+		// フェードを停止位置に補正
+		posFade.y = fade::DOWN_POS.y;
+
+		// 移動量を初期化
+		m_fMoveY = 0.0f;
+
+		// 終了状態にする
+		m_state = STATE_END;
+	}
+
+	// フェード位置を反映
+	m_pFade->SetVec3Position(posFade);
 }

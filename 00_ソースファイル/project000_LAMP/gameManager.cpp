@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "player.h"
 #include "retentionManager.h"
+#include "middleResultManager.h"
 #include "editStageManager.h"
 
 //************************************************************
@@ -27,7 +28,8 @@ namespace
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
-CEditStageManager *CGameManager::m_pEditStage = NULL;	// エディットステージの情報
+CMiddleResultManager	*CGameManager::m_pMiddleResult	= NULL;	// 中間リザルトの情報
+CEditStageManager		*CGameManager::m_pEditStage		= NULL;	// エディットステージの情報
 
 //************************************************************
 //	親クラス [CGameManager] のメンバ関数
@@ -65,6 +67,20 @@ HRESULT CGameManager::Init(void)
 	// 生存ランキングを初期化
 	CManager::GetInstance()->GetRetentionManager()->InitSurvivalRank();
 
+	if (m_pMiddleResult == NULL)
+	{ // 中間リザルトが使用されていない場合
+
+		// 中間リザルトの生成
+		m_pMiddleResult = CMiddleResultManager::Create();
+		if (m_pMiddleResult == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			return E_FAIL;
+		}
+	}
+	else { assert(false); }	// 使用済み
+
 #if _DEBUG
 
 	if (m_pEditStage == NULL)
@@ -92,6 +108,13 @@ HRESULT CGameManager::Init(void)
 //============================================================
 void CGameManager::Uninit(void)
 {
+	if (m_pMiddleResult != NULL)
+	{ // 中間リザルトが使用されている場合
+
+		// 中間リザルトの破棄
+		CMiddleResultManager::Release(m_pMiddleResult);
+	}
+
 	if (m_pEditStage != NULL)
 	{ // エディットステージが使用されている場合
 
@@ -133,7 +156,12 @@ void CGameManager::Update(void)
 
 	case STATE_RESULT:
 
-		// 無し
+		if (m_pMiddleResult != NULL)
+		{ // 中間リザルトが使用されている場合
+
+			// 中間リザルトの更新
+			m_pMiddleResult->Update();
+		}
 
 		break;
 

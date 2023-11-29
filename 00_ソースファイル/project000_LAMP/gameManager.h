@@ -18,6 +18,7 @@
 //************************************************************
 //	前方宣言
 //************************************************************
+class CMiddleResultManager;	// 中間リザルトマネージャークラス
 class CEditStageManager;	// エディットステージマネージャークラス
 
 //************************************************************
@@ -53,11 +54,14 @@ public:
 	// 静的メンバ関数
 	static CGameManager *Create(void);	// 生成
 	static HRESULT Release(CGameManager *&prGameManager);	// 破棄
-	static CEditStageManager *GetEditStage(void);	// エディットステージ取得
+
+	static CMiddleResultManager	*GetMiddleResult(void);	// 中間リザルト取得
+	static CEditStageManager	*GetEditStage(void);	// エディットステージ取得
 
 private:
 	// 静的メンバ変数
-	static CEditStageManager *m_pEditStage;	// エディットステージの情報
+	static CMiddleResultManager	*m_pMiddleResult;	// 中間リザルトの情報
+	static CEditStageManager	*m_pEditStage;		// エディットステージの情報
 
 	// メンバ変数
 	EState m_state;			// 状態
