@@ -263,6 +263,15 @@ HRESULT CGameManager::Release(CGameManager *&prGameManager)
 }
 
 //============================================================
+//	中間リザルト取得処理
+//============================================================
+CMiddleResultManager * CGameManager::GetMiddleResult(void)
+{
+	// 中間リザルトを返す
+	return m_pMiddleResult;
+}
+
+//============================================================
 //	エディットステージ取得処理
 //============================================================
 CEditStageManager *CGameManager::GetEditStage(void)

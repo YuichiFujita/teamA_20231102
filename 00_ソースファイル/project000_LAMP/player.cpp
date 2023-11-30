@@ -365,6 +365,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 	{
 		// 変数を宣言
 		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
 		// カウンターを初期化
 		m_nCounterState = 0;
@@ -392,6 +393,11 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
 			m_move.y = KNOCK_UP;
 			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
+
+			// ノックバック方向に向きを設定
+			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
+			m_destRot.y = rotPlayer.y;	// 目標向きを設定
+			SetVec3Rotation(rotPlayer);	// 向きを設定
 
 			// 空中状態にする
 			m_bJump = true;
@@ -431,6 +437,15 @@ void CPlayer::SetState(const int nState)
 
 			if (m_state == STATE_DEATH)
 			{ // 死亡状態の場合
+
+				// マテリアルを再設定
+				ResetMaterial();
+
+				// メインカラーを設定
+				SetMainMaterial();
+
+				// 透明度を透明に再設定
+				SetAlpha(1.0f);
 
 				// 生存ランキングを更新
 				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
@@ -840,10 +855,73 @@ void CPlayer::UpdateMotion(int nMotion)
 				SetMotion(nMotion);
 			}
 		}
+		else
+		{ // ループしないモーションだった場合
+
+			switch (GetMotionType())
+			{ // モーションごとの処理
+			case MOTION_ATTACK:	// 攻撃モーション：ループOFF
+			case MOTION_DASH:	// ダッシュモーション：ループOFF
+			case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
+			case MOTION_DEATH:	// 死亡モーション：ループOFF
+
+				break;
+
+			case MOTION_LAND:	// 着地モーション：ループOFF
+
+				if (nMotion != MOTION_IDOL)
+				{ // 待機モーションではない場合
+
+					// 現在のモーションの設定
+					SetMotion(nMotion);
+				}
+
+				break;
+
+			default:	// 例外処理
+				assert(false);
+				break;
+			}
+		}
 	}
 
 	// オブジェクトキャラクターの更新
 	CObjectChara::Update();
+
+	switch (GetMotionType())
+	{ // モーションごとの処理
+	case MOTION_IDOL:	// 待機モーション：ループON
+	case MOTION_CHARGE:	// チャージモーション：ループON
+	case MOTION_PULL:	// 引きずりモーション：ループON
+
+		break;
+
+	case MOTION_MOVE:	// 移動モーション：ループON
+
+		break;
+
+	case MOTION_ATTACK:	// 攻撃モーション：ループOFF
+	case MOTION_DASH:	// ダッシュモーション：ループOFF
+	case MOTION_LAND:	// 着地モーション：ループOFF
+
+		if (IsMotionFinish())
+		{ // モーションが終了していた場合
+
+			// 現在のモーションの設定
+			SetMotion(nMotion);
+		}
+
+		break;
+
+	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
+	case MOTION_DEATH:	// 死亡モーション：ループOFF
+
+		break;
+
+	default:	// 例外処理
+		assert(false);
+		break;
+	}
 }
 
 //============================================================
@@ -952,6 +1030,9 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 
 		// 無敵の人にする
 		SetInvuln();
+
+		// 着地モーションを設定
+		SetMotion(MOTION_LAND);
 	}
 
 	// 向き更新
@@ -974,8 +1055,8 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 		HitKillY(DMG_KILLY);
 	}
 
-	// 吹っ飛びモーションを返す
-	return MOTION_KNOCK;
+	// 現在のモーションを返す
+	return (EMotion)GetMotionType();
 }
 
 //============================================================
@@ -1027,6 +1108,9 @@ void CPlayer::UpdateOldPosition(void)
 //============================================================
 CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 {
+	// 変数を宣言
+	EMotion currentMotion = MOTION_IDOL;	// 現在のモーション
+
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
@@ -1108,6 +1192,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 移動量を更新
 			m_move.x += sinf(pPad->GetPressLStickRot(m_nPadID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
 			m_move.z += cosf(pPad->GetPressLStickRot(m_nPadID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
+
+			// 移動モーションを設定
+			currentMotion = MOTION_MOVE;
 		}
 		else
 		{ // ダッシュ中の場合
@@ -1115,13 +1202,20 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 移動量を更新
 			m_move.x += sinf(m_dashRot.y) * fMove;
 			m_move.z += cosf(m_dashRot.y) * fMove;
+
+			// ダッシュモーションを設定
+			currentMotion = MOTION_DASH;
 		}
 
-		if (m_pFlail->GetLengthChain() >= 1000.0f)
-		{
+		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
+		{ // 引きずり距離の場合
+
 			// 移動量を更新
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
+
+			// 引きずりモーションを設定
+			currentMotion = MOTION_PULL;
 		}
 
 		// 目標向きを設定
@@ -1149,6 +1243,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 溜めてる間鉄球を振り回す
 			m_pFlail->SetChainRotMove(-0.003f * m_nCounterFlail);
 
+			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * 5.0f);
+
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
@@ -1165,12 +1261,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
+			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (float)((m_nCounterFlail - 4) / 4));
 
 			if (m_nCounterFlail < 30)
 			{
 				// 目標角度に合わせる
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
+				m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1));
 			}
 
 			// カウンターの設定
@@ -1184,7 +1282,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetLengthChain() == 20.0f * (flail::FLAIL_NUM - 1))
+			if (m_pFlail->GetLengthChain() == m_pFlail->GetLengthTarget())
 			{
 				m_nCounterFlail = flail::FLAIL_DROP;
 			}
@@ -1283,9 +1381,10 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", m_nCounterFlail);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖長さ]：%f\n", m_pFlail->GetLengthChain());
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖目標長さ]：%f\n", m_pFlail->GetLengthTarget());
 
-	// 待機モーションを返す
-	return MOTION_IDOL;
+	// 現在のモーションを返す
+	return currentMotion;
 }
 
 //============================================================
