@@ -28,6 +28,8 @@ public:
 	{
 		TYPE_STONE = 0,	// 石テクスチャ
 		TYPE_BOX,		// 箱テクスチャ
+		TYPE_BRICK,		// レンガ
+		TYPE_CONCRETE,	// コンクリート
 		TYPE_MAX		// この列挙型の総数
 	};
 

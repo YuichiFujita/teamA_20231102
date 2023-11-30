@@ -30,8 +30,8 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define CLASS_NAME	"WindowClass"	// ウインドウクラスの名前
-#define WINDOW_NAME	"NeverGiveUp!"	// ウインドウの名前 (キャプションに表示)
+#define CLASS_NAME	"WindowClass"		// ウインドウクラスの名前
+#define WINDOW_NAME	"CHAIN AND STAR"	// ウインドウの名前 (キャプションに表示)
 
 #define FPS		(60)			// アプリケーションのFPS値
 #define APP_FPS	(1000 / FPS)	// アプリケーションの経過時間の判定用

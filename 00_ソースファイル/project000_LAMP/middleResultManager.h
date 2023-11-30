@@ -34,6 +34,20 @@ public:
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
+	// 状態列挙
+	enum EState
+	{
+		STATE_FADEIN = 0,	// フェードイン状態
+		STATE_FADEIN_WAIT,	// フェードイン待機状態
+		STATE_FADEIN_ADD,	// フェードイン加速状態
+		STATE_WAIT,			// 待機状態
+		STATE_FADEOUT,		// フェードアウト状態
+		STATE_FADEOUT_WAIT,	// フェードアウト待機状態
+		STATE_FADEOUT_ADD,	// フェードアウト加速状態
+		STATE_END,			// 終了状態
+		STATE_MAX			// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CMiddleResultManager();
 
@@ -50,11 +64,20 @@ public:
 	static HRESULT Release(CMiddleResultManager *&prMiddleResultManager);	// 破棄
 
 private:
+	// メンバ変数
+	void UpdateFadeIn(void);		// フェードイン更新
+	void UpdateFadeInAdd(void);		// フェードイン加速更新
+	void UpdateFadeOut(void);		// フェードアウト更新
+	void UpdateFadeOutAdd(void);	// フェードアウト加速更新
+
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
-	CObject2D *m_pFade;	// フェードの情報
+	CObject2D *m_pFade;		// フェードの情報
+	EState m_state;			// 状態
+	int m_nCounterState;	// 状態管理カウンター
+	float m_fMoveY;			// 縦移動量
 };
 
 #endif	// _MIDDLE_RESULT_MANAGER_H_
