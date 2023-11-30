@@ -98,6 +98,8 @@ public:
 	void SetLengthTarget(const float& rLengthTarget);		// 目標長さ設定
 	float GetLengthTarget(void);							// 目標長さ取得
 
+	void CatchFlail(void);
+
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
 	( // 引数

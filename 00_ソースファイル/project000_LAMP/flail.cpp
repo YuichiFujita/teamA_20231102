@@ -1064,3 +1064,27 @@ float CFlail::GetLengthTarget(void)
 	// 長さを返す
 	return m_fLengthTarget;
 }
+
+//============================================================
+//	フレイル強制取得処理
+//============================================================
+void CFlail::CatchFlail()
+{
+	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
+	{
+		D3DXVECTOR3 pos, rot;
+		pos = m_chain[nCntChain].multiModel->GetVec3Position();
+		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
+
+		pos = VEC3_ZERO;
+		rot = VEC3_ZERO;
+
+		m_chain[nCntChain].multiModel->SetVec3Position(pos);
+		m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
+
+		m_fLengthChain = 0.0f;
+
+		// モデルの更新
+		m_chain[nCntChain].multiModel->Update();
+	}
+}
