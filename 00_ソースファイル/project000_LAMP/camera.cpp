@@ -432,9 +432,13 @@ void CCamera::SetDestLookDown(void)
 			else { assert(false); }	// 非使用中
 		}
 
-		// プレイヤーの位置の平均を求める
-		posLook /= (float)nNumPlayer;
-		posLook.y = 0.0f;	// Y座標は固定
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
+		{ // 生存人数が1人以上の場合
+
+			// プレイヤーの位置の平均を求める
+			posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
+			posLook.y = 0.0f;	// Y座標は固定
+		}
 
 		// カメラの距離を加算
 		fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
@@ -733,9 +737,13 @@ void CCamera::LookDown(void)
 		else { assert(false); }	// 非使用中
 	}
 
-	// プレイヤーの位置の平均を求める
-	posLook /= (float)nNumPlayer;
-	posLook.y = 0.0f;	// Y座標は固定
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
+	{ // 生存人数が1人以上の場合
+
+		// プレイヤーの位置の平均を求める
+		posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
+		posLook.y = 0.0f;	// Y座標は固定
+	}
 
 	// カメラの距離を加算
 	fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
