@@ -131,14 +131,14 @@ CHARACTERSET
 	PARTSSET						# [13]ñ_
 		INDEX = 13
 		PARENT = 5					# (êe)âEéË
-		POS = 0.0 0.0 2.0
+		POS = 0.0 0.0 50.0
 		ROT = 1.5 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET						# [13]ñ_
 		INDEX = 14
 		PARENT = 13					# (êe)ìSãÖ
-		POS = 0.0 -100.0 0.0
+		POS = 0.0 -160.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
