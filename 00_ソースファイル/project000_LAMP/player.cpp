@@ -861,7 +861,7 @@ void CPlayer::UpdateMotion(int nMotion)
 			switch (GetMotionType())
 			{ // モーションごとの処理
 			case MOTION_ATTACK:	// 攻撃モーション：ループOFF
-			//case MOTION_DASH:	// ダッシュモーション：ループOFF
+			case MOTION_DASH:	// ダッシュモーション：ループOFF
 			case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 			case MOTION_DEATH:	// 死亡モーション：ループOFF
 
@@ -869,8 +869,12 @@ void CPlayer::UpdateMotion(int nMotion)
 
 			case MOTION_LAND:	// 着地モーション：ループOFF
 
-				// 現在のモーションの設定
-				SetMotion(nMotion);
+				if (nMotion != MOTION_IDOL)
+				{ // 待機モーションではない場合
+
+					// 現在のモーションの設定
+					SetMotion(nMotion);
+				}
 
 				break;
 
