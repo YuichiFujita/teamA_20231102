@@ -55,7 +55,12 @@ public:
 	{
 		MOTION_IDOL = 0,	// 待機モーション
 		MOTION_MOVE,		// 移動モーション
+		MOTION_ATTACK,		// 攻撃モーション
+		MOTION_CHARGE,		// チャージモーション
+		MOTION_DASH,		// ダッシュモーション
+		MOTION_PULL,		// 引きずりモーション
 		MOTION_KNOCK,		// 吹っ飛びモーション
+		MOTION_LAND,		// 着地モーション
 		MOTION_DEATH,		// 死亡モーション
 		MOTION_MAX			// この列挙型の総数
 	};
