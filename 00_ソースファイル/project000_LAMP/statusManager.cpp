@@ -68,7 +68,7 @@ HRESULT CStatusManager::Init(void)
 	m_pLife = NULL;			// ‘Ì—Í‚Ìî•ñ
 	m_pKnockRate = NULL;	// ‚Á”ò‚Ñ—¦‚Ìî•ñ
 
-	// ‘Ì—Í‚Ìî•ñ‚Ì¶¬
+							// ‘Ì—Í‚Ìî•ñ‚Ì¶¬
 	m_pLife = CMultiValue::Create
 	( // ˆø”
 		CValue::TEXTURE_UI,	// ƒeƒNƒXƒ`ƒƒ
@@ -81,14 +81,13 @@ HRESULT CStatusManager::Init(void)
 	if (m_pLife == NULL)
 	{ // ¶¬‚ÉŽ¸”s‚µ‚½ê‡
 
-		// Ž¸”s‚ð•Ô‚·
+	  // Ž¸”s‚ð•Ô‚·
 		return E_FAIL;
 	}
-
 	// —Dæ‡ˆÊ‚ðÝ’è
 	m_pLife->SetPriority(PRIORITY);
 
-	// ‚Á”ò‚Ñ—¦‚Ìî•ñ‚ÌÝ’è
+							// ‚Á”ò‚Ñ—¦‚Ìî•ñ‚ÌÝ’è
 	m_pKnockRate = CMultiValue::Create
 	( // ˆø”
 		CValue::TEXTURE_UI,	// ƒeƒNƒXƒ`ƒƒ
@@ -101,21 +100,26 @@ HRESULT CStatusManager::Init(void)
 	if (m_pKnockRate == NULL)
 	{ // ¶¬‚ÉŽ¸”s‚µ‚½ê‡
 
-		// Ž¸”s‚ð•Ô‚·
+	  // Ž¸”s‚ð•Ô‚·
 		return E_FAIL;
-	}
-	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
-	{
-		CObject2D * pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
-		pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
-	}
-	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
-	{
-		CObject2D * pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
-		pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
 	}
 	// —Dæ‡ˆÊ‚ðÝ’è
 	m_pKnockRate->SetPriority(PRIORITY);
+
+
+	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
+	{
+		m_pKnockRate->SetEnableDraw(false);
+		 m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		 m_pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
+	}
+	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
+	{
+		m_pLife->SetEnableDraw(false);
+		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		m_pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
+	}
+	
 
 	// ¬Œ÷‚ð•Ô‚·
 	return S_OK;
@@ -132,6 +136,7 @@ HRESULT CStatusManager::Uninit(void)
 	// ‚Á”ò‚Ñ—¦‚ÌI—¹
 	m_pKnockRate->Uninit();
 
+	m_pUI->Uninit();
 	// ¬Œ÷‚ð•Ô‚·
 	return S_OK;
 }
@@ -146,6 +151,7 @@ void CStatusManager::Update(void)
 
 	// ‚Á”ò‚Ñ—¦‚ÌXV
 	m_pKnockRate->Update();
+
 }
 
 //============================================================
