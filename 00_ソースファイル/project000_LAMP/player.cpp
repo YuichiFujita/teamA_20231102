@@ -432,6 +432,15 @@ void CPlayer::SetState(const int nState)
 			if (m_state == STATE_DEATH)
 			{ // 死亡状態の場合
 
+				// マテリアルを再設定
+				ResetMaterial();
+
+				// メインカラーを設定
+				SetMainMaterial();
+
+				// 透明度を透明に再設定
+				SetAlpha(1.0f);
+
 				// 生存ランキングを更新
 				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 			}
