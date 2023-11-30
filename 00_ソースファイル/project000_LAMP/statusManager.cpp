@@ -9,8 +9,6 @@
 //************************************************************
 #include "statusManager.h"
 #include "manager.h"
-#include "objectGauge2D.h"
-#include "valueUI.h"
 #include "multiValue.h"
 
 //************************************************************
@@ -22,27 +20,20 @@ namespace
 
 	namespace life
 	{
-		const int MAX_LIFE		= 100;	// 最大体力
-		const int CHANGE_FRAME	= 10;	// ゲージ変動フレーム
-
-		const D3DXVECTOR3	POS = D3DXVECTOR3(400.0f, 200.0f, 0.0f);		// ゲージ位置
-		const D3DXVECTOR3	SIZE_GAUGE = D3DXVECTOR3(300.0f, 20.0f, 0.0f);	// ゲージ大きさ
-		const D3DXCOLOR		COL_GAUGE_FRONT	= XCOL_YELLOW;	// ゲージ前景色
-		const D3DXCOLOR		COL_GAUGE_BACK	= XCOL_RED;		// ゲージ背景色
+		const int MAX_LIFE	= 100;	// 数字
+		const int MAX_DIG	= 3;	// 桁数
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(200.0f, 0.0f, 0.0f);		// 行間
 	}
 
 	namespace knockrate
 	{
-		const char* TITLE_TEX_PASS = "data\\TEXTURE\\continue001.png";	// タイトルテクスチャ
-
-		const int	MAX_DIG = 3;	// 数字桁数
-		const int	MAX_NUM = 100;	// 数字最大
-
-		const D3DXVECTOR3 POS			= D3DXVECTOR3(200.0f, 400.0f, 0.0f);	// UI位置
-		const D3DXVECTOR3 SPACE_TITLE	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// タイトル空白
-		const D3DXVECTOR3 SPACE_VALUE	= D3DXVECTOR3(100.0f, 0.0f, 0.0f);		// 数字空白
-		const D3DXVECTOR3 SIZE_TITLE	= D3DXVECTOR3(400.0f, 100.0f, 0.0f);	// タイトル大きさ
-		const D3DXVECTOR3 SIZE_VALUE	= D3DXVECTOR3(100.0f, 100.0f, 0.0f);	// 数字大きさ
+		const int MAX_LIFE	= 100;	// 数字
+		const int MAX_DIG	= 3;	// 桁数
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(200.0f, 400.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(200.0f, 0.0f, 0.0f);		// 行間
 	}
 }
 
@@ -77,15 +68,14 @@ HRESULT CStatusManager::Init(void)
 	m_pKnockRate = NULL;	// 吹っ飛び率の情報
 
 	// 体力の情報の生成
-	m_pLife = CObjectGauge2D::Create
+	m_pLife = CMultiValue::Create
 	( // 引数
-		CObject::LABEL_UI,		// オブジェクトラベル
-		life::MAX_LIFE,			// 最大表示値
-		life::CHANGE_FRAME,		// 表示値変動フレーム
-		life::POS,				// 位置
-		life::SIZE_GAUGE,		// ゲージ大きさ
-		life::COL_GAUGE_FRONT,	// 表ゲージ色
-		life::COL_GAUGE_BACK	// 裏ゲージ色
+		CValue::TEXTURE_UI,	// テクスチャ
+		life::MAX_LIFE,		// 数字
+		life::MAX_DIG,		// 桁数
+		life::POS,			// 位置
+		life::SIZE,			// 大きさ
+		life::SPACE			// 行間
 	);
 	if (m_pLife == NULL)
 	{ // 生成に失敗した場合
@@ -98,16 +88,14 @@ HRESULT CStatusManager::Init(void)
 	m_pLife->SetPriority(PRIORITY);
 
 	// 吹っ飛び率の情報の設定
-	m_pKnockRate = CValueUI::Create
+	m_pKnockRate = CMultiValue::Create
 	( // 引数
-		knockrate::TITLE_TEX_PASS,	// タイトルテクスチャパス
-		CValue::TEXTURE_NORMAL,		// 数字テクスチャ
-		knockrate::MAX_DIG,			// 桁数
-		knockrate::POS,				// 位置
-		knockrate::SPACE_TITLE,		// 行間
-		knockrate::SPACE_VALUE,		// 数字行間
-		knockrate::SIZE_TITLE,		// タイトル大きさ
-		knockrate::SIZE_VALUE		// 数字大きさ
+		CValue::TEXTURE_UI,	// テクスチャ
+		life::MAX_LIFE,		// 数字
+		life::MAX_DIG,		// 桁数
+		life::POS,			// 位置
+		life::SIZE,			// 大きさ
+		life::SPACE			// 行間
 	);
 	if (m_pKnockRate == NULL)
 	{ // 生成に失敗した場合
@@ -118,9 +106,6 @@ HRESULT CStatusManager::Init(void)
 
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
-
-	// 吹っ飛び率の最大値を設定
-	m_pKnockRate->GetMultiValue()->SetMax(knockrate::MAX_NUM);
 
 	// 成功を返す
 	return S_OK;
@@ -194,7 +179,7 @@ int CStatusManager::GetNumLife(void) const
 int CStatusManager::GetNumMaxLife(void) const
 {
 	// 最大体力を返す
-	return m_pLife->GetMaxNum();
+	return m_pLife->GetMax();
 }
 
 //============================================================
@@ -212,7 +197,7 @@ void CStatusManager::SetEnableDrawLife(const bool bDraw)
 void CStatusManager::AddNumRate(const int nAdd)
 {
 	// 引数の吹っ飛び率を加算
-	m_pKnockRate->GetMultiValue()->AddNum(nAdd);
+	m_pKnockRate->AddNum(nAdd);
 }
 
 //============================================================
@@ -221,7 +206,7 @@ void CStatusManager::AddNumRate(const int nAdd)
 void CStatusManager::SetNumRate(const int nSet)
 {
 	// 引数の吹っ飛び率を設定
-	m_pKnockRate->GetMultiValue()->SetNum(nSet);
+	m_pKnockRate->SetNum(nSet);
 }
 
 //============================================================
@@ -230,7 +215,7 @@ void CStatusManager::SetNumRate(const int nSet)
 int CStatusManager::GetNumRate(void) const
 {
 	// 吹っ飛び率を返す
-	return m_pKnockRate->GetMultiValue()->GetNum();
+	return m_pKnockRate->GetNum();
 }
 
 //============================================================
@@ -239,7 +224,7 @@ int CStatusManager::GetNumRate(void) const
 int CStatusManager::GetNumMaxRate(void) const
 {
 	// 最大吹っ飛び率を返す
-	return m_pKnockRate->GetMultiValue()->GetNum();
+	return m_pKnockRate->GetMax();
 }
 
 //============================================================

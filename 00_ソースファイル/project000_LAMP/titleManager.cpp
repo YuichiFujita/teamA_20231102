@@ -22,11 +22,11 @@
 //************************************************************
 #define TITLE_PRIO	(14)	// タイトルの優先順位
 
-#define POS_LOGO_NEVER	(D3DXVECTOR3(SCREEN_WIDTH * 0.5f,  300.0f, 0.0f))	// タイトルロゴの位置 (NEVER)
-#define POS_LOGO_GIVE	(D3DXVECTOR3(710.0f,  310.0f, 0.0f))	// タイトルロゴの位置 (GIVE)
+#define POS_LOGO_NEVER	(D3DXVECTOR3(SCREEN_WIDTH * 0.3f,  300.0f, 0.0f))	// タイトルロゴの位置 (NEVER)
+#define POS_LOGO_GIVE	(D3DXVECTOR3(SCREEN_WIDTH * 0.3f,  300.0f, 0.0f))	// タイトルロゴの位置 (GIVE)
 #define POS_LOGO_UP		(D3DXVECTOR3(1050.0f, 320.0f, 0.0f))	// タイトルロゴの位置 (UP!)
 
-#define SIZE_TITLE	(D3DXVECTOR3(769.0f, 158.0f, 0.0f) * 1.2f)	// タイトルロゴの大きさ
+#define SIZE_TITLE	(D3DXVECTOR3(600.0f, 600.0f, 0.0f) * 0.8f)	// タイトルロゴの大きさ
 #define INIT_SCALE	(15.0f)	// タイトルロゴの初期拡大率
 #define SUB_SCALE	(0.65f)	// タイトルロゴ拡大率の減算量
 
@@ -49,7 +49,8 @@
 //************************************************************
 const char *CTitleManager::mc_apLogoTextureFile[] =	// ロゴテクスチャ定数
 {
-	"data\\TEXTURE\\Chain_and_Star.png",	// NEVERテクスチャ
+	"data\\TEXTURE\\Logo_Ball.png",	// テクスチャ
+	"data\\TEXTURE\\Crack.png",	//テクスチャ
 };
 const char *CTitleManager::mc_apSelectTextureFile[] =	// 選択テクスチャ定数
 {

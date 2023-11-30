@@ -27,6 +27,7 @@ public:
 	enum ETexture
 	{
 		TEXTURE_NORMAL = 0,	// 通常テクスチャ
+		TEXTURE_UI,			// UI数字テクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 

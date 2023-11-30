@@ -145,7 +145,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pDepthShadow->SetShadowMap(&m_pZTexture);	// シャドウマップテクスチャを登録
 	D3DXMatrixPerspectiveFovLH(&CameraProj, D3DXToRadian(45), 1.777f, 10.0f, 50000.0f);
 	D3DXMatrixPerspectiveFovLH(&LightProj, D3DXToRadian(90), 1.0f, 30.0f, 50000.0f);
-	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(300.0f, 2000.0f, -600.0f), &D3DXVECTOR3(0.0f, -10.0f, 0.0f), &D3DXVECTOR3(0, 1, 0));
+	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(1000.0f, 4000.0f, -000.0f), &D3DXVECTOR3(120.0f, -10.0f, 100.0f), &D3DXVECTOR3(0, 1, 0));
 	// Z値テクスチャOBJへ登録
 	m_pZTex->SetViewMatrix(&LightView);
 	m_pZTex->SetProjMatrix(&LightProj);

@@ -18,8 +18,7 @@
 //************************************************************
 //	前方宣言
 //************************************************************
-class CObjectGauge2D;	// オブジェクトゲージ2Dクラス
-class CValueUI;			// 数字UIクラス
+class CMultiValue;	// マルチ数字クラス
 
 //************************************************************
 //	クラス定義
@@ -57,8 +56,8 @@ public:
 
 private:
 	// メンバ変数
-	CObjectGauge2D	*m_pLife;		// 体力の情報
-	CValueUI		*m_pKnockRate;	// 吹っ飛び率の情報
+	CMultiValue *m_pLife;		// 体力の情報
+	CMultiValue *m_pKnockRate;	// 吹っ飛び率の情報
 
 	const int m_nPadID;	// パッドID定数
 };
