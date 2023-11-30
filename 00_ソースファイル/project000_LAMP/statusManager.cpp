@@ -10,7 +10,8 @@
 #include "statusManager.h"
 #include "manager.h"
 #include "multiValue.h"
-
+#include "retentionManager.h"
+#include "object2D.h"
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -22,9 +23,9 @@ namespace
 	{
 		const int MAX_LIFE	= 100;	// 数字
 		const int MAX_DIG	= 3;	// 桁数
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(200.0f, 0.0f, 0.0f);		// 行間
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(150.0f, 600.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(D3DXVECTOR3(64.0f, 144.0f, 0.0f) * 0.75f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(40.0f, 0.0f, 0.0f);		// 行間
 	}
 
 	namespace knockrate
@@ -73,7 +74,7 @@ HRESULT CStatusManager::Init(void)
 		CValue::TEXTURE_UI,	// テクスチャ
 		life::MAX_LIFE,		// 数字
 		life::MAX_DIG,		// 桁数
-		life::POS,			// 位置
+		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f), life::POS.y, life::POS.x),			// 位置
 		life::SIZE,			// 大きさ
 		life::SPACE			// 行間
 	);
@@ -93,7 +94,7 @@ HRESULT CStatusManager::Init(void)
 		CValue::TEXTURE_UI,	// テクスチャ
 		life::MAX_LIFE,		// 数字
 		life::MAX_DIG,		// 桁数
-		life::POS,			// 位置
+		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f), life::POS.y, life::POS.x),			// 位置
 		life::SIZE,			// 大きさ
 		life::SPACE			// 行間
 	);
@@ -103,7 +104,16 @@ HRESULT CStatusManager::Init(void)
 		// 失敗を返す
 		return E_FAIL;
 	}
-
+	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
+	{
+		CObject2D * pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
+	}
+	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
+	{
+		CObject2D * pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
+	}
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
 
