@@ -33,7 +33,8 @@ namespace
 
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(SCREEN_SIZE.x, 1770.0f, 0.0f);	// フェード大きさ
 
-		const float	ADD_MOVE = 0.4f;		// フェード移動量
+		const int	WAIT_FRAME	= 8;		// フェード待機フレーム
+		const float	ADD_MOVE	= 0.4f;		// フェード移動量
 		const float	ADD_ACCEL_MOVE = 1.75f;	// フェード加速移動量
 	}
 }
@@ -132,21 +133,15 @@ void CMiddleResultManager::Update(void)
 
 	case STATE_FADEIN_WAIT:
 
-		// TODO：仮の処理
-		m_nCounterState++;
-		if (m_nCounterState >= 8)
-		{ // カウンター
-
-			m_nCounterState = 0;
-			m_state = STATE_FADEIN_ADD;
-		}
+		// フェードイン待機の更新
+		UpdateFadeInWait();
 
 		break;
 
-	case STATE_FADEIN_ADD:
+	case STATE_FADEIN_ACCEL:
 
 		// フェードイン加速の更新
-		UpdateFadeInAdd();
+		UpdateFadeInAccel();
 
 		break;
 
@@ -171,21 +166,15 @@ void CMiddleResultManager::Update(void)
 
 	case STATE_FADEOUT_WAIT:
 
-		// TODO：仮の処理
-		m_nCounterState++;
-		if (m_nCounterState >= 8)
-		{ // カウンター
-
-			m_nCounterState = 0;
-			m_state = STATE_FADEOUT_ADD;
-		}
+		// フェードアウト待機の更新
+		UpdateFadeOutWait();
 
 		break;
 
-	case STATE_FADEOUT_ADD:
+	case STATE_FADEOUT_ACCEL:
 
 		// フェードアウト加速の更新
-		UpdateFadeOutAdd();
+		UpdateFadeOutAccel();
 
 		break;
 
@@ -301,9 +290,28 @@ void CMiddleResultManager::UpdateFadeIn(void)
 }
 
 //============================================================
+//	フェードイン待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeInWait(void)
+{
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState >= fade::WAIT_FRAME)
+	{ // 待機が終了した場合
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フェードイン加速状態にする
+		m_state = STATE_FADEIN_ACCEL;
+	}
+}
+
+//============================================================
 //	フェードイン加速の更新処理
 //============================================================
-void CMiddleResultManager::UpdateFadeInAdd(void)
+void CMiddleResultManager::UpdateFadeInAccel(void)
 {
 	// 変数を宣言
 	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置
@@ -363,9 +371,28 @@ void CMiddleResultManager::UpdateFadeOut(void)
 }
 
 //============================================================
+//	フェードアウト待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFadeOutWait(void)
+{
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState >= fade::WAIT_FRAME)
+	{ // 待機が終了した場合
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フェードアウト加速状態にする
+		m_state = STATE_FADEOUT_ACCEL;
+	}
+}
+
+//============================================================
 //	フェードアウト加速の更新処理
 //============================================================
-void CMiddleResultManager::UpdateFadeOutAdd(void)
+void CMiddleResultManager::UpdateFadeOutAccel(void)
 {
 	// 変数を宣言
 	D3DXVECTOR3 posFade = m_pFade->GetVec3Position();	// フェード位置

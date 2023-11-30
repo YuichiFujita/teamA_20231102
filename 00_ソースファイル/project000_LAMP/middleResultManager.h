@@ -37,15 +37,15 @@ public:
 	// 状態列挙
 	enum EState
 	{
-		STATE_FADEIN = 0,	// フェードイン状態
-		STATE_FADEIN_WAIT,	// フェードイン待機状態
-		STATE_FADEIN_ADD,	// フェードイン加速状態
-		STATE_WAIT,			// 待機状態
-		STATE_FADEOUT,		// フェードアウト状態
-		STATE_FADEOUT_WAIT,	// フェードアウト待機状態
-		STATE_FADEOUT_ADD,	// フェードアウト加速状態
-		STATE_END,			// 終了状態
-		STATE_MAX			// この列挙型の総数
+		STATE_FADEIN = 0,		// フェードイン状態
+		STATE_FADEIN_WAIT,		// フェードイン待機状態
+		STATE_FADEIN_ACCEL,		// フェードイン加速状態
+		STATE_WAIT,				// 待機状態
+		STATE_FADEOUT,			// フェードアウト状態
+		STATE_FADEOUT_WAIT,		// フェードアウト待機状態
+		STATE_FADEOUT_ACCEL,	// フェードアウト加速状態
+		STATE_END,				// 終了状態
+		STATE_MAX				// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -66,9 +66,11 @@ public:
 private:
 	// メンバ変数
 	void UpdateFadeIn(void);		// フェードイン更新
-	void UpdateFadeInAdd(void);		// フェードイン加速更新
+	void UpdateFadeInWait(void);	// フェードイン待機更新
+	void UpdateFadeInAccel(void);	// フェードイン加速更新
 	void UpdateFadeOut(void);		// フェードアウト更新
-	void UpdateFadeOutAdd(void);	// フェードアウト加速更新
+	void UpdateFadeOutWait(void);	// フェードアウト待機更新
+	void UpdateFadeOutAccel(void);	// フェードアウト加速更新
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
