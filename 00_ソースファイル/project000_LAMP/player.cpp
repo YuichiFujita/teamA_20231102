@@ -28,6 +28,8 @@
 #include "rankingManager.h"
 #include "stage.h"
 #include "field.h"
+#include "liquid.h"
+#include "scrollMeshField.h"
 
 #include "effect3D.h"
 #include "particle3D.h"
@@ -214,7 +216,7 @@ void CPlayer::Uninit(void)
 void CPlayer::Update(void)
 {
 	// 変数を宣言
-	EMotion currentMotion = MOTION_IDOL;	// 現在のモーション
+	EMotion currentMotion = MOTION_DEATH;	// 現在のモーション
 
 	// 過去位置の更新
 	UpdateOldPosition();
@@ -253,6 +255,10 @@ void CPlayer::Update(void)
 		break;
 
 	case STATE_DEATH:	// 死亡状態
+
+		// 死亡状態時の更新
+		UpdateDeath();
+
 		break;
 
 	default:
@@ -1096,6 +1102,43 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 
 	// 通常状態の処理を行い、その返り値のモーションを返す
 	return UpdateNormal();
+}
+
+//============================================================
+//	死亡状態時の更新処理
+//============================================================
+void CPlayer::UpdateDeath(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
+
+	// ポインタを宣言
+	CStage *pStage = CScene::GetStage();	// ステージ情報
+	if (pStage == NULL)
+	{ // ステージが使用されていない場合
+
+		// 処理を抜ける
+		assert(false);
+	}
+
+	// 重力の更新
+	UpdateGravity();
+
+	// 着地判定 (位置更新)
+	UpdateLanding(posPlayer);
+
+	// 向き更新
+	UpdateRotation(rotPlayer);
+
+	// 波に着地させる
+	pStage->GetLiquid()->GetScrollMeshField(0)->LandPosition(posPlayer, m_move);
+
+	// 位置を反映
+	SetVec3Position(posPlayer);
+
+	// 向きを反映
+	SetVec3Rotation(rotPlayer);
 }
 
 //============================================================
