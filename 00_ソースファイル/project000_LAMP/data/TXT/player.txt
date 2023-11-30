@@ -104,7 +104,7 @@ CHARACTERSET
 	PARTSSET						# [13]棒
 		INDEX = 13
 		PARENT = 5					# (親)右手
-		POS = 0.0 0.0 50.0
+		POS = 0.0 -7.0 -75.0
 		ROT = 1.5 0.0 0.0
 	END_PARTSSET
 
@@ -584,7 +584,7 @@ MOTIONSET
 	NUM_KEY = 4		# キー数
 
 	KEYSET
-		FRAME = 10
+		FRAME = 5
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
 			ROT = 0.00 0.00 0.00
@@ -657,7 +657,7 @@ MOTIONSET
 	END_KEYSET
 
 	KEYSET
-		FRAME = 10
+		FRAME = 5
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
 			ROT = 0.00 0.00 0.00
@@ -730,7 +730,7 @@ MOTIONSET
 	END_KEYSET
 
 	KEYSET
-		FRAME = 10
+		FRAME = 5
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
 			ROT = 0.00 0.00 0.00
@@ -803,7 +803,7 @@ MOTIONSET
 	END_KEYSET
 
 	KEYSET
-		FRAME = 10
+		FRAME = 5
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
 			ROT = 0.00 0.00 0.00

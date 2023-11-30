@@ -59,7 +59,7 @@ namespace
 	{
 		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.45f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
 		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
-		const float MUL_DIS		= 0.6f;		// 加算距離の乗算量
+		const float MUL_DIS		= 0.5f;		// 加算距離の乗算量
 		const float REV_POS		= 0.05f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数
 	}
@@ -373,6 +373,7 @@ void CCamera::SetDestLookDown(void)
 	//----------------------------------------------------
 	{
 		int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
+		bool bInit = false;				// 初期化状況
 		D3DXVECTOR3 posMin = VEC3_ZERO;	// 最小の位置
 		D3DXVECTOR3 posMax = VEC3_ZERO;	// 最大の位置
 
@@ -388,6 +389,17 @@ void CCamera::SetDestLookDown(void)
 				{ // 死んでいない場合
 
 					D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
+
+					if (!bInit)
+					{ // 初期化されていない場合
+
+						// 最小と最大の位置を初期化
+						posMin = posPlayer;
+						posMax = posPlayer;
+
+						// 初期化済みにする
+						bInit = true;
+					}
 
 					// プレイヤーの位置を加算
 					posLook += posPlayer;
@@ -420,9 +432,13 @@ void CCamera::SetDestLookDown(void)
 			else { assert(false); }	// 非使用中
 		}
 
-		// プレイヤーの位置の平均を求める
-		posLook /= (float)nNumPlayer;
-		posLook.y = 0.0f;	// Y座標は固定
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
+		{ // 生存人数が1人以上の場合
+
+			// プレイヤーの位置の平均を求める
+			posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
+			posLook.y = 0.0f;	// Y座標は固定
+		}
 
 		// カメラの距離を加算
 		fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
@@ -660,6 +676,7 @@ void CCamera::LookDown(void)
 	D3DXVECTOR3 diffPosR = VEC3_ZERO;	// 注視点の差分位置
 	D3DXVECTOR3 diffRot  = VEC3_ZERO;	// 差分向き
 	float fDis = lookdown::INIT_DIS;	// 距離
+	bool bInit = false;					// 初期化状況
 	int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
 
 	//----------------------------------------------------
@@ -677,6 +694,17 @@ void CCamera::LookDown(void)
 			{ // 死んでいない場合
 
 				D3DXVECTOR3 posPlayer = pPlayer->GetVec3Position();	// プレイヤー位置
+
+				if (!bInit)
+				{ // 初期化されていない場合
+
+					// 最小と最大の位置を初期化
+					posMin = posPlayer;
+					posMax = posPlayer;
+
+					// 初期化済みにする
+					bInit = true;
+				}
 
 				// プレイヤーの位置を加算
 				posLook += posPlayer;
@@ -709,9 +737,13 @@ void CCamera::LookDown(void)
 		else { assert(false); }	// 非使用中
 	}
 
-	// プレイヤーの位置の平均を求める
-	posLook /= (float)nNumPlayer;
-	posLook.y = 0.0f;	// Y座標は固定
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
+	{ // 生存人数が1人以上の場合
+
+		// プレイヤーの位置の平均を求める
+		posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
+		posLook.y = 0.0f;	// Y座標は固定
+	}
 
 	// カメラの距離を加算
 	fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;

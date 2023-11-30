@@ -904,7 +904,6 @@ void CPlayer::UpdateMotion(int nMotion)
 
 		break;
 
-	case MOTION_ATTACK:	// 攻撃モーション：ループOFF
 	case MOTION_DASH:	// ダッシュモーション：ループOFF
 	case MOTION_LAND:	// 着地モーション：ループOFF
 
@@ -917,6 +916,7 @@ void CPlayer::UpdateMotion(int nMotion)
 
 		break;
 
+	case MOTION_ATTACK:	// 攻撃モーション：ループOFF
 	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 	case MOTION_DEATH:	// 死亡モーション：ループOFF
 
@@ -1256,7 +1256,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 目標向きを設定
 			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
 
-			// FUJITA：ここでチャージモーション
+			// チャージモーションを設定
+			currentMotion = MOTION_CHARGE;
 		}
 
 		// 投擲
@@ -1280,7 +1281,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
 
-			// FUJITA：ここで投げモーション開始
+			// 攻撃モーションを設定
+			currentMotion = MOTION_ATTACK;
 		}
 
 		if (m_nCounterFlail == flail::FLAIL_THROW)
@@ -1292,7 +1294,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// フレイルが止まったらカウンターを次の段階へ
 			if (m_pFlail->GetLengthChain() == m_pFlail->GetLengthTarget())
 			{
-				// FUJITA：ここまで投げモーション継続
+				// モーションを攻撃から変更
+				SetMotion(currentMotion);
 
 				m_nCounterFlail = flail::FLAIL_DROP;
 			}
