@@ -1256,7 +1256,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 目標向きを設定
 			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
 
-			// FUJITA：ここでチャージモーション
+			// チャージモーションを設定
+			currentMotion = MOTION_CHARGE;
 		}
 
 		// 投擲
@@ -1280,7 +1281,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
 
-			// FUJITA：ここで投げモーション開始
+			// 攻撃モーションを設定
+			currentMotion = MOTION_ATTACK;
 		}
 
 		if (m_nCounterFlail == flail::FLAIL_THROW)
