@@ -32,6 +32,7 @@ public:
 	enum EType
 	{
 		TYPE_SEA = 0,	// ‰t‘Ì
+		TYPE_LAVA,
 		TYPE_MAX		// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 

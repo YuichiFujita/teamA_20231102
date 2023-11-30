@@ -25,6 +25,7 @@ namespace flail
 	const int	FLAIL_DROP = -1;		// フレイル落下状態
 	const int	FLAIL_DEF = 0;			// フレイル取得状態
 	const int	FLAIL_NUM = 30;			// フレイルの数
+	const float	FLAIL_RADIUS = 20.0f;	// フレイルの半径
 }
 
 //************************************************************
@@ -63,6 +64,7 @@ public:
 	struct SChain
 	{
 		CMultiModel *multiModel;
+		D3DXVECTOR3 posOld;
 		D3DXVECTOR3 rotOld;
 	};
 	
@@ -92,6 +94,11 @@ public:
 
 	void SetLengthChain(const float& rLengthChain);			// 長さ設定
 	float GetLengthChain(void);								// 長さ取得
+
+	void SetLengthTarget(const float& rLengthTarget);		// 目標長さ設定
+	float GetLengthTarget(void);							// 目標長さ取得
+
+	void CatchFlail(void);
 
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
@@ -125,6 +132,7 @@ private:
 	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
+	float		m_fLengthTarget;				// 鎖の長さ目標
 
 };
 
