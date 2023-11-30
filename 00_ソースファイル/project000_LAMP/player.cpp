@@ -1203,7 +1203,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			currentMotion = MOTION_DASH;
 		}
 
-		if (m_pFlail->GetLengthChain() >= 1000.0f)
+		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
 		{ // 引きずり距離の場合
 
 			// 移動量を更新
@@ -1239,6 +1239,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 溜めてる間鉄球を振り回す
 			m_pFlail->SetChainRotMove(-0.003f * m_nCounterFlail);
 
+			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * 5.0f);
+
 			// 移動量を更新
 			m_move.x *= 0.5f;
 			m_move.z *= 0.5f;
@@ -1255,12 +1257,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
+			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (float)((m_nCounterFlail - 4) / 4));
 
 			if (m_nCounterFlail < 30)
 			{
 				// 目標角度に合わせる
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
+				m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1));
 			}
 
 			// カウンターの設定
@@ -1274,7 +1278,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetLengthChain() == 20.0f * (flail::FLAIL_NUM - 1))
+			if (m_pFlail->GetLengthChain() == m_pFlail->GetLengthTarget())
 			{
 				m_nCounterFlail = flail::FLAIL_DROP;
 			}
@@ -1373,6 +1377,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", m_nCounterFlail);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖長さ]：%f\n", m_pFlail->GetLengthChain());
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖目標長さ]：%f\n", m_pFlail->GetLengthTarget());
 
 	// 現在のモーションを返す
 	return currentMotion;

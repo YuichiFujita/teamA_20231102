@@ -57,6 +57,7 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	m_move = VEC3_ZERO;
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
+	m_fLengthTarget = 0.0f;
 	m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
 }
@@ -129,11 +130,6 @@ void CFlail::Update(void)
 	// 引っ張る時のみ角度調整
 	m_fChainRot += m_fChainRotMove;
 
-	if (player->GetCounterFlail() == flail::FLAIL_DROP)
-	{
-		m_fChainRotMove += (0.0f - m_fChainRotMove) * 0.1f;
-	}
-
 	if (D3DXVec3Length(&m_move) > 0.0f && D3DXVec3Length(&m_move) < 5.0f)
 	{
 		m_move.x = 0.0f;
@@ -158,6 +154,11 @@ void CFlail::Update(void)
 
 	// 鎖の更新
 	UpdateChain();
+
+	if (player->GetCounterFlail() == flail::FLAIL_DROP)
+	{
+		m_fChainRotMove += (0.0f - m_fChainRotMove) * 0.1f;
+	}
 }
 
 //============================================================
@@ -214,8 +215,11 @@ void CFlail::UpdateFlailPos(void)
 		m_move.z += (0.0f - m_move.z) * 0.15f;
 	}
 
-	pos.x = m_posOrg.x + (sinf(m_fChainRot) * 1.0f);
-	pos.z = m_posOrg.z + (cosf(m_fChainRot) * 1.0f);
+	if (player->GetCounterFlail() != flail::FLAIL_DROP)
+	{
+		pos.x = m_posOrg.x + (sinf(m_fChainRot) * 1.0f);
+		pos.z = m_posOrg.z + (cosf(m_fChainRot) * 1.0f);
+	}
 
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
@@ -237,10 +241,33 @@ void CFlail::UpdateChain(void)
 		D3DXVECTOR3 pos, rot;
 		m_chain[nCntChain].rotOld = m_chain[nCntChain].multiModel->GetVec3Rotation();
 		pos = m_chain[nCntChain].multiModel->GetVec3Position();
+		m_chain[nCntChain].posOld = m_chain[nCntChain].multiModel->GetVec3Position();
 		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 
 		if (nCntChain == 0)
 		{
+			if (player->GetCounterFlail() == flail::FLAIL_DROP)
+			{
+				D3DXVECTOR3 vecPtoF = VEC3_ZERO;
+				float lengthPtoF = 0.0f;
+				vecPtoF.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 - GetMtxWorld()._41;
+				vecPtoF.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43 - GetMtxWorld()._43;
+
+				m_fChainRot = atan2f(vecPtoF.x, vecPtoF.z) + D3DX_PI * 0.5f;
+				lengthPtoF = D3DXVec3Length(&vecPtoF);
+
+				if (lengthPtoF > flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
+				{
+					lengthPtoF = flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1);
+				}
+				else if (lengthPtoF < 0.0f)
+				{
+					lengthPtoF = 0.0f;
+				}
+
+				m_fLengthTarget = lengthPtoF;
+			}
+
 			rot.x = 0.0f;
 			rot.y = m_fChainRot;
 			rot.z = 0.0f;
@@ -264,26 +291,26 @@ void CFlail::UpdateChain(void)
 
 			if (player->GetCounterFlail() <= flail::FLAIL_CHARGE && player->GetCounterFlail() > flail::FLAIL_DEF)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f && m_fLengthChain <= 60.0f) || nCntChain == 1)
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain <= m_fLengthTarget) || nCntChain == 1)
 				{
 					pos.x += 5.0f;
 
-					if (pos.x > 20.0f)
+					if (pos.x > flail::FLAIL_RADIUS)
 					{
-						pos.x = 20.0f;
+						pos.x = flail::FLAIL_RADIUS;
 					}
 				}
 			}
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= 20.0f) || nCntChain == 1)
+				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 				{
 					pos.x += 10.0f;
 
-					if (pos.x > 20.0f)
+					if (pos.x > flail::FLAIL_RADIUS)
 					{
-						pos.x = 20.0f;
+						pos.x = flail::FLAIL_RADIUS;
 					}
 				}
 			}
@@ -984,4 +1011,22 @@ float CFlail::GetLengthChain(void)
 {
 	// 長さを返す
 	return m_fLengthChain;
+}
+
+//============================================================
+//	目標長さの設定処理
+//============================================================
+void CFlail::SetLengthTarget(const float& rLengthTarget)
+{
+	// 引数の長さを設定
+	m_fLengthTarget = rLengthTarget;
+}
+
+//============================================================
+//	目標長さの取得処理
+//============================================================
+float CFlail::GetLengthTarget(void)
+{
+	// 長さを返す
+	return m_fLengthTarget;
 }
