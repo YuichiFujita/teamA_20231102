@@ -268,7 +268,8 @@ void CObstacle::SaveStatus(void)
 			fprintf(pFile, "		TYPE = %d\n", nCntObs);
 			fprintf(pFile, "		BREAK = %d\n", m_aStatusInfo[nCntObs].state);
 			fprintf(pFile, "		LIFE = %d\n", m_aStatusInfo[nCntObs].nLife);
-			fprintf(pFile, "		VEC_CENTER = %.2f %.2f %.2f\n", m_aStatusInfo[nCntObs].vecCenter.x, m_aStatusInfo[nCntObs].vecCenter.y, m_aStatusInfo[nCntObs].vecCenter.z);
+			fprintf(pFile, "		LENGTH_CENTER = %.2f\n", m_aStatusInfo[nCntObs].fLengthCenter);
+			fprintf(pFile, "		ANGLE_CENTER = %.2f\n",  m_aStatusInfo[nCntObs].fAngleCenter);
 			fprintf(pFile, "		SIZE_COLL = %.2f %.2f %.2f\n", m_aStatusInfo[nCntObs].sizeColl.x, m_aStatusInfo[nCntObs].sizeColl.y, m_aStatusInfo[nCntObs].sizeColl.z);
 			fprintf(pFile, "	END_OBSTACLESET\n\n");
 		}
@@ -356,13 +357,17 @@ void CObstacle::LoadSetup(void)
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 								fscanf(pFile, "%d", &m_aStatusInfo[nType].nLife);	// 体力を読み込む
 							}
-							else if (strcmp(&aString[0], "VEC_CENTER") == 0)
-							{ // 読み込んだ文字列が VEC_CENTER の場合
+							else if (strcmp(&aString[0], "LENGTH_CENTER") == 0)
+							{ // 読み込んだ文字列が LENGTH_CENTER の場合
 
-								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
-								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.x);	// 判定中心位置ベクトルXを読み込む
-								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.y);	// 判定中心位置ベクトルYを読み込む
-								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.z);	// 判定中心位置ベクトルZを読み込む
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].fLengthCenter);	// 判定中心位置の距離を読み込む
+							}
+							else if (strcmp(&aString[0], "ANGLE_CENTER") == 0)
+							{ // 読み込んだ文字列が ANGLE_CENTER の場合
+
+								fscanf(pFile, "%s", &aString[0]);							// = を読み込む (不要)
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].fAngleCenter);	// 判定中心位置の角度を読み込む
 							}
 							else if (strcmp(&aString[0], "SIZE_COLL") == 0)
 							{ // 読み込んだ文字列が SIZE_COLL の場合

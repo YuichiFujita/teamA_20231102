@@ -179,6 +179,10 @@ void CMiddleResultManager::Update(void)
 		break;
 
 	case STATE_END:
+
+		// ƒŠƒUƒ‹ƒg‚É‘JˆÚ
+		CManager::GetInstance()->SetScene(CScene::MODE_RESULT);
+
 		break;
 
 	default:

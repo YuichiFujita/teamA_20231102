@@ -148,7 +148,7 @@ void CGameManager::Update(void)
 				m_nCounterState = 0;
 
 				// リザルトに移行
-				//m_state = STATE_RESULT;	// TODO：遷移直す
+				m_state = STATE_RESULT;
 			}
 		}
 
