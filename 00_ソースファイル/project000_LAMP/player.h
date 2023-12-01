@@ -157,6 +157,7 @@ private:
 	bool ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos);	// 地盤との一軸ごとの当たり判定
 	bool ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos);	// ブロックとの一軸ごとの当たり判定
 	bool CollisionGroundBlock(D3DXVECTOR3& rPos);	// 地盤・ブロックとの当たり判定
+	bool CollisionObstacle(D3DXVECTOR3& rPos);		// 障害物との当たり判定
 
 	// 静的メンバ変数
 	static const char *mc_apModelFile[];	// モデル定数
