@@ -17,7 +17,8 @@
 //************************************************************
 namespace
 {
-	const char* SETUP_TXT = "data\\TXT\\obstacle.txt";	// 障害物セットアップテキスト
+	const char* SETUP_TXT = "data\\TXT\\obstacle.txt";		// 障害物セットアップテキスト
+	const char* SAVE_TXT = "data\\TXT\\save_obstacle.txt";	// 障害物セーブテキスト
 	const int	PRIORITY = 1;	// 障害物の優先順位
 }
 
@@ -214,6 +215,81 @@ CObstacle *CObstacle::Create
 }
 
 //============================================================
+//	ステータス情報設定処理
+//============================================================
+void CObstacle::SetStatusInfo(const int nID, const SStatusInfo status)
+{
+	// 引数インデックスのステータスを設定
+	m_aStatusInfo[nID] = status;
+}
+
+//============================================================
+//	ステータス情報取得処理
+//============================================================
+CObstacle::SStatusInfo CObstacle::GetStatusInfo(const int nID)
+{
+	// 引数インデックスのステータスを返す
+	return m_aStatusInfo[nID];
+}
+
+//============================================================
+//	ステータス保存処理
+//============================================================
+void CObstacle::SaveStatus(void)
+{
+#if _DEBUG
+
+	// ポインタを宣言
+	FILE *pFile = NULL;	// ファイルポインタ
+
+	// ファイルを書き出し形式で開く
+	pFile = fopen(SAVE_TXT, "w");
+
+	if (pFile != NULL)
+	{ // ファイルが存在する場合
+
+		// 見出しを書き出し
+		fprintf(pFile, "#==============================================================================\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "#	障害物セーブテキスト [save_obstacle.txt]\n");
+		fprintf(pFile, "#	Author : you\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "#==============================================================================\n");
+		fprintf(pFile, "---------->--<---------- ここから下を コピーし貼り付け ---------->--<----------\n\n");
+
+		// 情報開始地点を書き出し
+		fprintf(pFile, "STATUSSET\n\n");
+
+		for (int nCntObs = 0; nCntObs < MAX_PRIO; nCntObs++)
+		{ // 優先順位の総数分繰り返す
+	
+			// 情報を書き出し
+			fprintf(pFile, "	OBSTACLESET\n");
+			fprintf(pFile, "		TYPE = %d\n", nCntObs);
+			fprintf(pFile, "		BREAK = %d\n", m_aStatusInfo[nCntObs].state);
+			fprintf(pFile, "		LIFE = %d\n", m_aStatusInfo[nCntObs].nLife);
+			fprintf(pFile, "		VEC_CENTER = %.2f %.2f %.2f\n", m_aStatusInfo[nCntObs].vecCenter.x, m_aStatusInfo[nCntObs].vecCenter.y, m_aStatusInfo[nCntObs].vecCenter.z);
+			fprintf(pFile, "		SIZE_COLL = %.2f %.2f %.2f\n", m_aStatusInfo[nCntObs].sizeColl.x, m_aStatusInfo[nCntObs].sizeColl.y, m_aStatusInfo[nCntObs].sizeColl.z);
+			fprintf(pFile, "	END_OBSTACLESET\n\n");
+		}
+
+		// 情報終了地点を書き出し
+		fprintf(pFile, "END_STATUSSET\n\n");
+
+		// ファイルを閉じる
+		fclose(pFile);
+	}
+	else
+	{ // ファイルが開けなかった場合
+
+		// エラーメッセージボックス
+		MessageBox(NULL, "障害物セーブファイルの書き出しに失敗！", "警告！", MB_ICONWARNING);
+	}
+
+#endif	// _DEBUG
+}
+
+//============================================================
 //	セットアップ処理
 //============================================================
 void CObstacle::LoadSetup(void)
@@ -279,6 +355,22 @@ void CObstacle::LoadSetup(void)
 
 								fscanf(pFile, "%s", &aString[0]);					// = を読み込む (不要)
 								fscanf(pFile, "%d", &m_aStatusInfo[nType].nLife);	// 体力を読み込む
+							}
+							else if (strcmp(&aString[0], "VEC_CENTER") == 0)
+							{ // 読み込んだ文字列が VEC_CENTER の場合
+
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.x);	// 判定中心位置ベクトルXを読み込む
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.y);	// 判定中心位置ベクトルYを読み込む
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].vecCenter.z);	// 判定中心位置ベクトルZを読み込む
+							}
+							else if (strcmp(&aString[0], "SIZE_COLL") == 0)
+							{ // 読み込んだ文字列が SIZE_COLL の場合
+
+								fscanf(pFile, "%s", &aString[0]);						// = を読み込む (不要)
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].sizeColl.x);	// 判定大きさXを読み込む
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].sizeColl.y);	// 判定大きさYを読み込む
+								fscanf(pFile, "%f", &m_aStatusInfo[nType].sizeColl.z);	// 判定大きさZを読み込む
 							}
 						} while (strcmp(&aString[0], "END_OBSTACLESET") != 0);	// 読み込んだ文字列が END_OBSTACLESET ではない場合ループ
 					}
