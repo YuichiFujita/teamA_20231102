@@ -1320,22 +1320,31 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
-			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() * 1.3f);
+			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() * 1.2f);
 
 			if ((int)lengthTarget % 10 != 0)
 			{
 				lengthTarget = (int)lengthTarget - (int)lengthTarget % 10;
 			}
 
-			if (lengthTarget < flail::FLAIL_RADIUS * 10.0f)
+			if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
 			{
-				lengthTarget = flail::FLAIL_RADIUS * 10.0f;
+				lengthTarget = flail::FLAIL_RADIUS * 40.0f;
 			}
 
 			m_pFlail->SetLengthTarget(lengthTarget);
 
+			D3DXVECTOR3 posFlail = m_pFlail->GetVec3Position();
+			if (posFlail.y < 0.0f)
+			{
+				posFlail.y = 0.0f;
+				m_pFlail->SetVec3Position(posFlail);
+			}
+
 			if (DEAD_ZONE < fStick)
 			{
+				m_pFlail->CatchFlail();
+
 				// 目標角度に合わせる
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
@@ -1355,7 +1364,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.z = 0.0f;
 
 			// フレイルが止まったらカウンターを次の段階へ
-			if (m_pFlail->GetLengthChain() == m_pFlail->GetLengthTarget())
+			if (m_pFlail->GetLengthChain() >= m_pFlail->GetLengthTarget())
 			{
 				// モーションを攻撃から変更
 				SetMotion(currentMotion);

@@ -186,7 +186,10 @@ void CFlail::UpdateFlailPos(void)
 			}
 			else
 			{
-				pos.y = CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetScrollMeshField(0)->GetPositionHeight(pos);
+				if (m_fLengthTarget <= flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
+				{
+					pos.y = CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetScrollMeshField(0)->GetPositionHeight(pos);
+				}
 			}
 		}
 		else if (player->GetCounterFlail() < flail::FLAIL_DROP)
@@ -282,11 +285,7 @@ void CFlail::UpdateChain(void)
 					lengthPtoF = 0.0f;
 				}
 
-				if (lengthPtoFTarget > flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
-				{
-					lengthPtoFTarget = flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1);
-				}
-				else if (lengthPtoFTarget < 0.0f)
+				if (lengthPtoFTarget < 0.0f)
 				{
 					lengthPtoFTarget = 0.0f;
 				}
@@ -340,13 +339,28 @@ void CFlail::UpdateChain(void)
 
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
-				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
+				if (m_fChainRotMove == 0.0f)
 				{
-					pos.x += 10.0f;
-
-					if (pos.x > flail::FLAIL_RADIUS)
+					if ((/*m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && */m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
-						pos.x = flail::FLAIL_RADIUS;
+						pos.x += 0.7f;
+
+						if (pos.x > flail::FLAIL_RADIUS)
+						{
+							pos.x = flail::FLAIL_RADIUS;
+						}
+					}
+				}
+				else
+				{
+					if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
+					{
+						pos.x += 10.0f;
+
+						if (pos.x > flail::FLAIL_RADIUS)
+						{
+							pos.x = flail::FLAIL_RADIUS;
+						}
 					}
 				}
 			}
@@ -424,40 +438,6 @@ void CFlail::Draw(void)
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
-
-	//pos = m_chain[0].multiModel->GetVec3Position();
-	//rot = m_chain[0].multiModel->GetVec3Rotation();
-	//scale = m_chain[0].multiModel->GetVec3Scaling();
-	//mtxOrg = m_chain[0].multiModel->GetPtrMtxWorld();
-
-	//// ワールドマトリックスの初期化
-	//D3DXMatrixIdentity(mtxOrg);
-	//D3DXMatrixIdentity(&mtxChain);
-
-	//// 拡大率を反映
-	//D3DXMatrixScaling(&mtxScale, scale.x, scale.y, scale.z);
-	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxScale);
-
-	//// 向きを反映
-	//D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
-	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxRot);
-
-	//// 位置を反映
-	//D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y, pos.z);
-	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxTrans);
-
-	//// 親のマトリックスを設定
-	//mtxParent = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld();
-
-	//// ワールドマトリックスと親マトリックスを掛け合わせる
-	//D3DXMatrixMultiply(mtxOrg, mtxOrg, &mtxParent);
-
-	//mtxChain._41 = mtxOrg->_41;
-	//mtxChain._42 = mtxOrg->_42;
-	//mtxChain._43 = mtxOrg->_43;
-
-	//// ワールドマトリックスの設定
-	//pDevice->SetTransform(D3DTS_WORLD, &mtxChain);
 
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
@@ -636,17 +616,21 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		}
 	}
 
-	CollisionGround(CPlayer::AXIS_X, rPos);
-	CollisionBlock(CPlayer::AXIS_X, rPos);
-
-	CollisionGround(CPlayer::AXIS_Y, rPos);
-	CollisionBlock(CPlayer::AXIS_Y, rPos);
-
-	CollisionGround(CPlayer::AXIS_Z, rPos);
-	CollisionBlock(CPlayer::AXIS_Z, rPos);
+	if (CollisionGround(CPlayer::AXIS_X, rPos) == true ||
+		CollisionBlock(CPlayer::AXIS_X, rPos) == true ||
+		CollisionGround(CPlayer::AXIS_Y, rPos) == true ||
+		CollisionBlock(CPlayer::AXIS_Y, rPos) == true ||
+		CollisionGround(CPlayer::AXIS_Z, rPos) == true ||
+		CollisionBlock(CPlayer::AXIS_Z, rPos) == true)
+	{
+		if (m_fLengthTarget > flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
+		{
+			rPos.y += 6.0f;
+		}
+	}
 }
 
-void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
+bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
 	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最小大きさ
@@ -654,6 +638,7 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報
+	bool bHitBox = false;	// 接触の判定情報
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -708,7 +693,7 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_X:	// X軸
 
 								// X軸の衝突判定
-					collision::ResponseSingleX
+					bHitBox = collision::ResponseSingleX
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -725,7 +710,7 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_Y:	// Y軸
 
 								// Y軸の衝突判定
-					collision::ResponseSingleY
+					bHitBox = collision::ResponseSingleY
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -753,7 +738,7 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_Z:	// Z軸
 
 								// Z軸の衝突判定
-					collision::ResponseSingleZ
+					bHitBox = collision::ResponseSingleZ
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -777,9 +762,11 @@ void CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 			}
 		}
 	}
+
+	return bHitBox;
 }
 
-void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
+bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
 	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(40.0f, 40.0f, 40.0f);		// プレイヤー最小大きさ
@@ -787,6 +774,7 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 	bool bMin = false;	// 不の方向の判定状況
 	bool bMax = false;	// 正の方向の判定状況
 	bool bHit = false;	// 着地の判定情報
+	bool bHitBox = false;	// 接触の判定情報
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -841,7 +829,7 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_X:	// X軸
 
 										// X軸の衝突判定
-					collision::ResponseSingleX
+					bHitBox = collision::ResponseSingleX
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -858,7 +846,7 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_Y:	// Y軸
 
 										// Y軸の衝突判定
-					collision::ResponseSingleY
+					bHitBox = collision::ResponseSingleY
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -886,7 +874,7 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				case CPlayer::AXIS_Z:	// Z軸
 
 										// Z軸の衝突判定
-					collision::ResponseSingleZ
+					bHitBox = collision::ResponseSingleZ
 					( // 引数
 						rPos,			// 判定位置
 						m_oldPos,		// 判定過去位置
@@ -910,6 +898,8 @@ void CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 			}
 		}
 	}
+
+	return bHitBox;
 }
 
 //============================================================
@@ -1095,6 +1085,9 @@ void CFlail::CatchFlail()
 
 		pos = VEC3_ZERO;
 		rot = VEC3_ZERO;
+
+		m_chain[nCntChain].posOld = VEC3_ZERO;
+		m_chain[nCntChain].rotOld = VEC3_ZERO;
 
 		m_chain[nCntChain].multiModel->SetVec3Position(pos);
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
