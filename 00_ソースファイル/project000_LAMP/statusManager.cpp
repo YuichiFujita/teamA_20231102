@@ -203,8 +203,12 @@ int CStatusManager::GetNumMaxLife(void) const
 //============================================================
 void CStatusManager::SetEnableDrawLife(const bool bDraw)
 {
-	// ˆø”‚Ì•`‰æó‹µ‚ðÝ’è
-	m_pLife->SetEnableDraw(bDraw);
+	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
+	{ // Ž€–SðŒ‚ª‘Ì—Í‚Ìê‡
+
+		// ˆø”‚Ì•`‰æó‹µ‚ðÝ’è
+		m_pLife->SetEnableDraw(bDraw);
+	}
 }
 
 //============================================================
@@ -248,8 +252,12 @@ int CStatusManager::GetNumMaxRate(void) const
 //============================================================
 void CStatusManager::SetEnableDrawRate(const bool bDraw)
 {
-	// ˆø”‚Ì•`‰æó‹µ‚ðÝ’è
-	m_pKnockRate->SetEnableDraw(bDraw);
+	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
+	{ // Ž€–SðŒ‚ª‚Á”ò‚Ñ—¦‚Ìê‡
+
+		// ˆø”‚Ì•`‰æó‹µ‚ðÝ’è
+		m_pKnockRate->SetEnableDraw(bDraw);
+	}
 }
 
 //============================================================

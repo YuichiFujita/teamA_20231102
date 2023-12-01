@@ -1267,6 +1267,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 		// –Ú•WŒü‚«‚ðÝ’è
 		m_destRot.y = atan2f(-m_move.x, -m_move.z);
+		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 	}
 
 	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// ƒXƒeƒBƒbƒNŠeŽ²‚Ì“|‚µ—Ê
@@ -1288,13 +1289,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
-			m_pFlail->SetChainRotMove(-0.003f * m_nCounterFlail);
+			m_pFlail->SetChainRotMove((-0.002f * m_nCounterFlail) - 0.12f);
 
 			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * 5.0f);
 
 			// ˆÚ“®—Ê‚ðXV
-			m_move.x *= 0.5f;
-			m_move.z *= 0.5f;
+			m_move.x *= 1.0f - (0.0042f * m_nCounterFlail);
+			m_move.z *= 1.0f - (0.0042f * m_nCounterFlail);
 
 			// –Ú•WŒü‚«‚ðÝ’è
 			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
@@ -1308,17 +1309,29 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			// —­‚ß‚½ŽžŠÔ‚É‰ž‚¶‚Ä”ò‹——£‘‰Á
 			D3DXVECTOR3 move = VEC3_ZERO;
+			float lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (flail::FLAIL_NUM - 1));
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
-			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (float)((m_nCounterFlail - 4) / 4));
+			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() * 1.3f);
 
-			if (m_nCounterFlail < 30)
+			if ((int)lengthTarget % 10 != 0)
+			{
+				lengthTarget = (int)lengthTarget - (int)lengthTarget % 10;
+			}
+
+			if (lengthTarget < flail::FLAIL_RADIUS * 10.0f)
+			{
+				lengthTarget = flail::FLAIL_RADIUS * 10.0f;
+			}
+
+			m_pFlail->SetLengthTarget(lengthTarget);
+
+			if (DEAD_ZONE < fStick)
 			{
 				// –Ú•WŠp“x‚É‡‚í‚¹‚é
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
-				m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1));
 			}
 
 			// ƒJƒEƒ“ƒ^[‚ÌÝ’è
@@ -1355,66 +1368,69 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// “S‹…‚ÆƒvƒŒƒCƒ„[‚Ì‹——£‚ªˆê’è–¢–ž‚ÌŽžƒvƒŒƒCƒ„[ˆÊ’u‚É“S‹…ŒÅ’è
-		if (m_pFlail->GetLengthChain() == 0.0f)
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 2.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
 		{
-			m_nCounterFlail = 1;
+			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
+			m_pFlail->CatchFlail();
 		}
-
-		// ˆø‚«–ß‚·
-		if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
+		else
 		{
-			m_nCounterFlail -= 1;
-
-			if (m_nCounterFlail < -60)
+			// ˆø‚«–ß‚·
+			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 			{
-				m_nCounterFlail = -60;
-			}
+				m_nCounterFlail -= 1;
 
-			if (m_nCounterFlail == -2)
-			{
-				float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
-				float rot2 = m_destRot.y;
-				float rot3 = rot2 - rot1;
+				if (m_nCounterFlail < -60)
+				{
+					m_nCounterFlail = -60;
+				}
 
-				useful::NormalizeRot(rot3);
+				if (m_nCounterFlail == -2)
+				{
+					float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
+					float rot2 = m_destRot.y;
+					float rot3 = rot2 - rot1;
 
-				if (DEAD_ZONE < fStick)
-				{ // ƒfƒbƒhƒ][ƒ“ˆÈã‚Ìê‡
+					useful::NormalizeRot(rot3);
 
-					if (rot3 > 0.0f)
-					{
-						// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
-						m_pFlail->SetChainRotMove(0.1f);
+					if (DEAD_ZONE < fStick)
+					{ // ƒfƒbƒhƒ][ƒ“ˆÈã‚Ìê‡
+
+						if (rot3 > 0.0f)
+						{
+							// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
+							m_pFlail->SetChainRotMove(0.1f);
+						}
+						else
+						{
+							// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
+							m_pFlail->SetChainRotMove(-0.1f);
+						}
 					}
 					else
 					{
 						// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
-						m_pFlail->SetChainRotMove(-0.1f);
+						m_pFlail->SetChainRotMove(0.0f);
 					}
 				}
-				else
-				{
-					// —­‚ß‚Ä‚éŠÔ“S‹…‚ðU‚è‰ñ‚·
-					m_pFlail->SetChainRotMove(0.0f);
-				}
+
+				// —­‚ß‚½ŽžŠÔ‚É‰ž‚¶‚Ä”ò‹——£‘‰Á
+				D3DXVECTOR3 move = VEC3_ZERO;
+				move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
+				move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
+				m_pFlail->SetMove(move);
+
+				// ˆÚ“®—Ê‚ðXV
+				m_move.x = 0.0f;
+				m_move.z = 0.0f;
 			}
-			
-			// —­‚ß‚½ŽžŠÔ‚É‰ž‚¶‚Ä”ò‹——£‘‰Á
-			D3DXVECTOR3 move = VEC3_ZERO;
-			move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-			move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-			m_pFlail->SetMove(move);
 
-			// ˆÚ“®—Ê‚ðXV
-			m_move.x = 0.0f;
-			m_move.z = 0.0f;
-		}
-
-		// “Š±
-		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
-		{
-			m_nCounterFlail = flail::FLAIL_DROP;
+			// “Š±
+			if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
+			{
+				m_nCounterFlail = flail::FLAIL_DROP;
+			}
 		}
 	}
 
