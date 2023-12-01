@@ -37,20 +37,28 @@
 #define SIZE_SELECTBG	(D3DXVECTOR3((float)SCREEN_WIDTH, 120.0f, 0.0f))	// 選択背景の大きさ
 #define COL_SELECTBG	(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f))					// 選択背景の色
 
-#define POS_SELECT		(D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 560.0f, 0.0f))	// 選択の位置
+#define POS_SELECT		(D3DXVECTOR3(SCREEN_WIDTH * 0.75f, 600.0f, 0.0f))	// 選択の位置
 #define SPACE_SELECT	(D3DXVECTOR3(560.0f, 0.0f, 0.0f))	// 選択の空間
 #define SIZE_SELECT		(D3DXVECTOR3(466.0f, 64.0f, 0.0f))	// 選択の大きさ
 
 #define CHOICE_COL	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// 選択中カラー
 #define DEFAULT_COL	(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))	// 非選択中カラー
 
+#define LOGO_POS (D3DXVECTOR3(SCREEN_WIDTH * 0.35f,  320.0f, 0.0f))
+
+
+D3DXVECTOR3 aTitle_Size[] =
+{
+	D3DXVECTOR3(1000.0f, 600.0f, 0.0f) * 0.9f,
+	D3DXVECTOR3(600.0f, 600.0f, 0.0f) * 0.9f
+};
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
 const char *CTitleManager::mc_apLogoTextureFile[] =	// ロゴテクスチャ定数
 {
-	"data\\TEXTURE\\Logo_Ball.png",	// テクスチャ
 	"data\\TEXTURE\\Crack.png",	//テクスチャ
+	"data\\TEXTURE\\Logo_Ball.png",	// テクスチャ
 };
 const char *CTitleManager::mc_apSelectTextureFile[] =	// 選択テクスチャ定数
 {
@@ -111,30 +119,6 @@ HRESULT CTitleManager::Init(void)
 	m_nSelect = 0;				// 現在の選択
 	m_nOldSelect = 0;			// 前回の選択
 
-	//--------------------------------------------------------
-	//	選択背景の生成・設定
-	//--------------------------------------------------------
-	// 選択背景の生成
-	m_pSelectBG = CObject2D::Create
-	( // 引数
-		POS_SELECTBG,	// 位置
-		SIZE_SELECTBG,	// 大きさ
-		VEC3_ZERO,		// 向き
-		COL_SELECTBG	// 色
-	);
-	if (m_pSelectBG == NULL)
-	{ // 生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// 優先順位を設定
-	m_pSelectBG->SetPriority(TITLE_PRIO);
-
-	// 描画をしない設定にする
-	m_pSelectBG->SetEnableDraw(false);
 
 	//--------------------------------------------------------
 	//	選択表示の生成・設定
@@ -171,23 +155,21 @@ HRESULT CTitleManager::Init(void)
 	//--------------------------------------------------------
 	//	タイトルロゴの生成・設定
 	//--------------------------------------------------------
+
 	for (int nCntTitle = 0; nCntTitle < LOGO_MAX; nCntTitle++)
 	{ // タイトルロゴの総数分繰り返す
-
-		// タイトルロゴの生成
 		m_apLogo[nCntTitle] = CObject2D::Create
 		( // 引数
-			aPosLogo[nCntTitle],	// 位置
-			SIZE_TITLE	// 大きさ
+			LOGO_POS,	// 位置
+			aTitle_Size[nCntTitle]	// 大きさ
 		);
 		if (m_apLogo[nCntTitle] == NULL)
 		{ // 生成に失敗した場合
 
-			// 失敗を返す
+		  // 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
-
 		// テクスチャを登録・割当
 		m_apLogo[nCntTitle]->BindTexture(pTexture->Regist(mc_apLogoTextureFile[nCntTitle]));
 
@@ -246,8 +228,7 @@ void CTitleManager::Uninit(void)
 	// フェードの終了
 	m_pFade->Uninit();
 
-	// 選択背景の終了
-	m_pSelectBG->Uninit();
+	
 }
 
 //============================================================
@@ -309,8 +290,7 @@ void CTitleManager::Update(void)
 	// フェードの更新
 	m_pFade->Update();
 
-	// 選択背景の更新
-	m_pSelectBG->Update();
+	
 }
 
 //============================================================
@@ -397,16 +377,13 @@ void CTitleManager::UpdateFade(void)
 			// 描画をする設定にする
 			m_apLogo[nCntTitle]->SetEnableDraw(true);
 		}
-
+		m_apLogo[0]->SetEnableDraw(false);
 		for (int nCntTitle = 0; nCntTitle < SELECT_MAX; nCntTitle++)
 		{ // 選択項目の総数分繰り返す
 
 			// 選択表示を描画する設定にする
 			m_apSelect[nCntTitle]->SetEnableDraw(true);
 		}
-
-		// 選択背景を描画する設定にする
-		m_pSelectBG->SetEnableDraw(true);
 
 		// 状態を変更
 		m_state = STATE_MOVE;	// タイトル移動状態
@@ -431,7 +408,7 @@ void CTitleManager::UpdateMove(void)
 		{ // タイトルロゴの総数分繰り返す
 
 			// タイトルロゴの大きさを設定
-			m_apLogo[nCntTitle]->SetVec3Sizing(SIZE_TITLE * m_fScale);
+			m_apLogo[nCntTitle]->SetVec3Sizing(aTitle_Size[nCntTitle] * m_fScale);
 		}
 	}
 	else
@@ -444,7 +421,9 @@ void CTitleManager::UpdateMove(void)
 		{ // タイトルロゴの総数分繰り返す
 
 			// タイトルロゴの大きさを設定
-			m_apLogo[nCntTitle]->SetVec3Sizing(SIZE_TITLE);
+			m_apLogo[nCntTitle]->SetVec3Sizing(aTitle_Size[nCntTitle]);
+			// 描画をする設定にする
+			m_apLogo[nCntTitle]->SetEnableDraw(true);
 		}
 
 		// 状態を変更
@@ -574,7 +553,7 @@ void CTitleManager::SkipStaging(void)
 	{ // タイトルロゴの総数分繰り返す
 
 		// タイトルロゴの大きさを設定
-		m_apLogo[nCntTitle]->SetVec3Sizing(SIZE_TITLE);
+		m_apLogo[nCntTitle]->SetVec3Sizing(aTitle_Size[nCntTitle]);
 
 		// 描画をする設定にする
 		m_apLogo[nCntTitle]->SetEnableDraw(true);
@@ -590,8 +569,6 @@ void CTitleManager::SkipStaging(void)
 	// フェードを透明にする
 	m_pFade->SetColor(XCOL_ABLACK);
 
-	// 選択背景を描画する設定にする
-	m_pSelectBG->SetEnableDraw(true);
 
 	// カメラの更新を再開
 	CManager::GetInstance()->GetCamera()->SetEnableUpdate(true);
