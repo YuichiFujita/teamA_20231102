@@ -144,21 +144,21 @@ public:
 	// 静的メンバ関数
 	static CObjectMeshCube *Create		// 生成
 	( // 引数
-		const D3DXVECTOR3& rPos,		// 位置
-		const D3DXVECTOR3& rRot,		// 向き
-		const D3DXVECTOR3& rSize,		// 大きさ
-		const D3DXCOLOR& rCubeCol,		// キューブ色
-		const D3DXCOLOR& rBorderCol,	// 縁取り色
-		const EBorder bordState,		// 縁取り状態
-		const float fBordThick,			// 縁取り太さ
-		const ETexState texState,		// テクスチャ状態
-		const SFaceTex& rTexID,			// テクスチャ種類
-		const EOrigin origin = ORIGIN_CENTER,		// 原点
-		const D3DXVECTOR2& rTexPartX = VEC2_ONE,	// テクスチャ分割数X
-		const D3DXVECTOR2& rTexPartY = VEC2_ONE,	// テクスチャ分割数Y
-		const D3DXVECTOR2& rTexPartZ = VEC2_ONE,	// テクスチャ分割数Z
-		const D3DCULL cull = D3DCULL_CCW,			// カリング状況
-		const bool bLight = true					// ライティング状況
+		const D3DXVECTOR3&	rPos,		// 位置
+		const D3DXVECTOR3&	rRot,		// 向き
+		const D3DXVECTOR3&	rSize,		// 大きさ
+		const D3DXCOLOR&	rCubeCol,	// キューブ色
+		const D3DXCOLOR&	rBorderCol	= XCOL_BLACK,			// 縁取り色
+		const EBorder		bordState	= BORDER_OFF,			// 縁取り状態
+		const float			fBordThick	= 0.0f,					// 縁取り太さ
+		const ETexState		texState	= TEXSTATE_ONE,			// テクスチャ状態
+		const SFaceTex&		rTexID		= SFaceTex(NONE_IDX),	// テクスチャ種類
+		const EOrigin		origin		= ORIGIN_CENTER,		// 原点
+		const D3DXVECTOR2&	rTexPartX	= VEC2_ONE,				// テクスチャ分割数X
+		const D3DXVECTOR2&	rTexPartY	= VEC2_ONE,				// テクスチャ分割数Y
+		const D3DXVECTOR2&	rTexPartZ	= VEC2_ONE,				// テクスチャ分割数Z
+		const D3DCULL		cull		= D3DCULL_CCW,			// カリング状況
+		const bool			bLight		= true					// ライティング状況
 	);
 
 	// メンバ関数

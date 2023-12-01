@@ -12,16 +12,22 @@
 #include "input.h"
 #include "collision.h"
 #include "editStageManager.h"
+#include "objectMeshCube.h"
 #include "stage.h"
 #include "effect3D.h"
 
 //************************************************************
 //	マクロ定義
 //************************************************************
+#define KEY_DOUBLE		(DIK_LCONTROL)	// 二重化キー
+#define NAME_DOUBLE		("LCTRL")		// 二重化表示
 #define KEY_TRIGGER		(DIK_LSHIFT)	// トリガー化キー
 #define NAME_TRIGGER	("LSHIFT")		// トリガー化表示
 #define KEY_REVERSE		(DIK_LCONTROL)	// 操作逆転化キー
 #define NAME_REVERSE	("LCTRL")		// 操作逆転化表示
+
+#define KEY_SAVE	(DIK_F8)	// 保存キー
+#define NAME_SAVE	("F8")		// 保存表示
 
 #define KEY_CREATE		(DIK_0)	// 生成キー
 #define NAME_CREATE		("0")	// 生成表示
@@ -29,13 +35,33 @@
 #define NAME_RELEASE	("9")	// 破棄表示
 #define KEY_TYPE		(DIK_2)	// 種類変更キー
 #define NAME_TYPE		("2")	// 種類変更表示
+#define KEY_BREAK		(DIK_3)	// 破壊変更キー
+#define NAME_BREAK		("3")	// 破壊変更表示
+#define KEY_LIFE		(DIK_4)	// 体力変更キー
+#define NAME_LIFE		("4")	// 体力変更表示
+
+#define KEY_UP_SCALE_X		(DIK_T)	// X軸拡大キー
+#define NAME_UP_SCALE_X		("T")	// X軸拡大表示
+#define KEY_DOWN_SCALE_X	(DIK_G)	// X軸縮小キー
+#define NAME_DOWN_SCALE_X	("G")	// X軸縮小表示
+#define KEY_UP_SCALE_Z		(DIK_U)	// Z軸拡大キー
+#define NAME_UP_SCALE_Z		("U")	// Z軸拡大表示
+#define KEY_DOWN_SCALE_Z	(DIK_J)	// Z軸縮小キー
+#define NAME_DOWN_SCALE_Z	("J")	// Z軸縮小表示
 
 //************************************************************
 //	定数宣言
 //************************************************************
 namespace
 {
-	const float	INIT_ALPHA = 0.5f;	// 配置前のα値
+	const float	INIT_ALPHA		= 0.5f;		// 配置前のα値
+	const float	SIZE_COLLY		= 300.0f;	// 判定の大きさY
+	const float	MIN_SIZE		= 10.0f;	// 最小の大きさ
+	const float	MAX_SIZE		= 10000.0f;	// 最大の大きさ
+	const float	MOVE_SIZE		= 10.0f;	// 大きさ変動量
+	const int	MIN_LIFE		= 1;		// 最小の体力
+	const int	MAX_LIFE		= 6;		// 最大の体力
+	const D3DXCOLOR	COLL_COL	= D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.4f);	// 当たり判定色
 }
 
 //************************************************************
@@ -89,9 +115,11 @@ HRESULT CEditObstacle::Init(void)
 	// 変数を宣言
 	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
 	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
+	D3DXVECTOR3 sizeColl = CObstacle::GetStatusInfo(m_obstacle.type).sizeColl;	// 判定大きさ
 
 	// メンバ変数を初期化
 	m_pObstacle		= NULL;						// 障害物情報
+	m_pVisual		= NULL;						// 当たり判定視認キューブ
 	m_obstacle.type	= CObstacle::TYPE_CONIFER;	// 障害物種類
 
 	// 障害物の生成
@@ -106,6 +134,15 @@ HRESULT CEditObstacle::Init(void)
 
 	// 透明度を設定
 	m_pObstacle->SetAlpha(INIT_ALPHA);
+
+	// 判定視認キューブの生成
+	m_pVisual = CObjectMeshCube::Create
+	( // 引数
+		posEdit,	// 位置
+		rotEdit,	// 向き
+		sizeColl,	// 大きさ
+		COLL_COL	// キューブ色
+	);
 
 	// 成功を返す
 	return S_OK;
@@ -126,13 +163,20 @@ void CEditObstacle::Uninit(void)
 #if _DEBUG
 
 	if (m_pObstacle != NULL)
-	{ // 生成に失敗した場合
+	{ // 使用中の場合
 
 		// 障害物の色の全初期化
 		InitAllColorObstacle();
 
 		// 障害物の終了
 		m_pObstacle->Uninit();
+	}
+
+	if (m_pVisual != NULL)
+	{ // 使用中の場合
+
+		// 判定視認キューブの終了
+		m_pVisual->Uninit();
 	}
 
 #endif	// _DEBUG
@@ -158,17 +202,34 @@ void CEditObstacle::Update(void)
 	// 種類変更の更新
 	UpdateChangeType();
 
+	// 大きさの更新
+	UpdateSizing();
+
+	// 破壊変更の更新
+	UpdateChangeBreak();
+
+	// 体力変更の更新
+	UpdateChangeLife();
+
 	// 障害物の生成
 	CreateObstacle();
 
 	// 障害物の破棄
 	ReleaseObstacle();
 
+	// ステータス情報の保存
+	SaveStatusInfo();
+
 	// 位置を反映
 	m_pObstacle->SetVec3Position(pEdit->GetVec3Position());
+	m_pVisual->SetVec3Position(pEdit->GetVec3Position());
 
 	// 向きを反映
 	m_pObstacle->SetVec3Rotation(pEdit->GetVec3Rotation());
+	m_pVisual->SetVec3Rotation(pEdit->GetVec3Rotation());
+
+	// 判定視認キューブの更新
+	m_pVisual->Update();
 
 #endif	// _DEBUG
 }
@@ -181,7 +242,11 @@ void CEditObstacle::DrawDebugControl(void)
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
-	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s]\n", NAME_TYPE);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "障害物ステータス保存：[%s+%s]\n", NAME_DOUBLE, NAME_SAVE);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "大きさ：[%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s+%s]\n", NAME_TYPE, NAME_REVERSE);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "破壊変更：[%s]\n", NAME_BREAK);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "体力変更：[%s]\n", NAME_LIFE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "削除：[%s]\n", NAME_RELEASE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "設置：[%s]\n", NAME_CREATE);
 }
@@ -193,8 +258,15 @@ void CEditObstacle::DrawDebugInfo(void)
 {
 	// ポインタを宣言
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
+	static char* apBreak[] = { "不可能", "可能" };	// 破壊状況
+
+	// 破壊状況数の不一致
+	assert((sizeof(apBreak) / sizeof(apBreak[0])) == CObstacle::BREAK_MAX);
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_obstacle.type);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[大きさ]\n", m_pVisual->GetVec3Sizing().x, m_pVisual->GetVec3Sizing().y, m_pVisual->GetVec3Sizing().z);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%s：[破壊]\n", apBreak[CObstacle::GetStatusInfo(m_obstacle.type).state]);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[体力]\n", CObstacle::GetStatusInfo(m_obstacle.type).nLife);
 }
 
 //============================================================
@@ -304,17 +376,156 @@ void CEditObstacle::UpdateChangeType(void)
 	// ポインタを宣言
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
-	if (m_pKeyboard->IsTrigger(KEY_TYPE))
+	// 種類を変更
+	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
 	{
-		// 種類を変更
-		m_obstacle.type = (CObstacle::EType)((m_obstacle.type + 1) % CObstacle::TYPE_MAX);
+		if (m_pKeyboard->IsTrigger(KEY_TYPE))
+		{
+			// 種類を変更
+			m_obstacle.type = (CObstacle::EType)((m_obstacle.type + 1) % CObstacle::TYPE_MAX);
 
-		// 種類を反映
-		m_pObstacle->SetType(m_obstacle.type);
+			// 種類を反映
+			m_pObstacle->SetType(m_obstacle.type);
 
-		// 透明度を設定
-		m_pObstacle->SetAlpha(INIT_ALPHA);
+			// 透明度を設定
+			m_pObstacle->SetAlpha(INIT_ALPHA);
+		}
 	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_TYPE))
+		{
+			// 種類を変更
+			m_obstacle.type = (CObstacle::EType)((m_obstacle.type + (CObstacle::TYPE_MAX - 1)) % CObstacle::TYPE_MAX);
+
+			// 種類を反映
+			m_pObstacle->SetType(m_obstacle.type);
+
+			// 透明度を設定
+			m_pObstacle->SetAlpha(INIT_ALPHA);
+		}
+	}
+}
+
+//============================================================
+//	大きさの更新処理
+//============================================================
+void CEditObstacle::UpdateSizing(void)
+{
+	// 変数を宣言
+	CObstacle::SStatusInfo status = CObstacle::GetStatusInfo(m_obstacle.type);	// ステータス情報
+
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 大きさを変更
+	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
+	{
+		if (m_pKeyboard->IsPress(KEY_UP_SCALE_X))
+		{
+			status.sizeColl.x += MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_X))
+		{
+			status.sizeColl.x -= MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsPress(KEY_UP_SCALE_Z))
+		{
+			status.sizeColl.z += MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsPress(KEY_DOWN_SCALE_Z))
+		{
+			status.sizeColl.z -= MOVE_SIZE;
+		}
+	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_X))
+		{
+			status.sizeColl.x += MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_X))
+		{
+			status.sizeColl.x -= MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_UP_SCALE_Z))
+		{
+			status.sizeColl.z += MOVE_SIZE;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_DOWN_SCALE_Z))
+		{
+			status.sizeColl.z -= MOVE_SIZE;
+		}
+	}
+
+	// 大きさを補正
+	status.sizeColl.y = SIZE_COLLY;	// 縦の大きさは固定
+	useful::LimitNum(status.sizeColl.x, MIN_SIZE, MAX_SIZE);
+	useful::LimitNum(status.sizeColl.z, MIN_SIZE, MAX_SIZE);
+
+	// ステータス情報を反映
+	CObstacle::SetStatusInfo(m_obstacle.type, status);
+
+	// 大きさを反映
+	m_pVisual->SetVec3Sizing(status.sizeColl);
+}
+
+//============================================================
+//	破壊変更の更新処理
+//============================================================
+void CEditObstacle::UpdateChangeBreak(void)
+{
+	// 変数を宣言
+	CObstacle::SStatusInfo status = CObstacle::GetStatusInfo(m_obstacle.type);	// ステータス情報
+
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 破壊状況を変更
+	if (m_pKeyboard->IsTrigger(KEY_BREAK))
+	{
+		// 破壊状況を変更
+		status.state = (CObstacle::EBreak)((status.state + 1) % CObstacle::BREAK_MAX);
+	}
+
+	// ステータス情報を反映
+	CObstacle::SetStatusInfo(m_obstacle.type, status);
+}
+
+//============================================================
+//	体力変更の更新処理
+//============================================================
+void CEditObstacle::UpdateChangeLife(void)
+{
+	// 変数を宣言
+	CObstacle::SStatusInfo status = CObstacle::GetStatusInfo(m_obstacle.type);	// ステータス情報
+
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 体力を変更
+	if (!m_pKeyboard->IsPress(KEY_REVERSE))
+	{
+		if (m_pKeyboard->IsTrigger(KEY_LIFE))
+		{
+			// 体力を加算
+			status.nLife++;
+		}
+	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_LIFE))
+		{
+			// 体力を減算
+			status.nLife--;
+		}
+	}
+
+	// 体力を補正
+	useful::LimitNum(status.nLife, MIN_LIFE, MAX_LIFE);
+
+	// ステータス情報を反映
+	CObstacle::SetStatusInfo(m_obstacle.type, status);
 }
 
 //============================================================
@@ -385,6 +596,26 @@ void CEditObstacle::ReleaseObstacle(void)
 
 	// 障害物の削除判定
 	DeleteCollisionObstacle(bRelease);
+}
+
+
+//============================================================
+//	ステータス情報保存処理
+//============================================================
+void CEditObstacle::SaveStatusInfo(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+
+	// 障害物を保存
+	if (m_pKeyboard->IsPress(KEY_DOUBLE))
+	{
+		if (m_pKeyboard->IsTrigger(KEY_SAVE))
+		{
+			// 障害物のステータス保存処理
+			CObstacle::SaveStatus();
+		}
+	}
 }
 
 //============================================================

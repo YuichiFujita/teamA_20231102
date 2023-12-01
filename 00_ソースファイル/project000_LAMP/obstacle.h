@@ -65,6 +65,8 @@ public:
 	// ステータス構造体
 	struct SStatusInfo
 	{
+		D3DXVECTOR3 vecCenter;	// 判定中心位置ベクトル
+		D3DXVECTOR3 sizeColl;	// 判定大きさ
 		EBreak state;	// 破壊状況
 		int nLife;		// 体力
 	};
@@ -84,6 +86,10 @@ public:
 		const D3DXVECTOR3& rPos,	// 位置
 		const D3DXVECTOR3& rRot		// 向き
 	);
+
+	static void SetStatusInfo(const int nID, const SStatusInfo status);	// ステータス情報設定
+	static SStatusInfo GetStatusInfo(const int nID);					// ステータス情報取得
+	static void SaveStatus(void);	// ステータス保存
 	static void LoadSetup(void);	// セットアップ
 
 private:
