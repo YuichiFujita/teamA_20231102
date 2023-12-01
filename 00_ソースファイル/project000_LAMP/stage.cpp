@@ -360,7 +360,7 @@ CLiquid *CStage::GetLiquid(void)
 //============================================================
 //	生成処理
 //============================================================
-CStage *CStage::Create(const ELoad load)
+CStage *CStage::Create(void)
 {
 	// ポインタを宣言
 	CStage *pStage = NULL;		// ステージ生成用
@@ -390,7 +390,7 @@ CStage *CStage::Create(const ELoad load)
 		}
 
 		// セットアップの読込
-		if (FAILED(LoadSetup(pStage, load)))
+		if (FAILED(LoadSetup(pStage)))
 		{ // 読み込みに失敗した場合
 
 			// メモリ開放
@@ -432,9 +432,10 @@ HRESULT CStage::Release(CStage *&prStage)
 //============================================================
 //	セットアップ処理
 //============================================================
-HRESULT CStage::LoadSetup(CStage *pStage, const ELoad load)
+HRESULT CStage::LoadSetup(CStage *pStage)
 {
 	// 変数を宣言
+	int nLoadID = rand() % (sizeof(SETUP_TXT) / sizeof(SETUP_TXT[0]));	// 読込ステージインデックス
 	int nEnd = 0;	// テキスト読み込み終了の確認用
 
 	// 変数配列を宣言
@@ -444,7 +445,7 @@ HRESULT CStage::LoadSetup(CStage *pStage, const ELoad load)
 	FILE *pFile;	// ファイルポインタ
 
 	// ファイルを読み込み形式で開く
-	pFile = fopen(SETUP_TXT[load], "r");
+	pFile = fopen(SETUP_TXT[nLoadID], "r");
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合
