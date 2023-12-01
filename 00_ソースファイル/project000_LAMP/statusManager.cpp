@@ -12,6 +12,7 @@
 #include "multiValue.h"
 #include "retentionManager.h"
 #include "object2D.h"
+
 //************************************************************
 //	’è”éŒ¾
 //************************************************************
@@ -258,6 +259,15 @@ void CStatusManager::SetEnableDrawRate(const bool bDraw)
 		// ˆø”‚Ì•`‰æó‹µ‚ðÝ’è
 		m_pKnockRate->SetEnableDraw(bDraw);
 	}
+}
+
+//============================================================
+//	UI‚Ì•`‰æÝ’èˆ—
+//============================================================
+void CStatusManager::SetEnableDrawUI(const bool bDraw)
+{
+	// UI‚Ì•`‰æó‹µ‚ðÝ’è
+	m_pUI->SetEnableDraw(bDraw);
 }
 
 //============================================================

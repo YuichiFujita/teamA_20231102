@@ -26,6 +26,7 @@
 //	前方宣言
 //************************************************************
 class CObject2D;		// オブジェクト2Dクラス
+class CAnim2D;		// オブジェクト2Dクラス
 class CTimerManager;	// タイマーマネージャークラス
 
 //************************************************************
@@ -41,6 +42,7 @@ public:
 
 		TEXTURE_WHO = 0,
 		TEXTURE_WIN,
+		TEXTURE_WINNERFRAME,
 		TEXTURE_FRAME,
 		TEXTURE_RESTART,
 		TEXTURE_BACK,
@@ -113,6 +115,7 @@ private:
 	CObject2D *m_apWinLog[NUM_WIN];		// 勝利ロゴ
 	CObject2D *m_pBigFrame;				// 巨大フレーム
 	CObject2D *m_apFrame[NUM_FRAME];	// フレーム
+	CAnim2D *m_apNumber[NUM_FRAME];	// フレーム
 	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
 	CObject2D *m_pFade;					// フェードの情報
 	CObject2D *m_pCover;

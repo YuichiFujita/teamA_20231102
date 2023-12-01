@@ -55,11 +55,10 @@ CScene::~CScene()
 HRESULT CScene::Init(void)
 {
 	// 変数を宣言
-	CStage::ELoad load = CStage::LOAD_GAME;	// 読込ステージ
 	int nNumCreate = 0;	// プレイヤー生成数
 
 	// ステージの生成
-	m_pStage = CStage::Create(load);
+	m_pStage = CStage::Create();
 	if (m_pStage == NULL)
 	{ // 非使用中の場合
 
