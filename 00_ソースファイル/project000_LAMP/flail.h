@@ -24,7 +24,7 @@ namespace flail
 	const int	FLAIL_THROW = 240;		// フレイル投げ状態
 	const int	FLAIL_DROP = -1;		// フレイル落下状態
 	const int	FLAIL_DEF = 0;			// フレイル取得状態
-	const int	FLAIL_NUM = 40;			// フレイルの数
+	const int	FLAIL_NUM = 80;			// フレイルの数
 	const float	FLAIL_RADIUS = 20.0f;	// フレイルの半径
 }
 
@@ -112,8 +112,8 @@ public:
 private:
 	//メンバ関数
 	void Collision(D3DXVECTOR3& rPos);		// 長さ設定
-	void CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
-	void CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	bool CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	bool CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	void BindParent(const CPlayer& rPlayer);
 	void UpdateChain(void);		// 更新
 	void UpdateFlailPos(void);	// 更新
