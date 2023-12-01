@@ -30,8 +30,8 @@ public:
 	// ƒƒS—ñ‹“
 	enum ELogo
 	{
-		LOGO_TITLE = 0,	// ƒƒS
-		//LOGO_CRACK,	// ƒqƒr
+		LOGO_CRACK = 0,	// ƒƒS
+		LOGO_TITLE,	// ƒqƒr
 		LOGO_MAX		// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 
