@@ -37,6 +37,7 @@
 #include "statusManager.h"
 #include "flail.h"
 #include "spawnpoint.h"
+#include "obstacle.h"
 
 //************************************************************
 //	定数宣言
@@ -991,6 +992,9 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 向き更新
 	UpdateRotation(rotPlayer);
 
+	// 障害物との当たり判定
+	CollisionObstacle(posPlayer);
+
 	// ステージ範囲外の補正
 	pStage->LimitPosition(posPlayer, RADIUS);
 
@@ -1047,6 +1051,9 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 
 	// 向き更新
 	UpdateRotation(rotPlayer);
+
+	// 障害物との当たり判定
+	CollisionObstacle(posPlayer);
 
 	// ステージ範囲外の補正
 	pStage->LimitPosition(posPlayer, RADIUS);
@@ -1829,7 +1836,7 @@ bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
 				// ブロックの向きを設定
 				rotBlock = pObjCheck->GetVec3Rotation();
 
-				// ブロックの最小の大きさを設定
+				// ブロックの大きさを設定
 				sizeBlock = pObjCheck->GetVec3Sizing();
 
 				switch (axis)
@@ -1940,6 +1947,71 @@ bool CPlayer::CollisionGroundBlock(D3DXVECTOR3& rPos)
 
 	// 着地状況を返す
 	return bLand;
+}
+
+//============================================================
+//	障害物との当たり判定
+//============================================================
+bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+		// ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+			// ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+				// 変数を宣言
+				D3DXVECTOR3 posObs = VEC3_ZERO;		// 障害物位置
+				D3DXVECTOR3 rotObs = VEC3_ZERO;		// 障害物向き
+				D3DXVECTOR3 sizeObsMin = VEC3_ZERO;	// 障害物大きさ
+				D3DXVECTOR3 sizeObsMax = VEC3_ZERO;	// 障害物大きさ
+
+				// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
+				{ // オブジェクトラベルが障害物ではない場合
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 障害物の位置を設定
+				posObs = pObjCheck->GetVec3Position();
+
+				// 障害物の向きを設定
+				rotObs = pObjCheck->GetVec3Rotation();
+
+				// 障害物の大きさを設定
+				sizeObsMax = CObstacle::GetStatusInfo(pObjCheck->GetType()).sizeColl;
+				sizeObsMin = sizeObsMax * -1.0f;
+
+				// 障害物との判定を実行
+				collision::Square(posObs, &rPos, m_oldPos, rotObs, sizeObsMax, sizeObsMin);
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 判定情報を返す
+	return bHit;
 }
 
 //============================================================

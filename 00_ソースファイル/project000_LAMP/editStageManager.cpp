@@ -56,10 +56,10 @@ namespace
 {
 	const char* SAVE_TXT	= "data\\TXT\\save_stage.txt";	// ステージセーブテキスト
 
-	const float INIT_MOVE	= 40.0f;	// 配置物の初期移動量
-	const float CHANGE_MOVE = 10.0f;	// 配置物の移動量の変動量
+	const float INIT_MOVE	= 10.0f;	// 配置物の初期移動量
+	const float CHANGE_MOVE = 2.0f;		// 配置物の移動量の変動量
 	const float MIN_MOVE	= 10.0f;	// 配置物の最小移動量
-	const float MAX_MOVE	= 200.0f;	// 配置物の最大移動量
+	const float MAX_MOVE	= 100.0f;	// 配置物の最大移動量
 	const float ADDROT		= 0.05f;	// 配置物の回転量
 }
 
@@ -586,6 +586,7 @@ void CEditStageManager::DrawDebugControl(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "移動量変更：[%s/%s]\n", NAME_MOVE_UP, NAME_MOVE_DOWN);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "回転：[%s/%s]\n", NAME_ROTA_RIGHT, NAME_ROTA_LEFT);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "配置物変更：[%s]\n", NAME_CHANGE_THING);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "--------------------------------------\n");
 
 	if (m_pStage != NULL)
 	{ // エディットステージが使用されている場合
@@ -615,6 +616,7 @@ void CEditStageManager::DrawDebugInfo(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f：[移動量]\n", m_fMove);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[位置]\n", m_pos.x, m_pos.y, m_pos.z);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[向き]\n", m_rot.x, m_rot.y, m_rot.z);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "--------------------------------------\n");
 
 	if (m_pStage != NULL)
 	{ // エディットステージが使用されている場合
