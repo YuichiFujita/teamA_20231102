@@ -1499,7 +1499,7 @@ MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 2		# キー数
 
-	KEYSET
+	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 20
 		KEY	# ----- [ 0 ] -----
 			POS = 0.00 0.00 0.00
@@ -1645,3 +1645,4 @@ MOTIONSET
 		END_KEY
 	END_KEYSET
 END_MOTIONSET
+
