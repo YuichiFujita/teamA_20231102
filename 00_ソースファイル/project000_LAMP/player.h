@@ -143,6 +143,7 @@ private:
 	EMotion UpdateNormal(void);	// 通常状態時の更新
 	EMotion UpdateKnock(void);	// ノック状態時の更新
 	EMotion UpdateInvuln(void);	// 無敵状態時の更新
+	void UpdateDeath(void);		// 死亡状態時の更新
 
 	void UpdateOldPosition(void);			// 過去位置の更新
 	EMotion UpdateMove(D3DXVECTOR3& rPos);	// 移動量・目標向きの更新

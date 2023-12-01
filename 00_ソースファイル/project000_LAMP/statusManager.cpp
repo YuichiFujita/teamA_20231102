@@ -10,7 +10,8 @@
 #include "statusManager.h"
 #include "manager.h"
 #include "multiValue.h"
-
+#include "retentionManager.h"
+#include "object2D.h"
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -22,9 +23,9 @@ namespace
 	{
 		const int MAX_LIFE	= 100;	// 数字
 		const int MAX_DIG	= 3;	// 桁数
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(200.0f, 200.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(200.0f, 0.0f, 0.0f);		// 行間
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(150.0f, 600.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(D3DXVECTOR3(64.0f, 144.0f, 0.0f) * 0.75f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(40.0f, 0.0f, 0.0f);		// 行間
 	}
 
 	namespace knockrate
@@ -67,45 +68,58 @@ HRESULT CStatusManager::Init(void)
 	m_pLife = NULL;			// 体力の情報
 	m_pKnockRate = NULL;	// 吹っ飛び率の情報
 
-	// 体力の情報の生成
+							// 体力の情報の生成
 	m_pLife = CMultiValue::Create
 	( // 引数
 		CValue::TEXTURE_UI,	// テクスチャ
 		life::MAX_LIFE,		// 数字
 		life::MAX_DIG,		// 桁数
-		life::POS,			// 位置
+		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f), life::POS.y, life::POS.x),			// 位置
 		life::SIZE,			// 大きさ
 		life::SPACE			// 行間
 	);
 	if (m_pLife == NULL)
 	{ // 生成に失敗した場合
 
-		// 失敗を返す
+	  // 失敗を返す
 		return E_FAIL;
 	}
-
 	// 優先順位を設定
 	m_pLife->SetPriority(PRIORITY);
 
-	// 吹っ飛び率の情報の設定
+							// 吹っ飛び率の情報の設定
 	m_pKnockRate = CMultiValue::Create
 	( // 引数
 		CValue::TEXTURE_UI,	// テクスチャ
 		life::MAX_LIFE,		// 数字
 		life::MAX_DIG,		// 桁数
-		life::POS,			// 位置
+		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f), life::POS.y, life::POS.x),			// 位置
 		life::SIZE,			// 大きさ
 		life::SPACE			// 行間
 	);
 	if (m_pKnockRate == NULL)
 	{ // 生成に失敗した場合
 
-		// 失敗を返す
+	  // 失敗を返す
 		return E_FAIL;
 	}
-
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
+
+
+	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
+	{
+		m_pKnockRate->SetEnableDraw(false);
+		 m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		 m_pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
+	}
+	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
+	{
+		m_pLife->SetEnableDraw(false);
+		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		m_pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
+	}
+	
 
 	// 成功を返す
 	return S_OK;
@@ -122,6 +136,7 @@ HRESULT CStatusManager::Uninit(void)
 	// 吹っ飛び率の終了
 	m_pKnockRate->Uninit();
 
+	m_pUI->Uninit();
 	// 成功を返す
 	return S_OK;
 }
@@ -136,6 +151,7 @@ void CStatusManager::Update(void)
 
 	// 吹っ飛び率の更新
 	m_pKnockRate->Update();
+
 }
 
 //============================================================
