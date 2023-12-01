@@ -682,6 +682,9 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	// 引数の描画状況を設定
 	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
 	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
+
+	// UIの描画状況を設定
+	m_pStatus->SetEnableDrawUI(bDraw);
 }
 
 //============================================================
@@ -1989,6 +1992,7 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
+				CObstacle::SStatusInfo status;		// 障害物ステータス
 				D3DXVECTOR3 posObs = VEC3_ZERO;		// 障害物位置
 				D3DXVECTOR3 rotObs = VEC3_ZERO;		// 障害物向き
 				D3DXVECTOR3 sizeObsMin = VEC3_ZERO;	// 障害物大きさ
@@ -2007,14 +2011,20 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 					continue;
 				}
 
-				// 障害物の位置を設定
-				posObs = pObjCheck->GetVec3Position();
+				// 障害物のステータスを設定
+				status = CObstacle::GetStatusInfo(pObjCheck->GetType());
 
 				// 障害物の向きを設定
 				rotObs = pObjCheck->GetVec3Rotation();
 
+				// 障害物の位置を設定
+				posObs = pObjCheck->GetVec3Position();
+				posObs.x += sinf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+				posObs.y = 0.0f;
+				posObs.z += cosf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+
 				// 障害物の大きさを設定
-				sizeObsMax = CObstacle::GetStatusInfo(pObjCheck->GetType()).sizeColl;
+				sizeObsMax = status.sizeColl;
 				sizeObsMin = sizeObsMax * -1.0f;
 
 				// 障害物との判定を実行

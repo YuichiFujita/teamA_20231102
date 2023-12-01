@@ -65,10 +65,11 @@ public:
 	// ステータス構造体
 	struct SStatusInfo
 	{
-		D3DXVECTOR3 vecCenter;	// 判定中心位置ベクトル
 		D3DXVECTOR3 sizeColl;	// 判定大きさ
-		EBreak state;	// 破壊状況
-		int nLife;		// 体力
+		EBreak state;			// 破壊状況
+		float fLengthCenter;	// 判定中心位置の距離
+		float fAngleCenter;		// 判定中心位置の方向
+		int nLife;				// 体力
 	};
 
 	// オーバーライド関数
