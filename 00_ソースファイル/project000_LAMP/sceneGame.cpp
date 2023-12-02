@@ -16,6 +16,7 @@
 #include "timerManager.h"
 #include "stage.h"
 #include "pause.h"
+#include "mask.h"
 #include "player.h"
 #include "block.h"
 #include "obstacle.h"
@@ -91,6 +92,9 @@ HRESULT CSceneGame::Init(void)
 		assert(false);
 		return E_FAIL;
 	}
+
+	// マスクの生成 (プレイヤーの壁裏表示用ポリゴン)
+	CMask::Create(SCREEN_CENT, SCREEN_SIZE, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f));
 
 	//--------------------------------------------------------
 	//	初期設定

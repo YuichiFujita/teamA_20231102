@@ -439,6 +439,23 @@ void CFlail::Draw(void)
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
 
+	// ステンシルテストを有効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	
+	// 比較参照値を設定する
+	pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+	
+	// ステンシルマスクを指定する 
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 255);
+
+	// ステンシル比較関数を指定する
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
+
+	// ステンシル結果に対しての反映設定
+	pDevice->SetRenderState(D3DRS_STENCILPASS,	D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
+	pDevice->SetRenderState(D3DRS_STENCILFAIL,	D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL,	D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
+
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM; nCntChain++)
 	{
 		int IDParent = nCntChain - 1;
@@ -527,6 +544,9 @@ void CFlail::Draw(void)
 
 	// オブジェクトモデルの描画
 	CObjectModel::Draw();
+
+	// ステンシルテストを無効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 }
 
 //============================================================

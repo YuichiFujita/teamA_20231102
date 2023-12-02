@@ -305,11 +305,31 @@ void CPlayer::Update(void)
 //============================================================
 void CPlayer::Draw(void)
 {
-	// ステータス情報の描画
-	m_pStatus->Draw();
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+
+	// ステンシルテストを有効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	
+	// 比較参照値を設定する
+	pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+	
+	// ステンシルマスクを指定する 
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 255);
+
+	// ステンシル比較関数を指定する
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
+
+	// ステンシル結果に対しての反映設定
+	pDevice->SetRenderState(D3DRS_STENCILPASS,	D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
+	pDevice->SetRenderState(D3DRS_STENCILFAIL,	D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL,	D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
 
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
+
+	// ステンシルテストを無効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 }
 
 //============================================================
@@ -1177,59 +1197,28 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// PC操作
 #if 0
-	if (pKeyboard->IsPress(DIK_W))
+	if (m_nPadID == 0)
 	{
-		if (pKeyboard->IsPress(DIK_A))
+		if (pKeyboard->IsPress(DIK_W))
 		{
 			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+			m_move.z += 2.0f;
+		}
+		else if (pKeyboard->IsPress(DIK_S))
+		{
+			// 移動量を更新
+			m_move.z -= 2.0f;
+		}
+		else if (pKeyboard->IsPress(DIK_A))
+		{
+			// 移動量を更新
+			m_move.x -= 2.0f;
 		}
 		else if (pKeyboard->IsPress(DIK_D))
 		{
 			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+			m_move.x += 2.0f;
 		}
-		else
-		{
-			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y) * MOVE_PLAYER;
-		}
-	}
-	else if (pKeyboard->IsPress(DIK_S))
-	{
-		if (pKeyboard->IsPress(DIK_A))
-		{
-			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-		}
-		else if (pKeyboard->IsPress(DIK_D))
-		{
-			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-		}
-		else
-		{
-			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y) * MOVE_PLAYER;
-		}
-	}
-	else if (pKeyboard->IsPress(DIK_A))
-	{
-		// 移動量を更新
-		m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-		m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-	}
-	else if (pKeyboard->IsPress(DIK_D))
-	{
-		// 移動量を更新
-		m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-		m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
 	}
 #endif
 
