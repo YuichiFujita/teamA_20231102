@@ -1330,9 +1330,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				lengthTarget = (int)lengthTarget - (int)lengthTarget % 10;
 			}
 
-			if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
+			if (lengthTarget < flail::FLAIL_RADIUS * 20.0f)
 			{
-				lengthTarget = flail::FLAIL_RADIUS * 40.0f;
+				lengthTarget = flail::FLAIL_RADIUS * 20.0f;
 			}
 
 			m_pFlail->SetLengthTarget(lengthTarget);
@@ -1347,6 +1347,11 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			if (DEAD_ZONE < fStick)
 			{
 				m_pFlail->CatchFlail();
+
+				if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
+				{
+					lengthTarget = flail::FLAIL_RADIUS * 40.0f;
+				}
 
 				// –Ú•WŠp“x‚É‡‚í‚¹‚é
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
