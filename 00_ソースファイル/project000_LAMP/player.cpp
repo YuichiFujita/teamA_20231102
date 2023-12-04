@@ -1132,6 +1132,9 @@ void CPlayer::UpdateDeath(void)
 		assert(false);
 	}
 
+	// フレイルを強制的に所持
+	m_pFlail->CatchFlail();
+
 	// 重力の更新
 	UpdateGravity();
 
@@ -1264,7 +1267,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			currentMotion = MOTION_DASH;
 		}
 
-		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (flail::FLAIL_NUM - 1))
+		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1))
 		{ // 引きずり距離の場合
 
 			// 移動量を更新
@@ -1319,23 +1322,11 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
-			float lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (flail::FLAIL_NUM - 1));
+			float lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
-			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove() * 1.2f);
-
-			if ((int)lengthTarget % 10 != 0)
-			{
-				lengthTarget = (int)lengthTarget - (int)lengthTarget % 10;
-			}
-
-			if (lengthTarget < flail::FLAIL_RADIUS * 20.0f)
-			{
-				lengthTarget = flail::FLAIL_RADIUS * 20.0f;
-			}
-
-			m_pFlail->SetLengthTarget(lengthTarget);
+			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove());
 
 			D3DXVECTOR3 posFlail = m_pFlail->GetVec3Position();
 			if (posFlail.y < 0.0f)
@@ -1346,17 +1337,28 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 			if (DEAD_ZONE < fStick)
 			{
-				m_pFlail->CatchFlail();
+				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
 
-				if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
+				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN)
 				{
-					lengthTarget = flail::FLAIL_RADIUS * 40.0f;
+					lengthTarget = flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN;
 				}
 
 				// 目標角度に合わせる
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
 			}
+			else
+			{
+				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)) * 0.6f;
+
+				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN * 0.5f)
+				{
+					lengthTarget = flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN * 0.5f;
+				}
+			}
+
+			m_pFlail->SetLengthTarget(lengthTarget);
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
@@ -1453,7 +1455,18 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			// 投擲
 			if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
 			{
+				D3DXVECTOR3 vecPtoFTarget = VEC3_ZERO;
+				float lengthPtoFTarget = 0.0f;
+
 				m_nCounterFlail = flail::FLAIL_DROP;
+
+				vecPtoFTarget.x = GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 - m_pFlail->GetVec3Position().x;
+				vecPtoFTarget.y = GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_42 - m_pFlail->GetVec3Position().y;
+				vecPtoFTarget.z = GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43 - m_pFlail->GetVec3Position().z;
+
+				lengthPtoFTarget = D3DXVec3Length(&vecPtoFTarget);
+
+				m_pFlail->SetLengthTarget(lengthPtoFTarget);
 			}
 		}
 	}
