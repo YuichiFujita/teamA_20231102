@@ -170,6 +170,7 @@ private:
 	D3DXVECTOR3	m_destRot;			// 目標向き
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
+	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター
 	float		m_fPlusMove;		// プラス移動量

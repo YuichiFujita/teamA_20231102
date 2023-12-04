@@ -103,6 +103,7 @@ public:
 	float GetLengthTarget(void);							// 目標長さ取得
 
 	void CatchFlail(void);
+	void ShotFlail(const float rot);
 
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
@@ -118,6 +119,7 @@ private:
 	void Collision(D3DXVECTOR3& rPos);		// 長さ設定
 	bool CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	bool CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	bool CollisionObstacle(D3DXVECTOR3& rPos);		// 障害物との当たり判定
 	void BindParent(const CPlayer& rPlayer);
 	void UpdateChain(void);		// 更新
 	void UpdateFlailPos(void);	// 更新
