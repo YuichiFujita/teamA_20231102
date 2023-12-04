@@ -420,26 +420,29 @@ void CEditStageManager::UpdateChangeMove(void)
 	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
 
 	// 移動量を変更
-	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
+	if (m_pKeyboard->IsPress(KEY_DOUBLE))
 	{
-		if (m_pKeyboard->IsPress(KEY_MOVE_UP))
+		if (!m_pKeyboard->IsPress(KEY_TRIGGER))
 		{
-			m_fMove += CHANGE_MOVE;
+			if (m_pKeyboard->IsPress(KEY_MOVE_UP))
+			{
+				m_fMove += CHANGE_MOVE;
+			}
+			if (m_pKeyboard->IsPress(KEY_MOVE_DOWN))
+			{
+				m_fMove -= CHANGE_MOVE;
+			}
 		}
-		if (m_pKeyboard->IsPress(KEY_MOVE_DOWN))
+		else
 		{
-			m_fMove -= CHANGE_MOVE;
-		}
-	}
-	else
-	{
-		if (m_pKeyboard->IsTrigger(KEY_MOVE_UP))
-		{
-			m_fMove += CHANGE_MOVE;
-		}
-		if (m_pKeyboard->IsTrigger(KEY_MOVE_DOWN))
-		{
-			m_fMove -= CHANGE_MOVE;
+			if (m_pKeyboard->IsTrigger(KEY_MOVE_UP))
+			{
+				m_fMove += CHANGE_MOVE;
+			}
+			if (m_pKeyboard->IsTrigger(KEY_MOVE_DOWN))
+			{
+				m_fMove -= CHANGE_MOVE;
+			}
 		}
 	}
 
@@ -583,7 +586,7 @@ void CEditStageManager::DrawDebugControl(void)
 	pDebug->Print(CDebugProc::POINT_RIGHT, "======================================\n");
 	pDebug->Print(CDebugProc::POINT_RIGHT, "ステージ保存：[%s+%s]\n", NAME_DOUBLE, NAME_SAVE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "移動：[%s/%s/%s/%s/%s/%s+%s]\n", NAME_FAR, NAME_LEFT, NAME_NEAR, NAME_RIGHT, NAME_UP, NAME_DOWN, NAME_TRIGGER);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "移動量変更：[%s/%s]\n", NAME_MOVE_UP, NAME_MOVE_DOWN);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "移動量変更：[%s/%s+%s]\n", NAME_MOVE_UP, NAME_MOVE_DOWN, NAME_DOUBLE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "回転：[%s/%s]\n", NAME_ROTA_RIGHT, NAME_ROTA_LEFT);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "配置物変更：[%s]\n", NAME_CHANGE_THING);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "--------------------------------------\n");

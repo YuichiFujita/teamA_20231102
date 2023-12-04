@@ -20,6 +20,7 @@
 //************************************************************
 class CMultiValue;	// マルチ数字クラス
 class CObject2D;
+
 //************************************************************
 //	クラス定義
 //************************************************************
@@ -49,6 +50,7 @@ public:
 	int  GetNumRate(void) const;				// 吹っ飛び率取得
 	int  GetNumMaxRate(void) const;				// 最大吹っ飛び率取得
 	void SetEnableDrawRate(const bool bDraw);	// 吹っ飛び率の描画設定
+	void SetEnableDrawUI(const bool bDraw);		// UIの描画設定
 
 	// 静的メンバ関数
 	static CStatusManager *Create(const int nPadID);	// 生成

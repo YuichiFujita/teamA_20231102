@@ -36,11 +36,11 @@ public:
 	// デストラクタ
 	~CEditObstacle() override;
 
-
 	// 障害物情報構造体
 	struct SInfo
 	{
-		CObstacle::EType type;	// 障害物種類
+		CObstacle::EType type;		// 障害物種類
+		D3DXVECTOR3 posCollCenter;	// 判定の中心位置
 	};
 
 	// オーバーライド関数
@@ -56,7 +56,8 @@ public:
 private:
 	// メンバ関数
 	void UpdateChangeType(void);	// 種類変更の更新
-	void UpdateSizing(void);		// 大きさ更新
+	void UpdateCollPosition(void);	// 判定位置の更新
+	void UpdateCollSizing(void);	// 判定大きさの更新
 	void UpdateChangeBreak(void);	// 破壊変更の更新
 	void UpdateChangeLife(void);	// 体力変更の更新
 	void CreateObstacle(void);		// 障害物生成

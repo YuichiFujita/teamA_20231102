@@ -40,6 +40,15 @@
 #define KEY_LIFE		(DIK_4)	// 体力変更キー
 #define NAME_LIFE		("4")	// 体力変更表示
 
+#define KEY_MOVE_RIGHT	(DIK_RIGHT)	// 右移動キー
+#define NAME_MOVE_RIGHT	("→")		// 右移動表示
+#define KEY_MOVE_LEFT	(DIK_LEFT)	// 左移動キー
+#define NAME_MOVE_LEFT	("←")		// 左移動表示
+#define KEY_MOVE_FAR	(DIK_UP)	// 奥移動キー
+#define NAME_MOVE_FAR	("↑")		// 奥移動表示
+#define KEY_MOVE_NEAR	(DIK_DOWN)	// 手前移動キー
+#define NAME_MOVE_NEAR	("↓")		// 手前移動表示
+
 #define KEY_UP_SCALE_X		(DIK_T)	// X軸拡大キー
 #define NAME_UP_SCALE_X		("T")	// X軸拡大表示
 #define KEY_DOWN_SCALE_X	(DIK_G)	// X軸縮小キー
@@ -55,6 +64,7 @@
 namespace
 {
 	const float	INIT_ALPHA		= 0.5f;		// 配置前のα値
+	const float	MOVE_POS		= 10.0f;	// 位置移動量
 	const float	SIZE_COLLY		= 300.0f;	// 判定の大きさY
 	const float	MIN_SIZE		= 10.0f;	// 最小の大きさ
 	const float	MAX_SIZE		= 10000.0f;	// 最大の大きさ
@@ -113,14 +123,24 @@ HRESULT CEditObstacle::Init(void)
 	}
 
 	// 変数を宣言
-	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
-	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
-	D3DXVECTOR3 sizeColl = CObstacle::GetStatusInfo(m_obstacle.type).sizeColl;	// 判定大きさ
+	D3DXVECTOR3 posEdit		= pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 rotEdit		= pEdit->GetVec3Rotation();	// エディットの向き
+	D3DXVECTOR3 posColl		= VEC3_ZERO;				// 判定位置
+	D3DXVECTOR3 sizeColl	= CObstacle::GetStatusInfo(m_obstacle.type).sizeColl;		// 判定大きさ
+	float fLengthColl		= CObstacle::GetStatusInfo(m_obstacle.type).fLengthCenter;	// 判定中心位置の距離
+	float fAngleColl		= CObstacle::GetStatusInfo(m_obstacle.type).fAngleCenter;	// 判定中心位置の角度
+
+	// 判定位置を求める
+	posColl = posEdit;
+	posColl.x += sinf(rotEdit.y + fAngleColl) * fLengthColl;
+	posColl.y = 0.0f;
+	posColl.z += cosf(rotEdit.y + fAngleColl) * fLengthColl;
 
 	// メンバ変数を初期化
 	m_pObstacle		= NULL;						// 障害物情報
 	m_pVisual		= NULL;						// 当たり判定視認キューブ
 	m_obstacle.type	= CObstacle::TYPE_CONIFER;	// 障害物種類
+	m_obstacle.posCollCenter = posColl;			// 判定の中心位置
 
 	// 障害物の生成
 	m_pObstacle = CObstacle::Create(m_obstacle.type, posEdit, rotEdit);
@@ -138,7 +158,7 @@ HRESULT CEditObstacle::Init(void)
 	// 判定視認キューブの生成
 	m_pVisual = CObjectMeshCube::Create
 	( // 引数
-		posEdit,	// 位置
+		posColl,	// 位置
 		rotEdit,	// 向き
 		sizeColl,	// 大きさ
 		COLL_COL	// キューブ色
@@ -199,11 +219,18 @@ void CEditObstacle::Update(void)
 		return;
 	}
 
+	// 変数を宣言
+	D3DXVECTOR3 posEdit = pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 rotEdit = pEdit->GetVec3Rotation();	// エディットの向き
+
 	// 種類変更の更新
 	UpdateChangeType();
 
-	// 大きさの更新
-	UpdateSizing();
+	// 判定位置の更新
+	UpdateCollPosition();
+
+	// 判定大きさの更新
+	UpdateCollSizing();
 
 	// 破壊変更の更新
 	UpdateChangeBreak();
@@ -221,12 +248,12 @@ void CEditObstacle::Update(void)
 	SaveStatusInfo();
 
 	// 位置を反映
-	m_pObstacle->SetVec3Position(pEdit->GetVec3Position());
-	m_pVisual->SetVec3Position(pEdit->GetVec3Position());
+	m_pObstacle->SetVec3Position(posEdit);
+	m_pVisual->SetVec3Position(m_obstacle.posCollCenter);
 
 	// 向きを反映
-	m_pObstacle->SetVec3Rotation(pEdit->GetVec3Rotation());
-	m_pVisual->SetVec3Rotation(pEdit->GetVec3Rotation());
+	m_pObstacle->SetVec3Rotation(rotEdit);
+	m_pVisual->SetVec3Rotation(rotEdit);
 
 	// 判定視認キューブの更新
 	m_pVisual->Update();
@@ -243,7 +270,8 @@ void CEditObstacle::DrawDebugControl(void)
 	CDebugProc *pDebug = CManager::GetInstance()->GetDebugProc();	// デバッグプロックの情報
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "障害物ステータス保存：[%s+%s]\n", NAME_DOUBLE, NAME_SAVE);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "大きさ：[%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "判定位置：[%s/%s/%s/%s]\n", NAME_MOVE_RIGHT, NAME_MOVE_LEFT, NAME_MOVE_FAR, NAME_MOVE_NEAR);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "判定大きさ：[%s/%s/%s/%s+%s]\n", NAME_UP_SCALE_X, NAME_DOWN_SCALE_X, NAME_UP_SCALE_Z, NAME_DOWN_SCALE_Z, NAME_TRIGGER);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "種類変更：[%s+%s]\n", NAME_TYPE, NAME_REVERSE);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "破壊変更：[%s]\n", NAME_BREAK);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "体力変更：[%s]\n", NAME_LIFE);
@@ -264,7 +292,8 @@ void CEditObstacle::DrawDebugInfo(void)
 	assert((sizeof(apBreak) / sizeof(apBreak[0])) == CObstacle::BREAK_MAX);
 
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[種類]\n", m_obstacle.type);
-	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[大きさ]\n", m_pVisual->GetVec3Sizing().x, m_pVisual->GetVec3Sizing().y, m_pVisual->GetVec3Sizing().z);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[判定位置]\n", m_obstacle.posCollCenter.x, m_obstacle.posCollCenter.y, m_obstacle.posCollCenter.z);
+	pDebug->Print(CDebugProc::POINT_RIGHT, "%f %f %f：[判定大きさ]\n", m_pVisual->GetVec3Sizing().x, m_pVisual->GetVec3Sizing().y, m_pVisual->GetVec3Sizing().z);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%s：[破壊]\n", apBreak[CObstacle::GetStatusInfo(m_obstacle.type).state]);
 	pDebug->Print(CDebugProc::POINT_RIGHT, "%d：[体力]\n", CObstacle::GetStatusInfo(m_obstacle.type).nLife);
 }
@@ -408,9 +437,89 @@ void CEditObstacle::UpdateChangeType(void)
 }
 
 //============================================================
-//	大きさの更新処理
+//	判定位置の更新処理
 //============================================================
-void CEditObstacle::UpdateSizing(void)
+void CEditObstacle::UpdateCollPosition(void)
+{
+	// ポインタを宣言
+	CInputKeyboard *m_pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード情報
+	CEditStageManager *pEdit = GetPtrEditStage();	// エディットステージ情報
+	if (pEdit == NULL)
+	{ // エディットステージが存在しない場合
+
+		// 処理を抜ける
+		assert(false);
+		return;
+	}
+
+	// 変数を宣言
+	CObstacle::SStatusInfo status = CObstacle::GetStatusInfo(m_obstacle.type);	// ステータス情報
+	D3DXVECTOR3 posEdit	= pEdit->GetVec3Position();	// エディットの位置
+	D3DXVECTOR3 rotEdit	= pEdit->GetVec3Rotation();	// エディットの向き
+	float fLengthColl	= status.fLengthCenter;		// 判定中心位置の距離
+	float fAngleColl	= status.fAngleCenter;		// 判定中心位置の角度
+
+	// 判定位置を求める
+	m_obstacle.posCollCenter = posEdit;
+	m_obstacle.posCollCenter.x += sinf(rotEdit.y + fAngleColl) * fLengthColl;
+	m_obstacle.posCollCenter.y = 0.0f;
+	m_obstacle.posCollCenter.z += cosf(rotEdit.y + fAngleColl) * fLengthColl;
+
+	// 位置を変更
+	if (!m_pKeyboard->IsPress(KEY_TRIGGER))
+	{
+		if (m_pKeyboard->IsPress(KEY_MOVE_RIGHT))
+		{
+			m_obstacle.posCollCenter.x += MOVE_POS;
+		}
+		if (m_pKeyboard->IsPress(KEY_MOVE_LEFT))
+		{
+			m_obstacle.posCollCenter.x -= MOVE_POS;
+		}
+		if (m_pKeyboard->IsPress(KEY_MOVE_FAR))
+		{
+			m_obstacle.posCollCenter.z += MOVE_POS;
+		}
+		if (m_pKeyboard->IsPress(KEY_MOVE_NEAR))
+		{
+			m_obstacle.posCollCenter.z -= MOVE_POS;
+		}
+	}
+	else
+	{
+		if (m_pKeyboard->IsTrigger(KEY_MOVE_RIGHT))
+		{
+			m_obstacle.posCollCenter.x += MOVE_POS;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_MOVE_LEFT))
+		{
+			m_obstacle.posCollCenter.x -= MOVE_POS;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_MOVE_FAR))
+		{
+			m_obstacle.posCollCenter.z += MOVE_POS;
+		}
+		if (m_pKeyboard->IsTrigger(KEY_MOVE_NEAR))
+		{
+			m_obstacle.posCollCenter.z -= MOVE_POS;
+		}
+	}
+
+	// 判定中心位置の距離を設定
+	status.fLengthCenter = sqrtf((m_obstacle.posCollCenter.x - posEdit.x) * (m_obstacle.posCollCenter.x - posEdit.x)
+						 + (m_obstacle.posCollCenter.z - posEdit.z) * (m_obstacle.posCollCenter.z - posEdit.z));
+
+	// 判定中心位置の角度を設定
+	status.fAngleCenter = atan2f((m_obstacle.posCollCenter.x - posEdit.x), (m_obstacle.posCollCenter.z - posEdit.z)) - rotEdit.y;
+	
+	// ステータス情報を反映
+	CObstacle::SetStatusInfo(m_obstacle.type, status);
+}
+
+//============================================================
+//	判定大きさの更新処理
+//============================================================
+void CEditObstacle::UpdateCollSizing(void)
 {
 	// 変数を宣言
 	CObstacle::SStatusInfo status = CObstacle::GetStatusInfo(m_obstacle.type);	// ステータス情報

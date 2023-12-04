@@ -305,11 +305,31 @@ void CPlayer::Update(void)
 //============================================================
 void CPlayer::Draw(void)
 {
-	// ステータス情報の描画
-	m_pStatus->Draw();
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+
+	// ステンシルテストを有効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	
+	// 比較参照値を設定する
+	pDevice->SetRenderState(D3DRS_STENCILREF, 1);
+	
+	// ステンシルマスクを指定する 
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 255);
+
+	// ステンシル比較関数を指定する
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
+
+	// ステンシル結果に対しての反映設定
+	pDevice->SetRenderState(D3DRS_STENCILPASS,	D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
+	pDevice->SetRenderState(D3DRS_STENCILFAIL,	D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL,	D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
 
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
+
+	// ステンシルテストを無効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 }
 
 //============================================================
@@ -682,6 +702,9 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	// 引数の描画状況を設定
 	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
 	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
+
+	// UIの描画状況を設定
+	m_pStatus->SetEnableDrawUI(bDraw);
 }
 
 //============================================================
@@ -1174,59 +1197,28 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// PC操作
 #if 0
-	if (pKeyboard->IsPress(DIK_W))
+	if (m_nPadID == 0)
 	{
-		if (pKeyboard->IsPress(DIK_A))
+		if (pKeyboard->IsPress(DIK_W))
 		{
 			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
+			m_move.z += 2.0f;
+		}
+		else if (pKeyboard->IsPress(DIK_S))
+		{
+			// 移動量を更新
+			m_move.z -= 2.0f;
+		}
+		else if (pKeyboard->IsPress(DIK_A))
+		{
+			// 移動量を更新
+			m_move.x -= 2.0f;
 		}
 		else if (pKeyboard->IsPress(DIK_D))
 		{
 			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
+			m_move.x += 2.0f;
 		}
-		else
-		{
-			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y) * MOVE_PLAYER;
-		}
-	}
-	else if (pKeyboard->IsPress(DIK_S))
-	{
-		if (pKeyboard->IsPress(DIK_A))
-		{
-			// 移動量を更新
-			m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-			m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.75f)) * MOVE_PLAYER;
-		}
-		else if (pKeyboard->IsPress(DIK_D))
-		{
-			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.25f)) * MOVE_PLAYER;
-		}
-		else
-		{
-			// 移動量を更新
-			m_move.x -= sinf(pCamera->rot.y) * MOVE_PLAYER;
-			m_move.z -= cosf(pCamera->rot.y) * MOVE_PLAYER;
-		}
-	}
-	else if (pKeyboard->IsPress(DIK_A))
-	{
-		// 移動量を更新
-		m_move.x += sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-		m_move.z += cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-	}
-	else if (pKeyboard->IsPress(DIK_D))
-	{
-		// 移動量を更新
-		m_move.x -= sinf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
-		m_move.z -= cosf(pCamera->rot.y - (D3DX_PI * 0.5f)) * MOVE_PLAYER;
 	}
 #endif
 
@@ -1327,9 +1319,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				lengthTarget = (int)lengthTarget - (int)lengthTarget % 10;
 			}
 
-			if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
+			if (lengthTarget < flail::FLAIL_RADIUS * 20.0f)
 			{
-				lengthTarget = flail::FLAIL_RADIUS * 40.0f;
+				lengthTarget = flail::FLAIL_RADIUS * 20.0f;
 			}
 
 			m_pFlail->SetLengthTarget(lengthTarget);
@@ -1344,6 +1336,11 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			if (DEAD_ZONE < fStick)
 			{
 				m_pFlail->CatchFlail();
+
+				if (lengthTarget < flail::FLAIL_RADIUS * 40.0f)
+				{
+					lengthTarget = flail::FLAIL_RADIUS * 40.0f;
+				}
 
 				// 目標角度に合わせる
 				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
@@ -1998,6 +1995,7 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 			{ // オブジェクトが使用されている場合繰り返す
 
 				// 変数を宣言
+				CObstacle::SStatusInfo status;		// 障害物ステータス
 				D3DXVECTOR3 posObs = VEC3_ZERO;		// 障害物位置
 				D3DXVECTOR3 rotObs = VEC3_ZERO;		// 障害物向き
 				D3DXVECTOR3 sizeObsMin = VEC3_ZERO;	// 障害物大きさ
@@ -2016,14 +2014,20 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 					continue;
 				}
 
-				// 障害物の位置を設定
-				posObs = pObjCheck->GetVec3Position();
+				// 障害物のステータスを設定
+				status = CObstacle::GetStatusInfo(pObjCheck->GetType());
 
 				// 障害物の向きを設定
 				rotObs = pObjCheck->GetVec3Rotation();
 
+				// 障害物の位置を設定
+				posObs = pObjCheck->GetVec3Position();
+				posObs.x += sinf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+				posObs.y = 0.0f;
+				posObs.z += cosf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+
 				// 障害物の大きさを設定
-				sizeObsMax = CObstacle::GetStatusInfo(pObjCheck->GetType()).sizeColl;
+				sizeObsMax = status.sizeColl;
 				sizeObsMin = sizeObsMax * -1.0f;
 
 				// 障害物との判定を実行
