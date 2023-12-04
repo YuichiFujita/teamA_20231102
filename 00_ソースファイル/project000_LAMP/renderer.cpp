@@ -127,26 +127,24 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 
 	// テクスチャステージステートの設定 (テクスチャのアルファブレンドの設定)
 #if 1
-	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
+	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
+	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1,	D3DTA_TEXTURE);
+	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2,	D3DTA_CURRENT);
 #else
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
-	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CURRENT);
+	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_CURRENT);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1,	D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2,	D3DTA_CURRENT);
 
 	m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLOROP,	D3DTOP_DISABLE);
-	m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+	m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
+	m_pD3DDevice->SetTextureStageState(1, D3DTSS_COLORARG2,	D3DTA_CURRENT);
 	m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAOP,	D3DTOP_DISABLE);
 	m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAARG1,	D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAARG2,	D3DTA_CURRENT);
 #endif
-
-
 
 	// シェーダー用の初期化は以下
 	// Z値テクスチャ生成オブジェクトの生成と初期化
@@ -155,6 +153,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pZTex = new CZTexture;
 	m_pZTex->Init(*m_pDev, SCREEN_WIDTH * 2.0f, SCREEN_WIDTH * 2.0f, D3DFMT_A32B32G32R32F);
 	m_pZTex->GetZTex(&m_pZTexture);
+
 	// 深度バッファシャドウオブジェクトの生成と初期化
 	m_pDepthShadow = new CDepthShadow;
 	m_pDepthShadow->Init(*m_pDev);
@@ -162,9 +161,11 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	D3DXMatrixPerspectiveFovLH(&CameraProj, D3DXToRadian(45), 1.777f, 10.0f, 50000.0f);
 	D3DXMatrixPerspectiveFovLH(&LightProj, D3DXToRadian(90), 1.0f, 30.0f, 50000.0f);
 	D3DXMatrixLookAtLH(&LightView, &D3DXVECTOR3(1000.0f, 4000.0f, -000.0f), &D3DXVECTOR3(120.0f, -10.0f, 100.0f), &D3DXVECTOR3(0, 1, 0));
+
 	// Z値テクスチャOBJへ登録
 	m_pZTex->SetViewMatrix(&LightView);
 	m_pZTex->SetProjMatrix(&LightProj);
+
 	// 深度バッファシャドウOBJへ登録
 	// カメラビューは毎回変わるので描画時に登録します
 	m_pDepthShadow->SetLightViewMatrix(&LightView);
@@ -351,7 +352,7 @@ void CRenderer::Draw(void)
 		D3DXMatrixScaling(&SpriteScaleMat, 0.125f, 0.125f, 1.0f);
 		m_pSprite->SetTransform(&SpriteScaleMat);
 		m_pSprite->Begin(0);
-		//m_pSprite->Draw(m_pZTexture, NULL, NULL, NULL, 0xffffffff);
+		m_pSprite->Draw(m_pZTexture, NULL, NULL, NULL, 0xffffffff);
 		m_pSprite->End();
 		// デバッグ表示の描画
         CManager::GetInstance()->GetDebugProc()->Draw();

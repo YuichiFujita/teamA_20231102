@@ -20,7 +20,8 @@ CRetentionManager::CRetentionManager()
 {
 	// メンバ変数をクリア
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
-	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
+	memset(&m_aWinPoint[0], 0, sizeof(m_aWinPoint));			// 勝利ポイント数
+	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
@@ -42,7 +43,8 @@ HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
-	memset(&m_aEntry[0], 0, sizeof(m_aEntry));	// エントリー状況
+	memset(&m_aWinPoint[0], 0, sizeof(m_aWinPoint));			// 勝利ポイント数
+	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
@@ -278,7 +280,7 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 //============================================================
 //	生存ランキング取得処理
 //============================================================
-CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
+CRetentionManager::ESurvival CRetentionManager::GetSurvivalRank(const int nID) const
 {
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤーの最大数分繰り返す
@@ -287,11 +289,11 @@ CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
 		{ // ランキングが設定されていない場合
 
 			// 引数のプレイヤーインデックスを設定
-			return (ERank)nCntPlayer;
+			return (ESurvival)nCntPlayer;
 		}
 	}
 
-	// 使用できないインデックスを返す
+	// 4位を返す (例外)
 	assert(false);
-	return RANK_4TH;
+	return SURVIVAL_4TH;
 }

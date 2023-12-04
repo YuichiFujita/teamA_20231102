@@ -180,8 +180,18 @@ void CMiddleResultManager::Update(void)
 
 	case STATE_END:
 
-		// ƒŠƒUƒ‹ƒg‚É‘JˆÚ
-		CManager::GetInstance()->SetScene(CScene::MODE_RESULT);
+		//if ()
+		{ // ŸŽÒ‚ªŒˆ‚Ü‚Á‚Ä‚¢‚È‚¢ê‡
+
+			// ƒQ[ƒ€‚É‘JˆÚ
+			CManager::GetInstance()->SetScene(CScene::MODE_GAME);
+		}
+		//else
+		//{ // ŸŽÒ‚ªŒˆ‚Ü‚Á‚½ê‡
+
+		//	// ƒŠƒUƒ‹ƒg‚É‘JˆÚ
+		//	CManager::GetInstance()->SetScene(CScene::MODE_RESULT);
+		//}
 
 		break;
 
