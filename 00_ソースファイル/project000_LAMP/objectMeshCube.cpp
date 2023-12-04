@@ -145,6 +145,7 @@ HRESULT CObjectMeshCube::Init(void)
 
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -249,6 +250,7 @@ void CObjectMeshCube::Draw(void)
 			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
 			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
 		}
+
 		// ポリゴンの描画
 		pDevice->DrawIndexedPrimitive
 		( // 引数
@@ -287,6 +289,7 @@ void CObjectMeshCube::Draw(void)
 
 			// テクスチャの設定
 			pDevice->SetTexture(0, pTexture->GetTexture(aTexType[nCntFace]));
+
 			if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
 			{
 				CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
@@ -300,6 +303,7 @@ void CObjectMeshCube::Draw(void)
 				CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
 				CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
 			}
+
 			// ポリゴンの描画
 			pDevice->DrawIndexedPrimitive
 			( // 引数
@@ -310,6 +314,7 @@ void CObjectMeshCube::Draw(void)
 				nCntFace * NUM_VTX_FACE,	// インデックスバッファの開始地点
 				NUM_VTX_FACE - 2			// プリミティブ (ポリゴン) 数
 			);
+
 			if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
 			{
 				CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
@@ -342,6 +347,7 @@ void CObjectMeshCube::Draw(void)
 
 		// ライティングを無効にする
 		pDevice->SetRenderState(D3DRS_LIGHTING, false);
+
 		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
 		{
 			CManager::GetInstance()->GetRenderer()->GetZShader()->SetWorldMatrix(&m_meshCube.mtxWorld);
@@ -355,6 +361,7 @@ void CObjectMeshCube::Draw(void)
 			CManager::GetInstance()->GetRenderer()->GetDepthShader()->SetParamToEffect();
 			CManager::GetInstance()->GetRenderer()->GetDepthShader()->BeginPass();
 		}
+
 		// ポリゴンの描画
 		pDevice->DrawIndexedPrimitive
 		( // 引数
@@ -365,6 +372,7 @@ void CObjectMeshCube::Draw(void)
 			NEED_VTX_CUBE,			// インデックスバッファの開始地点
 			NEED_VTX_CUBE - 2		// プリミティブ (ポリゴン) 数
 		);
+
 		if (CManager::GetInstance()->GetRenderer()->GetZShader()->GetbPass())
 		{
 			CManager::GetInstance()->GetRenderer()->GetZShader()->EndPass();
@@ -373,6 +381,7 @@ void CObjectMeshCube::Draw(void)
 		{
 			CManager::GetInstance()->GetRenderer()->GetDepthShader()->EndPass();
 		}
+
 		// ポリゴンの表面のみを表示状態にする
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 

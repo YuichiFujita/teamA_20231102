@@ -24,7 +24,8 @@ namespace flail
 	const int	FLAIL_THROW = 240;		// フレイル投げ状態
 	const int	FLAIL_DROP = -1;		// フレイル落下状態
 	const int	FLAIL_DEF = 0;			// フレイル取得状態
-	const int	FLAIL_NUM = 80;			// フレイルの数
+	const int	FLAIL_NUM_MAX = 80;		// フレイルの最大数
+	const int	FLAIL_NUM_MIN = 40;		// フレイルの最小数
 	const float	FLAIL_RADIUS = 20.0f;	// フレイルの半径
 }
 
@@ -80,6 +81,9 @@ public:
 	void SetPlayerID(const int& rPlayerID);					// プレイヤー番号設定
 	int GetPlayerID(void);									// プレイヤー番号取得
 
+	void SetNumChain(const int& rNumChain);					// プレイヤー番号設定
+	int GetNumChain(void);									// プレイヤー番号取得
+
 	void SetMove(const D3DXVECTOR3& rMove);					// 位置設定
 	D3DXVECTOR3 GetMove(void);								// 位置取得
 
@@ -123,11 +127,12 @@ private:
 	static const char *mc_apModelFileChain[];	// モデル定数
 
 	// メンバ変数
-	SChain		m_chain[flail::FLAIL_NUM];		// 鎖
+	SChain		m_chain[flail::FLAIL_NUM_MAX];		// 鎖
 	D3DXVECTOR3 m_posOrg;						// 回転原点
 	D3DXVECTOR3 m_oldPos;						// 過去の位置
 	D3DXVECTOR3	m_move;							// 移動量
 	int			m_nPlayerID;					// プレイヤーID
+	int			m_nNumChain;					// 鎖の数
 	float		m_fChainRot;					// 角度
 	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度
