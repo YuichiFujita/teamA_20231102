@@ -18,8 +18,9 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define FVF_VERTEX_2D	(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				// 頂点フォーマット [2D]
-#define FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
+#define FVF_VERTEX_2D		(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)				// 頂点フォーマット [2D]
+#define FVF_VERTEX_3D		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット [3D]
+#define FVF_VERTEX_MULTEX3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX2)	// 頂点フォーマット [MULTEX3D]
 
 #define MAX_PRIO		(16)	// 優先順位の総数
 #define DEFAULT_PRIO	(8)		// デフォルトの優先順位
@@ -43,6 +44,16 @@ struct VERTEX_3D
 	D3DXVECTOR3	nor;	// 法線ベクトル
 	D3DCOLOR	col;	// 頂点カラー
 	D3DXVECTOR2	tex;	// テクスチャ座標
+};
+
+// 頂点情報 [MULTEX3D]
+struct VERTEX_MULTEX3D
+{
+	D3DXVECTOR3	pos;	// 頂点座標
+	D3DXVECTOR3	nor;	// 法線ベクトル
+	D3DCOLOR	col;	// 頂点カラー
+	D3DXVECTOR2	tex0;	// テクスチャ座標_0枚目
+	D3DXVECTOR2	tex1;	// テクスチャ座標_1枚目
 };
 
 //************************************************************
