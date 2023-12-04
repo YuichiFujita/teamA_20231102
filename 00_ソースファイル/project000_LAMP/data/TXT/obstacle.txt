@@ -19,9 +19,9 @@ STATUSSET
 		TYPE = 0
 		BREAK = 1
 		LIFE = 5
-		LENGTH_CENTER = 1000.0
-		ANGLE_CENTER = 0.0
-		SIZE_COLL = 250.00 10.00 210.00
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = -2.18
+		SIZE_COLL = 150.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#広葉樹モデル
@@ -30,6 +30,9 @@ STATUSSET
 		TYPE = 1
 		BREAK = 1
 		LIFE = 5
+		LENGTH_CENTER = 60.00
+		ANGLE_CENTER = 1.57
+		SIZE_COLL = 120.00 300.00 30.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#エルデンリング風壺モデル
@@ -38,6 +41,9 @@ STATUSSET
 		TYPE = 2
 		BREAK = 1
 		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 60.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#ゼルダの伝説風壺モデル
@@ -46,6 +52,9 @@ STATUSSET
 		TYPE = 3
 		BREAK = 1
 		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 40.00 300.00 40.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#岩モデル
@@ -53,7 +62,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 4
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = -3.14
+		SIZE_COLL = 80.00 300.00 80.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#ゆがんだ岩モデル
@@ -62,6 +74,9 @@ STATUSSET
 		TYPE = 5
 		BREAK = 1
 		LIFE = 3
+		LENGTH_CENTER = 10.00
+		ANGLE_CENTER = 1.57
+		SIZE_COLL = 70.00 300.00 70.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#ひび割れた岩モデル
@@ -70,6 +85,9 @@ STATUSSET
 		TYPE = 6
 		BREAK = 1
 		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 80.00 300.00 80.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#石レンガの柱モデル
@@ -77,7 +95,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 7
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 50.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#井戸モデル
@@ -85,7 +106,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 8
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 70.00 300.00 90.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#丸屋根の壁モデル
@@ -93,7 +117,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 9
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 150.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#もろい丸屋根の壁モデル
@@ -102,6 +129,9 @@ STATUSSET
 		TYPE = 10
 		BREAK = 1
 		LIFE = 2
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 150.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#三角屋根の壁モデル
@@ -109,7 +139,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 11
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 150.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#もろい三角屋根の壁モデル
@@ -118,6 +151,9 @@ STATUSSET
 		TYPE = 12
 		BREAK = 1
 		LIFE = 2
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 150.00 300.00 50.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#城モデル
@@ -125,7 +161,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 13
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = 0.00
+		SIZE_COLL = 160.00 300.00 160.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#カステル・デル・モンテ風の城モデル
@@ -133,7 +172,10 @@ STATUSSET
 	OBSTACLESET
 		TYPE = 14
 		BREAK = 0
-		LIFE = 0
+		LIFE = 1
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = -3.14
+		SIZE_COLL = 160.00 300.00 160.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#柵モデル1
@@ -142,6 +184,9 @@ STATUSSET
 		TYPE = 15
 		BREAK = 1
 		LIFE = 3
+		LENGTH_CENTER = 10.00
+		ANGLE_CENTER = -0.00
+		SIZE_COLL = 200.00 300.00 80.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#柵モデル2
@@ -150,6 +195,9 @@ STATUSSET
 		TYPE = 16
 		BREAK = 1
 		LIFE = 3
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = -0.00
+		SIZE_COLL = 200.00 300.00 20.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#噴水モデル
@@ -158,6 +206,9 @@ STATUSSET
 		TYPE = 17
 		BREAK = 0
 		LIFE = 0
+		LENGTH_CENTER = -10.00
+		ANGLE_CENTER = -0.00
+		SIZE_COLL = 120.00 300.00 120.00
 	END_OBSTACLESET
 	#------------------------------------------------------------------------------
 	#塔モデル
@@ -166,6 +217,9 @@ STATUSSET
 		TYPE = 18
 		BREAK = 0
 		LIFE = 0
+		LENGTH_CENTER = 0.00
+		ANGLE_CENTER = -0.00
+		SIZE_COLL = 90.00 300.00 90.00
 	END_OBSTACLESET
 
 
