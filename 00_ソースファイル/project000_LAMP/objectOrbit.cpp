@@ -16,17 +16,6 @@
 #include "pause.h"
 
 //************************************************************
-//	静的メンバ変数宣言
-//************************************************************
-const D3DXVECTOR3 CObjectOrbit::mc_aOffset[][MAX_OFFSET]	// オフセットの位置加減量
-{
-	{ D3DXVECTOR3(0.0f, 0.0f, 0.0f),	D3DXVECTOR3(-6.0f, 0.0f, 0.0f) },	// 左下腕オフセット
-	{ D3DXVECTOR3(0.0f, 0.0f, 0.0f),	D3DXVECTOR3(6.0f, 0.0f, 0.0f) },	// 右下腕オフセット
-	{ D3DXVECTOR3(0.0f, 0.0f, 0.0f),	D3DXVECTOR3(0.0f, 6.0f, 0.0f) },	// 左脛オフセット
-	{ D3DXVECTOR3(0.0f, 0.0f, 0.0f),	D3DXVECTOR3(0.0f, -6.0f, 0.0f) },	// 右脛オフセット
-};
-
-//************************************************************
 //	子クラス [CObjectOrbit] のメンバ関数
 //************************************************************
 //============================================================
@@ -35,12 +24,12 @@ const D3DXVECTOR3 CObjectOrbit::mc_aOffset[][MAX_OFFSET]	// オフセットの位置加減
 CObjectOrbit::CObjectOrbit()
 {
 	// メンバ変数をクリア
-	m_pVtxBuff = NULL;		// 頂点バッファ
-	m_state = STATE_NORMAL;	// 状態
-	m_nCounterState = 0;	// 状態管理カウンター
-	m_nNumVtx = 0;			// 必要頂点数
-	m_nTextureID = 0;		// テクスチャインデックス
 	memset(&m_orbit, 0, sizeof(m_orbit));	// 軌跡の情報
+	m_pVtxBuff	= NULL;			// 頂点バッファ
+	m_state		= STATE_NORMAL;	// 状態
+	m_nNumVtx	= 0;			// 必要頂点数
+	m_nTextureID	= 0;		// テクスチャインデックス
+	m_nCounterState	= 0;		// 状態管理カウンター
 }
 
 //============================================================
@@ -49,12 +38,12 @@ CObjectOrbit::CObjectOrbit()
 CObjectOrbit::CObjectOrbit(const CObject::ELabel label, const int nPriority) : CObject(label, nPriority)
 {
 	// メンバ変数をクリア
-	m_pVtxBuff = NULL;		// 頂点バッファ
-	m_state = STATE_NORMAL;	// 状態
-	m_nCounterState = 0;	// 状態管理カウンター
-	m_nNumVtx = 0;			// 必要頂点数
-	m_nTextureID = 0;		// テクスチャインデックス
 	memset(&m_orbit, 0, sizeof(m_orbit));	// 軌跡の情報
+	m_pVtxBuff	= NULL;			// 頂点バッファ
+	m_state		= STATE_NORMAL;	// 状態
+	m_nNumVtx	= 0;			// 必要頂点数
+	m_nTextureID	= 0;		// テクスチャインデックス
+	m_nCounterState	= 0;		// 状態管理カウンター
 }
 
 //============================================================
@@ -71,28 +60,24 @@ CObjectOrbit::~CObjectOrbit()
 HRESULT CObjectOrbit::Init(void)
 {
 	// メンバ変数を初期化
-	m_pVtxBuff = NULL;			// 頂点バッファ
-	m_state = STATE_NORMAL;		// 状態
-	m_nCounterState = 0;		// 状態管理カウンター
-	m_nNumVtx = 0;				// 必要頂点数
-	m_nTextureID = NONE_IDX;	// テクスチャインデックス
+	m_pVtxBuff	= NULL;			// 頂点バッファ
+	m_state		= STATE_NORMAL;	// 状態
+	m_nNumVtx	= 0;			// 必要頂点数
+	m_nTextureID	= NONE_IDX;	// テクスチャインデックス
+	m_nCounterState	= 0;		// 状態管理カウンター
 
 	// 軌跡の情報を初期化
 	memset(&m_orbit.mtxVanish, 0, sizeof(m_orbit.mtxVanish));	// 消失開始時の親のマトリックス
-	m_orbit.pMtxParent = NULL;	// 親のマトリックス
-	m_orbit.pPosPoint = NULL;	// 各頂点座標
-	m_orbit.pColPoint = NULL;	// 各頂点カラー
-	m_orbit.nPart = 1;			// 分割数
-	m_orbit.nTexPart = 1;		// テクスチャ分割数
-	m_orbit.bAlpha = false;		// 透明化状況
-	m_orbit.bInit = false;		// 初期化状況
-
-	for (int nCntOff = 0; nCntOff < MAX_OFFSET; nCntOff++)
-	{ // オフセットの数分繰り返す
-
-		m_orbit.aOffset[nCntOff] = VEC3_ZERO;	// 両端のオフセット
-		m_orbit.aCol[nCntOff] = XCOL_WHITE;		// 両端の基準色
-	}
+	m_orbit.offset = SOffset(VEC3_ZERO, VEC3_ZERO, XCOL_WHITE);	// オフセット情報
+	D3DXMatrixIdentity(&m_orbit.aMtxWorldPoint[0]);	// 両端のワールドマトリックス
+	D3DXMatrixIdentity(&m_orbit.aMtxWorldPoint[1]);	// 両端のワールドマトリックス
+	m_orbit.pMtxParent	= NULL;		// 親のマトリックス
+	m_orbit.pPosPoint	= NULL;		// 各頂点座標
+	m_orbit.pColPoint	= NULL;		// 各頂点カラー
+	m_orbit.nPart		= 1;		// 分割数
+	m_orbit.nTexPart	= 1;		// テクスチャ分割数
+	m_orbit.bAlpha		= false;	// 透明化状況
+	m_orbit.bInit		= false;	// 初期化状況
 
 	// 長さを設定
 	if (FAILED(SetLength(1)))
@@ -164,8 +149,8 @@ void CObjectOrbit::Draw(void)
 	D3DXMatrixIdentity(&mtxIdent);
 
 	// ポインタを宣言
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
-	CTexture *pTexture = CManager::GetInstance()->GetTexture();						// テクスチャへのポインタ
+	LPDIRECT3DDEVICE9	pDevice		= CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+	CTexture			*pTexture	= CManager::GetInstance()->GetTexture();				// テクスチャへのポインタ
 
 	if (CManager::GetInstance()->GetScene()->GetMode() == CScene::MODE_GAME)
 	{ // モードがゲームの場合
@@ -184,6 +169,15 @@ void CObjectOrbit::Draw(void)
 		//----------------------------------------------------
 		//	レンダーステートを変更
 		//----------------------------------------------------
+		if (m_orbit.bAdd)
+		{ // 加算合成がONの場合
+
+			// αブレンディングを加算合成に設定
+			pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+			pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+			pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		}
+
 		// ライティングを無効にする
 		pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -244,7 +238,7 @@ void CObjectOrbit::Draw(void)
 				D3DXMatrixIdentity(&m_orbit.aMtxWorldPoint[nCntOff]);
 
 				// 位置を反映
-				D3DXMatrixTranslation(&m_orbit.aMtxWorldPoint[nCntOff], m_orbit.aOffset[nCntOff].x, m_orbit.aOffset[nCntOff].y, m_orbit.aOffset[nCntOff].z);
+				D3DXMatrixTranslation(&m_orbit.aMtxWorldPoint[nCntOff], m_orbit.offset.aOffset[nCntOff].x, m_orbit.offset.aOffset[nCntOff].y, m_orbit.offset.aOffset[nCntOff].z);
 
 				// 親のマトリックスと掛け合わせる
 				D3DXMatrixMultiply(&m_orbit.aMtxWorldPoint[nCntOff], &m_orbit.aMtxWorldPoint[nCntOff], &mtxParent);
@@ -276,7 +270,7 @@ void CObjectOrbit::Draw(void)
 				);
 
 				// 頂点カラーの設定
-				m_orbit.pColPoint[nCntOff] = m_orbit.aCol[nCntOff];
+				m_orbit.pColPoint[nCntOff] = m_orbit.offset.aCol[nCntOff];
 			}
 		}
 
@@ -298,7 +292,7 @@ void CObjectOrbit::Draw(void)
 				);
 
 				// 頂点カラーの設定
-				m_orbit.pColPoint[nCntVtx] = m_orbit.aCol[nCntVtx % MAX_OFFSET];
+				m_orbit.pColPoint[nCntVtx] = m_orbit.offset.aCol[nCntVtx % MAX_OFFSET];
 			}
 
 			// 初期化済みにする
@@ -329,6 +323,11 @@ void CObjectOrbit::Draw(void)
 		//----------------------------------------------------
 		//	レンダーステートを元に戻す
 		//----------------------------------------------------
+		// αブレンディングを元に戻す
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
 		// ライティングを有効にする
 		pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
@@ -376,19 +375,6 @@ void CObjectOrbit::BindTexture(const char *pTexturePass)
 }
 
 //============================================================
-//	色の設定処理
-//============================================================
-void CObjectOrbit::SetColor(const D3DXCOLOR& rCol)
-{
-	for (int nCntOff = 0; nCntOff < MAX_OFFSET; nCntOff++)
-	{ // オフセットの数分繰り返す
-
-		// 引数の色を設定
-		m_orbit.aCol[nCntOff] = rCol;
-	}
-}
-
-//============================================================
 //	状態取得処理
 //============================================================
 int CObjectOrbit::GetState(void) const
@@ -403,10 +389,10 @@ int CObjectOrbit::GetState(void) const
 CObjectOrbit *CObjectOrbit::Create
 (
 	D3DXMATRIX *pMtxParent,	// 親マトリックス
-	const D3DXCOLOR& rCol,	// 色
-	const EOffset offset,	// オフセット
+	const SOffset offset,	// オフセット情報
 	const int nPart,		// 分割数
 	const int nTexPart,		// テクスチャ分割数
+	const bool bAdd,		// 加算合成状況
 	const bool bAlpha		// 透明化状況
 )
 {
@@ -439,14 +425,14 @@ CObjectOrbit *CObjectOrbit::Create
 		// 親のマトリックスを設定
 		pObjectOrbit->SetMatrixParent(pMtxParent);
 
-		// 色を設定
-		pObjectOrbit->SetColor(rCol);
-
-		// オフセットを設定
+		// オフセット情報を設定
 		pObjectOrbit->SetOffset(offset);
 
 		// テクスチャ分割数を設定
 		pObjectOrbit->SetTexPart(nTexPart);
+
+		// 加算合成状況を設定
+		pObjectOrbit->SetEnableAdd(bAdd);
 
 		// 透明化状況を設定
 		pObjectOrbit->SetEnableAlpha(bAlpha);
@@ -534,16 +520,12 @@ void CObjectOrbit::SetMatrixParent(D3DXMATRIX *pMtxParent)
 }
 
 //============================================================
-//	オフセットの設定処理
+//	オフセット情報の設定処理
 //============================================================
-void CObjectOrbit::SetOffset(const EOffset offset)
+void CObjectOrbit::SetOffset(const SOffset offset)
 {
-	for (int nCntOff = 0; nCntOff < MAX_OFFSET; nCntOff++)
-	{ // オフセットの数分繰り返す
-
-		// 引数のオフセットを設定
-		m_orbit.aOffset[nCntOff] = mc_aOffset[(int)offset][nCntOff];
-	}
+	// 引数のオフセット情報を設定
+	m_orbit.offset = offset;
 }
 
 //============================================================
@@ -556,6 +538,15 @@ void CObjectOrbit::SetTexPart(const int nTexPart)
 
 	// 引数のテクスチャ分割数を設定
 	m_orbit.nTexPart = nTexPart;
+}
+
+//============================================================
+//	加算合成状況の設定処理
+//============================================================
+void CObjectOrbit::SetEnableAdd(const bool bAdd)
+{
+	// 引数の加算合成状況を設定
+	m_orbit.bAdd = bAdd;
 }
 
 //============================================================
