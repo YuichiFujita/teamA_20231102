@@ -14,6 +14,7 @@
 #include "camera.h"
 #include "texture.h"
 #include "object2D.h"
+#include "valueUI.h"
 
 //************************************************************
 //	定数宣言
@@ -42,8 +43,32 @@ namespace
 	// ランキングタイトル基本情報
 	namespace title
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 90.0f, 0.0f);	// タイトル位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(560.0f, 130.0f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(280.0f, 100.0f, 0.0f);	// タイトル位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(400.0f, 130.0f, 0.0f);	// タイトル大きさ
+
+		const int	WAIT_FRAME	= 24;		// タイトル待機フレーム
+		const float	INIT_SCALE	= 0.025f;	// タイトル初期拡大率
+		const float	ADD_SCALE	= 0.09f;	// タイトル加算拡大率
+		const float	SET_SCALE	= 1.0f;		// タイトル設定拡大率
+	}
+
+	// 勝利ポイント基本情報
+	namespace win
+	{
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(760.0f, 100.0f, 0.0f);			// 位置
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(230.0f, 0.0f, 0.0f);				// 行間
+		const D3DXVECTOR3 SPACE_VALUE	= D3DXVECTOR3(80.0f, 0.0f, 0.0f);		// 数字行間
+		const D3DXVECTOR3 SIZE_TITLE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);	// タイトル大きさ
+		const D3DXVECTOR3 SIZE_VALUE	= D3DXVECTOR3(100.0f, 100.0f, 0.0f);	// 数字大きさ
+
+		const float	DIGIT = 2;	// 桁数
+	}
+
+	// 勝利ポイント背景基本情報
+	namespace winBG
+	{
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(860.0f, 100.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(720.0f, 145.0f, 0.0f);	// 大きさ
 
 		const int	WAIT_FRAME	= 24;		// タイトル待機フレーム
 		const float	INIT_SCALE	= 0.025f;	// タイトル初期拡大率
@@ -59,6 +84,8 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\middleResult000.png",	// フェードテクスチャ
 	NULL,	// ランキングタイトルテクスチャ
+	"data\\TEXTURE\\bg.png",	// 勝利ポイント背景テクスチャ
+	NULL,	// 勝利ポイントタイトルテクスチャ
 };
 
 //************************************************************
@@ -70,8 +97,11 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 CMiddleResultManager::CMiddleResultManager()
 {
 	// メンバ変数をクリア
-	m_pFade		= NULL;			// フェードの情報
-	m_pTitle	= NULL;			// タイトルの情報
+	m_pFade			= NULL;	// フェードの情報
+	m_pTitle		= NULL;	// タイトルの情報
+	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
+	m_pWinPoint		= NULL;	// 勝利ポイントの情報
+
 	m_state		= STATE_FADEIN;	// 状態
 	m_fMoveY	= 0.0f;			// 縦移動量
 	m_fScale	= 0.0f;			// 拡大率
@@ -91,15 +121,22 @@ CMiddleResultManager::~CMiddleResultManager()
 //============================================================
 HRESULT CMiddleResultManager::Init(void)
 {
-	// メンバ変数を初期化
-	m_pFade		= NULL;			// フェードの情報
-	m_pTitle	= NULL;			// タイトルの情報
+	//--------------------------------------------------------
+	//	メンバ変数の初期化
+	//--------------------------------------------------------
+	m_pFade			= NULL;	// フェードの情報
+	m_pTitle		= NULL;	// タイトルの情報
+	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
+	m_pWinPoint		= NULL;	// 勝利ポイントの情報
+
 	m_state		= STATE_FADEIN;	// 状態
 	m_fMoveY	= 0.0f;			// 縦移動量
 	m_fScale	= 1.0f;			// 拡大率
 	m_nCounterState = 0;		// 状態管理カウンター
 
-	// フェードの生成
+	//--------------------------------------------------------
+	//	フェードの生成
+	//--------------------------------------------------------
 	m_pFade = CObject2D::Create
 	( // 引数
 		fade::UP_POS,	// 位置
@@ -121,7 +158,9 @@ HRESULT CMiddleResultManager::Init(void)
 	// 優先順位を設定
 	m_pFade->SetPriority(PRIORITY);
 
-	// タイトルの情報
+	//--------------------------------------------------------
+	//	タイトルの生成
+	//--------------------------------------------------------
 	m_pTitle = CObject2D::Create
 	( // 引数
 		title::POS,						// 位置
@@ -144,6 +183,60 @@ HRESULT CMiddleResultManager::Init(void)
 	// 自動描画をOFFにする
 	m_pTitle->SetEnableDraw(false);
 
+	//--------------------------------------------------------
+	//	勝利ポイント背景の生成
+	//--------------------------------------------------------
+	m_pWinPointBG = CObject2D::Create
+	( // 引数
+		winBG::POS,						// 位置
+		winBG::SIZE * winBG::INIT_SCALE	// 大きさ
+	);
+	if (m_pWinPointBG == NULL)
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// テクスチャを登録・割当
+	m_pWinPointBG->BindTexture(mc_apTextureFile[TEXTURE_WIN_BG]);
+
+	// 優先順位を設定
+	m_pWinPointBG->SetPriority(PRIORITY);
+
+	// 自動描画をOFFにする
+	m_pWinPointBG->SetEnableDraw(false);
+
+
+	//--------------------------------------------------------
+	//	勝利ポイントの生成
+	//--------------------------------------------------------
+	m_pWinPoint = CValueUI::Create
+	( // 引数
+		mc_apTextureFile[TEXTURE_WIN],	// タイトルテクスチャパス
+		CValue::TEXTURE_UI,	// 数字テクスチャ
+		win::DIGIT,			// 桁数
+		win::POS,			// 位置
+		win::SPACE,			// 行間
+		win::SPACE_VALUE,	// 数字行間
+		win::SIZE_TITLE,	// タイトル大きさ
+		win::SIZE_VALUE		// 数字大きさ
+	);
+	if (m_pWinPoint == NULL)
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 優先順位を設定
+	m_pWinPoint->SetPriority(PRIORITY);
+
+	// 自動描画をOFFにする
+	m_pWinPoint->SetEnableDraw(false);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -158,6 +251,12 @@ HRESULT CMiddleResultManager::Uninit(void)
 
 	// タイトルの終了
 	m_pTitle->Uninit();
+
+	// 勝利ポイント背景の終了
+	m_pWinPointBG->Uninit();
+
+	// 勝利ポイントの終了
+	m_pWinPoint->Uninit();
 
 	// 成功を返す
 	return S_OK;
@@ -202,6 +301,20 @@ void CMiddleResultManager::Update(void)
 
 		// ランキングタイトル表示の更新
 		UpdateRankTitle();
+
+		break;
+
+	case STATE_WINPOINT_WAIT:
+
+		// 勝利ポイント待機の更新
+		UpdateWinPointWait();
+
+		break;
+
+	case STATE_WINPOINT:
+
+		// 勝利ポイント表示の更新
+		UpdateWinPoint();
 
 		break;
 
@@ -265,6 +378,12 @@ void CMiddleResultManager::Update(void)
 
 	// タイトルの更新
 	m_pTitle->Update();
+
+	// 勝利ポイント背景の更新
+	m_pWinPointBG->Update();
+
+	// 勝利ポイントの更新
+	m_pWinPoint->Update();
 }
 
 //============================================================
@@ -463,6 +582,62 @@ void CMiddleResultManager::UpdateRankTitle(void)
 
 		// 拡大率を初期化
 		m_fScale = 1.0f;
+
+		// 勝利ポイント待機状態にする
+		m_state = STATE_WINPOINT_WAIT;
+	}
+}
+
+//============================================================
+//	勝利ポイント待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdateWinPointWait(void)
+{
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState >= winBG::WAIT_FRAME)
+	{ // 待機が終了した場合
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// 勝利ポイント表示状態にする
+		m_state = STATE_WINPOINT;
+
+		// 勝利ポイント背景の自動描画をONにする
+		m_pWinPointBG->SetEnableDraw(true);
+
+		// 勝利ポイント背景の拡大率を設定
+		m_fScale = winBG::INIT_SCALE;
+	}
+}
+
+//============================================================
+//	勝利ポイント表示の更新処理
+//============================================================
+void CMiddleResultManager::UpdateWinPoint(void)
+{
+	// 拡大率を加算
+	m_fScale += winBG::ADD_SCALE;
+
+	if (m_fScale < winBG::SET_SCALE)
+	{ // まだ大きくなる場合
+
+		// 勝利ポイント背景の大きさを反映
+		m_pWinPointBG->SetVec3Sizing(winBG::SIZE * m_fScale);
+	}
+	else
+	{ // 大きくなり切った場合
+
+		// 勝利ポイント背景の大きさを反映
+		m_pWinPointBG->SetVec3Sizing(winBG::SIZE);
+
+		// 拡大率を初期化
+		m_fScale = 1.0f;
+
+		// 勝利ポイント表示の自動描画をONにする
+		m_pWinPoint->SetEnableDraw(true);
 
 		// 待機状態にする
 		m_state = STATE_WAIT;
