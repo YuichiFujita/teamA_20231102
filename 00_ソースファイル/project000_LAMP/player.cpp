@@ -19,6 +19,7 @@
 #include "texture.h"
 #include "collision.h"
 #include "fade.h"
+#include "playerAI.h"
 
 #include "multiModel.h"
 #include "objectOrbit.h"
@@ -38,6 +39,8 @@
 #include "flail.h"
 #include "spawnpoint.h"
 #include "obstacle.h"
+#include "playerAI.h"
+
 #include "orbitalEffect.h"
 //************************************************************
 //	定数宣言
@@ -114,12 +117,14 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
+	m_motionOld		= 0;			// 過去モーション
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
 	m_fPlusMove		= 0.0f;			// プラス移動量
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= false;		// ジャンプ状況
+	m_bAI			= false;
 }
 
 //============================================================
@@ -186,6 +191,16 @@ HRESULT CPlayer::Init(void)
 	}
 	m_pFlail->SetPlayerID(m_nPadID);
 
+	// フレイルの生成
+	m_pAI = CPlayerAI::Create(m_pFlail, &GetVec3Position(), &m_move, &m_destRot, &m_nCounterFlail, m_nPadID);
+	if (m_pAI == NULL)
+	{ // 非使用中の場合
+
+	  // 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
 	// メインカラーを設定
 	SetMainMaterial();
 	SetEnableDepthShadow(true);
@@ -207,6 +222,13 @@ void CPlayer::Uninit(void)
 	// フレイルの終了
 	m_pFlail->Uninit();
 
+	if (m_pAI != NULL)
+	{ // 使用中の場合
+	// メモリ開放
+		delete m_pAI;
+		m_pAI = NULL;
+	}
+
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -225,6 +247,10 @@ void CPlayer::Update(void)
 	switch (m_state)
 	{ // 状態ごとの処理
 	case STATE_NONE:	// 何もしない状態
+
+		// 待機モーションにする
+		currentMotion = MOTION_IDOL;
+
 		break;
 
 	case STATE_SPAWN:	// スポーン状態
@@ -265,22 +291,6 @@ void CPlayer::Update(void)
 	default:
 		assert(false);
 		break;
-	}
-
-	// フレイルの更新
-	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
-	{
-		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (m_pFlail->GetVec3PosOrg());
-		float length, chainRot;
-
-		vecFlail.y = 0.0f;
-		length = D3DXVec3Length(&vecFlail);
-		chainRot = atan2f(vecFlail.x, vecFlail.z);
-
-		m_pFlail->SetChainRot(chainRot);
-		m_pFlail->SetChainRotTarget(chainRot);
-		m_pFlail->SetLengthChain(length);
-		m_pFlail->SetMove(VEC3_ZERO);
 	}
 
 	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
@@ -464,20 +474,20 @@ void CPlayer::SetState(const int nState)
 		if (m_state != STATE_DEATH)
 		{ // 死亡状態じゃない場合
 
+			// マテリアルを再設定
+			ResetMaterial();
+
+			// メインカラーを設定
+			SetMainMaterial();
+
+			// 透明度を透明に再設定
+			SetAlpha(1.0f);
+
 			// 引数の状態を設定
 			m_state = (EState)nState;
 
 			if (m_state == STATE_DEATH)
 			{ // 死亡状態の場合
-
-				// マテリアルを再設定
-				ResetMaterial();
-
-				// メインカラーを設定
-				SetMainMaterial();
-
-				// 透明度を透明に再設定
-				SetAlpha(1.0f);
 
 				// 生存ランキングを更新
 				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
@@ -881,6 +891,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	// 変数を宣言
 	int nAnimMotion = GetMotionType();	// 現在再生中のモーション
 
+	m_motionOld = nAnimMotion;
+
 	if (nMotion != NONE_IDX)
 	{ // モーションが設定されている場合
 
@@ -1005,8 +1017,18 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 		return MOTION_IDOL;
 	}
 
-	// 移動操作
-	currentMotion = UpdateMove(posPlayer);
+	if (m_bAI)
+	{
+		
+	}
+	else
+	{
+		// CPU操作
+		m_pAI->playerAI(m_motionOld);
+
+		// 移動操作
+		currentMotion = UpdateMove(posPlayer);
+	}
 
 	// 重力の更新
 	UpdateGravity();
@@ -1014,8 +1036,22 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 着地判定
 	UpdateLanding(posPlayer);
 
-	// ダッシュ更新
-	UpdateDash();
+	if (m_bAI)
+	{
+		m_pAI->AIDash
+		(
+			m_move,
+			m_dashRot,
+			m_destRot,
+			m_fPlusMove,
+			m_bDash
+		);
+	}
+	else
+	{
+		// ダッシュ更新
+		UpdateDash();
+	}
 
 	// 向き更新
 	UpdateRotation(rotPlayer);
@@ -1194,7 +1230,7 @@ void CPlayer::UpdateOldPosition(void)
 CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 {
 	// 変数を宣言
-	EMotion currentMotion = MOTION_IDOL;	// 現在のモーション
+	EMotion currentMotion = MOTION_IDOL;		// 現在のモーション
 
 	// ポインタを宣言
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
@@ -1233,7 +1269,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
-
+	
 	if (DEAD_ZONE < fStick)
 	{ // デッドゾーン以上の場合
 
@@ -1261,15 +1297,31 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			currentMotion = MOTION_DASH;
 		}
 
-		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1))
+		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1) || m_motionOld == MOTION_PULL)
 		{ // 引きずり距離の場合
 
 			// 移動量を更新
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
 
-			// 引きずりモーションを設定
-			currentMotion = MOTION_PULL;
+			D3DXVECTOR3 vecFlail;
+			float rotMove, rotFlail, rotDiff;
+
+			vecFlail = m_pFlail->GetVec3Position() - GetVec3Position();
+
+			rotMove = atan2f(m_move.x, m_move.z);
+			rotFlail = atan2f(vecFlail.x, vecFlail.z);
+
+			rotDiff = rotMove - rotFlail;
+			useful::NormalizeRot(rotDiff);
+
+			CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角度差]：%f\n", rotDiff);
+
+			if (rotDiff > D3DX_PI * 0.5f || rotDiff < D3DX_PI * -0.5f)
+			{
+				// 引きずりモーションを設定
+				currentMotion = MOTION_PULL;
+			}
 		}
 
 		// 目標向きを設定
@@ -1339,7 +1391,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				}
 
 				// 目標角度に合わせる
-				m_pFlail->SetChainRot(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
+				m_pFlail->ShotFlail(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
 				m_pFlail->SetChainRotMove(0.0f);
 			}
 			else
@@ -1379,6 +1431,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 	else if (m_nCounterFlail == flail::FLAIL_DEF)
 	{
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
 		// カウンターアップ開始
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
@@ -1468,16 +1523,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	if (DEAD_ZONE < fStick)
 	{ // デッドゾーン以上の場合
 		m_pFlail->SetChainRotTarget(CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f);
-	}
-
-	// 目標角度変更処理
-	if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_A) == TRUE)
-	{
-		m_pFlail->SetChainRotTarget(m_pFlail->GetChainRotTarget() - 0.015f);
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_D) == TRUE)
-	{
-		m_pFlail->SetChainRotTarget(m_pFlail->GetChainRotTarget() + 0.015f);
 	}
 
 	// 位置を表示

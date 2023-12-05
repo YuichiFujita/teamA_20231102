@@ -23,8 +23,8 @@
 #include "retentionManager.h"
 #include "gameManager.h"
 #include "editStageManager.h"
-
 #include "ready.h"
+
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
@@ -108,6 +108,7 @@ HRESULT CSceneGame::Init(void)
 
 		// プレイヤーを出現
 		CScene::GetPlayer(nCntPlayer)->SetSpawn();
+		CScene::GetPlayer(nCntPlayer)->SetState(CPlayer::STATE_NONE);
 	}
 
 	// 見下ろしカメラの目標位置の設定
