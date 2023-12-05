@@ -268,22 +268,6 @@ void CPlayer::Update(void)
 		break;
 	}
 
-	// フレイルの更新
-	if (D3DXVec3Length(&m_move) > 1.0f && m_nCounterFlail < 0)
-	{
-		D3DXVECTOR3 vecFlail = m_pFlail->GetVec3Position() - (m_pFlail->GetVec3PosOrg());
-		float length, chainRot;
-
-		vecFlail.y = 0.0f;
-		length = D3DXVec3Length(&vecFlail);
-		chainRot = atan2f(vecFlail.x, vecFlail.z);
-
-		m_pFlail->SetChainRot(chainRot);
-		m_pFlail->SetChainRotTarget(chainRot);
-		m_pFlail->SetLengthChain(length);
-		m_pFlail->SetMove(VEC3_ZERO);
-	}
-
 	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
 	{ // 残り人数が1人の場合
 
@@ -1393,6 +1377,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 	else if (m_nCounterFlail == flail::FLAIL_DEF)
 	{
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
 		// カウンターアップ開始
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
