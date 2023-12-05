@@ -38,7 +38,7 @@
 #include "flail.h"
 #include "spawnpoint.h"
 #include "obstacle.h"
-
+#include "orbitalEffect.h"
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -337,7 +337,7 @@ void CPlayer::Draw(void)
 //============================================================
 void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 {
-
+	
 	if (IsDeath())
 	{ // 死亡フラグが立っている場合
 
@@ -437,7 +437,11 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			SetMotion(MOTION_KNOCK);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			for (int i = 0; i < 16; i++)
+			{
+
+				COrbitalEffect::Create(GetVec3Position(), D3DXVECTOR3(3.0f, 3.0f, 3.0f), D3DXCOLOR(1.0f, 0.5f, 0.2f, 1.0f), 120, D3DXVECTOR3(((rand() % 2000 - 1000) * 0.1f), ((rand() % 1000) * 0.1f), ((rand() % 2000 - 1000) * 0.1f)),0.99f,true,true);
+			}
 		}
 
 		// サウンドの再生

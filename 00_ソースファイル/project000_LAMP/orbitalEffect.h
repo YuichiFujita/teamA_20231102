@@ -41,8 +41,9 @@ public:
 	static COrbitalEffect *Create	// 生成
 	( // 引数
 		const D3DXVECTOR3& rPos,	// 位置
+		const D3DXVECTOR3& Offset,	// 大きさ
 		const D3DXCOLOR col,
-		const float fOffset,		// 大きさ
+
 		const int nLife = 1,					// 寿命
 		const D3DXVECTOR3& rMove = VEC3_ZERO,	// 移動量
 		const float fAttenuation = 0.9f,
@@ -59,6 +60,7 @@ private:
 	CObjectOrbit * m_pOrbit;	//オービット
 	D3DXMATRIX m_Mtx;
 							// メンバ変数
+	D3DXVECTOR3 m_pos;		//座標
 	D3DXVECTOR3 m_move;		// 移動量
 	int		m_nLife;		// 寿命
 	float	m_fOffset;		//サイズ
