@@ -203,6 +203,7 @@
     <ClCompile Include="objectOrbit.cpp" />
     <ClCompile Include="objectTornado.cpp" />
     <ClCompile Include="obstacle.cpp" />
+    <ClCompile Include="orbitalEffect.cpp" />
     <ClCompile Include="particle2D.cpp" />
     <ClCompile Include="particle3D.cpp" />
     <ClCompile Include="pause.cpp" />
@@ -213,6 +214,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="rankingManager.cpp" />
+    <ClCompile Include="ready.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="renderState.cpp" />
     <ClCompile Include="resultManager.cpp" />
@@ -293,6 +295,7 @@
     <ClInclude Include="objectOrbit.h" />
     <ClInclude Include="objectTornado.h" />
     <ClInclude Include="obstacle.h" />
+    <ClInclude Include="orbitalEffect.h" />
     <ClInclude Include="particle2D.h" />
     <ClInclude Include="particle3D.h" />
     <ClInclude Include="pause.h" />
@@ -300,6 +303,7 @@
     <ClInclude Include="playerEntry.h" />
     <ClInclude Include="precompile.h" />
     <ClInclude Include="rankingManager.h" />
+    <ClInclude Include="ready.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="renderState.h" />
     <ClInclude Include="resource.h" />

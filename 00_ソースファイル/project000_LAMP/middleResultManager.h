@@ -76,12 +76,10 @@ private:
 	void UpdateFadeIn(void);		// フェードイン更新
 	void UpdateFadeInWait(void);	// フェードイン待機更新
 	void UpdateFadeInAccel(void);	// フェードイン加速更新
-
 	void UpdateRankTitleWait(void);	// ランキングタイトル待機更新
 	void UpdateRankTitle(void);		// ランキングタイトル表示更新
 	void UpdateWinPointWait(void);	// 勝利ポイント待機更新
 	void UpdateWinPoint(void);		// 勝利ポイント表示更新
-
 	void UpdateFadeOut(void);		// フェードアウト更新
 	void UpdateFadeOutWait(void);	// フェードアウト待機更新
 	void UpdateFadeOutAccel(void);	// フェードアウト加速更新

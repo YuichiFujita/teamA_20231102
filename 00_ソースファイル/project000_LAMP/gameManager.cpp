@@ -15,6 +15,7 @@
 #include "player.h"
 #include "retentionManager.h"
 #include "middleResultManager.h"
+
 #include "editStageManager.h"
 
 //************************************************************
@@ -57,8 +58,9 @@ CGameManager::~CGameManager()
 //============================================================
 HRESULT CGameManager::Init(void)
 {
+	m_pReady = CReady::Create();
 	// メンバ変数を初期化
-	m_state = STATE_NORMAL;	// 状態
+	m_state = STATE_READY;	// 状態
 	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 生存人数を初期化
@@ -132,16 +134,17 @@ void CGameManager::Update(void)
 	{ // 状態ごとの処理
 	case STATE_NONE:
 		break;
-
+	case STATE_READY:
+		break;
 	case STATE_NORMAL:
 
-		//if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
 		{ // 生き残りがいない場合
 
 			// カウンターを加算
 			m_nCounterState++;
 
-			//if (m_nCounterState >= WAIT_RESULT_FRAME)
+			if (m_nCounterState >= WAIT_RESULT_FRAME)
 			{ // 余韻が経過した場合
 
 				// カウンターを初期化

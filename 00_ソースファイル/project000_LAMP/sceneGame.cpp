@@ -24,6 +24,7 @@
 #include "gameManager.h"
 #include "editStageManager.h"
 
+#include "ready.h"
 //************************************************************
 //	静的メンバ変数宣言
 //************************************************************
@@ -121,6 +122,7 @@ HRESULT CSceneGame::Init(void)
 	// BGMの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
 
+
 	// 成功を返す
 	return S_OK;
 }
@@ -207,8 +209,8 @@ void CSceneGame::Update(void)
 	}
 	else { assert(false); }	// 非使用中
 
-	if (m_pGameManager->GetState() == CGameManager::STATE_NORMAL)
-	{ // ゲームマネージャーが通常状態の場合
+	if (m_pGameManager->GetState() != CGameManager::STATE_RESULT)
+	{ // ゲームマネージャーがリザルト状態以外の場合
 
 		if (m_pPause != NULL)
 		{ // 使用中の場合
