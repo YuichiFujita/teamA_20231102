@@ -138,13 +138,13 @@ void CGameManager::Update(void)
 		break;
 	case STATE_NORMAL:
 
-		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
+		//if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
 		{ // 生き残りがいない場合
 
 			// カウンターを加算
 			m_nCounterState++;
 
-			if (m_nCounterState >= WAIT_RESULT_FRAME)
+			//if (m_nCounterState >= WAIT_RESULT_FRAME)
 			{ // 余韻が経過した場合
 
 				// カウンターを初期化
