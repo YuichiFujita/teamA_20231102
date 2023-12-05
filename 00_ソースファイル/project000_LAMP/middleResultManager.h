@@ -31,6 +31,7 @@ public:
 	enum ETexture
 	{
 		TEXTURE_FADE = 0,	// フェードテクスチャ
+		TEXTURE_TITLE,		// ランキングタイトルテクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
@@ -40,6 +41,8 @@ public:
 		STATE_FADEIN = 0,		// フェードイン状態
 		STATE_FADEIN_WAIT,		// フェードイン待機状態
 		STATE_FADEIN_ACCEL,		// フェードイン加速状態
+		STATE_RANK_TITLE_WAIT,	// ランキングタイトル待機状態
+		STATE_RANK_TITLE,		// ランキングタイトル表示状態
 		STATE_WAIT,				// 待機状態
 		STATE_FADEOUT,			// フェードアウト状態
 		STATE_FADEOUT_WAIT,		// フェードアウト待機状態
@@ -68,6 +71,10 @@ private:
 	void UpdateFadeIn(void);		// フェードイン更新
 	void UpdateFadeInWait(void);	// フェードイン待機更新
 	void UpdateFadeInAccel(void);	// フェードイン加速更新
+
+	void UpdateRankTitleWait(void);	// ランキングタイトル待機更新
+	void UpdateRankTitle(void);		// ランキングタイトル表示更新
+
 	void UpdateFadeOut(void);		// フェードアウト更新
 	void UpdateFadeOutWait(void);	// フェードアウト待機更新
 	void UpdateFadeOutAccel(void);	// フェードアウト加速更新
@@ -77,9 +84,11 @@ private:
 
 	// メンバ変数
 	CObject2D *m_pFade;		// フェードの情報
+	CObject2D *m_pTitle;	// タイトルの情報
 	EState m_state;			// 状態
 	int m_nCounterState;	// 状態管理カウンター
 	float m_fMoveY;			// 縦移動量
+	float m_fScale;			// 拡大率
 };
 
 #endif	// _MIDDLE_RESULT_MANAGER_H_
