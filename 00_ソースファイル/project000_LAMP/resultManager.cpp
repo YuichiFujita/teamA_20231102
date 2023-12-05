@@ -32,10 +32,10 @@
 //フェード関連
 namespace Fade
 {
-	const D3DXCOLOR SETCOL_FADE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f));	// α値の停止値
-	const D3DXVECTOR3 SIZE_FADE		(SCREEN_SIZE * 0.95f);					// フェードの大きさ
-	const D3DXCOLOR INITCOL_FADE	(XCOL_AWHITE);							// α値の初期値
-	const float ADD_ALPHA			(0.008f);								// α値の加算量
+	const D3DXCOLOR SETCOL_FADE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f));					// α値の停止値
+	const D3DXVECTOR3 SIZE_FADE		(SCREEN_SIZE);											// フェードの大きさ
+	const D3DXCOLOR INITCOL_FADE	(XCOL_AWHITE);											// α値の初期値
+	const float ADD_ALPHA			(0.008f);												// α値の加算量
 
 }
 //勝利ロゴ関連
@@ -50,57 +50,72 @@ namespace Win
 	};
 
 	//定数の定義
-	const D3DXVECTOR3	POS							= D3DXVECTOR3(425.0f, 350.0f, 0.0f);	// 位置
-	const D3DXVECTOR3	DESTPOS						= D3DXVECTOR3(240.0f, 60.0f, 0.0f);		// 位置
-	const float			DISTANCE[NUMBER_MAX]		= { 440.0f,100.0f};						// 間隔
+	const D3DXVECTOR3	POS							= D3DXVECTOR3(625.0f, 350.0f, 0.0f);	// 位置
+	const D3DXVECTOR3	DESTPOS						= D3DXVECTOR3(265.0f, 60.0f, 0.0f);		// 位置
+	const float			DISTANCE[NUMBER_MAX]		= { 170.0f,150.0f};						// 間隔
 	const D3DXVECTOR3	INIT_SIZE					= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE_WIN				= D3DXVECTOR3(390.0f, 85.0f, 0.0f);						// 目的の位置
-	const D3DXVECTOR3	DESTSIZE_NUMBER				= D3DXVECTOR3(120.0f, 75.0f, 0.0f);						// 目的の位置
-	const int			MAX_WAIT					= 10;									// 待機時間の最大値
+
+	const D3DXVECTOR3	DESTSIZE_WIN[NUMBER_MAX]	= { D3DXVECTOR3(540.0f, 140.0f, 0.0f),
+														D3DXVECTOR3(500.0f, 100.0f, 0.0f) };	// 目的の位置
+
+	const D3DXVECTOR3	DESTSIZE_NUMBER[NUMBER_MAX] = { D3DXVECTOR3(210.0f, 100.0f, 0.0f),
+														D3DXVECTOR3(180.0f, 80.0f, 0.0f) };		// 目的の位置
+
+	const int			MAX_WAIT					= 300;									// 待機時間の最大値
 	const float			VALUE_INERTIA[NUMBER_MAX]	= {0.015f,0.05f};						// 慣性の値
 }
 //巨大フレーム関連
 namespace BigFrame
 {
 	//定数の定義
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(250.0f, 400.0f, 0.0f);			// 位置
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(413.0f, 594.0f, 0.0f);			// 目的の位置
-	const int			MAX_WAIT		= 10;											// 待機時間の最大値
-	const float			VALUE_INERTIA	= 0.015f;										// 慣性の値
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(270.0f, 400.0f, 0.0f);				// 位置
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(530.0f, 610.0f, 0.0f);				// 目的の位置
+	const int			MAX_WAIT		= 10;												// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.015f;											// 慣性の値
+
+}
+namespace Number
+{
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(640.0f, 110.0f, 0.0f);					// 位置
+	const float			DISTANCE		= 170.0f;											// 間隔
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(128.0f, 140.0f, 0.0f);				// 目的の位置
+	const int			NUM = 3;															// 表示させる数
+	const int			MAX_WAIT = 5;														// 待機時間の最大値
+	const float			VALUE_INERTIA = 0.09f;												// 慣性の値
 
 }
 //フレーム関連
 namespace Frame
 {
 	//定数の定義
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(860.0f, 165.0f, 0.0f);				// 位置
-	const float			DISTANCE		= 145.0f;										// 間隔
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f,0.0f, 0.0f);					// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(630.0f, 150.0f, 0.0f);			// 目的の位置
-	const D3DXVECTOR3	NUMBERSIZE		= D3DXVECTOR3(630.0f, 150.0f, 0.0f);			// 目的の位置
-	const int			NUM				= 3;											// 表示させる数
-	const int			MAX_WAIT		= 5;											// 待機時間の最大値
-	const float			VALUE_INERTIA	= 0.025f;										// 慣性の値
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(920.0f, 110.0f, 0.0f);					// 位置
+	const float			DISTANCE		= 170.0f;											// 間隔
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f,0.0f, 0.0f);						// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 160.0f, 0.0f);				// 目的の位置
+	const int			NUM				= 3;												// 表示させる数
+	const int			MAX_WAIT		= 5;												// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.025f;											// 慣性の値
 }
 //カバー関連
 namespace Cover
 {
 	//定数の定義
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(600.0f, 370.0f, 0.0f);			// 位置
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);				// サイズの初期化
-	const D3DXCOLOR		INIT_COL		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);			// 色の初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 450.0f, 0.0f);			// 目的の位置
-	const float			VALUE_INERTIA	= 0.06f;										// 慣性の値
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(600.0f, 370.0f, 0.0f);				// 位置
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// サイズの初期化
+	const D3DXCOLOR		INIT_COL		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);				// 色の初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 450.0f, 0.0f);				// 目的の位置
+	const float			VALUE_INERTIA	= 0.06f;											// 慣性の値
 
 }
 //選択肢関連
 namespace Select
 {
-	const D3DXVECTOR3	POS			= D3DXVECTOR3(500.0f, 400.0f, 0.0f);			// 位置
-	const float			DISTANCE	= 200.0f;										// 間隔
-	const int			PRIORITY	= 15;											// 優先順位
-	const float			INIT_SIZE	= 120.0f;										// サイズの初期化
+	const D3DXVECTOR3	POS			= D3DXVECTOR3(500.0f, 400.0f, 0.0f);					// 位置
+	const float			DISTANCE	= 200.0f;												// 間隔
+	const int			PRIORITY	= 15;													// 優先順位
+	const float			INIT_SIZE	= 120.0f;												// サイズの初期化
 }
 
 //************************************************************
@@ -108,12 +123,12 @@ namespace Select
 //************************************************************
 const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\Winner_.png",			// 勝った
+	"data\\TEXTURE\\Winner_.png",				// 勝った
 	"data\\TEXTURE\\PlayerCount.png",			// 誰が
-	"data\\TEXTURE\\Winner_flame.png",	// 勝者フレーム
-	"data\\TEXTURE\\ranking_flame.png",	// フレーム
-	"data\\TEXTURE\\YES.png",	// 再戦
-	"data\\TEXTURE\\NO.png",	// 戻る
+	"data\\TEXTURE\\Winner_flame.png",			// 勝者フレーム
+	"data\\TEXTURE\\ranking_flame.png",			// フレーム
+	"data\\TEXTURE\\YES.png",					// 再戦
+	"data\\TEXTURE\\NO.png",					// 戻る
 };
 
 //************************************************************
@@ -150,10 +165,12 @@ HRESULT CResultManager::Init(void)
 	//オブジェクトの数分初期化を行う
 	for (int nCnt = 0; nCnt < OBJ_MAX; nCnt++)
 	{
-		m_arPos[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	//位置
-		m_arSize[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	//サイズ
+		m_arPos[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	// 位置
+		m_arSize[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	// サイズ
 		m_anNum[nCnt] = 0;									// 現在の番号
 		m_anWaitTime[nCnt] = 0;								// 待機時間
+		m_abool[nCnt] = false;								// 判定用
+		m_abSizeFinish[nCnt] = false;						// サイズ変更判定用
 	}
 
 	// メンバ変数を初期化
@@ -210,12 +227,41 @@ HRESULT CResultManager::Init(void)
 	//--------------------------------------------------------
 	for (int nCnt = 0; nCnt < NUM_WIN; nCnt++)
 	{
-		m_apWinLog[nCnt] = CObject2D::Create
-		(
-			D3DXVECTOR3(Win::POS.x + Win::DISTANCE[Win::NUMBER_ZERO] * nCnt , Win::POS.y, Win::POS.z),
-			Win::INIT_SIZE
-		);
-		
+		//現在のカウントで処理を分ける
+		switch (nCnt)
+		{
+			//
+			case 0:
+
+				m_apWinLog[nCnt] = CAnim2D::Create
+				(
+					1,
+					1,
+					D3DXVECTOR3(Win::POS.x + Win::DISTANCE[Win::NUMBER_ZERO] * nCnt, Win::POS.y, Win::POS.z),
+					Win::INIT_SIZE
+				);
+
+
+			break;
+
+			//
+			case 1:
+
+				m_apWinLog[nCnt] = CAnim2D::Create
+				(
+					1,
+					MAX_PLAYER,
+					D3DXVECTOR3(Win::POS.x + Win::DISTANCE[Win::NUMBER_ZERO] * nCnt, Win::POS.y, Win::POS.z),
+					Win::INIT_SIZE
+				);
+
+				//ここで勝利者の番号を出す
+				m_apWinLog[nCnt]->SetPattern(0);
+
+			break;
+
+		}
+
 		if (m_apWinLog[nCnt] == NULL)
 		{ // 生成に失敗した場合
 
@@ -236,10 +282,16 @@ HRESULT CResultManager::Init(void)
 	//--------------------------------------------------------
 	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
 	{
-		m_apNumber[nCnt] = CAnim2D::Create(10, 1, D3DXVECTOR3(Frame::POS.x - 220.0f, Frame::POS.y + Frame::DISTANCE * nCnt, Frame::POS.z), D3DXVECTOR3(128.0f, 128.0f, 0.0f));
+		m_apNumber[nCnt] = CAnim2D::Create
+		(	10, 
+			1, 
+			D3DXVECTOR3(Number::POS.x, Number::POS.y + Number::DISTANCE * nCnt, Number::POS.z),
+			Number::INIT_SIZE);
+
 		m_apNumber[nCnt]->BindTexture("data\\TEXTURE\\number002.png");
 		m_apNumber[nCnt]->SetPattern(nCnt + 1);
 		m_apNumber[nCnt]->SetPriority(RESULT_PRIO);
+
 		m_apFrame[nCnt] = CObject2D::Create
 		(
 			D3DXVECTOR3(Frame::POS.x, Frame::POS.y + Frame::DISTANCE * nCnt, Frame::POS.z),
@@ -420,16 +472,25 @@ void CResultManager::Update(void)
 
 		UpdateFrame();
 
+		UpdateNumber();
+
+		//もしどちらの判定もtrueになっていたら
+		if (m_abool[EObj::OBJ_FRAME] == true
+			&& m_abool[EObj::OBJ_NUMBER] == true)
+		{
+			//スキップされている状態にする
+			m_bSkiped = true;
+
+			//キー入力待機状態にする
+			m_state = STATE_HOLD;
+		}
+
 		break;
 
-	case STATE_SELECT:
-
-		UpdateCover();
-		
-		break;
-
+		//キー入力待機状態
 	case STATE_HOLD:
 
+		//何かのキーが押されていたら
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_RETURN)
 			|| CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE)
 			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_A)
@@ -442,6 +503,13 @@ void CResultManager::Update(void)
 			m_state = STATE_SELECT;
 		}
 
+		break;
+
+		//選択
+	case STATE_SELECT:
+
+		UpdateCover();
+		
 		break;
 
 	case STATE_WAIT:	// 遷移待機状態
@@ -541,49 +609,75 @@ void CResultManager::UpdateWin(void)
 		//中身チェック
 		if (m_apWinLog[nCnt] != nullptr)
 		{
+			//更新処理
 			m_apWinLog[nCnt]->Update();
+			
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_WIN].x += (Win::DESTSIZE_WIN[Win::NUMBER_ZERO].x + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
 			//目的の位置に到着するまで加算し続ける
-			m_arSize[EObj::OBJ_WIN].x += (Win::DESTSIZE_WIN.x + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
+			m_arSize[EObj::OBJ_WIN_NUM].x += (Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].x + m_arSize[EObj::OBJ_WIN_NUM].x) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
 			//そのサイズを超えそうになったら
-			if (m_arSize[EObj::OBJ_WIN].x >= Win::DESTSIZE_WIN.x)
+			if (m_arSize[EObj::OBJ_WIN].x >= Win::DESTSIZE_WIN[Win::NUMBER_ZERO].x&&
+				m_arSize[EObj::OBJ_WIN_NUM].x >= Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].x)
 			{
 				//値を固定する
-				m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN.x;
+				m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN[Win::NUMBER_ZERO].x;
+				m_arSize[EObj::OBJ_WIN_NUM].x = Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].x;
 			}
 
 			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_WIN].y += (Win::DESTSIZE_WIN[Win::NUMBER_ZERO].y + m_arSize[EObj::OBJ_WIN].y) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
-			m_arSize[EObj::OBJ_WIN].y += (Win::DESTSIZE_WIN.y + m_arSize[EObj::OBJ_WIN].y) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_WIN_NUM].y += (Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].y + m_arSize[EObj::OBJ_WIN].y) * Win::VALUE_INERTIA[Win::NUMBER_ZERO];
 
 			//そのサイズを超えそうになったら
-			if (m_arSize[EObj::OBJ_WIN].y >= Win::DESTSIZE_WIN.y)
+			if (m_arSize[EObj::OBJ_WIN].y >= Win::DESTSIZE_WIN[Win::NUMBER_ZERO].y
+				&&m_arSize[EObj::OBJ_WIN_NUM].y >= Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].y)
 			{//値を固定する
-				m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN.y;
+
+				m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN[Win::NUMBER_ZERO].y;
+				m_arSize[EObj::OBJ_WIN_NUM].y = Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].y;
 			}
 
 			//サイズの設定を行う
-			m_apWinLog[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+			m_apWinLog[Win::NUMBER_ZERO]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+
+			//サイズの設定を行う
+			m_apWinLog[Win::NUMBER_ONE]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN_NUM]);
 
 			//どちらも目的の位置に到着していたら
-			if (m_arSize[EObj::OBJ_WIN].x == Win::DESTSIZE_WIN.x &&
-				m_arSize[EObj::OBJ_WIN].y == Win::DESTSIZE_WIN.y)
+			if (m_arSize[EObj::OBJ_WIN].x == Win::DESTSIZE_WIN[Win::NUMBER_ZERO].x &&
+				m_arSize[EObj::OBJ_WIN].y == Win::DESTSIZE_WIN[Win::NUMBER_ZERO].y&&
+				m_arSize[EObj::OBJ_WIN_NUM].x == Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].x &&
+				m_arSize[EObj::OBJ_WIN_NUM].y == Win::DESTSIZE_NUMBER[Win::NUMBER_ZERO].y)
 			{
 				m_anWaitTime[EObj::OBJ_WIN]++;
 
+				//もし0.0の位置にどの座標もあったら
 				if (m_arPos[EObj::OBJ_WIN].x == 0.0f&&
 					m_arPos[EObj::OBJ_WIN].y == 0.0f&&
 					m_arPos[EObj::OBJ_WIN].z == 0.0f)
 				{
+					//瞬間移動を防止するため
 					m_arPos[EObj::OBJ_WIN].x = Win::POS.x;
 					m_arPos[EObj::OBJ_WIN].y = Win::POS.y;
 					m_arPos[EObj::OBJ_WIN].z = Win::POS.z;
 				}
 			}
 
+			//待機時間が最大待機時間を超えていたら
 			if (m_anWaitTime[EObj::OBJ_WIN] >= Win::MAX_WAIT)
 			{
+				//中身がないことを
+				if (m_arSize[EObj::OBJ_WIN_NUM].x == 0.0f
+					&&m_arSize[EObj::OBJ_WIN_NUM].y == 0.0f)
+				{
+					m_arSize[EObj::OBJ_WIN_NUM] = m_arSize[EObj::OBJ_WIN];
+				}
+
 				m_anWaitTime[EObj::OBJ_WIN] = Win::MAX_WAIT;
 
 				//目的の位置に到着するまで加算し続ける
@@ -606,39 +700,51 @@ void CResultManager::UpdateWin(void)
 				}
 
 				//目的の位置に到着するまで加算し続ける
-				m_arSize[EObj::OBJ_WIN].x -= (Win::DESTSIZE_WIN.x + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
+				m_arSize[EObj::OBJ_WIN].x -= (Win::DESTSIZE_WIN[Win::NUMBER_ONE].x + m_arSize[EObj::OBJ_WIN].x) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
+				m_arSize[EObj::OBJ_WIN_NUM].x -= (Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].x + m_arSize[EObj::OBJ_WIN_NUM].x) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
 
 				//そのサイズを超えそうになったら
-				if (m_arSize[EObj::OBJ_WIN].x <= Win::DESTSIZE_WIN.x)
+				if (m_arSize[EObj::OBJ_WIN].x <= Win::DESTSIZE_WIN[Win::NUMBER_ONE].x&&
+					m_arSize[EObj::OBJ_WIN_NUM].x <= Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].x)
 				{
 					//値を固定する
-					m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN.x;
+					m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN[Win::NUMBER_ONE].x;
+					m_arSize[EObj::OBJ_WIN_NUM].x = Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].x;
 				}
 
 				//目的の位置に到着するまで加算し続ける
-
-				m_arSize[EObj::OBJ_WIN].y -= (Win::DESTSIZE_WIN.y + m_arSize[EObj::OBJ_WIN].y)* Win::VALUE_INERTIA[Win::NUMBER_ONE];
+				m_arSize[EObj::OBJ_WIN].y -= (Win::DESTSIZE_WIN[Win::NUMBER_ONE].y + m_arSize[EObj::OBJ_WIN].y)* Win::VALUE_INERTIA[Win::NUMBER_ONE];
+				m_arSize[EObj::OBJ_WIN_NUM].y -= (Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].y + m_arSize[EObj::OBJ_WIN_NUM].y) * Win::VALUE_INERTIA[Win::NUMBER_ONE];
 
 				//そのサイズを超えそうになったら
-				if (m_arSize[EObj::OBJ_WIN].y <= Win::DESTSIZE_WIN.y)
-				{//値を固定する
-					m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN.y;
+				if (m_arSize[EObj::OBJ_WIN].y <= Win::DESTSIZE_WIN[Win::NUMBER_ONE].y&&
+					m_arSize[EObj::OBJ_WIN_NUM].y <= Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].y)
+				{
+					//値を固定する
+					m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN[Win::NUMBER_ONE].y;
+					m_arSize[EObj::OBJ_WIN_NUM].y = Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].y;
 				}
 
 				//サイズの設定を行う
-				m_apWinLog[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+				m_apWinLog[Win::NUMBER_ZERO]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+				m_apWinLog[Win::NUMBER_ONE]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN_NUM]);
+
+				//位置を設定する
 				m_apWinLog[nCnt]->SetVec3Position(D3DXVECTOR3(
 					m_arPos[EObj::OBJ_WIN].x + Win::DISTANCE[Win::NUMBER_ONE] * nCnt,
 					m_arPos[EObj::OBJ_WIN].y,
 					m_arPos[EObj::OBJ_WIN].z));
 
-				//どちらも目的の位置に到着していたら
-				if (m_arSize[EObj::OBJ_WIN].x == Win::DESTSIZE_WIN.x &&
-					m_arSize[EObj::OBJ_WIN].y == Win::DESTSIZE_WIN.y &&
+				//もしサイズ・位置がその位置にあったら
+				if (m_apWinLog[Win::NUMBER_ZERO]->GetVec3Sizing().x == Win::DESTSIZE_WIN[Win::NUMBER_ONE].x&&
+					m_apWinLog[Win::NUMBER_ZERO]->GetVec3Sizing().y == Win::DESTSIZE_WIN[Win::NUMBER_ONE].y&&
+					m_apWinLog[Win::NUMBER_ONE]->GetVec3Sizing().x == Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].x&&
+					m_apWinLog[Win::NUMBER_ONE]->GetVec3Sizing().y == Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].y&&
 					m_arPos[EObj::OBJ_WIN].x == Win::DESTPOS.x&&
 					m_arPos[EObj::OBJ_WIN].y == Win::DESTPOS.y)
 				{
-					m_anWaitTime[EObj::OBJ_WIN] = 0;
+	
+					//巨大フレームのステートに移行
 					m_state = STATE_BIG_FRAME;
 				}
 			}
@@ -651,6 +757,14 @@ void CResultManager::UpdateWin(void)
 //============================================================
 void CResultManager::UpdateBigFrame(void)
 {
+	//いるかはわからないが念のため
+	if (m_anWaitTime[EObj::OBJ_WIN] != 0)
+	{
+		//0に初期化する
+		m_anWaitTime[EObj::OBJ_WIN] = 0;
+	}
+
+	//中身チェック
 	if (m_pBigFrame != nullptr)
 	{
 		m_pBigFrame->Update();
@@ -678,11 +792,14 @@ void CResultManager::UpdateBigFrame(void)
 		//サイズの設定を行う
 		m_pBigFrame->SetVec3Sizing(m_arSize[EObj::OBJ_BIGFRAME]);
 
+		//目的のサイズになっていたら
 		if (m_arSize[EObj::OBJ_BIGFRAME].x == BigFrame::DESTSIZE.x
 			&&m_arSize[EObj::OBJ_BIGFRAME].y == BigFrame::DESTSIZE.y)
 		{
+			//待機時間を増やす
 			m_anWaitTime[EObj::OBJ_BIGFRAME]++;
 
+			//最大待機時間になっていたら
 			if (m_anWaitTime[EObj::OBJ_BIGFRAME] == BigFrame::MAX_WAIT)
 			{
 				m_anWaitTime[EObj::OBJ_BIGFRAME] = 0;
@@ -697,72 +814,165 @@ void CResultManager::UpdateBigFrame(void)
 //============================================================
 void CResultManager::UpdateFrame(void)
 {
-	//中身チェック
-	if (m_apFrame[m_anNum[EObj::OBJ_FRAME]] != nullptr)
+	if (m_abSizeFinish[EObj::OBJ_FRAME] == false)
 	{
-		//描画をするようにする
-		m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetEnableDraw(true);
-		m_apFrame[m_anNum[EObj::OBJ_FRAME]]->Update();
-
-		//目的の位置に到着するまで加算し続ける
-		m_arSize[EObj::OBJ_FRAME].x += (Frame::DESTSIZE.x + m_arSize[EObj::OBJ_FRAME].x) * Frame::VALUE_INERTIA;
-
-		//そのサイズを超えそうになったら
-		if (m_arSize[EObj::OBJ_FRAME].x >= Frame::DESTSIZE.x)
+		//中身チェック
+		if (m_apFrame[m_anNum[EObj::OBJ_FRAME]] != nullptr)
 		{
-			//値を固定する
-			m_arSize[EObj::OBJ_FRAME].x = Frame::DESTSIZE.x;
-		}
+			//描画をするようにする
+			//m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetEnableDraw(true);
+			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->Update();
 
-		//目的の位置に到着するまで加算し続ける
-		m_arSize[EObj::OBJ_FRAME].y += (Frame::DESTSIZE.y + m_arSize[EObj::OBJ_FRAME].y) * Frame::VALUE_INERTIA;
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_FRAME].x += (Frame::DESTSIZE.x + m_arSize[EObj::OBJ_FRAME].x) * Frame::VALUE_INERTIA;
 
-		//そのサイズを超えそうになったら
-		if (m_arSize[EObj::OBJ_FRAME].y >= Frame::DESTSIZE.y)
-		{
-			//値を固定する
-			m_arSize[EObj::OBJ_FRAME].y = Frame::DESTSIZE.y;
-		}
-
-		//サイズを設定する
-		m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetVec3Sizing(m_arSize[EObj::OBJ_FRAME]);
-
-		//もしフレームの拡大率がその値になっていたら
-		if (m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x
-			&&m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
-		{
-			//範囲外にいかないようにする
-			if (m_anNum[EObj::OBJ_FRAME] >= Frame::NUM)
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_FRAME].x >= Frame::DESTSIZE.x)
 			{
-				m_anNum[EObj::OBJ_FRAME] = Frame::NUM;
+				//値を固定する
+				m_arSize[EObj::OBJ_FRAME].x = Frame::DESTSIZE.x;
 			}
-			//範囲外にいっていなければ
-			else if (!(m_anNum[EObj::OBJ_FRAME] >= Frame::NUM))
-			{
-				//待機時間を加算する
-				m_anWaitTime[EObj::OBJ_FRAME]++;
 
-				//待機時間の最大値を超えそうになったら
-				if (m_anWaitTime[EObj::OBJ_FRAME] >= Frame::MAX_WAIT)
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_FRAME].y += (Frame::DESTSIZE.y + m_arSize[EObj::OBJ_FRAME].y) * Frame::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_FRAME].y >= Frame::DESTSIZE.y)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_FRAME].y = Frame::DESTSIZE.y;
+
+			}
+
+			//サイズを設定する
+			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->SetVec3Sizing(m_arSize[EObj::OBJ_FRAME]);
+
+			//もしフレームの拡大率がその値になっていたら
+			if (m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x
+				&&m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
+			{
+				//範囲外にいかないようにする
+				if (m_anNum[EObj::OBJ_FRAME] >= Frame::NUM)
 				{
-					//値のリセットを行う
-					m_anWaitTime[EObj::OBJ_FRAME] = 0;
-					m_anNum[EObj::OBJ_FRAME]++;
-					m_arSize[EObj::OBJ_FRAME].x = Frame::INIT_SIZE.x;
-					m_arSize[EObj::OBJ_FRAME].y = Frame::INIT_SIZE.y;
+					//フレーム
+					m_anNum[EObj::OBJ_FRAME] = Frame::NUM;
+					m_abSizeFinish[EObj::OBJ_FRAME] = true;
+
+				}
+				//範囲外にいっていなければ
+				else if (!(m_anNum[EObj::OBJ_FRAME] >= Frame::NUM))
+				{
+					//フレーム
+					//待機時間を加算する
+					m_anWaitTime[EObj::OBJ_FRAME]++;
+
+					//待機時間の最大値を超えそうになったら
+					if (m_anWaitTime[EObj::OBJ_FRAME] >= Frame::MAX_WAIT)
+					{
+						m_abSizeFinish[EObj::OBJ_FRAME] = true;
+
+						//値のリセットを行う
+						m_abSizeFinish[EObj::OBJ_NUMBER] = false;
+						m_anWaitTime[EObj::OBJ_FRAME] = 0;
+						m_anNum[EObj::OBJ_FRAME]++;
+						m_arSize[EObj::OBJ_FRAME].x = Frame::INIT_SIZE.x;
+						m_arSize[EObj::OBJ_FRAME].y = Frame::INIT_SIZE.y;
+
+					}
 				}
 			}
-		}
-		//番号・Xサイズ・Yサイズがその値になっていたら
-		if (m_anNum[EObj::OBJ_FRAME] == Frame::NUM &&
-			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x&&
-			m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
-		{
-
-			m_state = STATE_HOLD;
+			//番号・Xサイズ・Yサイズがその値になっていたら
+			if (m_anNum[EObj::OBJ_FRAME] == Frame::NUM &&
+				m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().x == Frame::DESTSIZE.x&&
+				m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
+			{
+				//判定をtrueにする
+				m_abool[EObj::OBJ_FRAME] = true;
+			}
 		}
 	}
+}
+//============================================================
+//	番号の更新処理
+//============================================================
+void CResultManager::UpdateNumber(void)
+{
+	if (m_abSizeFinish[EObj::OBJ_FRAME] == true)
+	{
+		//中身チェック
+		if (m_apNumber[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
+		{
+			//番号
+			m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->Update();
 
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_NUMBER].x += (Number::DESTSIZE.x + m_arSize[EObj::OBJ_NUMBER].x) * Number::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_NUMBER].x >= Number::DESTSIZE.x)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_NUMBER].x = Number::DESTSIZE.x;
+			}
+
+			//目的の位置に到着するまで加算し続ける
+			m_arSize[EObj::OBJ_NUMBER].y += (Number::DESTSIZE.y + m_arSize[EObj::OBJ_NUMBER].y) * Number::VALUE_INERTIA;
+
+			//そのサイズを超えそうになったら
+			if (m_arSize[EObj::OBJ_NUMBER].y >= Number::DESTSIZE.y)
+			{
+				//値を固定する
+				m_arSize[EObj::OBJ_NUMBER].y = Number::DESTSIZE.y;
+
+			}
+
+			//サイズを設定する
+			m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->SetVec3Sizing(m_arSize[EObj::OBJ_NUMBER]);
+
+			//もしフレームの拡大率がその値になっていたら
+			if (m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().x == Number::DESTSIZE.x
+				&&m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
+			{
+				//範囲外にいかないようにする
+				if (m_anNum[EObj::OBJ_NUMBER] >= Number::NUM)
+				{
+					//番号
+					m_anNum[EObj::OBJ_NUMBER] = Number::NUM;
+					m_abSizeFinish[EObj::OBJ_NUMBER] = true;
+
+
+				}
+				//範囲外にいっていなければ
+				else if (!(m_anNum[EObj::OBJ_NUMBER] >= Number::NUM))
+				{
+					//待機時間を加算する
+					m_anWaitTime[EObj::OBJ_NUMBER]++;
+
+					//待機時間の最大値を超えそうになったら
+					if (m_anWaitTime[EObj::OBJ_NUMBER] >= Number::MAX_WAIT)
+					{
+						m_abSizeFinish[EObj::OBJ_NUMBER] = true;
+
+						//値のリセットを行う
+						m_abSizeFinish[EObj::OBJ_FRAME] = false;
+						m_anWaitTime[EObj::OBJ_NUMBER] = 0;
+						m_anNum[EObj::OBJ_NUMBER]++;
+						m_arSize[EObj::OBJ_NUMBER].x = Number::INIT_SIZE.x;
+						m_arSize[EObj::OBJ_NUMBER].y = Number::INIT_SIZE.y;
+
+					}
+				}
+			}
+			//番号・Xサイズ・Yサイズがその値になっていたら
+			if (m_anNum[EObj::OBJ_NUMBER] == Number::NUM &&
+				m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().x == Number::DESTSIZE.x&&
+				m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
+			{
+				//判定をtrueにする
+				m_abool[EObj::OBJ_NUMBER] = true;
+			}
+		}
+	}
 }
 //============================================================
 //	フェードインの更新処理
@@ -959,13 +1169,23 @@ void CResultManager::SkipStaging(void)
 		if (m_apWinLog[nCnt] != nullptr)
 		{
 			//サイズ・位置の設定
-			m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN.x;
-			m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN.y;
+			m_arSize[EObj::OBJ_WIN].x = Win::DESTSIZE_WIN[Win::NUMBER_ONE].x;
+			m_arSize[EObj::OBJ_WIN].y = Win::DESTSIZE_WIN[Win::NUMBER_ONE].y;
+
+			//サイズ・位置の設定
+			m_arSize[EObj::OBJ_WIN_NUM].x = Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].x;
+			m_arSize[EObj::OBJ_WIN_NUM].y = Win::DESTSIZE_NUMBER[Win::NUMBER_ONE].y;
+
+
 			m_arPos[EObj::OBJ_WIN].x = Win::DESTPOS.x;
 			m_arPos[EObj::OBJ_WIN].y = Win::DESTPOS.y;
 
 			//サイズ・位置のセットを行う
-			m_apWinLog[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+			m_apWinLog[Win::NUMBER_ZERO]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN]);
+
+			//サイズ・位置のセットを行う
+			m_apWinLog[Win::NUMBER_ONE]->SetVec3Sizing(m_arSize[EObj::OBJ_WIN_NUM]);
+
 			m_apWinLog[nCnt]->SetVec3Position(D3DXVECTOR3(
 				m_arPos[EObj::OBJ_WIN].x + Win::DISTANCE[Win::NUMBER_ONE] * nCnt,
 				m_arPos[EObj::OBJ_WIN].y,
@@ -1005,6 +1225,17 @@ void CResultManager::SkipStaging(void)
 		m_anNum[OBJ_FRAME] = Frame::NUM;
 	}
 
+	//フレーム数分回す
+	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
+	{
+		//サイズの設定
+		m_arSize[EObj::OBJ_NUMBER].x = Number::DESTSIZE.x;
+		m_arSize[EObj::OBJ_NUMBER].y = Number::DESTSIZE.y;
+
+		//サイズのセットを行う
+		m_apNumber[nCnt]->SetVec3Sizing(m_arSize[EObj::OBJ_NUMBER]);
+		m_anNum[OBJ_NUMBER] = Number::NUM;
+	}
 	m_state = STATE_FRAME;
 
 }

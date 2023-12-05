@@ -67,8 +67,10 @@ public:
 	enum EObj
 	{
 		OBJ_WIN = 0,	//勝利ロゴ
+		OBJ_WIN_NUM,
 		OBJ_BIGFRAME,
 		OBJ_FRAME,		//フレーム
+		OBJ_NUMBER,
 		OBJ_COVER,
 		OBJ_SELECT,		//セレクト
 		OBJ_MAX
@@ -106,13 +108,14 @@ private:
 	void UpdateWin(void);			// 勝利ロゴ
 	void UpdateBigFrame(void);		// 巨大フレーム
 	void UpdateFrame(void);			// フレーム
+	void UpdateNumber(void);		// 番号
 	void UpdateCover(void);			// カバー
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
-	CObject2D *m_apWinLog[NUM_WIN];		// 勝利ロゴ
+	CAnim2D *m_apWinLog[NUM_WIN];		// 勝利ロゴ
 	CObject2D *m_pBigFrame;				// 巨大フレーム
 	CObject2D *m_apFrame[NUM_FRAME];	// フレーム
 	CAnim2D *m_apNumber[NUM_FRAME];	// フレーム
@@ -128,6 +131,8 @@ private:
 	int m_anNum[OBJ_MAX];				//　数
 	int m_anWaitTime[OBJ_MAX];			//　待機時間
 	bool m_bSkiped;
+	bool m_abSizeFinish[OBJ_MAX];
+	bool m_abool[OBJ_MAX];				// 判定用
 };
 
 #endif	// _RESULTMANAGER_H_
