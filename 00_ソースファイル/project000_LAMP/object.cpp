@@ -67,7 +67,7 @@ CObject::CObject()
 	m_bDraw			= true;			// 自身の描画状況
 	m_bDeath		= false;		// 自身の死亡フラグ
 	m_bDepthShadow	= false;		// 自身の影表示状況
-
+	m_bZTex			= false;
 	// ユニークIDを加算
 	m_dwNextID++;
 

@@ -210,7 +210,7 @@ CObject2D *CObject2D::Create(const D3DXVECTOR3& rPos, const D3DXVECTOR3& rSize, 
 //============================================================
 void CObject2D::BindTexture(const int nTextureID)
 {
-	if (nTextureID > NONE_IDX)
+	if (nTextureID >= NONE_IDX)
 	{ // テクスチャインデックスが使用可能な場合
 
 		// テクスチャインデックスを代入
