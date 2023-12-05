@@ -225,6 +225,10 @@ void CPlayer::Update(void)
 	switch (m_state)
 	{ // 状態ごとの処理
 	case STATE_NONE:	// 何もしない状態
+
+		// 待機モーションにする
+		currentMotion = MOTION_IDOL;
+
 		break;
 
 	case STATE_SPAWN:	// スポーン状態
@@ -460,20 +464,20 @@ void CPlayer::SetState(const int nState)
 		if (m_state != STATE_DEATH)
 		{ // 死亡状態じゃない場合
 
+			// マテリアルを再設定
+			ResetMaterial();
+
+			// メインカラーを設定
+			SetMainMaterial();
+
+			// 透明度を透明に再設定
+			SetAlpha(1.0f);
+
 			// 引数の状態を設定
 			m_state = (EState)nState;
 
 			if (m_state == STATE_DEATH)
 			{ // 死亡状態の場合
-
-				// マテリアルを再設定
-				ResetMaterial();
-
-				// メインカラーを設定
-				SetMainMaterial();
-
-				// 透明度を透明に再設定
-				SetAlpha(1.0f);
 
 				// 生存ランキングを更新
 				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);

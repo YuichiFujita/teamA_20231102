@@ -134,8 +134,10 @@ void CGameManager::Update(void)
 	{ // ó‘Ô‚²‚Æ‚Ìˆ—
 	case STATE_NONE:
 		break;
+
 	case STATE_READY:
 		break;
+
 	case STATE_NORMAL:
 
 		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
