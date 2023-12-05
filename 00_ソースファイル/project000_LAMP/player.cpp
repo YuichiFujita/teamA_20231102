@@ -337,6 +337,7 @@ void CPlayer::Draw(void)
 //============================================================
 void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 {
+
 	if (IsDeath())
 	{ // €–Sƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚éê‡
 

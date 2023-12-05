@@ -14,7 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
-
+#include "ready.h"
 //************************************************************
 //	前方宣言
 //************************************************************
@@ -32,6 +32,7 @@ public:
 	enum EState
 	{
 		STATE_NONE = 0,	// 何もしない状態
+		STATE_READY,	// 通常状態
 		STATE_NORMAL,	// 通常状態
 		STATE_RESULT,	// リザルト状態
 		STATE_END,		// 終了状態
@@ -66,6 +67,7 @@ private:
 	// メンバ変数
 	EState m_state;			// 状態
 	int m_nCounterState;	// 状態管理カウンター
+	CReady * m_pReady;
 };
 
 #endif	// _GAMEMANAGER_H_
