@@ -19,6 +19,7 @@
 #include "texture.h"
 #include "collision.h"
 #include "fade.h"
+#include "playerAI.h"
 
 #include "multiModel.h"
 #include "objectOrbit.h"
@@ -38,6 +39,7 @@
 #include "flail.h"
 #include "spawnpoint.h"
 #include "obstacle.h"
+#include "playerAI.h"
 
 //************************************************************
 //	定数宣言
@@ -121,6 +123,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= false;		// ジャンプ状況
+	m_bAI			= false;
 }
 
 //============================================================
@@ -187,6 +190,16 @@ HRESULT CPlayer::Init(void)
 	}
 	m_pFlail->SetPlayerID(m_nPadID);
 
+	// フレイルの生成
+	m_pAI = CPlayerAI::Create(m_pFlail, &GetVec3Position(), &m_move, &m_destRot, &m_nCounterFlail, m_nPadID);
+	if (m_pAI == NULL)
+	{ // 非使用中の場合
+
+	  // 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
 	// メインカラーを設定
 	SetMainMaterial();
 	SetEnableDepthShadow(true);
@@ -207,6 +220,13 @@ void CPlayer::Uninit(void)
 
 	// フレイルの終了
 	m_pFlail->Uninit();
+
+	if (m_pAI != NULL)
+	{ // 使用中の場合
+	// メモリ開放
+		delete m_pAI;
+		m_pAI = NULL;
+	}
 
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
@@ -987,8 +1007,18 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 		return MOTION_IDOL;
 	}
 
-	// 移動操作
-	currentMotion = UpdateMove(posPlayer);
+	if (m_bAI)
+	{
+		
+	}
+	else
+	{
+		// CPU操作
+		m_pAI->playerAI(m_motionOld);
+
+		// 移動操作
+		currentMotion = UpdateMove(posPlayer);
+	}
 
 	// 重力の更新
 	UpdateGravity();
@@ -996,8 +1026,22 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 着地判定
 	UpdateLanding(posPlayer);
 
-	// ダッシュ更新
-	UpdateDash();
+	if (m_bAI)
+	{
+		m_pAI->AIDash
+		(
+			m_move,
+			m_dashRot,
+			m_destRot,
+			m_fPlusMove,
+			m_bDash
+		);
+	}
+	else
+	{
+		// ダッシュ更新
+		UpdateDash();
+	}
 
 	// 向き更新
 	UpdateRotation(rotPlayer);
@@ -1215,7 +1259,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
-
+	
 	if (DEAD_ZONE < fStick)
 	{ // デッドゾーン以上の場合
 

@@ -22,6 +22,7 @@
 //************************************************************
 class CStatusManager;	// ステータスマネージャークラス
 class CFlail;			// フレイルクラス
+class CPlayerAI;		// フレイルクラス
 
 //************************************************************
 //	クラス定義
@@ -165,6 +166,7 @@ private:
 	// メンバ変数
 	CStatusManager *m_pStatus;		// ステータスの情報
 	CFlail		*m_pFlail;			// フレイルの情報
+	CPlayerAI	*m_pAI;				// AI情報
 	D3DXVECTOR3	m_oldPos;			// 過去位置
 	D3DXVECTOR3	m_move;				// 移動量
 	D3DXVECTOR3	m_destRot;			// 目標向き
@@ -177,6 +179,7 @@ private:
 	float		m_fSinAlpha;		// 透明向き
 	bool		m_bDash;			// ダッシュ状況
 	bool		m_bJump;			// ジャンプ状況
+	bool		m_bAI;			// ジャンプ状況
 	const int	m_nPadID;			// パッドインデックス
 };
 

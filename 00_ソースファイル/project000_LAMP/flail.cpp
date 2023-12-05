@@ -25,7 +25,7 @@
 //************************************************************
 namespace
 {
-	const int	PRIORITY	= 3;	// フレイルの優先順位
+	const int	PRIORITY	= 3;		// フレイルの優先順位
 
 	const float	RADIUS		= 50.0f;	// 半径
 	const int	HIT_DAMAGE	= 10;		// ダメージ量
@@ -150,7 +150,8 @@ void CFlail::Update(void)
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖角度 %f\n", m_fChainRot);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖長さ %f\n", m_fLengthChain);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", player->GetCounterFlail());*/
-		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角速度]：%f\n", m_fChainRotMove);
+		//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角速度]：%f\n", m_fChainRotMove);
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル位置]：%f %f %f\n", GetVec3Position().x, GetVec3Position().y, GetVec3Position().z);
 	}
 
 	// オブジェクトモデルの更新
@@ -826,7 +827,7 @@ bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 		}
 	}
 
-	return bHitBox;
+	return bHitBoxCheck;
 }
 bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
