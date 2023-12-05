@@ -352,7 +352,7 @@ void CRenderer::Draw(void)
 		D3DXMatrixScaling(&SpriteScaleMat, 0.125f, 0.125f, 1.0f);
 		m_pSprite->SetTransform(&SpriteScaleMat);
 		m_pSprite->Begin(0);
-		m_pSprite->Draw(m_pZTexture, NULL, NULL, NULL, 0xffffffff);
+		//m_pSprite->Draw(m_pZTexture, NULL, NULL, NULL, 0xffffffff);
 		m_pSprite->End();
 		// デバッグ表示の描画
         CManager::GetInstance()->GetDebugProc()->Draw();
