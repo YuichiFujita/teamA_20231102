@@ -55,10 +55,11 @@ public:
 	};
 
 	// オーバーライド関数
-	HRESULT Init(void) override;	// 初期化
-	void Uninit(void) override;		// 終了
-	void Update(void) override;		// 更新
-	void Draw(void) override;		// 描画
+	HRESULT Init(void) override;			// 初期化
+	void Uninit(void) override;				// 終了
+	void Update(void) override;				// 更新
+	void Draw(void) override;				// 描画
+	void Hit(void) override;				// ヒット
 	void SetType(const int nType) override;	// 種類設定
 	int GetType(void) const override;		// 種類取得
 

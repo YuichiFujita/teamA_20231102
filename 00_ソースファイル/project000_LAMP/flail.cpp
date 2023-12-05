@@ -925,7 +925,8 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				// 障害物との判定を実行
 				if (bHit)
 				{
-					// FUJITA：障害物破壊用のHIT処理よんでもろて
+					// Hit処理
+					pObjCheck->Hit();
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -997,7 +998,8 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 				// 障害物との判定を実行
 				if (collision::Square(posObs, &rPos, m_oldPos, rotObs, sizeObsMax, sizeObsMin))
 				{
-					// FUJITA：障害物破壊用のHIT処理よんでもろて
+					// HIT処理
+					pObjCheck->Hit();
 				}
 
 				// 次のオブジェクトへのポインタを代入
