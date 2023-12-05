@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "object2D.h"
 #include "valueUI.h"
+#include "multiValue.h"
 
 //************************************************************
 //	定数宣言
@@ -43,7 +44,7 @@ namespace
 	// ランキングタイトル基本情報
 	namespace title
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(280.0f, 100.0f, 0.0f);	// タイトル位置
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(280.0f, 160.0f, 0.0f);	// タイトル位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(400.0f, 130.0f, 0.0f);	// タイトル大きさ
 
 		const int	WAIT_FRAME	= 24;		// タイトル待機フレーム
@@ -55,7 +56,7 @@ namespace
 	// 勝利ポイント基本情報
 	namespace win
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(760.0f, 100.0f, 0.0f);			// 位置
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(760.0f, 160.0f, 0.0f);			// 位置
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(230.0f, 0.0f, 0.0f);				// 行間
 		const D3DXVECTOR3 SPACE_VALUE	= D3DXVECTOR3(80.0f, 0.0f, 0.0f);		// 数字行間
 		const D3DXVECTOR3 SIZE_TITLE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);	// タイトル大きさ
@@ -67,13 +68,45 @@ namespace
 	// 勝利ポイント背景基本情報
 	namespace winBG
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(860.0f, 100.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(860.0f, 160.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(720.0f, 145.0f, 0.0f);	// 大きさ
 
 		const int	WAIT_FRAME	= 24;		// タイトル待機フレーム
 		const float	INIT_SCALE	= 0.025f;	// タイトル初期拡大率
 		const float	ADD_SCALE	= 0.09f;	// タイトル加算拡大率
 		const float	SET_SCALE	= 1.0f;		// タイトル設定拡大率
+	}
+
+	// プレイヤーナンバー基本情報
+	namespace number
+	{
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(160.0f, 350.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// タイトル大きさ
+		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
+		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);		// タイトル空白
+		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;							// 数字空白
+		const int			DIGIT		= 1;									// 桁数
+	}
+
+	// プレイヤー勝利ポイント基本情報
+	namespace playerPoint
+	{
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(160.0f, 460.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// タイトル大きさ
+		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
+		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(-40.0f, 100.0f, 0.0f);	// タイトル空白
+		const D3DXVECTOR3	SPACE_VALUE	= D3DXVECTOR3(80.0f, 0.0f, 0.0f);		// 数字空白
+		const int			DIGIT		= 2;									// 桁数
+	}
+
+	// プレイヤーフレーム基本情報
+	namespace frame
+	{
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 460.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(340.0f, 340.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
 }
 
@@ -84,8 +117,11 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\middleResult000.png",	// フェードテクスチャ
 	NULL,	// ランキングタイトルテクスチャ
-	"data\\TEXTURE\\bg.png",	// 勝利ポイント背景テクスチャ
+	"data\\TEXTURE\\bg.png",				// 勝利ポイント背景テクスチャ
 	NULL,	// 勝利ポイントタイトルテクスチャ
+	"data\\TEXTURE\\entry_player.png",		// プレイヤーテクスチャ
+	NULL,	// 勝利ポイントテクスチャ
+	"data\\TEXTURE\\entry_flame.png",		// フレームテクスチャ
 };
 
 //************************************************************
@@ -97,6 +133,10 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 CMiddleResultManager::CMiddleResultManager()
 {
 	// メンバ変数をクリア
+	memset(&m_apNumber[0], 0, sizeof(m_apNumber));					// プレイヤーナンバーの情報
+	memset(&m_apPlayerWinPoint[0], 0, sizeof(m_apPlayerWinPoint));	// プレイヤー勝利ポイントの情報
+	memset(&m_apFrame[0], 0, sizeof(m_apFrame));					// プレイヤーフレームの情報
+
 	m_pFade			= NULL;	// フェードの情報
 	m_pTitle		= NULL;	// タイトルの情報
 	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
@@ -124,6 +164,10 @@ HRESULT CMiddleResultManager::Init(void)
 	//--------------------------------------------------------
 	//	メンバ変数の初期化
 	//--------------------------------------------------------
+	memset(&m_apNumber[0], 0, sizeof(m_apNumber));					// プレイヤーナンバーの情報
+	memset(&m_apPlayerWinPoint[0], 0, sizeof(m_apPlayerWinPoint));	// プレイヤー勝利ポイントの情報
+	memset(&m_apFrame[0], 0, sizeof(m_apFrame));					// プレイヤーフレームの情報
+
 	m_pFade			= NULL;	// フェードの情報
 	m_pTitle		= NULL;	// タイトルの情報
 	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
@@ -208,7 +252,6 @@ HRESULT CMiddleResultManager::Init(void)
 	// 自動描画をOFFにする
 	m_pWinPointBG->SetEnableDraw(false);
 
-
 	//--------------------------------------------------------
 	//	勝利ポイントの生成
 	//--------------------------------------------------------
@@ -237,6 +280,104 @@ HRESULT CMiddleResultManager::Init(void)
 	// 自動描画をOFFにする
 	m_pWinPoint->SetEnableDraw(false);
 
+	//--------------------------------------------------------
+	//	プレイヤーフレーム・勝利ポイント・ナンバーの生成
+	//--------------------------------------------------------
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// プレイヤーフレームの生成
+		m_apFrame[nCntEntry] = CObject2D::Create
+		( // 引数
+			frame::POS + (frame::SPACE * (float)nCntEntry),	// 位置
+			frame::SIZE,	// 大きさ
+			VEC3_ZERO,		// 向き
+			XCOL_WHITE		// 色
+		);
+		if (m_apFrame[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを登録・割当
+		m_apFrame[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+
+		// 優先順位を設定
+		m_apFrame[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apFrame[nCntEntry]->SetEnableDraw(false);
+
+		// プレイヤー勝利ポイントの生成
+		m_apPlayerWinPoint[nCntEntry] = CValueUI::Create
+		( // 引数
+			mc_apTextureFile[TEXTURE_PLAYER_POINT],							// タイトルテクスチャパス
+			CValue::TEXTURE_UI,												// 数字テクスチャ
+			playerPoint::DIGIT,												// 桁数
+			playerPoint::POS + (playerPoint::SPACE_POS * (float)nCntEntry),	// 位置
+			playerPoint::SPACE_TITLE,	// 行間
+			playerPoint::SPACE_VALUE,	// 数字行間
+			playerPoint::SIZE_TITLE,	// タイトル大きさ
+			playerPoint::SIZE_VALUE,	// 数字大きさ
+			VEC3_ZERO,					// タイトル向き
+			VEC3_ZERO,					// 数字向き
+			XCOL_WHITE,					// タイトル色
+			XCOL_WHITE					// 数字色
+		);
+		if (m_apPlayerWinPoint[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// 優先順位を設定
+		m_apPlayerWinPoint[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apPlayerWinPoint[nCntEntry]->SetEnableDraw(false);
+
+		// 数字を設定
+		m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetNum(0);	// TODO：現在のポイント代入
+
+		// プレイヤーナンバーの生成
+		m_apNumber[nCntEntry] = CValueUI::Create
+		( // 引数
+			mc_apTextureFile[TEXTURE_PLAYER],						// タイトルテクスチャパス
+			CValue::TEXTURE_NORMAL,									// 数字テクスチャ
+			number::DIGIT,											// 桁数
+			number::POS + (number::SPACE_POS * (float)nCntEntry),	// 位置
+			number::SPACE_TITLE,	// 行間
+			number::SPACE_VALUE,	// 数字行間
+			number::SIZE_TITLE,		// タイトル大きさ
+			number::SIZE_VALUE,		// 数字大きさ
+			VEC3_ZERO,				// タイトル向き
+			VEC3_ZERO,				// 数字向き
+			XCOL_WHITE,				// タイトル色
+			XCOL_WHITE				// 数字色
+		);
+		if (m_apNumber[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// 優先順位を設定
+		m_apNumber[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apNumber[nCntEntry]->SetEnableDraw(false);
+
+		// 数字を設定
+		m_apNumber[nCntEntry]->GetMultiValue()->SetNum(nCntEntry + 1);
+	}
+
 	// 成功を返す
 	return S_OK;
 }
@@ -257,6 +398,19 @@ HRESULT CMiddleResultManager::Uninit(void)
 
 	// 勝利ポイントの終了
 	m_pWinPoint->Uninit();
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// プレイヤーナンバーの終了
+		m_apNumber[nCntEntry]->Uninit();
+
+		// プレイヤー勝利ポイントの終了
+		m_apPlayerWinPoint[nCntEntry]->Uninit();
+
+		// プレイヤーフレームの終了
+		m_apFrame[nCntEntry]->Uninit();
+	}
 
 	// 成功を返す
 	return S_OK;
@@ -384,6 +538,19 @@ void CMiddleResultManager::Update(void)
 
 	// 勝利ポイントの更新
 	m_pWinPoint->Update();
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// プレイヤーナンバーの更新
+		m_apNumber[nCntEntry]->Update();
+
+		// プレイヤー勝利ポイントの更新
+		m_apPlayerWinPoint[nCntEntry]->Update();
+
+		// プレイヤーフレームの更新
+		m_apFrame[nCntEntry]->Update();
+	}
 }
 
 //============================================================

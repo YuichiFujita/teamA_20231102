@@ -14,6 +14,7 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
+#include "input.h"
 
 //************************************************************
 //	前方宣言
@@ -31,11 +32,14 @@ public:
 	// テクスチャ列挙
 	enum ETexture
 	{
-		TEXTURE_FADE = 0,	// フェードテクスチャ
-		TEXTURE_TITLE,		// ランキングタイトルテクスチャ
-		TEXTURE_WIN_BG,		// 勝利ポイント背景テクスチャ
-		TEXTURE_WIN,		// 勝利ポイントタイトルテクスチャ
-		TEXTURE_MAX			// この列挙型の総数
+		TEXTURE_FADE = 0,		// フェードテクスチャ
+		TEXTURE_TITLE,			// ランキングタイトルテクスチャ
+		TEXTURE_WIN_BG,			// 勝利ポイント背景テクスチャ
+		TEXTURE_WIN,			// 勝利ポイントタイトルテクスチャ
+		TEXTURE_PLAYER,			// プレイヤーテクスチャ
+		TEXTURE_PLAYER_POINT,	// 勝利ポイントテクスチャ
+		TEXTURE_FRAME,			// フレームテクスチャ
+		TEXTURE_MAX				// この列挙型の総数
 	};
 
 	// 状態列挙
@@ -92,6 +96,9 @@ private:
 	CObject2D	*m_pTitle;		// タイトルの情報
 	CObject2D	*m_pWinPointBG;	// 勝利ポイントの背景情報
 	CValueUI	*m_pWinPoint;	// 勝利ポイントの情報
+	CValueUI	*m_apNumber[MAX_PLAYER];			// プレイヤーナンバーの情報
+	CValueUI	*m_apPlayerWinPoint[MAX_PLAYER];	// プレイヤー勝利ポイントの情報
+	CObject2D	*m_apFrame[MAX_PLAYER];				// プレイヤーフレームの情報
 
 	EState	m_state;			// 状態
 	int		m_nCounterState;	// 状態管理カウンター
