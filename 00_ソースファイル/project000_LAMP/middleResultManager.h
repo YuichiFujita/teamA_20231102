@@ -52,6 +52,10 @@ public:
 		STATE_RANK_TITLE,		// ランキングタイトル表示状態
 		STATE_WINPOINT_WAIT,	// 勝利ポイント待機状態
 		STATE_WINPOINT,			// 勝利ポイント表示状態
+		STATE_FRAME_WAIT,		// プレイヤーフレーム待機状態
+		STATE_FRAME,			// プレイヤーフレーム表示状態
+		STATE_PLAYERPOINT_WAIT,	// プレイヤー勝利ポイント待機状態
+		STATE_PLAYERPOINT,		// プレイヤー勝利ポイント表示状態
 		STATE_WAIT,				// 待機状態
 		STATE_FADEOUT,			// フェードアウト状態
 		STATE_FADEOUT_WAIT,		// フェードアウト待機状態
@@ -77,16 +81,22 @@ public:
 
 private:
 	// メンバ変数
-	void UpdateFadeIn(void);		// フェードイン更新
-	void UpdateFadeInWait(void);	// フェードイン待機更新
-	void UpdateFadeInAccel(void);	// フェードイン加速更新
-	void UpdateRankTitleWait(void);	// ランキングタイトル待機更新
-	void UpdateRankTitle(void);		// ランキングタイトル表示更新
-	void UpdateWinPointWait(void);	// 勝利ポイント待機更新
-	void UpdateWinPoint(void);		// 勝利ポイント表示更新
-	void UpdateFadeOut(void);		// フェードアウト更新
-	void UpdateFadeOutWait(void);	// フェードアウト待機更新
-	void UpdateFadeOutAccel(void);	// フェードアウト加速更新
+	void UpdateFadeIn(void);			// フェードイン更新
+	void UpdateFadeInWait(void);		// フェードイン待機更新
+	void UpdateFadeInAccel(void);		// フェードイン加速更新
+	void UpdateRankTitleWait(void);		// ランキングタイトル待機更新
+	void UpdateRankTitle(void);			// ランキングタイトル表示更新
+	void UpdateWinPointWait(void);		// 勝利ポイント待機更新
+	void UpdateWinPoint(void);			// 勝利ポイント表示更新
+	void UpdateFrameWait(void);			// プレイヤーフレーム待機更新
+	void UpdateFrame(void);				// プレイヤーフレーム表示更新
+	void UpdatePlayerPointWait(void);	// プレイヤー勝利ポイント待機更新
+	void UpdatePlayerPoint(void);		// プレイヤー勝利ポイント表示更新
+	void UpdateFadeOut(void);			// フェードアウト更新
+	void UpdateFadeOutWait(void);		// フェードアウト待機更新
+	void UpdateFadeOutAccel(void);		// フェードアウト加速更新
+
+	void MovePositionAll(const D3DXVECTOR3& rAddMove);	// 全位置の移動
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数

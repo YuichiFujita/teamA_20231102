@@ -26,6 +26,14 @@
 #include "ready.h"
 
 //************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	D3DXCOLOR COL = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f);	// マスク色
+}
+
+//************************************************************
 //	静的メンバ変数宣言
 //************************************************************
 CGameManager	*CSceneGame::m_pGameManager	= NULL;	// ゲームマネージャー
@@ -95,7 +103,7 @@ HRESULT CSceneGame::Init(void)
 	}
 
 	// マスクの生成 (プレイヤーの壁裏表示用ポリゴン)
-	CMask::Create(SCREEN_CENT, SCREEN_SIZE, D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f));
+	CMask::Create(SCREEN_CENT, SCREEN_SIZE, COL);
 
 	//--------------------------------------------------------
 	//	初期設定
@@ -122,7 +130,6 @@ HRESULT CSceneGame::Init(void)
 
 	// BGMの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
-
 
 	// 成功を返す
 	return S_OK;
