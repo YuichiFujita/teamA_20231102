@@ -99,6 +99,11 @@ namespace
 		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(-40.0f, 100.0f, 0.0f);	// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= D3DXVECTOR3(80.0f, 0.0f, 0.0f);		// 数字空白
 		const int			DIGIT		= 2;									// 桁数
+
+		const int	WAIT_FRAME	= 8;		// プレイヤー勝利ポイント待機フレーム
+		const float	INIT_SCALE	= 0.025f;	// プレイヤー勝利ポイント初期拡大率
+		const float	ADD_SCALE	= 0.15f;	// プレイヤー勝利ポイント加算拡大率
+		const float	SET_SCALE	= 1.0f;		// プレイヤー勝利ポイント設定拡大率
 	}
 
 	// プレイヤーフレーム基本情報
@@ -107,6 +112,11 @@ namespace
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 460.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(340.0f, 340.0f, 0.0f);	// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
+
+		const int	WAIT_FRAME	= 24;		// プレイヤーフレーム待機フレーム
+		const float	INIT_SCALE	= 0.025f;	// プレイヤーフレーム初期拡大率
+		const float	ADD_SCALE	= 0.09f;	// プレイヤーフレーム加算拡大率
+		const float	SET_SCALE	= 1.0f;		// プレイヤーフレーム設定拡大率
 	}
 }
 
@@ -286,13 +296,19 @@ HRESULT CMiddleResultManager::Init(void)
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
+		// ポイントを宣言
+		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
+
+		// 変数を宣言
+		D3DXCOLOR colPolygon = (pPlayer == NULL) ? D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f) : XCOL_WHITE;	// ポリゴン色
+
 		// プレイヤーフレームの生成
 		m_apFrame[nCntEntry] = CObject2D::Create
 		( // 引数
 			frame::POS + (frame::SPACE * (float)nCntEntry),	// 位置
-			frame::SIZE,	// 大きさ
+			frame::SIZE * frame::INIT_SCALE,				// 大きさ
 			VEC3_ZERO,		// 向き
-			XCOL_WHITE		// 色
+			colPolygon		// 色
 		);
 		if (m_apFrame[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -318,14 +334,14 @@ HRESULT CMiddleResultManager::Init(void)
 			CValue::TEXTURE_UI,												// 数字テクスチャ
 			playerPoint::DIGIT,												// 桁数
 			playerPoint::POS + (playerPoint::SPACE_POS * (float)nCntEntry),	// 位置
-			playerPoint::SPACE_TITLE,	// 行間
-			playerPoint::SPACE_VALUE,	// 数字行間
-			playerPoint::SIZE_TITLE,	// タイトル大きさ
-			playerPoint::SIZE_VALUE,	// 数字大きさ
-			VEC3_ZERO,					// タイトル向き
-			VEC3_ZERO,					// 数字向き
-			XCOL_WHITE,					// タイトル色
-			XCOL_WHITE					// 数字色
+			playerPoint::SPACE_TITLE,							// 行間
+			playerPoint::SPACE_VALUE,							// 数字行間
+			playerPoint::SIZE_TITLE * playerPoint::INIT_SCALE,	// タイトル大きさ
+			playerPoint::SIZE_VALUE * playerPoint::INIT_SCALE,	// 数字大きさ
+			VEC3_ZERO,	// タイトル向き
+			VEC3_ZERO,	// 数字向き
+			colPolygon,	// タイトル色
+			colPolygon	// 数字色
 		);
 		if (m_apPlayerWinPoint[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -351,14 +367,14 @@ HRESULT CMiddleResultManager::Init(void)
 			CValue::TEXTURE_NORMAL,									// 数字テクスチャ
 			number::DIGIT,											// 桁数
 			number::POS + (number::SPACE_POS * (float)nCntEntry),	// 位置
-			number::SPACE_TITLE,	// 行間
-			number::SPACE_VALUE,	// 数字行間
-			number::SIZE_TITLE,		// タイトル大きさ
-			number::SIZE_VALUE,		// 数字大きさ
-			VEC3_ZERO,				// タイトル向き
-			VEC3_ZERO,				// 数字向き
-			XCOL_WHITE,				// タイトル色
-			XCOL_WHITE				// 数字色
+			number::SPACE_TITLE,							// 行間
+			number::SPACE_VALUE,							// 数字行間
+			number::SIZE_TITLE * playerPoint::INIT_SCALE,	// タイトル大きさ
+			number::SIZE_VALUE * playerPoint::INIT_SCALE,	// 数字大きさ
+			VEC3_ZERO,	// タイトル向き
+			VEC3_ZERO,	// 数字向き
+			colPolygon,	// タイトル色
+			colPolygon	// 数字色
 		);
 		if (m_apNumber[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -472,15 +488,43 @@ void CMiddleResultManager::Update(void)
 
 		break;
 
+	case STATE_FRAME_WAIT:
+
+		// プレイヤーフレーム待機の更新
+		UpdateFrameWait();
+
+		break;
+
+	case STATE_FRAME:
+
+		// プレイヤーフレーム表示の更新
+		UpdateFrame();
+
+		break;
+
+	case STATE_PLAYERPOINT_WAIT:
+
+		// プレイヤー勝利ポイント待機の更新
+		UpdatePlayerPointWait();
+
+		break;
+
+	case STATE_PLAYERPOINT:
+
+		// プレイヤー勝利ポイント表示の更新
+		UpdatePlayerPoint();
+
+		break;
+
 	case STATE_WAIT:
 
-		//// TODO：仮の処理
-		//m_nCounterState++;
-		//if (m_nCounterState == 60)
-		//{
-		//	m_nCounterState = 0;
-		//	m_state = STATE_FADEOUT;
-		//}
+		// TODO：仮の処理
+		m_nCounterState++;
+		if (m_nCounterState == 60)
+		{
+			m_nCounterState = 0;
+			m_state = STATE_FADEOUT;
+		}
 
 		break;
 
@@ -806,6 +850,145 @@ void CMiddleResultManager::UpdateWinPoint(void)
 		// 勝利ポイント表示の自動描画をONにする
 		m_pWinPoint->SetEnableDraw(true);
 
+		// プレイヤーフレーム待機状態にする
+		m_state = STATE_FRAME_WAIT;
+	}
+}
+
+//============================================================
+//	プレイヤーフレーム待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFrameWait(void)
+{
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState >= frame::WAIT_FRAME)
+	{ // 待機が終了した場合
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// プレイヤーフレーム表示状態にする
+		m_state = STATE_FRAME;
+
+		// プレイヤーフレームの拡大率を設定
+		m_fScale = frame::INIT_SCALE;
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤーフレームの自動描画をONにする
+			m_apFrame[nCntEntry]->SetEnableDraw(true);
+		}
+	}
+}
+
+//============================================================
+//	プレイヤーフレーム表示の更新処理
+//============================================================
+void CMiddleResultManager::UpdateFrame(void)
+{
+	// 拡大率を加算
+	m_fScale += frame::ADD_SCALE;
+
+	if (m_fScale < frame::SET_SCALE)
+	{ // まだ大きくなる場合
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤーフレームの大きさを反映
+			m_apFrame[nCntEntry]->SetVec3Sizing(frame::SIZE * m_fScale);
+		}
+	}
+	else
+	{ // 大きくなり切った場合
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤーフレームの大きさを反映
+			m_apFrame[nCntEntry]->SetVec3Sizing(frame::SIZE);
+		}
+
+		// 拡大率を初期化
+		m_fScale = 1.0f;
+
+		// プレイヤー勝利ポイント待機状態にする
+		m_state = STATE_PLAYERPOINT_WAIT;
+	}
+}
+
+//============================================================
+//	プレイヤー勝利ポイント待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdatePlayerPointWait(void)
+{
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState >= playerPoint::WAIT_FRAME)
+	{ // 待機が終了した場合
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// プレイヤー勝利ポイント表示状態にする
+		m_state = STATE_PLAYERPOINT;
+
+		// プレイヤー勝利ポイントの拡大率を設定
+		m_fScale = playerPoint::INIT_SCALE;
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤー勝利ポイントの自動描画をONにする
+			m_apPlayerWinPoint[nCntEntry]->SetEnableDraw(true);
+
+			// プレイヤーナンバーの自動描画をONにする
+			m_apNumber[nCntEntry]->SetEnableDraw(true);
+		}
+	}
+}
+
+//============================================================
+//	プレイヤー勝利ポイント表示の更新処理
+//============================================================
+void CMiddleResultManager::UpdatePlayerPoint(void)
+{
+	// 拡大率を加算
+	m_fScale += playerPoint::ADD_SCALE;
+
+	if (m_fScale < playerPoint::SET_SCALE)
+	{ // まだ大きくなる場合
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤーナンバー・勝利ポイントの大きさを反映
+			m_apNumber[nCntEntry]->SetScalingTitle(number::SIZE_TITLE * m_fScale);
+			m_apNumber[nCntEntry]->GetMultiValue()->SetVec3Sizing(number::SIZE_VALUE * m_fScale);
+			m_apPlayerWinPoint[nCntEntry]->SetScalingTitle(playerPoint::SIZE_TITLE * m_fScale);
+			m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetVec3Sizing(playerPoint::SIZE_VALUE * m_fScale);
+		}
+	}
+	else
+	{ // 大きくなり切った場合
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			// プレイヤーナンバー・勝利ポイントの大きさを反映
+			m_apNumber[nCntEntry]->SetScalingTitle(number::SIZE_TITLE);
+			m_apNumber[nCntEntry]->GetMultiValue()->SetVec3Sizing(number::SIZE_VALUE);
+			m_apPlayerWinPoint[nCntEntry]->SetScalingTitle(playerPoint::SIZE_TITLE);
+			m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetVec3Sizing(playerPoint::SIZE_VALUE);
+		}
+
+		// 拡大率を初期化
+		m_fScale = 1.0f;
+
 		// 待機状態にする
 		m_state = STATE_WAIT;
 	}
@@ -828,6 +1011,9 @@ void CMiddleResultManager::UpdateFadeOut(void)
 	if (posFade.y > fade::DOWN_MIDDLE_POS.y)
 	{ // 現在位置が停止位置を超えた場合
 
+		// 全位置の移動
+		MovePositionAll(D3DXVECTOR3(0.0f, posFade.y - fade::DOWN_POS.y, 0.0f));
+
 		// フェードを停止位置に補正
 		posFade.y = fade::DOWN_MIDDLE_POS.y;
 
@@ -836,6 +1022,12 @@ void CMiddleResultManager::UpdateFadeOut(void)
 
 		// フェードアウト待機状態にする
 		m_state = STATE_FADEOUT_WAIT;
+	}
+	else
+	{ // 現在位置が停止位置を超えていない場合
+
+		// 全位置の移動
+		MovePositionAll(D3DXVECTOR3(0.0f, m_fMoveY, 0.0f));
 	}
 
 	// フェード位置を反映
@@ -878,6 +1070,9 @@ void CMiddleResultManager::UpdateFadeOutAccel(void)
 	if (posFade.y > fade::DOWN_POS.y)
 	{ // 現在位置が停止位置を超えた場合
 
+		// 全位置の移動
+		MovePositionAll(D3DXVECTOR3(0.0f, posFade.y - fade::DOWN_POS.y, 0.0f));
+
 		// フェードを停止位置に補正
 		posFade.y = fade::DOWN_POS.y;
 
@@ -887,7 +1082,44 @@ void CMiddleResultManager::UpdateFadeOutAccel(void)
 		// 終了状態にする
 		m_state = STATE_END;
 	}
+	else
+	{ // 現在位置が停止位置を超えていない場合
+
+		// 全位置の移動
+		MovePositionAll(D3DXVECTOR3(0.0f, m_fMoveY, 0.0f));
+	}
 
 	// フェード位置を反映
 	m_pFade->SetVec3Position(posFade);
+}
+
+//============================================================
+//	全位置の移動処理
+//============================================================
+void CMiddleResultManager::MovePositionAll(const D3DXVECTOR3 & rAddMove)
+{
+	// フェードの位置の移動
+	m_pFade->SetVec3Position(m_pFade->GetVec3Position() + rAddMove);
+
+	// タイトルの位置の移動
+	m_pTitle->SetVec3Position(m_pTitle->GetVec3Position() + rAddMove);
+
+	// 勝利ポイント背景の位置の移動
+	m_pWinPointBG->SetVec3Position(m_pWinPointBG->GetVec3Position() + rAddMove);
+
+	// 勝利ポイントの位置の移動
+	m_pWinPoint->SetVec3Position(m_pWinPoint->GetVec3Position() + rAddMove);
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// プレイヤーナンバーの位置の移動
+		m_apNumber[nCntEntry]->SetVec3Position(m_apNumber[nCntEntry]->GetVec3Position() + rAddMove);
+
+		// プレイヤー勝利ポイントの位置の移動
+		m_apPlayerWinPoint[nCntEntry]->SetVec3Position(m_apPlayerWinPoint[nCntEntry]->GetVec3Position() + rAddMove);
+
+		// プレイヤーフレームの位置の移動
+		m_apFrame[nCntEntry]->SetVec3Position(m_apFrame[nCntEntry]->GetVec3Position() + rAddMove);
+	}
 }
