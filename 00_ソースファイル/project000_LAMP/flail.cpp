@@ -98,7 +98,8 @@ HRESULT CFlail::Init(void)
 		// モデルを割当
 		m_chain[nCntChain].multiModel->BindModel(mc_apModelFileChain[CFlail::CHAIN_NORMAL]);
 	}
-
+	m_pOrbit = CObjectOrbit::Create(GetPtrMtxWorld(), CObjectOrbit::SOffset(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, -50.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), 60,60);
+	m_pOrbit->BindTexture("data\\TEXTURE\\orbitLine.png");
 	// 成功を返す
 	return S_OK;
 }
@@ -110,7 +111,12 @@ void CFlail::Uninit(void)
 {
 	// オブジェクトモデルの終了
 	CObjectModel::Uninit();
-
+	if (m_pOrbit != NULL)
+	{
+		m_pOrbit->Uninit();
+		m_pOrbit = NULL;
+	}
+	
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		// モデルの終了
@@ -924,7 +930,8 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				// 障害物との判定を実行
 				if (bHit)
 				{
-					// FUJITA：障害物破壊用のHIT処理よんでもろて
+					// Hit処理
+					pObjCheck->Hit();
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -996,7 +1003,8 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 				// 障害物との判定を実行
 				if (collision::Square(posObs, &rPos, m_oldPos, rotObs, sizeObsMax, sizeObsMin))
 				{
-					// FUJITA：障害物破壊用のHIT処理よんでもろて
+					// HIT処理
+					pObjCheck->Hit();
 				}
 
 				// 次のオブジェクトへのポインタを代入

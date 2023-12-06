@@ -12,6 +12,8 @@
 #include "renderer.h"
 #include "texture.h"
 
+#include "ModelParticle.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -197,7 +199,27 @@ void CBlock::Draw(void)
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 }
+//============================================================
+//	当たり判定処理
+//============================================================
+void CBlock::Hit(void)
+{
+	if (IsDeath())
+	{ // 死亡フラグが立っている場合
 
+		return;
+	}
+	
+	//破壊できるブロックだったら
+	if (m_status.state == EBreak::BREAK_TRUE)
+	{
+		CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
+			CObjectMeshCube::GetVec3Position().z));
+
+		//終了処理を行う
+		Uninit();
+	}
+}
 //============================================================
 //	種類の設定処理
 //============================================================
