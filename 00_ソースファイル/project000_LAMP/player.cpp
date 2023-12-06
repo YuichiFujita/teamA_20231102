@@ -42,6 +42,7 @@
 #include "playerAI.h"
 
 #include "orbitalEffect.h"
+#include "orbitalParticle.h"
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -299,7 +300,6 @@ void CPlayer::Update(void)
 		// 生存ランキングを更新 (一位を設定)
 		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 	}
-
 	// フレイルの更新
 	m_pFlail->Update();
 
@@ -308,6 +308,7 @@ void CPlayer::Update(void)
 
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
+
 }
 
 //============================================================
@@ -447,11 +448,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			SetMotion(MOTION_KNOCK);
 
 			// 爆発パーティクルを生成
-			for (int i = 0; i < 16; i++)
-			{
 
-				COrbitalEffect::Create(GetVec3Position(), D3DXVECTOR3(3.0f, 3.0f, 3.0f), D3DXCOLOR(1.0f, 0.5f, 0.2f, 1.0f), 120, D3DXVECTOR3(((rand() % 2000 - 1000) * 0.1f), ((rand() % 1000) * 0.1f), ((rand() % 2000 - 1000) * 0.1f)),0.99f,true,true);
-			}
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f,0.99f);
 		}
 
 		// サウンドの再生

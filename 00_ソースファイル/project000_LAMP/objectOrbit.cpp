@@ -219,6 +219,8 @@ void CObjectOrbit::Draw(void)
 
 					// ó‘Ô‚ğİ’è
 					m_state = STATE_NONE;	// ‰½‚à‚µ‚È‚¢ó‘Ô
+					Uninit();
+					return;
 				}
 
 				break;

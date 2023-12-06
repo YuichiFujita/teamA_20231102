@@ -31,9 +31,9 @@ COrbitalEffect::COrbitalEffect() : CObject(LABEL_PARTICLE, PART_PRIO)
 	// メンバ変数をクリア
 	m_move = VEC3_ZERO;		// 移動量
 	m_nLife = 0;		// 寿命
-	m_bGravity = false;		// 大きさの減算量
 	m_fOffset = 0.0f;		// 透明度の減算量
 	m_bAdd = false;	// 加算合成状況
+
 }
 
 
@@ -72,8 +72,10 @@ void COrbitalEffect::Uninit(void)
 	// オブジェクトビルボードの終了
 	if (m_pOrbit != NULL)
 	{
+		m_pOrbit->SetState(CObjectOrbit::STATE_VANISH);
 		m_pOrbit->Uninit();
 		m_pOrbit = NULL;
+		
 	}
 	Release();
 }
@@ -115,10 +117,8 @@ void COrbitalEffect::Update(void)
 	m_pos += m_move;
 	m_move *= m_fAttenuation;
 	
-	if (m_bGravity)
-	{
-		m_move.y -= 5.0f;
-	}
+	m_move += m_Force;
+
 	// 寿命を減算
 	m_nLife--;
 
@@ -162,10 +162,11 @@ COrbitalEffect *COrbitalEffect::Create
 	const D3DXVECTOR3& Offset,	// 大きさ
 	const D3DXCOLOR col,
 	const int nLife,					// 寿命
+	const int nLength,
 	const D3DXVECTOR3& rMove,	// 移動量
+	const D3DXVECTOR3& rFoce,
 	const float fAttenuation,
-	const bool bAdd,
-	const bool bGravity,
+	const bool bAdd ,
 	const CObject::ELabel label	// オブジェクトラベル
 )
 {
@@ -207,7 +208,7 @@ COrbitalEffect *COrbitalEffect::Create
 		pOrbitalEffect->m_move = rMove;		// 移動量
 		pOrbitalEffect->m_nLife = nLife;		// 寿命
 		pOrbitalEffect->m_bAdd = bAdd;			// 加算合成状況
-		pOrbitalEffect->m_bGravity = bGravity;
+		pOrbitalEffect->m_Force = rFoce;
 												//ワールドマトリクスの初期化
 		D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス
 		D3DXMATRIX mtxParent;
@@ -222,7 +223,7 @@ COrbitalEffect *COrbitalEffect::Create
 		D3DXMatrixTranslation(&mtxTrans, pOrbitalEffect->m_pos.x, pOrbitalEffect->m_pos.y, pOrbitalEffect->m_pos.z);
 		D3DXMatrixMultiply(&pOrbitalEffect->m_Mtx, &pOrbitalEffect->m_Mtx, &mtxTrans);
 
-		pOrbitalEffect->m_pOrbit = CObjectOrbit::Create(&pOrbitalEffect->m_Mtx, CObjectOrbit::SOffset(Offset, -Offset, col),100);
+		pOrbitalEffect->m_pOrbit = CObjectOrbit::Create(&pOrbitalEffect->m_Mtx, CObjectOrbit::SOffset(Offset, -Offset, col),nLength);
 		pOrbitalEffect->m_pOrbit->SetEnableDraw(false);
 		// 確保したアドレスを返す
 		return pOrbitalEffect;
