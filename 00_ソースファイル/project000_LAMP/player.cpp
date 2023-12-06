@@ -33,6 +33,7 @@
 #include "scrollMeshField.h"
 
 #include "effect3D.h"
+
 #include "particle3D.h"
 
 #include "statusManager.h"
@@ -207,6 +208,10 @@ HRESULT CPlayer::Init(void)
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
 
+	m_pGuide = CObject3D::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
+	m_pGuide->SetEnableDraw(false);
+	m_pGuide->SetLabel(ELabel::LABEL_UI);
+	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
 	// 成功を返す
 	return S_OK;
 }
@@ -229,7 +234,12 @@ void CPlayer::Uninit(void)
 		delete m_pAI;
 		m_pAI = NULL;
 	}
-
+	if (m_pGuide != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pGuide->Uninit();
+		m_pGuide = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -1328,8 +1338,22 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 
 	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	D3DXVECTOR3 vec;
+	//ガイド表示計算
+	D3DXVec3Normalize(&vec, &D3DXVECTOR3(vecStick.x, 100.0f, -vecStick.y));
+	m_pGuide->SetVec3Position(GetVec3Position() + (vec * 300.0f));
+	m_pGuide->SetVec3Rotation(D3DXVECTOR3(0.0f, atan2f(vecStick.x, -vecStick.y), 0.0f));
+	if (vecStick != VEC3_ZERO)
+	{
+		m_pGuide->SetEnableDraw(true);
+	}
+	else
+	{
+		m_pGuide->SetEnableDraw(false);
+	}
 	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
+	
 	// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
