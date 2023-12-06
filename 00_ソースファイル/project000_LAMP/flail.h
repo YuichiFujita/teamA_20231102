@@ -17,6 +17,7 @@
 #include "objectModel.h"
 #include "multiModel.h"
 #include "player.h"
+#include "objectOrbit.h"
 
 namespace flail
 {
@@ -130,6 +131,7 @@ private:
 
 	// ƒƒ“ƒo•Ï”
 	SChain		m_chain[flail::FLAIL_NUM_MAX];		// ½
+	CObjectOrbit * m_pOrbit;
 	D3DXVECTOR3 m_posOrg;						// ‰ñ“]Œ´“_
 	D3DXVECTOR3 m_oldPos;						// ‰ß‹‚ÌˆÊ’u
 	D3DXVECTOR3	m_move;							// ˆÚ“®—Ê
