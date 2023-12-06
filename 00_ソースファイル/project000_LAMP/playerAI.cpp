@@ -160,9 +160,7 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 		m_pFlail->SetChainRotTarget(m_fRotstickR);
 
-		//m_fRotstickL = m_fRotstickR - (D3DX_PI * 0.5f);
-
-		//rDestRot.y = m_fRotstickR - HALF_PI;
+		m_fRotstickL = m_fRotstickR - (D3DX_PI * 0.5f);
 
 		if (m_nCounterFlail == flail::FLAIL_CHARGE || D3DXVec3Length(&vec) < flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)))
 		{
@@ -207,7 +205,7 @@ CPlayer::EMotion CPlayerAI::AIselect
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[ãﬂÇ≠ÇÃìG]ÅF%d\n", nApproach);
 
 	currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
-	//currentMotion = AIatack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+	currentMotion = AIatack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
 
 	return currentMotion;
 }
