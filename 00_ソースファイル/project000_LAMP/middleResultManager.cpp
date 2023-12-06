@@ -16,6 +16,8 @@
 #include "object2D.h"
 #include "valueUI.h"
 #include "multiValue.h"
+#include "fade.h"
+#include "retentionManager.h"
 
 //************************************************************
 //	定数宣言
@@ -23,6 +25,7 @@
 namespace
 {
 	const int PRIORITY = 14;	// 中間リザルトの優先順位
+	const int WAIT_FRAME = 8;	// 遷移の余韻フレーム
 
 	// フェード基本情報
 	namespace fade
@@ -37,8 +40,8 @@ namespace
 		const D3DXCOLOR		COL		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.88f);			// フェード色
 
 		const int	WAIT_FRAME	= 8;		// フェード待機フレーム
-		const float	ADD_MOVE	= 0.4f;		// フェード移動量
-		const float	ADD_ACCEL_MOVE = 1.75f;	// フェード加速移動量
+		const float	ADD_MOVE	= 0.65f;	// フェード移動量
+		const float	ADD_ACCEL_MOVE = 2.1f;	// フェード加速移動量
 	}
 
 	// ランキングタイトル基本情報
@@ -86,6 +89,7 @@ namespace
 		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
 		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);		// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;							// 数字空白
+		const D3DXCOLOR		COL_NOTJOIN = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);	// 非参加時の色
 		const int			DIGIT		= 1;									// 桁数
 	}
 
@@ -118,6 +122,19 @@ namespace
 		const float	ADD_SCALE	= 0.09f;	// プレイヤーフレーム加算拡大率
 		const float	SET_SCALE	= 1.0f;		// プレイヤーフレーム設定拡大率
 	}
+
+	// 操作基本情報
+	namespace control
+	{
+		const float	ADD_ALPHA		= 0.0045f;	// 透明度の加算量
+		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+		const float	MAX_ADD_ALPHA	= 0.45f;	// 透明度の最大加算量
+		const float	BASIC_ALPHA		= 0.85f;	// 基準の透明度
+
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(1080.0f, 660.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(370.0f, 90.0f, 0.0f);		// 大きさ
+		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);	// 色
+	}
 }
 
 //************************************************************
@@ -132,6 +149,7 @@ const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\entry_player.png",		// プレイヤーテクスチャ
 	NULL,	// 勝利ポイントテクスチャ
 	"data\\TEXTURE\\entry_flame.png",		// フレームテクスチャ
+	NULL,	// 操作方法テクスチャ
 };
 
 //************************************************************
@@ -147,6 +165,7 @@ CMiddleResultManager::CMiddleResultManager()
 	memset(&m_apPlayerWinPoint[0], 0, sizeof(m_apPlayerWinPoint));	// プレイヤー勝利ポイントの情報
 	memset(&m_apFrame[0], 0, sizeof(m_apFrame));					// プレイヤーフレームの情報
 
+	m_pControl		= NULL;	// 操作の情報
 	m_pFade			= NULL;	// フェードの情報
 	m_pTitle		= NULL;	// タイトルの情報
 	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
@@ -155,6 +174,7 @@ CMiddleResultManager::CMiddleResultManager()
 	m_state		= STATE_FADEIN;	// 状態
 	m_fMoveY	= 0.0f;			// 縦移動量
 	m_fScale	= 0.0f;			// 拡大率
+	m_fSinAlpha	= 0.0f;			// 透明向き
 	m_nCounterState = 0;		// 状態管理カウンター
 }
 
@@ -178,6 +198,7 @@ HRESULT CMiddleResultManager::Init(void)
 	memset(&m_apPlayerWinPoint[0], 0, sizeof(m_apPlayerWinPoint));	// プレイヤー勝利ポイントの情報
 	memset(&m_apFrame[0], 0, sizeof(m_apFrame));					// プレイヤーフレームの情報
 
+	m_pControl		= NULL;	// 操作の情報
 	m_pFade			= NULL;	// フェードの情報
 	m_pTitle		= NULL;	// タイトルの情報
 	m_pWinPointBG	= NULL;	// 勝利ポイントの背景情報
@@ -186,6 +207,7 @@ HRESULT CMiddleResultManager::Init(void)
 	m_state		= STATE_FADEIN;	// 状態
 	m_fMoveY	= 0.0f;			// 縦移動量
 	m_fScale	= 1.0f;			// 拡大率
+	m_fSinAlpha	= -HALF_PI;		// 透明向き
 	m_nCounterState = 0;		// 状態管理カウンター
 
 	//--------------------------------------------------------
@@ -290,6 +312,9 @@ HRESULT CMiddleResultManager::Init(void)
 	// 自動描画をOFFにする
 	m_pWinPoint->SetEnableDraw(false);
 
+	// 数字を設定
+	m_pWinPoint->GetMultiValue()->SetNum(0);	// TODO：終了のポイント代入
+
 	//--------------------------------------------------------
 	//	プレイヤーフレーム・勝利ポイント・ナンバーの生成
 	//--------------------------------------------------------
@@ -300,7 +325,7 @@ HRESULT CMiddleResultManager::Init(void)
 		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
 
 		// 変数を宣言
-		D3DXCOLOR colPolygon = (pPlayer == NULL) ? D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f) : XCOL_WHITE;	// ポリゴン色
+		D3DXCOLOR colPolygon = (pPlayer == NULL) ? number::COL_NOTJOIN : XCOL_WHITE;	// ポリゴン色
 
 		// プレイヤーフレームの生成
 		m_apFrame[nCntEntry] = CObject2D::Create
@@ -394,6 +419,33 @@ HRESULT CMiddleResultManager::Init(void)
 		m_apNumber[nCntEntry]->GetMultiValue()->SetNum(nCntEntry + 1);
 	}
 
+	//--------------------------------------------------------
+	//	操作の生成
+	//--------------------------------------------------------
+	m_pControl = CObject2D::Create
+	( // 引数
+		control::POS,	// 位置
+		control::SIZE,	// 大きさ
+		VEC3_ZERO,		// 向き
+		XCOL_AWHITE		// 色
+	);
+	if (m_pControl == NULL)
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// テクスチャを登録・割当
+	m_pControl->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
+
+	// 優先順位を設定
+	m_pControl->SetPriority(PRIORITY);
+
+	// 自動描画をOFFにする
+	m_pControl->SetEnableDraw(false);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -414,6 +466,9 @@ HRESULT CMiddleResultManager::Uninit(void)
 
 	// 勝利ポイントの終了
 	m_pWinPoint->Uninit();
+
+	// 操作の終了
+	m_pControl->Uninit();
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -518,13 +573,8 @@ void CMiddleResultManager::Update(void)
 
 	case STATE_WAIT:
 
-		// TODO：仮の処理
-		m_nCounterState++;
-		if (m_nCounterState == 60)
-		{
-			m_nCounterState = 0;
-			m_state = STATE_FADEOUT;
-		}
+		// 待機の更新
+		UpdateWait();
 
 		break;
 
@@ -551,18 +601,22 @@ void CMiddleResultManager::Update(void)
 
 	case STATE_END:
 
-		//if ()
-		{ // 勝者が決まっていない場合
+		if (CManager::GetInstance()->GetFade()->GetState() == CFade::FADE_NONE)
+		{ // フェード中ではない場合
 
-			// ゲームに遷移
-			CManager::GetInstance()->SetScene(CScene::MODE_GAME);
+			//if ()
+			{ // 勝者が決まっていない場合
+
+				// ゲームに遷移
+				CManager::GetInstance()->SetScene(CScene::MODE_GAME, WAIT_FRAME);
+			}
+			//else
+			//{ // 勝者が決まった場合
+
+			//	// リザルトに遷移
+			//	CManager::GetInstance()->SetScene(CScene::MODE_RESULT, WAIT_FRAME);
+			//}
 		}
-		//else
-		//{ // 勝者が決まった場合
-
-		//	// リザルトに遷移
-		//	CManager::GetInstance()->SetScene(CScene::MODE_RESULT);
-		//}
 
 		break;
 
@@ -570,6 +624,9 @@ void CMiddleResultManager::Update(void)
 		assert(false);
 		break;
 	}
+
+	// 遷移決定の更新
+	UpdateTransition();
 
 	// フェードの更新
 	m_pFade->Update();
@@ -582,6 +639,9 @@ void CMiddleResultManager::Update(void)
 
 	// 勝利ポイントの更新
 	m_pWinPoint->Update();
+
+	// 操作の更新
+	m_pControl->Update();
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -989,8 +1049,53 @@ void CMiddleResultManager::UpdatePlayerPoint(void)
 		// 拡大率を初期化
 		m_fScale = 1.0f;
 
+		// 操作の自動描画をONにする
+		m_pControl->SetEnableDraw(true);
+
 		// 待機状態にする
 		m_state = STATE_WAIT;
+	}
+}
+
+//============================================================
+//	待機の更新処理
+//============================================================
+void CMiddleResultManager::UpdateWait(void)
+{
+	// 変数を宣言
+	D3DXCOLOR colControl = m_pControl->GetColor();	// 操作表示色
+
+	if (colControl.a < control::MIN_COL.a)
+	{ // 透明度が最低限より低い場合
+
+		// 透明度を加算
+		colControl.a += control::ADD_ALPHA;
+
+		if (colControl.a > control::MIN_COL.a)
+		{ // 透明度が超過した場合
+
+			// 透明度を補正
+			colControl.a = control::MIN_COL.a;
+		}
+
+		// 操作表示色を設定
+		m_pControl->SetColor(colControl);
+	}
+	else
+	{ // 透明度が最低限以上の場合
+
+		// 変数を宣言
+		float fAddAlpha = 0.0f;	// 透明度の加算量
+
+		// 透明度を上げる
+		m_fSinAlpha += control::ADD_SINROT;
+		useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
+
+		// 透明度加算量を求める
+		fAddAlpha = (control::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
+
+		// 操作表示色を設定
+		m_pControl->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, control::BASIC_ALPHA + fAddAlpha));
 	}
 }
 
@@ -1091,6 +1196,97 @@ void CMiddleResultManager::UpdateFadeOutAccel(void)
 
 	// フェード位置を反映
 	m_pFade->SetVec3Position(posFade);
+}
+
+//============================================================
+//	遷移決定の更新処理
+//============================================================
+void CMiddleResultManager::UpdateTransition(void)
+{
+	// ポインタを宣言
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+
+	if (pKeyboard->IsTrigger(DIK_RETURN)
+	||  pKeyboard->IsTrigger(DIK_SPACE)
+	||  pPad->IsTrigger(CInputPad::KEY_A)
+	||  pPad->IsTrigger(CInputPad::KEY_B)
+	||  pPad->IsTrigger(CInputPad::KEY_X)
+	||  pPad->IsTrigger(CInputPad::KEY_Y)
+	||  pPad->IsTrigger(CInputPad::KEY_START))
+	{
+		if (m_state != STATE_WAIT)
+		{ // 遷移待機状態ではない場合
+
+			if (m_state != STATE_FADEOUT		// フェードアウト状態
+			&&  m_state != STATE_FADEOUT_WAIT	// フェードアウト待機状態
+			&&  m_state != STATE_FADEOUT_ACCEL	// フェードアウト加速状態
+			&&  m_state != STATE_END)			// 終了状態
+			{ // 上記の状態ではない場合
+
+				// 演出スキップ
+				SkipStaging();
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
+			}
+		}
+		else
+		{ // 遷移待機状態の場合
+
+			// 操作の自動描画をOFFにする
+			m_pControl->SetEnableDraw(false);
+
+			// フェードアウト状態にする
+			m_state = STATE_FADEOUT;
+		}
+	}
+}
+
+//============================================================
+//	演出スキップ処理
+//============================================================
+void CMiddleResultManager::SkipStaging(void)
+{
+	// 情報を初期化
+	m_fMoveY = 0.0f;	// 移動量
+	m_fScale = 1.0f;	// 拡大率
+
+	// 自動描画をONにする
+	m_pTitle->SetEnableDraw(true);		// ランキングタイトル
+	m_pWinPointBG->SetEnableDraw(true);	// 勝利ポイント背景
+	m_pWinPoint->SetEnableDraw(true);	// 勝利ポイント表示
+	m_pControl->SetEnableDraw(true);	// 操作
+
+	// フェード位置を反映
+	m_pFade->SetVec3Position(D3DXVECTOR3(fade::CENT_POS.x, fade::CENT_POS.y, 0.0f));
+
+	// ランキングタイトル大きさを反映
+	m_pTitle->SetVec3Sizing(title::SIZE);
+
+	// 勝利ポイント背景の大きさを反映
+	m_pWinPointBG->SetVec3Sizing(winBG::SIZE);
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// 自動描画をONにする
+		m_apFrame[nCntEntry]->SetEnableDraw(true);			// プレイヤーフレーム
+		m_apPlayerWinPoint[nCntEntry]->SetEnableDraw(true);	// プレイヤー勝利ポイント
+		m_apNumber[nCntEntry]->SetEnableDraw(true);			// プレイヤーナンバー
+
+		// プレイヤーフレームの大きさを反映
+		m_apFrame[nCntEntry]->SetVec3Sizing(frame::SIZE);
+
+		// プレイヤーナンバー・勝利ポイントの大きさを反映
+		m_apNumber[nCntEntry]->SetScalingTitle(number::SIZE_TITLE);
+		m_apNumber[nCntEntry]->GetMultiValue()->SetVec3Sizing(number::SIZE_VALUE);
+		m_apPlayerWinPoint[nCntEntry]->SetScalingTitle(playerPoint::SIZE_TITLE);
+		m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetVec3Sizing(playerPoint::SIZE_VALUE);
+	}
+
+	// 状態を変更
+	m_state = STATE_WAIT;	// 遷移待機状態
 }
 
 //============================================================

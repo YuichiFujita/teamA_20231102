@@ -39,6 +39,7 @@ public:
 		TEXTURE_PLAYER,			// プレイヤーテクスチャ
 		TEXTURE_PLAYER_POINT,	// 勝利ポイントテクスチャ
 		TEXTURE_FRAME,			// フレームテクスチャ
+		TEXTURE_CONTROL,		// 操作方法テクスチャ
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -92,10 +93,13 @@ private:
 	void UpdateFrame(void);				// プレイヤーフレーム表示更新
 	void UpdatePlayerPointWait(void);	// プレイヤー勝利ポイント待機更新
 	void UpdatePlayerPoint(void);		// プレイヤー勝利ポイント表示更新
+	void UpdateWait(void);				// 待機更新
 	void UpdateFadeOut(void);			// フェードアウト更新
 	void UpdateFadeOutWait(void);		// フェードアウト待機更新
 	void UpdateFadeOutAccel(void);		// フェードアウト加速更新
 
+	void UpdateTransition(void);	// 遷移決定
+	void SkipStaging(void);			// 演出スキップ
 	void MovePositionAll(const D3DXVECTOR3& rAddMove);	// 全位置の移動
 
 	// 静的メンバ変数
@@ -103,6 +107,7 @@ private:
 
 	// メンバ変数
 	CObject2D	*m_pFade;		// フェードの情報
+	CObject2D	*m_pControl;	// 操作の情報
 	CObject2D	*m_pTitle;		// タイトルの情報
 	CObject2D	*m_pWinPointBG;	// 勝利ポイントの背景情報
 	CValueUI	*m_pWinPoint;	// 勝利ポイントの情報
@@ -114,6 +119,7 @@ private:
 	int		m_nCounterState;	// 状態管理カウンター
 	float	m_fMoveY;			// 縦移動量
 	float	m_fScale;			// 拡大率
+	float	m_fSinAlpha;		// 透明向き
 };
 
 #endif	// _MIDDLE_RESULT_MANAGER_H_

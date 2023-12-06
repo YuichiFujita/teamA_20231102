@@ -161,7 +161,7 @@ HRESULT CTitleManager::Init(void)
 		m_apLogo[nCntTitle] = CObject2D::Create
 		( // ˆø”
 			LOGO_POS,	// ˆÊ’u
-			aTitle_Size[nCntTitle]	// ‘å‚«‚³
+			aTitle_Size[nCntTitle] * INIT_SCALE	// ‘å‚«‚³
 		);
 		if (m_apLogo[nCntTitle] == NULL)
 		{ // ¶¬‚É¸”s‚µ‚½ê‡
