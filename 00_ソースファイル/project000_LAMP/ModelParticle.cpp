@@ -102,6 +102,11 @@ void CModParticle::Set(void)
 		m_move.y = cosf((rand() % 629 - 314) / FLOAT_VALUE) * 1.0f;
 		m_move.z = cosf((rand() % 629 - 314) / FLOAT_VALUE) * 1.0f;
 
+		// ベクトルをランダムに設定
+		m_rot.x = sinf((rand() % 629 - 314) / FLOAT_VALUE) * 1.0f;
+		m_rot.y = cosf((rand() % 629 - 314) / FLOAT_VALUE) * 1.0f;
+		m_rot.z = cosf((rand() % 629 - 314) / FLOAT_VALUE) * 1.0f;
+
 		// ベクトルを正規化
 		D3DXVec3Normalize(&m_move, &m_move);
 
