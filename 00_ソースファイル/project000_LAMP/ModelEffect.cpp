@@ -24,7 +24,7 @@ namespace
 {
 	const int		MAX_PIECE	= 3;		//かけらの最大個数
 	const float		VALUE_GRAV	= 1.5f;		//重力を加える値
-	const float		VALUE_UP	= 60.0f;	//上昇する値
+	const float		VALUE_UP	= 50.0f;	//上昇する値
 	const int		MAX_LAND	= 4;		//着地数の最大数
 	const float		VALUE_ALPHA = 0.1f;		//透明度を下げる値
 

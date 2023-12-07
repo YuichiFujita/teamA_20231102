@@ -7,7 +7,7 @@
 namespace
 {
 	const int			NUM_PARTICLE	= 1;											//使うパーティクルの数
-	const D3DXVECTOR3	MOVE_VALUE		= D3DXVECTOR3(20.0f, 45.0f, 20.0f);				//移動値
+	const D3DXVECTOR3	MOVE_VALUE		= D3DXVECTOR3(5.0f, 45.0f, 5.0f);				//移動値
 	const int			NUM_LIFE		= 100;											//寿命
 	const float			FLOAT_VALUE		= 100.0f;										//移動値を出すための値
 }
