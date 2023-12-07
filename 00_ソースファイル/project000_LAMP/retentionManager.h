@@ -66,7 +66,8 @@ public:
 	int GetNumPlayer(void) const;			// プレイ人数取得
 	void InitNumSurvival(void);				// 生存人数初期化
 	int GetNumSurvival(void) const;			// 生存人数取得
-
+	void SetWinPoint(const int nWinPoint);	// 勝利ポイント設定
+	int GetWinPoint(void) const;			// 勝利ポイント取得
 	void AllSetEnableEntry(const bool bEntry);				// 全エントリー状況設定
 	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
 	bool IsEntry(const int nID) const;						// エントリー状況取得

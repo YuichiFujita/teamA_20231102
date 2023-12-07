@@ -210,6 +210,24 @@ int CRetentionManager::GetNumSurvival(void) const
 }
 
 //============================================================
+//	勝利ポイントの設定処理
+//============================================================
+void CRetentionManager::SetWinPoint(const int nWinPoint)
+{
+	// 引数の勝利ポイントを設定
+	m_nWinPoint = nWinPoint;
+}
+
+//============================================================
+//	勝利ポイント取得処理
+//============================================================
+int CRetentionManager::GetWinPoint(void) const
+{
+	// 勝利ポイントを返す
+	return m_nWinPoint;
+}
+
+//============================================================
 //	全エントリー状況の設定処理
 //============================================================
 void CRetentionManager::AllSetEnableEntry(const bool bEntry)

@@ -17,6 +17,7 @@
 #include "valueUI.h"
 #include "multiValue.h"
 #include "fade.h"
+#include "player.h"
 #include "retentionManager.h"
 
 //************************************************************
@@ -313,7 +314,7 @@ HRESULT CMiddleResultManager::Init(void)
 	m_pWinPoint->SetEnableDraw(false);
 
 	// 数字を設定
-	m_pWinPoint->GetMultiValue()->SetNum(0);	// TODO：終了のポイント代入
+	m_pWinPoint->GetMultiValue()->SetNum(CManager::GetInstance()->GetRetentionManager()->GetWinPoint());
 
 	//--------------------------------------------------------
 	//	プレイヤーフレーム・勝利ポイント・ナンバーの生成
@@ -325,6 +326,7 @@ HRESULT CMiddleResultManager::Init(void)
 		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
 
 		// 変数を宣言
+		int nPlayerWinPoint = (pPlayer == NULL) ? 0 : pPlayer->GetWinPoint();			// プレイヤー勝利ポイント
 		D3DXCOLOR colPolygon = (pPlayer == NULL) ? number::COL_NOTJOIN : XCOL_WHITE;	// ポリゴン色
 
 		// プレイヤーフレームの生成
@@ -383,7 +385,7 @@ HRESULT CMiddleResultManager::Init(void)
 		m_apPlayerWinPoint[nCntEntry]->SetEnableDraw(false);
 
 		// 数字を設定
-		m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetNum(0);	// TODO：現在のポイント代入
+		m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetNum(nPlayerWinPoint);
 
 		// プレイヤーナンバーの生成
 		m_apNumber[nCntEntry] = CValueUI::Create
