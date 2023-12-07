@@ -126,7 +126,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= false;		// ジャンプ状況
-	m_bAI			= false;
+	m_bAI			= true;
 }
 
 //============================================================
@@ -194,7 +194,7 @@ HRESULT CPlayer::Init(void)
 	m_pFlail->SetPlayerID(m_nPadID);
 
 	// フレイルの生成
-	m_pAI = CPlayerAI::Create(m_pFlail, &GetVec3Position(), &m_move, &m_destRot, &m_nCounterFlail, m_nPadID);
+	m_pAI = CPlayerAI::Create(m_nPadID);
 	if (m_pAI == NULL)
 	{ // 非使用中の場合
 
@@ -646,6 +646,8 @@ void CPlayer::SetSpawn(void)
 		// 向きを設定
 		SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
 		m_destRot = pSpawnPoint->GetVec3Rotation();
+
+		m_pAI->SetRotstickL(m_destRot.y);
 	}
 	else
 	{ // スポーンポイントがない場合
@@ -846,6 +848,14 @@ int CPlayer::GetCounterFlail(void) const
 }
 
 //============================================================
+//	フレイルカウンター設定処理
+//============================================================
+void CPlayer::SetCounterFlail(const int nCounterFlail)
+{
+	m_nCounterFlail = nCounterFlail;
+}
+
+//============================================================
 //	自身のメインカラーマテリアル設定処理
 //============================================================
 void CPlayer::SetMainMaterial(void)
@@ -1027,13 +1037,11 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		
+		// CPU操作
+		m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
 	}
 	else
 	{
-		// CPU操作
-		m_pAI->playerAI(m_motionOld);
-
 		// 移動操作
 		currentMotion = UpdateMove(posPlayer);
 	}
@@ -1046,14 +1054,15 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		m_pAI->AIDash
+		/*m_pAI->AIDash
 		(
+			GetVec3Position(),
 			m_move,
 			m_dashRot,
 			m_destRot,
 			m_fPlusMove,
 			m_bDash
-		);
+		);*/
 	}
 	else
 	{
@@ -1323,8 +1332,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			rotDiff = rotMove - rotFlail;
 			useful::NormalizeRot(rotDiff);
 
-			CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角度差]：%f\n", rotDiff);
-
 			if (rotDiff > D3DX_PI * 0.5f || rotDiff < D3DX_PI * -0.5f)
 			{
 				// 引きずりモーションを設定
@@ -1465,7 +1472,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 2.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 3.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
 		{
 			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
@@ -1497,12 +1504,12 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						if (rot3 > 0.0f)
 						{
 							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(0.1f);
+							m_pFlail->SetChainRotMove(0.03f);
 						}
 						else
 						{
 							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(-0.1f);
+							m_pFlail->SetChainRotMove(-0.03f);
 						}
 					}
 					else
@@ -1549,6 +1556,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+	//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動量]：%f %f %f\n", m_move.x, m_move.y, m_move.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", m_nCounterFlail);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖長さ]：%f\n", m_pFlail->GetLengthChain());
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖目標長さ]：%f\n", m_pFlail->GetLengthTarget());

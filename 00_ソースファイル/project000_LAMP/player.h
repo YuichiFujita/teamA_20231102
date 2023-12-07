@@ -130,6 +130,7 @@ public:
 	void HitKillY(const int nDmg);			// キルY座標ヒット
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
+	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
 
 protected:
 	// メンバ関数

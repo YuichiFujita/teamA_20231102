@@ -208,15 +208,7 @@ void CFlail::UpdateFlailPos(void)
 			D3DXMATRIX chainMtx = m_chain[0].multiModel->GetMtxWorld();
 			D3DXVECTOR3 chainPos = D3DXVECTOR3(chainMtx._41, chainMtx._42, chainMtx._43);
 
-			if (pos.y < chainPos.y)
-			{
-				pos.y += 10.0f;
-			}
-			
-			if (pos.y > chainPos.y)
-			{
-				pos.y = chainPos.y;
-			}
+			pos.y = chainPos.y;
 		}
 		else
 		{
@@ -378,7 +370,7 @@ void CFlail::UpdateChain(void)
 				{
 					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
-						pos.x += 0.7f;
+						pos.x += 0.4f + ((m_fLengthTarget - 700.0f) * 0.0006f);
 
 						if (pos.x > flail::FLAIL_RADIUS)
 						{
@@ -419,7 +411,14 @@ void CFlail::UpdateChain(void)
 			{
 				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
 				{
-					pos.x -= -0.3f * player->GetCounterFlail();
+					float speed = -0.5f * player->GetCounterFlail();
+
+					if (speed > 10.0f)
+					{
+						speed = 10.0f;  
+					}
+
+					pos.x -= speed;
 					
 					if (pos.x < 0.0f)
 					{
@@ -648,7 +647,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
-		for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+		for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
 		{
 			CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
 
@@ -1228,9 +1227,10 @@ void CFlail::CatchFlail()
 		m_chain[nCntChain].rotOld = m_chain[nCntChain].multiModel->GetVec3Rotation();
 		m_chain[nCntChain].posOld = m_chain[nCntChain].multiModel->GetVec3Position();
 
+		pos = VEC3_ZERO;
+
 		if (nCntChain == 0)
 		{
-			pos = VEC3_ZERO;
 			rot = VEC3_ZERO;
 		}
 		else
@@ -1290,11 +1290,11 @@ void CFlail::ShotFlail(const float rot)
 
 			if (nCntChain == 1)
 			{
-				rotChain.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
+				rotChain.y = 0.0f;
 			}
 			else
 			{
-				rotChain.y = m_chain[IDParent].rotOld.y * 1.0f;
+				rotChain.y = 0.0f;
 			}
 		}
 
