@@ -183,6 +183,8 @@
     <ClCompile Include="mask.cpp" />
     <ClCompile Include="middleResultManager.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="ModelEffect.cpp" />
+    <ClCompile Include="ModelParticle.cpp" />
     <ClCompile Include="modelUI.cpp" />
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="multiModel.cpp" />
@@ -277,6 +279,8 @@
     <ClInclude Include="mask.h" />
     <ClInclude Include="middleResultManager.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="ModelEffect.h" />
+    <ClInclude Include="ModelParticle.h" />
     <ClInclude Include="modelUI.h" />
     <ClInclude Include="motion.h" />
     <ClInclude Include="multiModel.h" />
