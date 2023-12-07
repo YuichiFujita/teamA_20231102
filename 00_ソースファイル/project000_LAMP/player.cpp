@@ -429,7 +429,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			SetMotion(MOTION_DEATH);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f, 0.99f);
 		}
 		else
 		{ // 死亡していない場合
@@ -812,7 +812,7 @@ void CPlayer::HitKillY(const int nDmg)
 			SetMotion(MOTION_DEATH);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 0.0f,100.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.1f, 0.99f);
 		}
 		else
 		{ // 死亡していない場合
@@ -821,7 +821,7 @@ void CPlayer::HitKillY(const int nDmg)
 			SetSpawn();
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 0.0f, 100.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.1f, 0.99f);
 		}
 
 		// サウンドの再生
