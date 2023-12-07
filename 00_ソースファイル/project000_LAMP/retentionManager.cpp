@@ -20,12 +20,12 @@ CRetentionManager::CRetentionManager()
 {
 	// メンバ変数をクリア
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
-	memset(&m_aWinPoint[0], 0, sizeof(m_aWinPoint));			// 勝利ポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
 	m_nNumSurvival	= 0;			// 生存プレイヤー数
+	m_nWinPoint		= 0;			// 勝利ポイント数
 }
 
 //============================================================
@@ -43,12 +43,12 @@ HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
-	memset(&m_aWinPoint[0], 0, sizeof(m_aWinPoint));			// 勝利ポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
 	m_nNumSurvival	= 0;			// 生存プレイヤー数
+	m_nWinPoint		= 0;			// 勝利ポイント数
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す

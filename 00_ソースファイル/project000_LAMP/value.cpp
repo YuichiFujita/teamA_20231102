@@ -25,7 +25,9 @@
 const char *CValue::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\number000.png",	// 通常テクスチャ
-	"data\\TEXTURE\\number001.png",	// 通常テクスチャ
+	"data\\TEXTURE\\number001.png",	// UI数字テクスチャ
+	"data\\TEXTURE\\number002.png",	// 銀数字テクスチャ
+	"data\\TEXTURE\\number003.png",	// 零ゴシックテクスチャ
 };
 
 //************************************************************
