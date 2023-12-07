@@ -16,7 +16,7 @@
 #include "main.h"
 #include "objectChara.h"
 #include "scene.h"
-
+#include "object3D.h"
 //************************************************************
 //	前方宣言
 //************************************************************
@@ -130,6 +130,7 @@ public:
 	void HitKillY(const int nDmg);			// キルY座標ヒット
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
+	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
 
 protected:
 	// メンバ関数
@@ -172,6 +173,7 @@ private:
 	D3DXVECTOR3	m_destRot;			// 目標向き
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
+	CObject3D * m_pGuide;			//投擲方向
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

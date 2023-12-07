@@ -57,7 +57,7 @@ private:
 	void Release(void) override;	// 破棄
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
-	CObjectOrbit * m_pOrbit;	//オービット
+	CObjectOrbit ** m_pOrbit;	//オービット
 	D3DXMATRIX m_Mtx;
 							// メンバ変数
 	D3DXVECTOR3 m_pos;		//座標

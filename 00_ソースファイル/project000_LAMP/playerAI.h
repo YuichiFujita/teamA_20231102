@@ -35,24 +35,51 @@ public:
 	// デストラクタ
 	~CPlayerAI();
 
-	HRESULT Init
+	HRESULT Init(const int nPadID);
+
+	CPlayer::EMotion playerAI
 	(
 		CFlail* pFlail,
-		D3DXVECTOR3* pPos,
-		D3DXVECTOR3* pMove,
-		D3DXVECTOR3* pDestRot,
-		int* pCounterFlail,
-		const int nPadID
+		D3DXVECTOR3& rPos,
+		D3DXVECTOR3& rMove,
+		D3DXVECTOR3& rDestRot,
+		int pCounterFlail,
+		const int nMotionOld
 	);
 
-	CPlayer::EMotion playerAI(const int nMotionOld);
+	CPlayer::EMotion AIselect
+	(
+		CFlail* pFlail,
+		D3DXVECTOR3& rPos,
+		D3DXVECTOR3& rMove,
+		D3DXVECTOR3& rDestRot,
+		int pCounterFlail,
+		const int nMotionOld
+	);
 
-	void AIselect(void);
-	void AIatack(void);
-	void AImove(void);
+	CPlayer::EMotion AIatack
+	(
+		CFlail* pFlail,
+		D3DXVECTOR3& rPos,
+		D3DXVECTOR3& rMove,
+		D3DXVECTOR3& rDestRot,
+		int pCounterFlail,
+		const int nMotionOld
+	);
+
+	CPlayer::EMotion AImove
+	(
+		CFlail* pFlail,
+		D3DXVECTOR3& rPos,
+		D3DXVECTOR3& rMove,
+		D3DXVECTOR3& rDestRot,
+		int pCounterFlail,
+		const int nMotionOld
+	);
 
 	void AIDash
 	(
+		D3DXVECTOR3& rPos,
 		D3DXVECTOR3& rMove,
 		D3DXVECTOR3& rDashRot,
 		D3DXVECTOR3& rDestRot,
@@ -60,35 +87,33 @@ public:
 		bool& rDash
 	);
 
+	void SetRotstickL(const float RotstickL);
+
 	// 静的メンバ関数
-	static CPlayerAI *Create	// 生成
-	( // 引数
-		CFlail* pFlail,
-		D3DXVECTOR3* pPos,
-		D3DXVECTOR3* pMove,
-		D3DXVECTOR3* pDestRot,
-		int* pCounterFlail,
-		const int nPadID
-	);
+	static CPlayerAI *Create(const int nPadID);	// 生成
 
 private:
 
 	//メンバ関数
 	bool Collision(D3DXVECTOR3& rPos);		// 長さ設定
 	bool CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	bool CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
+	bool CollisionObstacle(D3DXVECTOR3& rPos);
 
 	// メンバ変数
 	CFlail* m_pFlail;
-	D3DXVECTOR3* m_pPos;
-	D3DXVECTOR3* m_pMove;
-	D3DXVECTOR3* m_pDestRot;
-	int* m_pCounterFlail;
+	D3DXVECTOR3 m_pDashRot;
+	int m_nCounterFlail;
 	int m_nMotionOld;
 	int m_nPadID;
+	int m_nApproachNum;
+	bool m_bDash;
 
-	float fRotstickR;
+	float m_fRotstickR;
+	float m_fRotstickL;
 
 	bool m_bAtack;
+	bool m_bMove;
 };
 
 #endif	// _PLAYERAI_H_

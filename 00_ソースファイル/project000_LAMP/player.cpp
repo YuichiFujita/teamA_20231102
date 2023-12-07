@@ -33,6 +33,7 @@
 #include "scrollMeshField.h"
 
 #include "effect3D.h"
+
 #include "particle3D.h"
 
 #include "statusManager.h"
@@ -125,7 +126,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= false;		// ジャンプ状況
-	m_bAI			= false;
+	m_bAI			= true;
 }
 
 //============================================================
@@ -193,7 +194,7 @@ HRESULT CPlayer::Init(void)
 	m_pFlail->SetPlayerID(m_nPadID);
 
 	// フレイルの生成
-	m_pAI = CPlayerAI::Create(m_pFlail, &GetVec3Position(), &m_move, &m_destRot, &m_nCounterFlail, m_nPadID);
+	m_pAI = CPlayerAI::Create(m_nPadID);
 	if (m_pAI == NULL)
 	{ // 非使用中の場合
 
@@ -207,6 +208,10 @@ HRESULT CPlayer::Init(void)
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
 
+	m_pGuide = CObject3D::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
+	m_pGuide->SetEnableDraw(false);
+	m_pGuide->SetLabel(ELabel::LABEL_UI);
+	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
 	// 成功を返す
 	return S_OK;
 }
@@ -229,7 +234,12 @@ void CPlayer::Uninit(void)
 		delete m_pAI;
 		m_pAI = NULL;
 	}
-
+	if (m_pGuide != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pGuide->Uninit();
+		m_pGuide = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -419,7 +429,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			SetMotion(MOTION_DEATH);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f, 0.99f);
 		}
 		else
 		{ // 死亡していない場合
@@ -636,6 +646,8 @@ void CPlayer::SetSpawn(void)
 		// 向きを設定
 		SetVec3Rotation(pSpawnPoint->GetVec3Rotation());
 		m_destRot = pSpawnPoint->GetVec3Rotation();
+
+		m_pAI->SetRotstickL(m_destRot.y);
 	}
 	else
 	{ // スポーンポイントがない場合
@@ -800,7 +812,7 @@ void CPlayer::HitKillY(const int nDmg)
 			SetMotion(MOTION_DEATH);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 0.0f,100.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.1f, 0.99f);
 		}
 		else
 		{ // 死亡していない場合
@@ -809,7 +821,7 @@ void CPlayer::HitKillY(const int nDmg)
 			SetSpawn();
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 0.0f, 100.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.1f, 0.99f);
 		}
 
 		// サウンドの再生
@@ -833,6 +845,14 @@ int CPlayer::GetCounterFlail(void) const
 {
 	// フレイルカウンターを返す
 	return m_nCounterFlail;
+}
+
+//============================================================
+//	フレイルカウンター設定処理
+//============================================================
+void CPlayer::SetCounterFlail(const int nCounterFlail)
+{
+	m_nCounterFlail = nCounterFlail;
 }
 
 //============================================================
@@ -1017,13 +1037,11 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		
+		// CPU操作
+		m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
 	}
 	else
 	{
-		// CPU操作
-		m_pAI->playerAI(m_motionOld);
-
 		// 移動操作
 		currentMotion = UpdateMove(posPlayer);
 	}
@@ -1036,14 +1054,15 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		m_pAI->AIDash
+		/*m_pAI->AIDash
 		(
+			GetVec3Position(),
 			m_move,
 			m_dashRot,
 			m_destRot,
 			m_fPlusMove,
 			m_bDash
-		);
+		);*/
 	}
 	else
 	{
@@ -1313,8 +1332,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			rotDiff = rotMove - rotFlail;
 			useful::NormalizeRot(rotDiff);
 
-			CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角度差]：%f\n", rotDiff);
-
 			if (rotDiff > D3DX_PI * 0.5f || rotDiff < D3DX_PI * -0.5f)
 			{
 				// 引きずりモーションを設定
@@ -1328,8 +1345,22 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 
 	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	D3DXVECTOR3 vec;
+	//ガイド表示計算
+	D3DXVec3Normalize(&vec, &D3DXVECTOR3(vecStick.x, 100.0f, -vecStick.y));
+	m_pGuide->SetVec3Position(GetVec3Position() + (vec * 300.0f));
+	m_pGuide->SetVec3Rotation(D3DXVECTOR3(0.0f, atan2f(vecStick.x, -vecStick.y), 0.0f));
+	if (vecStick != VEC3_ZERO)
+	{
+		m_pGuide->SetEnableDraw(true);
+	}
+	else
+	{
+		m_pGuide->SetEnableDraw(false);
+	}
 	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
+	
 	// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
@@ -1441,7 +1472,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 2.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 3.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
 		{
 			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
@@ -1473,12 +1504,12 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						if (rot3 > 0.0f)
 						{
 							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(0.1f);
+							m_pFlail->SetChainRotMove(0.03f);
 						}
 						else
 						{
 							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(-0.1f);
+							m_pFlail->SetChainRotMove(-0.03f);
 						}
 					}
 					else
@@ -1525,6 +1556,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 	// 位置を表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+	//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動量]：%f %f %f\n", m_move.x, m_move.y, m_move.z);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", m_nCounterFlail);
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖長さ]：%f\n", m_pFlail->GetLengthChain());
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[鎖目標長さ]：%f\n", m_pFlail->GetLengthTarget());

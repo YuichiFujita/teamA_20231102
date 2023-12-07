@@ -213,9 +213,10 @@ void CBlock::Hit(void)
 	//破壊できるブロックだったら
 	if (m_status.state == EBreak::BREAK_TRUE)
 	{
-		CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
-			CObjectMeshCube::GetVec3Position().z));
-
+	
+		// WATANABE：ビルドすると未解決の外部参照って言われたからコメントアウトしておきました
+		/*CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
+			CObjectMeshCube::GetVec3Position().z));*/
 		//終了処理を行う
 		Uninit();
 	}

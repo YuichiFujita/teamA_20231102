@@ -15,6 +15,7 @@
 #include "flail.h"
 #include "collision.h"
 #include "retentionManager.h"
+#include "obstacle.h"
 
 //************************************************************
 //	定数宣言
@@ -29,6 +30,7 @@ namespace
 	const float	DASH_MINMOVE = 0.06f;	// ダッシュ再度可能になる移動量
 
 	const float STICK_LENGTH = 2.458f;
+	const float	STICK_REV = 0.00015f;	// スティックの傾き量の補正係数
 }
 
 //============================================================
@@ -38,12 +40,13 @@ CPlayerAI::CPlayerAI()
 {
 	//初期値代入
 	m_pFlail = NULL;
-	m_pPos = NULL;
-	m_pMove = NULL;
-	m_pDestRot = NULL;
-	m_pCounterFlail = NULL;
+	m_pDashRot = VEC3_ZERO;
+	m_nCounterFlail = 0;
 	m_nPadID = 0;
-	fRotstickR = 0.0f;
+	m_fRotstickR = 0.0f;
+	m_bDash = false;
+	m_bAtack = false;
+	m_bMove = false;
 }
 
 //============================================================
@@ -57,23 +60,11 @@ CPlayerAI::~CPlayerAI()
 //============================================================
 //	初期化処理
 //============================================================
-HRESULT CPlayerAI::Init
-(
-	CFlail* pFlail,
-	D3DXVECTOR3* pPos,
-	D3DXVECTOR3* pMove,
-	D3DXVECTOR3* pDestRot,
-	int* pCounterFlail,
-	const int nPadID
-)
+HRESULT CPlayerAI::Init(const int nPadID)
 {
-	//初期値代入
-	m_pFlail = pFlail;
-	m_pPos = pPos;
-	m_pMove = pMove;
-	m_pDestRot = pDestRot;
-	m_pCounterFlail = pCounterFlail;
 	m_nPadID = nPadID;
+
+	m_fRotstickL = 0.0f;
 
 	// 成功を返す
 	return S_OK;
@@ -84,26 +75,48 @@ HRESULT CPlayerAI::Init
 //============================================================
 CPlayer::EMotion CPlayerAI::playerAI
 (
+	CFlail* pFlail,
+	D3DXVECTOR3& pPos,
+	D3DXVECTOR3& rMove,
+	D3DXVECTOR3& pDestRot,
+	int pCounterFlail,
 	const int nMotionOld
 )
 {
+	CPlayer::EMotion currentMotion = CPlayer::MOTION_IDOL;		// 現在のモーション
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+
+	//値代入
+	m_pFlail = pFlail;
+	m_nCounterFlail = pCounterFlail;
 	m_nMotionOld = nMotionOld;
 
-	AIselect();
+	currentMotion = AIselect(pFlail,pPos, rMove, pDestRot, pCounterFlail, nMotionOld);
 
-	return CPlayer::MOTION_IDOL;
+	player->SetCounterFlail(m_nCounterFlail);
+
+	return currentMotion;
 }
 
 //============================================================
 //	行動選択に関するAI
 //============================================================
-void CPlayerAI::AIselect()
+CPlayer::EMotion CPlayerAI::AIselect
+(
+	CFlail* pFlail,
+	D3DXVECTOR3& rPos,
+	D3DXVECTOR3& rMove,
+	D3DXVECTOR3& rDestRot,
+	int pCounterFlail,
+	const int nMotionOld
+)
 {
+	CPlayer::EMotion currentMotion = CPlayer::MOTION_IDOL;		// 現在のモーション
 	float fLengthMin = flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1);
 	int nApproach = 0;
-	int nApproachNum = 0;
+	m_nApproachNum = 0;
 
-	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
 	{
 		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
 
@@ -113,7 +126,7 @@ void CPlayerAI::AIselect()
 			float length;
 
 			// プレイヤーとフレイルのベクトルを求める
-			vec = player->GetVec3Position() - *m_pPos;
+			vec = player->GetVec3Position() - rPos;
 			vec.y = 0.0f;	// Yは無視
 
 			// 距離を求める
@@ -124,7 +137,7 @@ void CPlayerAI::AIselect()
 				if (length < fLengthMin)
 				{
 					fLengthMin = length;
-					nApproachNum = nCntPlayer;
+					m_nApproachNum = nCntPlayer;
 				}
 
 				nApproach++;
@@ -134,32 +147,483 @@ void CPlayerAI::AIselect()
 
 	if (nApproach == 1)
 	{
-		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nApproachNum);
+		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nApproachNum);
 		D3DXVECTOR3 vec;
 
 		// プレイヤーとフレイルのベクトルを求める
-		vec = player->GetVec3Position() - *m_pPos;
+		vec = player->GetVec3Position() - rPos;
 		vec.y = 0.0f;	// Yは無視
 
-		fRotstickR = atan2f(vec.x, vec.z);
-		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[AI目標角度]：%f\n", fRotstickR);
+		m_fRotstickR = atan2f(vec.x, vec.z) - HALF_PI;
+
+		useful::NormalizeRot(m_fRotstickR);
+
+		m_pFlail->SetChainRotTarget(m_fRotstickR);
+
+		m_fRotstickL = m_fRotstickR - (D3DX_PI * 0.5f);
+
+		if (m_nCounterFlail == flail::FLAIL_CHARGE || D3DXVec3Length(&vec) < flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)))
+		{
+			m_bAtack = false;
+		}
+		else
+		{
+			m_bAtack = true;
+		}
+
+		if (D3DXVec3Length(&vec) < 300.0f)
+		{
+			m_bMove = true;
+		}
+		else
+		{
+			m_bMove = true;
+		}
 	}
+	else if (nApproach > 1)
+	{
+		m_fRotstickR = 0.0f;
+		m_nApproachNum = -1;
+
+		if (m_nCounterFlail == flail::FLAIL_CHARGE)
+		{
+			m_bAtack = false;
+		}
+		else
+		{
+			m_bAtack = true;
+		}
+
+		m_bMove = true;
+	}
+	else
+	{
+		m_bAtack = false;
+		m_bMove = true;
+	}
+
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[近くの敵]：%d\n", nApproach);
+
+	currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+	currentMotion = AIatack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+
+	return currentMotion;
 }
 
 //============================================================
 //	攻撃に関するAI
 //============================================================
-void CPlayerAI::AIatack()
+CPlayer::EMotion CPlayerAI::AIatack
+(
+	CFlail* pFlail,
+	D3DXVECTOR3& rPos,
+	D3DXVECTOR3& rMove,
+	D3DXVECTOR3& rDestRot,
+	int pCounterFlail,
+	const int nMotionOld
+)
 {
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+	CPlayer::EMotion currentMotion = CPlayer::MOTION_IDOL;		// 現在のモーション
 
+	// カウンターの値によって挙動を変更
+	if (m_nCounterFlail > flail::FLAIL_DEF)
+	{// 0より大きい時
+
+		if (m_bAtack && m_nCounterFlail <= flail::FLAIL_CHARGE)
+		{// 投げるボタンが押されている時
+		 // カウンターアップ
+			m_nCounterFlail++;
+
+			// 一定値でカウンターを止める
+			if (m_nCounterFlail > flail::FLAIL_CHARGE)
+			{
+				m_nCounterFlail = flail::FLAIL_CHARGE;
+			}
+
+			// 溜めてる間鉄球を振り回す
+			m_pFlail->SetChainRotMove((-0.002f * m_nCounterFlail) - 0.12f);
+
+			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * 5.0f);
+
+			// 移動量を更新
+			rMove.x *= 1.0f - (0.0042f * m_nCounterFlail);
+			rMove.z *= 1.0f - (0.0042f * m_nCounterFlail);
+
+			// 目標向きを設定
+			rDestRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
+
+			// チャージモーションを設定
+			currentMotion = CPlayer::MOTION_CHARGE;
+		}
+
+		// 投擲
+		if (m_bAtack == false && m_nCounterFlail != flail::FLAIL_THROW)
+		{
+			// 溜めた時間に応じて飛距離増加
+			D3DXVECTOR3 move = VEC3_ZERO;
+			float lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
+			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
+			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
+			m_pFlail->SetMove(move);
+			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove());
+
+			D3DXVECTOR3 posFlail = m_pFlail->GetVec3Position();
+			if (posFlail.y < 0.0f)
+			{
+				posFlail.y = 0.0f;
+				m_pFlail->SetVec3Position(posFlail);
+			}
+
+			if (m_nApproachNum != -1)
+			{
+				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
+
+				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN)
+				{
+					lengthTarget = flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN;
+				}
+
+				// 目標角度に合わせる
+				m_pFlail->ShotFlail(m_pFlail->GetChainRotTarget() - D3DX_PI * 0.5f);
+				m_pFlail->SetChainRotMove(0.0f);
+			}
+			else
+			{
+				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)) * 0.6f;
+
+				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN * 0.5f)
+				{
+					lengthTarget = flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN * 0.5f;
+				}
+			}
+
+			m_pFlail->SetLengthTarget(lengthTarget);
+
+			// カウンターの設定
+			m_nCounterFlail = flail::FLAIL_THROW;
+
+			// 攻撃モーションを設定
+			currentMotion = CPlayer::MOTION_ATTACK;
+		}
+
+		if (m_nCounterFlail == flail::FLAIL_THROW)
+		{
+			// 移動量を更新
+			rMove.x = 0.0f;
+			rMove.z = 0.0f;
+
+			// フレイルが止まったらカウンターを次の段階へ
+			if (m_pFlail->GetLengthChain() >= m_pFlail->GetLengthTarget())
+			{
+				// モーションを攻撃から変更
+				player->SetMotion(currentMotion);
+
+				m_nCounterFlail = flail::FLAIL_DROP;
+			}
+		}
+	}
+	else if (m_nCounterFlail == flail::FLAIL_DEF)
+	{
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
+		// カウンターアップ開始
+		if (m_bAtack)
+		{
+			m_nCounterFlail++;
+		}
+	}
+	else
+	{
+		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 3.0f)
+		{
+			m_nCounterFlail = flail::FLAIL_DEF;
+			m_pFlail->SetMove(VEC3_ZERO);
+			m_pFlail->CatchFlail();
+		}
+		else if (m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f && m_nCounterFlail == flail::FLAIL_DROP)
+		{
+			m_nCounterFlail = flail::FLAIL_DEF;
+			m_pFlail->SetMove(VEC3_ZERO);
+			m_pFlail->CatchFlail();
+		}
+		else
+		{
+			// 引き戻す
+			if (true)
+			{
+				m_nCounterFlail -= 1;
+
+				if (m_nCounterFlail < -60)
+				{
+					m_nCounterFlail = -60;
+				}
+
+				if (m_nCounterFlail == -2)
+				{
+					float rot1 = m_fRotstickR;
+					float rot2 = rDestRot.y;
+					float rot3 = rot2 - rot1;
+
+					useful::NormalizeRot(rot3);
+
+					if (rot3 > 1.0f)
+					{
+						// 溜めてる間鉄球を振り回す
+						m_pFlail->SetChainRotMove(0.03f);
+					}
+					else if (rot3 < -1.0f)
+					{
+						// 溜めてる間鉄球を振り回す
+						m_pFlail->SetChainRotMove(-0.03f);
+					}
+					else
+					{
+						// 溜めてる間鉄球を振り回す
+						m_pFlail->SetChainRotMove(0.0f);
+					}
+				}
+
+				// 溜めた時間に応じて飛距離増加
+				D3DXVECTOR3 move = VEC3_ZERO;
+				move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
+				move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
+				m_pFlail->SetMove(move);
+
+				// 移動量を更新
+				rMove.x = 0.0f;
+				rMove.z = 0.0f;
+			}
+		}
+	}
+
+	return currentMotion;
 }
 
 //============================================================
 //	移動に関するAI
 //============================================================
-void CPlayerAI::AImove()
+CPlayer::EMotion CPlayerAI::AImove
+(
+	CFlail* pFlail,
+	D3DXVECTOR3& rPos,
+	D3DXVECTOR3& rMove,
+	D3DXVECTOR3& rDestRot,
+	int pCounterFlail,
+	const int nMotionOld
+)
 {
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+	CPlayer::EMotion currentMotion = CPlayer::MOTION_IDOL;		// 現在のモーション
+	CCamera *pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
+	if (m_bMove)
+	{ // デッドゾーン以上の場合
+
+		// 変数を宣言
+		float fMove = 0.0f;	// プレイヤー移動量
+		float fRotDiff = 0.0f;
+
+		D3DXVECTOR3 movePos = VEC3_ZERO;
+
+		// 移動量を更新
+		movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 15.35f;
+		movePos.y = -1.0f;
+		movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 15.35f;
+
+		/*CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動予測位置]：%f %f %f\n", movePos.x, movePos.y, movePos.z);
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動予測位置差分]：%f %f %f\n", movePos.x - rPos.x, movePos.y - rPos.y, movePos.z - rPos.z);*/
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[変更前] %f\n", m_fRotstickL);
+
+		if (CollisionGround(CPlayer::AXIS_X, rPos))
+		{
+			// 移動量を更新
+			movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 15.35f;
+			movePos.y = 1.0f;
+			movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 15.35f;
+
+			if (CollisionBlock(CPlayer::AXIS_X, rPos))
+			{
+				while (fRotDiff < 3.14f)
+				{
+					fRotDiff += 0.1f;
+					fMove = 0.1f;
+
+					float colRot = m_fRotstickL + fRotDiff;
+					useful::NormalizeRot(colRot);
+
+					// 移動量を更新
+					movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+					movePos.y = 1.0f;
+					movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+					if (CollisionBlock(CPlayer::AXIS_X, rPos))
+					{
+						m_fRotstickL = colRot;
+
+						break;
+					}
+
+					colRot = m_fRotstickL - fRotDiff;
+					useful::NormalizeRot(colRot);
+
+					// 移動量を更新
+					movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+					movePos.y = 1.0f;
+					movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+					if (CollisionBlock(CPlayer::AXIS_X, rPos))
+					{
+						m_fRotstickL = colRot;
+
+						break;
+					}
+				}
+			}
+			else
+			{
+				if (CollisionObstacle(rPos))
+				{
+					while (fRotDiff < 3.14f)
+					{
+						fRotDiff += 0.1f;
+						fMove = 0.1f;
+
+						float colRot = m_fRotstickL + fRotDiff;
+						useful::NormalizeRot(colRot);
+
+						// 移動量を更新
+						movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+						movePos.y = 1.0f;
+						movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+						if (CollisionObstacle(rPos))
+						{
+							m_fRotstickL = colRot;
+
+							break;
+						}
+
+						colRot = m_fRotstickL - fRotDiff;
+						useful::NormalizeRot(colRot);
+
+						// 移動量を更新
+						movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+						movePos.y = 1.0f;
+						movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+						if (CollisionObstacle(rPos))
+						{
+							m_fRotstickL = colRot;
+
+							break;
+						}
+					}
+				}
+				else
+				{
+					fMove = 1.2f;
+				}
+			}
+		}
+		else
+		{
+			float fRotDiff = 0.0f;
+
+			while (fRotDiff < 3.14f)
+			{
+				fRotDiff += 0.1f;
+				fMove = 0.1f;
+
+				float colRot = m_fRotstickL + fRotDiff;
+				useful::NormalizeRot(colRot);
+
+				// 移動量を更新
+				movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+				movePos.y = -1.0f;
+				movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+				if (Collision(movePos))
+				{
+					m_fRotstickL = colRot;
+					CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[変更後] %f\n", m_fRotstickL);
+
+					break;
+				}
+
+				colRot = m_fRotstickL - fRotDiff;
+				useful::NormalizeRot(colRot);
+
+				// 移動量を更新
+				movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 15.35f;
+				movePos.y = -1.0f;
+				movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 15.35f;
+
+				if (Collision(movePos))
+				{
+					m_fRotstickL = colRot;
+					CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[変更後] %f\n", m_fRotstickL);
+
+					break;
+				}
+			}
+		}
+
+		if (!m_bDash)
+		{ // ダッシュ中ではない場合
+
+		  // 移動量を更新
+			rMove.x += sinf(m_fRotstickL + D3DX_PI) * fMove;
+			rMove.z += cosf(m_fRotstickL + D3DX_PI) * fMove;
+
+			// 移動モーションを設定
+			currentMotion = CPlayer::MOTION_MOVE;
+		}
+		else
+		{ // ダッシュ中の場合
+
+		  // 移動量を更新
+			rMove.x += sinf(m_pDashRot.y) * fMove;
+			rMove.z += cosf(m_pDashRot.y) * fMove;
+
+			// ダッシュモーションを設定
+			currentMotion = CPlayer::MOTION_DASH;
+		}
+
+		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1) || m_nMotionOld == CPlayer::MOTION_PULL)
+		{ // 引きずり距離の場合
+
+		  // 移動量を更新
+			rMove.x *= 0.7f;
+			rMove.z *= 0.7f;
+
+			D3DXVECTOR3 vecFlail;
+			float rotMove, rotFlail, rotDiff;
+
+			vecFlail = m_pFlail->GetVec3Position() - player->GetVec3Position();
+
+			rotMove = atan2f(rMove.x, rMove.z);
+			rotFlail = atan2f(vecFlail.x, vecFlail.z);
+
+			rotDiff = rotMove - rotFlail;
+			useful::NormalizeRot(rotDiff);
+
+			if (rotDiff > D3DX_PI * 0.5f || rotDiff < D3DX_PI * -0.5f)
+			{
+				// 引きずりモーションを設定
+				currentMotion = CPlayer::MOTION_PULL;
+			}
+		}
+
+		// 目標向きを設定
+		rDestRot.y = atan2f(-rMove.x, -rMove.z);
+		m_pFlail->SetChainRotTarget(rDestRot.y + D3DX_PI);
+	}
+
+	return currentMotion;
 }
 
 //============================================================
@@ -167,6 +631,7 @@ void CPlayerAI::AImove()
 //============================================================
 void CPlayerAI::AIDash
 (
+	D3DXVECTOR3& rPos,
 	D3DXVECTOR3& rMove,
 	D3DXVECTOR3& rDashRot,
 	D3DXVECTOR3& rDestRot,
@@ -185,20 +650,18 @@ void CPlayerAI::AIDash
 	{ // デッドゾーン以上の場合
 
 		D3DXVECTOR3 dashPos = VEC3_ZERO;
-		float rotMove;
 		bool bJumpSelect = false;
-		rotMove = m_pDestRot->y + HALF_PI;
 
 		// 移動量を更新
-		dashPos.x += sinf(rotMove + pCamera->GetVec3Rotation().y + HALF_PI) * 700.0f;
+		dashPos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 700.0f;
 		dashPos.y = -1.0f;
-		dashPos.z += cosf(rotMove + pCamera->GetVec3Rotation().y + HALF_PI) * 700.0f;
+		dashPos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 700.0f;
 
 		if (Collision(dashPos))
 		{
 			int nProb = rand() % 10000;
 
-			if (nProb > 9990)
+			if (nProb > 9900)
 			{
 				bJumpSelect = true;
 			}
@@ -234,9 +697,7 @@ void CPlayerAI::AIDash
 				rPlusMove += DASH_SIDE;
 
 				// ダッシュ時の向きを保存
-				rDashRot.y = rotMove + pCamera->GetVec3Rotation().y + HALF_PI;
-
-				m_pDestRot->y = rotMove + pCamera->GetVec3Rotation().y - HALF_PI;
+				rDashRot.y = m_fRotstickL + D3DX_PI;
 
 				// ダッシュしている状態にする
 				rDash = true;
@@ -247,38 +708,33 @@ void CPlayerAI::AIDash
 		}
 	}
 
-	//if (rDash)
-	//{ // ダッシュしている場合
+	if (m_bDash)
+	{ // ダッシュしている場合
 
-	//  // 移動量を更新
-	//	rMove.x += sinf(rDashRot.y) * rPlusMove;
-	//	rMove.z += cosf(rDashRot.y) * rPlusMove;
+	  // 移動量を更新
+		rMove.x += sinf(rDashRot.y) * rPlusMove;
+		rMove.z += cosf(rDashRot.y) * rPlusMove;
 
-	//	// プラス移動量を減算
-	//	rPlusMove += (0.0f - rPlusMove) * DASH_REV;
+		// プラス移動量を減算
+		rPlusMove += (0.0f - rPlusMove) * DASH_REV;
 
-	//	if (fabsf(rPlusMove) < DASH_MINMOVE)
-	//	{ // 移動量が一定値より少なくなった場合
+		if (fabsf(rPlusMove) < DASH_MINMOVE)
+		{ // 移動量が一定値より少なくなった場合
 
-	//	  // 再ダッシュできるようにする
-	//		rPlusMove = 0.0f;
-	//		rDash = false;
-	//	}
-	//}
+		  // 再ダッシュできるようにする
+			rPlusMove = 0.0f;
+			m_bDash = false;
+		}
+	}
+
+	m_pDashRot = rDashRot;
+	m_bDash = rDash;
 }
 
 //============================================================
 //	生成処理
 //============================================================
-CPlayerAI *CPlayerAI::Create
-( // 引数
-	CFlail* pFlail,
-	D3DXVECTOR3* pPos,
-	D3DXVECTOR3* pMove,
-	D3DXVECTOR3* pDestRot,
-	int* pCounterFlail,
-	const int nPadID
-)
+CPlayerAI *CPlayerAI::Create(const int nPadID)
 {
 	// ポインタを宣言
 	CPlayerAI *pAI = NULL;	// モデルUI生成用
@@ -295,7 +751,7 @@ CPlayerAI *CPlayerAI::Create
 	{ // 使用されている場合
 
 	  // モデルUIの初期化
-		if (FAILED(pAI->Init(pFlail, pPos, pMove, pDestRot, pCounterFlail, nPadID)))
+		if (FAILED(pAI->Init(nPadID)))
 		{ // 初期化に失敗した場合
 
 		  // メモリ開放
@@ -317,7 +773,7 @@ CPlayerAI *CPlayerAI::Create
 //============================================================
 bool CPlayerAI::Collision(D3DXVECTOR3& rPos)
 {
-	if (CollisionGround(CPlayer::AXIS_X, rPos))
+	if(CollisionGround(CPlayer::AXIS_X, rPos))
 	{
 		return true;
 	}
@@ -377,13 +833,12 @@ bool CPlayerAI::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 
 				// 地盤の最小の大きさを設定
 				sizeMinGround = pObjCheck->GetVec3Sizing();
-				sizeMinGround.y *= 2.0f;	// 縦の大きさを倍にする
 
 											// 地盤の最大の大きさを設定
 				sizeMaxGround = pObjCheck->GetVec3Sizing();
 				//sizeMaxGround.y = 0.0f;		// 縦の大きさを初期化
 
-				if (collision::SquareTrigger(posGround, rPos, rotGround, sizeMaxGround, sizeMinGround))
+				if (collision::SquareTrigger(posGround, rPos, rotGround, sizeMaxGround, -sizeMinGround))
 				{
 					bHitBoxCheck = true;
 				}
@@ -395,4 +850,141 @@ bool CPlayerAI::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 	}
 
 	return bHitBoxCheck;
+}
+bool CPlayerAI::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
+{
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+	  // ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+		  // ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+			  // 変数を宣言
+				D3DXVECTOR3 posBlock = VEC3_ZERO;	// ブロック位置
+				D3DXVECTOR3 rotBlock = VEC3_ZERO;	// ブロック向き
+				D3DXVECTOR3 sizeBlock = VEC3_ZERO;	// ブロック大きさ
+
+													// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
+				{ // オブジェクトラベルがブロックではない場合
+
+				  // 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// ブロックの位置を設定
+				posBlock = pObjCheck->GetVec3Position();
+
+				// ブロックの向きを設定
+				rotBlock = pObjCheck->GetVec3Rotation();
+
+				// ブロックの大きさを設定
+				sizeBlock = pObjCheck->GetVec3Sizing();
+
+				if (collision::SquareTrigger(posBlock, rPos, rotBlock, sizeBlock, -sizeBlock))
+				{
+					bHit = true;
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 各軸の判定情報を返す
+	return bHit;
+}
+bool CPlayerAI::CollisionObstacle(D3DXVECTOR3& rPos)
+{
+	// 変数を宣言
+	bool bHit = false;	// 着地の判定情報
+	bool bHitBoxCheck = false;	// 接触の判定情報
+
+	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+	{ // 優先順位の総数分繰り返す
+
+	  // ポインタを宣言
+		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+		if (pObjectTop != NULL)
+		{ // 先頭が存在する場合
+
+		  // ポインタを宣言
+			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+			while (pObjCheck != NULL)
+			{ // オブジェクトが使用されている場合繰り返す
+
+			  // 変数を宣言
+				CObstacle::SStatusInfo status;		// 障害物ステータス
+				D3DXVECTOR3 posObs = VEC3_ZERO;		// 障害物位置
+				D3DXVECTOR3 rotObs = VEC3_ZERO;		// 障害物向き
+				D3DXVECTOR3 sizeObsMin = VEC3_ZERO;	// 障害物大きさ
+				D3DXVECTOR3 sizeObsMax = VEC3_ZERO;	// 障害物大きさ
+
+													// ポインタを宣言
+				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+				if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
+				{ // オブジェクトラベルが障害物ではない場合
+
+				  // 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+
+					// 次の繰り返しに移行
+					continue;
+				}
+
+				// 障害物のステータスを設定
+				status = CObstacle::GetStatusInfo(pObjCheck->GetType());
+
+				// 障害物の向きを設定
+				rotObs = pObjCheck->GetVec3Rotation();
+
+				// 障害物の位置を設定
+				posObs = pObjCheck->GetVec3Position();
+				posObs.x += sinf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+				posObs.y = 0.0f;
+				posObs.z += cosf(rotObs.y + status.fAngleCenter) * status.fLengthCenter;
+
+				// 障害物の大きさを設定
+				sizeObsMax = status.sizeColl;
+				sizeObsMin = sizeObsMax * -1.0f;
+
+				// 障害物との判定を実行
+				if (collision::SquareTrigger(posObs, rPos, rotObs, sizeObsMax, sizeObsMin))
+				{
+					// FUJITA：障害物破壊用のHIT処理よんでもろて
+				}
+
+				// 次のオブジェクトへのポインタを代入
+				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 判定情報を返す
+	return bHitBoxCheck;
+}
+
+void CPlayerAI::SetRotstickL(const float RotstickL)
+{
+	m_fRotstickL = RotstickL;
 }
