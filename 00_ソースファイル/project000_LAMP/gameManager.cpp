@@ -61,7 +61,7 @@ HRESULT CGameManager::Init(void)
 	m_pReady = CReady::Create();
 
 	// メンバ変数を初期化
-	m_state = STATE_READY;	// 状態
+	m_state = STATE_RESULT;	// 状態
 	m_nCounterState = 0;	// 状態管理カウンター
 
 	// 生存人数を初期化
