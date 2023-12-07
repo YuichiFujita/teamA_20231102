@@ -41,11 +41,13 @@ CPlayerAI::CPlayerAI()
 	//初期値代入
 	m_pFlail = NULL;
 	m_pDashRot = VEC3_ZERO;
+	m_stateAI = STATEAI_NONE;
 	m_nCounterFlail = 0;
 	m_nPadID = 0;
+	m_nCountAI = 0;
 	m_fRotstickR = 0.0f;
 	m_bDash = false;
-	m_bAtack = false;
+	m_bAttack = false;
 	m_bMove = false;
 }
 
@@ -120,92 +122,228 @@ CPlayer::EMotion CPlayerAI::AIselect
 	{
 		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
 
-		if (player != NULL && nCntPlayer != m_nPadID && player->GetState() != CPlayer::STATE_DEATH)
+		if (player != NULL)
 		{
-			D3DXVECTOR3 vec;
-			float length;
-
-			// プレイヤーとフレイルのベクトルを求める
-			vec = player->GetVec3Position() - rPos;
-			vec.y = 0.0f;	// Yは無視
-
-			// 距離を求める
-			length = D3DXVec3Length(&vec);
-
-			if (length < flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1))
+			if (nCntPlayer != m_nPadID && player->GetState() != CPlayer::STATE_DEATH)
 			{
-				if (length < fLengthMin)
-				{
-					fLengthMin = length;
-					m_nApproachNum = nCntPlayer;
-				}
+				D3DXVECTOR3 vec;
+				float length;
 
-				nApproach++;
+				// プレイヤーとフレイルのベクトルを求める
+				vec = player->GetVec3Position() - rPos;
+				vec.y = 0.0f;	// Yは無視
+
+				// 距離を求める
+				length = D3DXVec3Length(&vec);
+
+				if (length < flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1))
+				{
+					if (length < fLengthMin)
+					{
+						fLengthMin = length;
+						m_nApproachNum = nCntPlayer;
+					}
+
+					nApproach++;
+				}
 			}
 		}
 	}
 
-	if (nApproach == 1)
+	m_nCountAI++;
+
+	if (m_nCountAI % 180 == 0)
 	{
-		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nApproachNum);
-		D3DXVECTOR3 vec;
+		m_nCountAI = 0;
 
-		// プレイヤーとフレイルのベクトルを求める
-		vec = player->GetVec3Position() - rPos;
-		vec.y = 0.0f;	// Yは無視
+		int nProb = rand() % 10000;
 
-		m_fRotstickR = atan2f(vec.x, vec.z) - HALF_PI;
-
-		useful::NormalizeRot(m_fRotstickR);
-
-		m_pFlail->SetChainRotTarget(m_fRotstickR);
-
-		m_fRotstickL = m_fRotstickR - (D3DX_PI * 0.5f);
-
-		if (m_nCounterFlail == flail::FLAIL_CHARGE || D3DXVec3Length(&vec) < flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)))
+		switch (m_stateAI)
 		{
-			m_bAtack = false;
-		}
-		else
-		{
-			m_bAtack = true;
-		}
+		case CPlayerAI::STATEAI_NONE:
 
-		if (D3DXVec3Length(&vec) < 300.0f)
-		{
-			m_bMove = true;
-		}
-		else
-		{
-			m_bMove = true;
+			if (nProb > 9500)
+			{
+				m_stateAI = STATEAI_NONE;
+			}
+			else if (nProb > 2000)
+			{
+				m_stateAI = STATEAI_MOVE;
+			}
+			else
+			{
+				m_stateAI = STATEAI_ATTACK;
+			}
+
+			break;
+
+		case CPlayerAI::STATEAI_MOVE:
+
+			if (nProb > 9000)
+			{
+				m_stateAI = STATEAI_NONE;
+			}
+			else if (nProb > 8000)
+			{
+				m_stateAI = STATEAI_MOVE;
+
+				nProb = rand() % 10000;
+
+				if (nProb > 4000)
+				{
+					m_fRotstickL = (float)((rand() % 629) - 314);
+				}
+				else
+				{
+
+				}
+			}
+			else
+			{
+				m_stateAI = STATEAI_ATTACK;
+			}
+
+			break;
+
+		case CPlayerAI::STATEAI_ATTACK:
+
+			if (nApproach > 0 && (m_nCounterFlail <= flail::FLAIL_THROW && m_nCounterFlail > flail::FLAIL_DEF))
+			{
+				m_stateAI = STATEAI_ATTACK;
+			}
+			else
+			{
+				if (nProb > 6000)
+				{
+					m_stateAI = STATEAI_NONE;
+				}
+				else if (nProb > 2000)
+				{
+					m_stateAI = STATEAI_MOVE;
+				}
+				else
+				{
+					m_stateAI = STATEAI_ATTACK;
+				}
+			}
+
+			break;
+
+		case CPlayerAI::STATEAI_MAX:
+
+			m_stateAI = STATEAI_NONE;
+
+			break;
+
+		default:
+
+			break;
 		}
 	}
-	else if (nApproach > 1)
+
+	switch (m_stateAI)
 	{
-		m_fRotstickR = 0.0f;
-		m_nApproachNum = -1;
+	case CPlayerAI::STATEAI_NONE:
+
+		m_bMove = false;
+		m_bAttack = false;
+
+		break;
+
+	case CPlayerAI::STATEAI_MOVE:
 
 		if (m_nCounterFlail == flail::FLAIL_CHARGE)
 		{
-			m_bAtack = false;
+			m_bAttack = true;
 		}
 		else
 		{
-			m_bAtack = true;
+			m_bAttack = false;
 		}
 
 		m_bMove = true;
-	}
-	else
-	{
-		m_bAtack = false;
-		m_bMove = true;
+
+		break;
+
+	case CPlayerAI::STATEAI_ATTACK:
+
+		if (nApproach == 1)
+		{
+			CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nApproachNum);
+			D3DXVECTOR3 vec, rodPos;
+
+			rodPos.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._41;
+			rodPos.y = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._42;
+			rodPos.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._43;
+
+			// プレイヤーとフレイルのベクトルを求める
+			vec = rodPos - rPos;
+			vec.y = 0.0f;	// Yは無視
+
+			m_fRotstickR = atan2f(vec.x, vec.z);
+
+			useful::NormalizeRot(m_fRotstickR);
+
+			m_pFlail->SetChainRotTarget(m_fRotstickR);
+
+			m_fRotstickL = m_fRotstickR - (D3DX_PI * 1.0f);
+
+			if (D3DXVec3Length(&vec) < flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)))
+			{
+				m_bAttack = false;
+			}
+			else
+			{
+				m_bAttack = true;
+			}
+
+			if (D3DXVec3Length(&vec) < 1200.0f)
+			{
+				m_bMove = false;
+			}
+			else
+			{
+				m_bMove = true;
+			}
+		}
+		else if (nApproach > 1)
+		{
+			m_fRotstickR = 0.0f;
+			m_nApproachNum = -1;
+
+			int nProb = rand() % 10000;
+
+			if (nProb > 3000 && m_nCounterFlail == flail::FLAIL_CHARGE)
+			{
+				m_bAttack = false;
+			}
+			else
+			{
+				m_bAttack = true;
+			}
+
+			m_bMove = true;
+		}
+		else
+		{
+			m_bAttack = false;
+			m_bMove = true;
+		}
+
+		break;
+
+	case CPlayerAI::STATEAI_MAX:
+
+		break;
+
+	default:
+		break;
 	}
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[近くの敵]：%d\n", nApproach);
 
 	currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
-	currentMotion = AIatack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+	currentMotion = AIattack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
 
 	return currentMotion;
 }
@@ -213,7 +351,7 @@ CPlayer::EMotion CPlayerAI::AIselect
 //============================================================
 //	攻撃に関するAI
 //============================================================
-CPlayer::EMotion CPlayerAI::AIatack
+CPlayer::EMotion CPlayerAI::AIattack
 (
 	CFlail* pFlail,
 	D3DXVECTOR3& rPos,
@@ -230,7 +368,7 @@ CPlayer::EMotion CPlayerAI::AIatack
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
 
-		if (m_bAtack && m_nCounterFlail <= flail::FLAIL_CHARGE)
+		if (m_bAttack && m_nCounterFlail <= flail::FLAIL_CHARGE)
 		{// 投げるボタンが押されている時
 		 // カウンターアップ
 			m_nCounterFlail++;
@@ -258,7 +396,7 @@ CPlayer::EMotion CPlayerAI::AIatack
 		}
 
 		// 投擲
-		if (m_bAtack == false && m_nCounterFlail != flail::FLAIL_THROW)
+		if (m_bAttack == false && m_nCounterFlail != flail::FLAIL_THROW)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
@@ -305,6 +443,9 @@ CPlayer::EMotion CPlayerAI::AIatack
 
 			// 攻撃モーションを設定
 			currentMotion = CPlayer::MOTION_ATTACK;
+
+			// AIも状態を設定
+			m_stateAI = STATEAI_NONE;
 		}
 
 		if (m_nCounterFlail == flail::FLAIL_THROW)
@@ -329,7 +470,7 @@ CPlayer::EMotion CPlayerAI::AIatack
 		m_pFlail->CatchFlail();
 
 		// カウンターアップ開始
-		if (m_bAtack)
+		if (m_bAttack)
 		{
 			m_nCounterFlail++;
 		}
