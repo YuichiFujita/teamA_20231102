@@ -29,6 +29,15 @@ class CPlayerAI
 {
 public:
 
+	// 行動パターン列挙
+	enum EStateAI
+	{
+		STATEAI_NONE = 0,	// X軸
+		STATEAI_MOVE,		// Y軸
+		STATEAI_ATTACK,		// Z軸
+		STATEAI_MAX			// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CPlayerAI();
 
@@ -57,7 +66,7 @@ public:
 		const int nMotionOld
 	);
 
-	CPlayer::EMotion AIatack
+	CPlayer::EMotion AIattack
 	(
 		CFlail* pFlail,
 		D3DXVECTOR3& rPos,
@@ -103,16 +112,18 @@ private:
 	// メンバ変数
 	CFlail* m_pFlail;
 	D3DXVECTOR3 m_pDashRot;
+	EStateAI m_stateAI;
 	int m_nCounterFlail;
 	int m_nMotionOld;
 	int m_nPadID;
 	int m_nApproachNum;
+	int m_nCountAI;
 	bool m_bDash;
 
 	float m_fRotstickR;
 	float m_fRotstickL;
 
-	bool m_bAtack;
+	bool m_bAttack;
 	bool m_bMove;
 };
 
