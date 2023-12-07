@@ -365,8 +365,8 @@ void CCamera::SetDestLookDown(void)
 		return;
 	}
 
-	D3DXVECTOR3 posLook = VEC3_ZERO;	// 注視点の位置
 	float fDis = lookdown::INIT_DIS;	// 距離
+	D3DXVECTOR3 posLook = VEC3_ZERO;	// 注視点の位置
 
 	//----------------------------------------------------
 	//	注視点の位置を計算
@@ -400,45 +400,40 @@ void CCamera::SetDestLookDown(void)
 						// 初期化済みにする
 						bInit = true;
 					}
+					else
+					{ // 初期化されている場合
 
-					// プレイヤーの位置を加算
-					posLook += posPlayer;
+						// 最小位置の更新
+						if (posPlayer.x < posMin.x)
+						{ // 現在の最小位置より小さい場合
 
-					// 最小位置の更新
-					if (posPlayer.x < posMin.x)
-					{ // 現在の最小位置より小さい場合
+							posMin.x = posPlayer.x;
+						}
+						if (posPlayer.z < posMin.z)
+						{ // 現在の最小位置より小さい場合
 
-						posMin.x = posPlayer.x;
-					}
-					if (posPlayer.z < posMin.z)
-					{ // 現在の最小位置より小さい場合
+							posMin.z = posPlayer.z;
+						}
 
-						posMin.z = posPlayer.z;
-					}
+						// 最大位置の更新
+						if (posPlayer.x > posMax.x)
+						{ // 現在の最大位置より大きい場合
 
-					// 最大位置の更新
-					if (posPlayer.x > posMax.x)
-					{ // 現在の最大位置より大きい場合
+							posMax.x = posPlayer.x;
+						}
+						if (posPlayer.z > posMax.z)
+						{ // 現在の最大位置より大きい場合
 
-						posMax.x = posPlayer.x;
-					}
-					if (posPlayer.z > posMax.z)
-					{ // 現在の最大位置より大きい場合
-
-						posMax.z = posPlayer.z;
+							posMax.z = posPlayer.z;
+						}
 					}
 				}
 			}
 			else { assert(false); }	// 非使用中
 		}
 
-		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
-		{ // 生存人数が1人以上の場合
-
-			// プレイヤーの位置の平均を求める
-			posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
-			posLook.y = 0.0f;	// Y座標は固定
-		}
+		// 注視点の位置を平均で求める
+		posLook = (posMin + posMax) / 2;
 
 		// カメラの距離を加算
 		fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
@@ -705,45 +700,40 @@ void CCamera::LookDown(void)
 					// 初期化済みにする
 					bInit = true;
 				}
+				else
+				{ // 初期化されている場合
 
-				// プレイヤーの位置を加算
-				posLook += posPlayer;
+					// 最小位置の更新
+					if (posPlayer.x < posMin.x)
+					{ // 現在の最小位置より小さい場合
 
-				// 最小位置の更新
-				if (posPlayer.x < posMin.x)
-				{ // 現在の最小位置より小さい場合
+						posMin.x = posPlayer.x;
+					}
+					if (posPlayer.z < posMin.z)
+					{ // 現在の最小位置より小さい場合
 
-					posMin.x = posPlayer.x;
-				}
-				if (posPlayer.z < posMin.z)
-				{ // 現在の最小位置より小さい場合
+						posMin.z = posPlayer.z;
+					}
 
-					posMin.z = posPlayer.z;
-				}
+					// 最大位置の更新
+					if (posPlayer.x > posMax.x)
+					{ // 現在の最大位置より大きい場合
 
-				// 最大位置の更新
-				if (posPlayer.x > posMax.x)
-				{ // 現在の最大位置より大きい場合
+						posMax.x = posPlayer.x;
+					}
+					if (posPlayer.z > posMax.z)
+					{ // 現在の最大位置より大きい場合
 
-					posMax.x = posPlayer.x;
-				}
-				if (posPlayer.z > posMax.z)
-				{ // 現在の最大位置より大きい場合
-
-					posMax.z = posPlayer.z;
+						posMax.z = posPlayer.z;
+					}
 				}
 			}
 		}
 		else { assert(false); }	// 非使用中
 	}
 
-	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() >= 1)
-	{ // 生存人数が1人以上の場合
-
-		// プレイヤーの位置の平均を求める
-		posLook /= (float)CManager::GetInstance()->GetRetentionManager()->GetNumSurvival();
-		posLook.y = 0.0f;	// Y座標は固定
-	}
+	// 注視点の位置を平均で求める
+	posLook = (posMin + posMax) / 2;
 
 	// カメラの距離を加算
 	fDis += sqrtf((posMin.x - posMax.x) * (posMin.x - posMax.x) + (posMin.z - posMax.z) * (posMin.z - posMax.z)) * lookdown::MUL_DIS;
