@@ -28,6 +28,8 @@ public:
 	{
 		TEXTURE_NORMAL = 0,	// 通常テクスチャ
 		TEXTURE_UI,			// UI数字テクスチャ
+		TEXTURE_SILVER,		// 銀数字テクスチャ
+		TEXTURE_ZERO,		// 零ゴシックテクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 

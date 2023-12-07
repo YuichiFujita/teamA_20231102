@@ -44,6 +44,7 @@
 
 #include "orbitalEffect.h"
 #include "orbitalParticle.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -119,6 +120,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
+	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_motionOld		= 0;			// 過去モーション
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
@@ -150,6 +152,7 @@ HRESULT CPlayer::Init(void)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
+	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
 	m_fPlusMove		= 0.0f;			// プラス移動量
@@ -845,6 +848,24 @@ int CPlayer::GetCounterFlail(void) const
 {
 	// フレイルカウンターを返す
 	return m_nCounterFlail;
+}
+
+//============================================================
+//	勝利ポイントの加算処理
+//============================================================
+void CPlayer::AddWinPoint(void)
+{
+	// 勝利ポイントを加算
+	m_nWinPoint++;
+}
+
+//============================================================
+//	勝利ポイント取得処理
+//============================================================
+int CPlayer::GetWinPoint(void) const
+{
+	// 勝利ポイントを返す
+	return m_nWinPoint;
 }
 
 //============================================================
