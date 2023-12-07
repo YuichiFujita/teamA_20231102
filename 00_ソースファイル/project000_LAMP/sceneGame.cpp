@@ -129,8 +129,24 @@ HRESULT CSceneGame::Init(void)
 	SetEnableDrawPause(m_bDrawPause);
 
 	// BGM‚ÌÄ¶
-	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
+	int nRand = rand() % 3;
 
+	switch (nRand)
+	{
+	case 0:
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
+		break;
+	case 1:
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME_1);
+		break;
+	case 2:
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME_2);
+		break;
+
+	default:
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
+		break;
+	}
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

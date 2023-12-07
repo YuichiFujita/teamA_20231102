@@ -32,8 +32,12 @@ public:
 	enum ELabel
 	{
 		LABEL_BGM_GENERAL = 0,	// BGM (汎用)
+		LABEL_BGM_ENTRY,		// BGM (エントリー)
 		LABEL_BGM_TUTORIAL,		// BGM (チュートリアル)
 		LABEL_BGM_GAME,			// BGM (ゲーム)
+		LABEL_BGM_GAME_1,			// BGM (ゲーム1)
+		LABEL_BGM_GAME_2,			// BGM (ゲーム2)
+		LABEL_BGM_RESULT,			// BGM (リザルト)
 
 		LABEL_SE_SELECT_000,	// 選択操作音00
 		LABEL_SE_SELECT_001,	// 選択操作音01
