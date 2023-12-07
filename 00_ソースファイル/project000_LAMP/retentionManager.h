@@ -85,9 +85,9 @@ private:
 	EWin	m_stateWin;		// 勝利条件
 	int		m_nNumPlayer;	// プレイヤー数
 	int		m_nNumSurvival;	// 生存プレイヤー数
+	int		m_nWinPoint;	// 勝利ポイント数
 
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
-	int		m_aWinPoint[MAX_PLAYER];		// 勝利ポイント数
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 };
 

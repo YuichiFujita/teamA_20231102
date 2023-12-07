@@ -214,8 +214,8 @@ void CBlock::Hit(void)
 	if (m_status.state == EBreak::BREAK_TRUE)
 	{
 		// WATANABE：ビルドすると未解決の外部参照って言われたからコメントアウトしておきました
-		/*CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
-			CObjectMeshCube::GetVec3Position().z));*/
+		CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
+			CObjectMeshCube::GetVec3Position().z));
 
 		//終了処理を行う
 		Uninit();

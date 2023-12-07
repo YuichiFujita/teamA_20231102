@@ -72,7 +72,7 @@ namespace
 	namespace winBG
 	{
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(860.0f, 160.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(720.0f, 145.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(620.0f, 165.0f, 0.0f);	// 大きさ
 
 		const int	WAIT_FRAME	= 24;		// タイトル待機フレーム
 		const float	INIT_SCALE	= 0.025f;	// タイトル初期拡大率
@@ -143,13 +143,13 @@ namespace
 const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\middleResult000.png",	// フェードテクスチャ
-	NULL,	// ランキングタイトルテクスチャ
-	"data\\TEXTURE\\bg.png",				// 勝利ポイント背景テクスチャ
-	NULL,	// 勝利ポイントタイトルテクスチャ
+	"data\\TEXTURE\\Mid_result.png",	// ランキングタイトルテクスチャ
+	"data\\TEXTURE\\white_flame.png",				// 勝利ポイント背景テクスチャ
+	"data\\TEXTURE\\target_score.png",	// 勝利ポイントタイトルテクスチャ
 	"data\\TEXTURE\\entry_player.png",		// プレイヤーテクスチャ
-	NULL,	// 勝利ポイントテクスチャ
+	"data\\TEXTURE\\Score.png",	// 勝利ポイントテクスチャ
 	"data\\TEXTURE\\entry_flame.png",		// フレームテクスチャ
-	NULL,	// 操作方法テクスチャ
+	"data\\TEXTURE\\Press_Start_Crack.png",	// 操作方法テクスチャ
 };
 
 //************************************************************
