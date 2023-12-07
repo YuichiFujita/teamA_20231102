@@ -50,13 +50,19 @@ public:
 
 private:
 
+	//静的メンバ変数
+	static const char *mc_apTextureFile[];	//テクスチャ定数
+
 	D3DXVECTOR3 m_rPos;		//位置
 	D3DXVECTOR3 m_rMove;	//移動量
 	D3DXVECTOR3 m_rot;		//向き
+	D3DXVECTOR3 m_rotMove;	//向きの移動量
 	D3DXVECTOR3 m_rSize;	//サイズ
+	D3DXCOLOR m_Col;		//色
 
 	bool m_bGravity;		//重力を加えるかどうか
 	int m_nLife;			//寿命
+	int m_nNumLand;			//着地した回数
 };
 
 #endif

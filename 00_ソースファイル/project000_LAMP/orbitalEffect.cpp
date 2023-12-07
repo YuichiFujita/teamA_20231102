@@ -72,8 +72,8 @@ void COrbitalEffect::Uninit(void)
 	// オブジェクトビルボードの終了
 	if (m_pOrbit != NULL)
 	{
-		(*m_pOrbit)->SetState(CObjectOrbit::STATE_VANISH);
-		delete m_pOrbit;
+		m_pOrbit->SetState(CObjectOrbit::STATE_VANISH);
+		m_pOrbit->Uninit();
 		m_pOrbit = NULL;
 		
 	}
@@ -122,7 +122,7 @@ void COrbitalEffect::Update(void)
 	// 寿命を減算
 	m_nLife--;
 
-	if (m_nLife <= 0 || m_pos.y < -100)
+	if (m_nLife <= 0)
 	{
 		Uninit();
 	}
@@ -133,7 +133,24 @@ void COrbitalEffect::Update(void)
 //============================================================
 void COrbitalEffect::Draw(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 
+	if (m_bAdd)
+	{ // 加算合成がONの場合
+
+	  // αブレンディングを加算合成に設定
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	}
+
+	m_pOrbit->Draw();
+
+	// αブレンディングを元に戻す
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 //============================================================
@@ -205,10 +222,9 @@ COrbitalEffect *COrbitalEffect::Create
 		//位置を反映
 		D3DXMatrixTranslation(&mtxTrans, pOrbitalEffect->m_pos.x, pOrbitalEffect->m_pos.y, pOrbitalEffect->m_pos.z);
 		D3DXMatrixMultiply(&pOrbitalEffect->m_Mtx, &pOrbitalEffect->m_Mtx, &mtxTrans);
-		pOrbitalEffect->m_pOrbit = new CObjectOrbit*;
-		(*pOrbitalEffect->m_pOrbit) = CObjectOrbit::Create(&pOrbitalEffect->m_Mtx, CObjectOrbit::SOffset(Offset, -Offset, col),nLength);
-		(*pOrbitalEffect->m_pOrbit)->SetPriority(0);
-		(*pOrbitalEffect->m_pOrbit)->SetEnableDraw(true);
+
+		pOrbitalEffect->m_pOrbit = CObjectOrbit::Create(&pOrbitalEffect->m_Mtx, CObjectOrbit::SOffset(Offset, -Offset, col),nLength);
+		pOrbitalEffect->m_pOrbit->SetEnableDraw(false);
 		// 確保したアドレスを返す
 		return pOrbitalEffect;
 	}

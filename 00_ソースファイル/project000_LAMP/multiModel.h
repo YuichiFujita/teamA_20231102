@@ -21,7 +21,7 @@
 //	クラス定義
 //************************************************************
 // マルチモデルクラス
-class CMultiModel : public CObject
+class CMultiModel : CObject
 {
 public:
 	// コンストラクタ
@@ -29,7 +29,7 @@ public:
 	explicit CMultiModel(const CObject::ELabel label, const int nPriority = DEFAULT_PRIO);
 
 	// デストラクタ
-	~CMultiModel() override;
+	~CMultiModel();
 
 	// オーバーライド関数
 	HRESULT Init(void) override;	// 初期化

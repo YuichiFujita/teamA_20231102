@@ -20,14 +20,14 @@
 //	クラス定義
 //************************************************************
 // パーティクル2Dクラス
-class CParticle2D : public CObject
+class CParticle2D : CObject
 {
 public:
 	// コンストラクタ
 	CParticle2D();
 
 	// デストラクタ
-	~CParticle2D() override;
+	~CParticle2D();
 
 	// パーティクル2D種類列挙
 	enum EType
