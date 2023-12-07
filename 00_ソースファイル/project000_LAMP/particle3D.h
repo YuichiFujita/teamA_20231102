@@ -20,14 +20,14 @@
 //	クラス定義
 //************************************************************
 // パーティクル3Dクラス
-class CParticle3D : CObject
+class CParticle3D : public CObject
 {
 public:
 	// コンストラクタ
 	CParticle3D();
 
 	// デストラクタ
-	~CParticle3D();
+	~CParticle3D() override;
 
 	// パーティクル3D種類列挙
 	enum EType
