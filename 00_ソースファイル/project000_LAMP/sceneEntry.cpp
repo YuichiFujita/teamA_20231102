@@ -73,7 +73,7 @@ HRESULT CSceneEntry::Init(void)
 	CManager::GetInstance()->GetCamera()->SetDestRotate();					// ƒJƒƒ‰‚Ì‰Šúî•ñ‚ğİ’è
 
 	// BGM‚ÌÄ¶
-	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GENERAL);
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_ENTRY);
 
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
