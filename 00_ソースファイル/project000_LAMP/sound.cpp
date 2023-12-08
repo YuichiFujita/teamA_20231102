@@ -39,6 +39,8 @@ const CSound::SSoundInfo CSound::mc_aSoundInfo[LABEL_MAX] =	// サウンド情報
 	{ "data\\SE\\jumppad000.wav",  0 },		// ジャンプパッド
 	{ "data\\SE\\stick000.wav",  0 },		// くっつき音
 	{ "data\\SE\\destruct1.wav",  0 },			// ぶつかり音
+	{ "data\\SE\\destruct2.wav",  0 },			// ぶつかり音2
+	{ "data\\SE\\chain2.wav",  0 },			// 振る音
 };
 
 //************************************************************

@@ -446,6 +446,8 @@ CPlayer::EMotion CPlayerAI::AIattack
 
 			// AI‚àó‘Ô‚ðÝ’è
 			m_stateAI = STATEAI_NONE;
+
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SWING);
 		}
 
 		if (m_nCounterFlail == flail::FLAIL_THROW)

@@ -19,6 +19,8 @@
 #include "scrollMeshField.h"
 #include "collision.h"
 #include "obstacle.h"
+#include "sound.h"	
+
 
 //************************************************************
 //	’è”éŒ¾
