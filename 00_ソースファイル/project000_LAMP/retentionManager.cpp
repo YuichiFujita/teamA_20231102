@@ -20,6 +20,7 @@ CRetentionManager::CRetentionManager()
 {
 	// メンバ変数をクリア
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
+	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
@@ -43,6 +44,7 @@ HRESULT CRetentionManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
+	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
@@ -288,6 +290,13 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 
 			// 生存人数を減算
 			m_nNumSurvival--;
+
+			if (m_nNumSurvival <= 0)
+			{ // だれも生存していない場合
+
+				// 現在のプレイヤーにポイントを与える
+				int a = 0;
+			}
 
 			// 処理を抜ける
 			break;

@@ -1460,6 +1460,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 			// UŒ‚ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 			currentMotion = MOTION_ATTACK;
+
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SWING);
 		}
 
 		if (m_nCounterFlail == flail::FLAIL_THROW)

@@ -89,6 +89,7 @@ private:
 	int		m_nWinPoint;	// 勝利ポイント数
 
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
+	int		m_aWinRank[MAX_PLAYER];			// 降順の勝利ランキング
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 };
 
