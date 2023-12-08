@@ -433,6 +433,8 @@ void CFlail::UpdateChain(void)
 			}
 		}
 
+		//CollisionChain(pos);
+
 		m_chain[nCntChain].multiModel->SetVec3Position(pos);
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
 
@@ -678,11 +680,16 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		// 障害物との当たり判定
-		CollisionObstacle(rPos);
-		CollisionBlock(CPlayer::AXIS_X, rPos);
-		CollisionBlock(CPlayer::AXIS_Z, rPos);
+		if (CollisionObstacle(rPos) ||
+			CollisionBlock(CPlayer::AXIS_X, rPos) ||
+			CollisionBlock(CPlayer::AXIS_Z, rPos))
+		{
+			m_fLengthTarget = m_fLengthChain;
+			m_fChainRotMove = 0.0f;
+		}
 
 		CollisionGround(CPlayer::AXIS_Y, rPos);
+
 		if (CollisionGround(CPlayer::AXIS_X, rPos) ||
 			CollisionGround(CPlayer::AXIS_Z, rPos))
 		{
@@ -691,6 +698,22 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				rPos.y += 10.0f;
 			}
 		}
+	}
+}
+void CFlail::CollisionChain(D3DXVECTOR3& rPos)
+{
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
+	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	{
+		// 障害物との当たり判定
+		CollisionObstacle(rPos);
+		CollisionBlock(CPlayer::AXIS_X, rPos);
+		CollisionBlock(CPlayer::AXIS_Z, rPos);
+
+		CollisionGround(CPlayer::AXIS_Y, rPos);
+		CollisionGround(CPlayer::AXIS_X, rPos);
+		CollisionGround(CPlayer::AXIS_Z, rPos);
 	}
 }
 bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
@@ -840,6 +863,7 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 	D3DXVECTOR3 sizeMinPlayer = D3DXVECTOR3(RADIUS, 0.0f, RADIUS);		// プレイヤー最小大きさ
 	D3DXVECTOR3 sizeMaxPlayer = D3DXVECTOR3(RADIUS, 100.0f, RADIUS);	// プレイヤー最大大きさ
 	bool bHit = false;	// 着地の判定情報
+	bool bHitCheck = false;	// 着地の判定情報
 
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
@@ -932,6 +956,8 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				{
 					// Hit処理
 					pObjCheck->Hit();
+
+					bHitCheck = true;
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -941,7 +967,7 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 	}
 
 	// 各軸の判定情報を返す
-	return bHit;
+	return bHitCheck;
 }
 bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 {
@@ -1005,6 +1031,8 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 				{
 					// HIT処理
 					pObjCheck->Hit();
+
+					bHitBoxCheck = true;
 				}
 
 				// 次のオブジェクトへのポインタを代入

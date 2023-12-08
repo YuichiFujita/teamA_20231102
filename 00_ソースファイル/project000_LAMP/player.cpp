@@ -1059,7 +1059,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	if (m_bAI)
 	{
 		// CPU操作
-		m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
+		currentMotion = m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
 	}
 	else
 	{
@@ -1075,7 +1075,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		/*m_pAI->AIDash
+		m_pAI->AIDash
 		(
 			GetVec3Position(),
 			m_move,
@@ -1083,7 +1083,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 			m_destRot,
 			m_fPlusMove,
 			m_bDash
-		);*/
+		);
 	}
 	else
 	{
@@ -1362,7 +1362,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 		// 目標向きを設定
 		m_destRot.y = atan2f(-m_move.x, -m_move.z);
-		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 	}
 
 	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
@@ -1483,6 +1482,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	{
 		// フレイルを強制的に所持
 		m_pFlail->CatchFlail();
+
+		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 
 		// カウンターアップ開始
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
