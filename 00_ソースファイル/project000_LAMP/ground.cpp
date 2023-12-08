@@ -23,12 +23,12 @@
 const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 {
 	{ // 草原テクスチャ
-		"data\\TEXTURE\\groundSide000.png",	// 左テクスチャ
-		"data\\TEXTURE\\groundSide000.png",	// 右テクスチャ
-		"data\\TEXTURE\\groundRoof000.png",	// 下テクスチャ
-		"data\\TEXTURE\\groundRoof000.png",	// 上テクスチャ
-		"data\\TEXTURE\\groundSide000.png",	// 前テクスチャ
-		"data\\TEXTURE\\groundSide000.png",	// 後テクスチャ
+		"data\\TEXTURE\\soil2.png",	// 左テクスチャ
+		"data\\TEXTURE\\soil2.png",	// 右テクスチャ
+		"data\\TEXTURE\\soil2.png",	// 下テクスチャ
+		"data\\TEXTURE\\soil.png",	// 上テクスチャ
+		"data\\TEXTURE\\soil2.png",	// 前テクスチャ
+		"data\\TEXTURE\\soil2.png",	// 後テクスチャ
 	},
 
 	{ // 石テクスチャ
@@ -238,15 +238,23 @@ CGround *CGround::Create
 
 		// 大きさを設定
 		pGround->SetVec3Sizing(rSize);
-
+		int nSprit;
 		// テクスチャの分割数Xを設定
-		pGround->SetTexturePatternX(rTexPartX);
+		if (type == TYPE_GRASS)
+		{
+			nSprit = 5;
+		}
+		else
+		{
+			nSprit = 2;
+		}
+		pGround->SetTexturePatternX(rTexPartX / nSprit);
 
 		// テクスチャの分割数Yを設定
-		pGround->SetTexturePatternY(rTexPartY);
+		pGround->SetTexturePatternY(rTexPartY / nSprit);
 
 		// テクスチャの分割数Zを設定
-		pGround->SetTexturePatternZ(rTexPartZ);
+		pGround->SetTexturePatternZ(rTexPartZ / nSprit);
 
 		// 確保したアドレスを返す
 		return pGround;
