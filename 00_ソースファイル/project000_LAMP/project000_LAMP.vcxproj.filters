@@ -297,9 +297,6 @@
     <ClCompile Include="ModelParticle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="item.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="itemspawn.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
