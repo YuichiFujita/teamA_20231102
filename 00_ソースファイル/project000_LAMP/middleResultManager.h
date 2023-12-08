@@ -72,9 +72,10 @@ public:
 	~CMiddleResultManager();
 
 	// メンバ関数
-	HRESULT Init(void);		// 初期化
-	HRESULT Uninit(void);	// 終了
-	void Update(void);		// 更新
+	HRESULT Init(void);			// 初期化
+	HRESULT Uninit(void);		// 終了
+	void Update(void);			// 更新
+	void SetResultData(void);	// リザルト情報設定
 
 	// 静的メンバ関数
 	static CMiddleResultManager *Create(void);	// 生成

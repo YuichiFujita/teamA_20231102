@@ -54,9 +54,6 @@ CScene::~CScene()
 //============================================================
 HRESULT CScene::Init(void)
 {
-	// 変数を宣言
-	int nNumCreate = 0;	// プレイヤー生成数
-
 	// ステージの生成
 	m_pStage = CStage::Create();
 	if (m_pStage == NULL)
@@ -87,10 +84,7 @@ HRESULT CScene::Init(void)
 			{ // エントリーされている場合
 
 				// プレイヤーオブジェクトの生成
-				m_apPlayer[nNumCreate] = CPlayer::Create(m_mode, nCntPlayer);
-
-				// 生成数を加算
-				nNumCreate++;
+				m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
 			}
 		}
 	}

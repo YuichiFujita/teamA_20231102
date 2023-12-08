@@ -9,6 +9,7 @@
 //************************************************************
 #include "retentionManager.h"
 #include "manager.h"
+#include "player.h"
 
 //************************************************************
 //	親クラス [CRetentionManager] のメンバ関数
@@ -21,6 +22,7 @@ CRetentionManager::CRetentionManager()
 	// メンバ変数をクリア
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
+	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
@@ -45,6 +47,7 @@ HRESULT CRetentionManager::Init(void)
 	// メンバ変数を初期化
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
+	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
@@ -230,6 +233,28 @@ int CRetentionManager::GetWinPoint(void) const
 }
 
 //============================================================
+//	ゲーム開始時の初期化処理
+//============================================================
+void CRetentionManager::InitGame(void)
+{
+	// 勝利ポイント数を初期化
+	m_nWinPoint = 0;
+
+	// 生存ランキングを初期化
+	InitSurvivalRank();
+
+	// 勝利ランキングを初期化
+	InitWinRank();
+
+	// プレイヤーポイント数を初期化
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		m_aPlayerWin[nCntPlayer] = 0;
+	}
+}
+
+//============================================================
 //	全エントリー状況の設定処理
 //============================================================
 void CRetentionManager::AllSetEnableEntry(const bool bEntry)
@@ -258,6 +283,27 @@ bool CRetentionManager::IsEntry(const int nID) const
 {
 	// 引数インデックスのエントリー状況を返す
 	return m_aEntry[nID];
+}
+
+//============================================================
+//	勝利ランキング初期化処理
+//============================================================
+void CRetentionManager::InitWinRank(void)
+{
+	// 勝利ランキングを初期化
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		m_aWinRank[nCntPlayer] = NONE_IDX;
+	}
+}
+
+//============================================================
+//	勝利ランキングソート処理
+//============================================================
+void CRetentionManager::SortWinRank(void)
+{
+	// TODO：勝利ランキングのソート作成
 }
 
 //============================================================
@@ -294,8 +340,8 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 			if (m_nNumSurvival <= 0)
 			{ // だれも生存していない場合
 
-				// 現在のプレイヤーにポイントを与える
-				int a = 0;
+				// 生存ランキング1位プレイヤーの勝利ポイントを加算
+				m_aPlayerWin[m_aSurvivalRank[SURVIVAL_1ST]]++;
 			}
 
 			// 処理を抜ける
@@ -323,4 +369,18 @@ CRetentionManager::ESurvival CRetentionManager::GetSurvivalRank(const int nID) c
 	// 4位を返す (例外)
 	assert(false);
 	return SURVIVAL_4TH;
+}
+
+//============================================================
+//	プレイヤーポイント数取得処理
+//============================================================
+int CRetentionManager::GetPlayerWin(const int nID) const
+{
+	if (nID > NONE_IDX && nID < MAX_PLAYER)
+	{ // インデックスが範囲内の場合
+
+		// 引数プレイヤーのポイントを返す
+		return m_aPlayerWin[nID];
+	}
+	else { assert(false); }	// 範囲外
 }

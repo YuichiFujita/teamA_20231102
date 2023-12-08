@@ -326,7 +326,6 @@ HRESULT CMiddleResultManager::Init(void)
 		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
 
 		// 変数を宣言
-		int nPlayerWinPoint = (pPlayer == NULL) ? 0 : pPlayer->GetWinPoint();			// プレイヤー勝利ポイント
 		D3DXCOLOR colPolygon = (pPlayer == NULL) ? number::COL_NOTJOIN : XCOL_WHITE;	// ポリゴン色
 
 		// プレイヤーフレームの生成
@@ -383,9 +382,6 @@ HRESULT CMiddleResultManager::Init(void)
 
 		// 自動描画をOFFにする
 		m_apPlayerWinPoint[nCntEntry]->SetEnableDraw(false);
-
-		// 数字を設定
-		m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetNum(nPlayerWinPoint);
 
 		// プレイヤーナンバーの生成
 		m_apNumber[nCntEntry] = CValueUI::Create
@@ -609,6 +605,8 @@ void CMiddleResultManager::Update(void)
 			//if ()
 			{ // 勝者が決まっていない場合
 
+				// TODO：勝者が決まり次第リザルト移行
+
 				// ゲームに遷移
 				CManager::GetInstance()->SetScene(CScene::MODE_GAME, WAIT_FRAME);
 			}
@@ -656,6 +654,26 @@ void CMiddleResultManager::Update(void)
 
 		// プレイヤーフレームの更新
 		m_apFrame[nCntEntry]->Update();
+	}
+}
+
+//============================================================
+//	リザルト情報の設定処理
+//============================================================
+void CMiddleResultManager::SetResultData(void)
+{
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// ポイントを宣言
+		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが使用されている場合
+
+			// プレイヤー勝利ポイントを設定
+			m_apPlayerWinPoint[nCntEntry]->GetMultiValue()->SetNum(CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCntEntry));
+		}
 	}
 }
 

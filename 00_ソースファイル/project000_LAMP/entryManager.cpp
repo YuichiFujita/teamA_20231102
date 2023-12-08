@@ -105,6 +105,9 @@ HRESULT CEntryManager::Init(void)
 	m_pControl	= NULL;	// 操作表示の情報
 	m_pStart	= NULL;	// 開始表示の情報
 
+	// ゲーム情報を初期化
+	CManager::GetInstance()->GetRetentionManager()->InitGame();
+
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
@@ -388,6 +391,10 @@ void CEntryManager::UpdateEntry(void)
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー数]：%d\n", nNumPlayer);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー1]：%s\n", pRetention->IsEntry(0) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー2]：%s\n", pRetention->IsEntry(1) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー3]：%s\n", pRetention->IsEntry(2) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー4]：%s\n", pRetention->IsEntry(3) ? "true" : "false");
 
 	// プレイ人数を設定
 	pRetention->SetNumPlayer(nNumPlayer);

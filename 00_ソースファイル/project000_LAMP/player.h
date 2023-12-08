@@ -130,8 +130,6 @@ public:
 	void HitKillY(const int nDmg);			// キルY座標ヒット
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
-	void AddWinPoint(void);					// 勝利ポイント加算
-	int GetWinPoint(void) const;			// 勝利ポイント取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
 
 protected:
@@ -176,7 +174,6 @@ private:
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
 	CObject3D * m_pGuide;			// 投擲方向
-	int			m_nWinPoint;		// 勝利ポイント数
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

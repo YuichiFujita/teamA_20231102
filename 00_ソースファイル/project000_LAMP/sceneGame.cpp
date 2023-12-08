@@ -111,12 +111,18 @@ HRESULT CSceneGame::Init(void)
 	// カメラを設定
 	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
-	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤー数分繰り返す
 
-		// プレイヤーを出現
-		CScene::GetPlayer(nCntPlayer)->SetSpawn();
-		CScene::GetPlayer(nCntPlayer)->SetState(CPlayer::STATE_NONE);
+		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが存在する場合
+
+			// プレイヤーを出現
+			pPlayer->SetSpawn();
+			pPlayer->SetState(CPlayer::STATE_NONE);
+		}
 	}
 
 	// 見下ろしカメラの目標位置の設定
@@ -287,11 +293,17 @@ void CSceneGame::SetEnableDrawUI(const bool bDraw)
 	// 引数のUIの描画状況を設定
 	m_bDrawUI = bDraw;
 
-	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤー数分繰り返す
 
-		// プレイヤーの描画状況を設定
-		CScene::GetPlayer(nCntPlayer)->SetEnableDrawUI(bDraw);
+		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが存在する場合
+
+			// プレイヤーの描画状況を設定
+			pPlayer->SetEnableDrawUI(bDraw);
+		}
 	}
 }
 
