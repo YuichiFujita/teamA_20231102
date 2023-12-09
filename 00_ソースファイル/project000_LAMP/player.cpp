@@ -213,6 +213,7 @@ HRESULT CPlayer::Init(void)
 	m_pGuide->SetEnableDraw(false);
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
+
 	// 成功を返す
 	return S_OK;
 }
@@ -231,7 +232,7 @@ void CPlayer::Uninit(void)
 
 	if (m_pAI != NULL)
 	{ // 使用中の場合
-	// メモリ開放
+		// メモリ開放
 		delete m_pAI;
 		m_pAI = NULL;
 	}
