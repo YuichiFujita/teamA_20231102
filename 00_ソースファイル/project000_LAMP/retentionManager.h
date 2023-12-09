@@ -38,14 +38,14 @@ public:
 		WIN_MAX				// この列挙型の総数
 	};
 
-	// 生存ランキング列挙
-	enum ESurvival
+	// ランキング列挙
+	enum ERank
 	{
-		SURVIVAL_1ST = 0,	// 生存ランキング：一位
-		SURVIVAL_2ND,		// 生存ランキング：二位
-		SURVIVAL_3RD,		// 生存ランキング：三位
-		SURVIVAL_4TH,		// 生存ランキング：四位
-		SURVIVAL_MAX		// この列挙型の総数
+		RANK_1ST = 0,	// ランキング：一位
+		RANK_2ND,		// ランキング：二位
+		RANK_3RD,		// ランキング：三位
+		RANK_4TH,		// ランキング：四位
+		RANK_MAX		// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -53,6 +53,13 @@ public:
 
 	// デストラクタ
 	~CRetentionManager();
+
+	// ソート構造体
+	struct SSortData
+	{
+		int nWinPoint;	// 勝利ポイント保持数
+		int nPlayerID;	// プレイヤー番号
+	};
 
 	// メンバ関数
 	HRESULT Init(void);	// 初期化
@@ -74,12 +81,13 @@ public:
 	void SetEnableEntry(const int nID, const bool bEntry);	// エントリー状況設定
 	bool IsEntry(const int nID) const;						// エントリー状況取得
 
-	void InitWinRank(void);							// 勝利ランキング初期化
-	void SortWinRank(void);							// 勝利ランキングソート
-	void InitSurvivalRank(void);					// 生存ランキング初期化
-	void SetSurvivalRank(const int nPlayerID);		// 生存ランキング設定
-	ESurvival GetSurvivalRank(const int nID) const;	// 生存ランキング取得
-	int GetPlayerWin(const int nID) const;			// プレイヤーポイント数取得
+	void InitWinRank(void);						// 勝利ランキング初期化
+	void SetWinRank(void);						// 勝利ランキング設定
+	int GetWinRank1st(void) const;				// 勝利ランキング一位プレイヤー取得
+	void InitSurvivalRank(void);				// 生存ランキング初期化
+	void SetSurvivalRank(const int nPlayerID);	// 生存ランキング設定
+	ERank GetSurvivalRank(const int nID) const;	// 生存ランキング取得
+	int GetPlayerWin(const int nID) const;		// プレイヤーポイント数取得
 
 	// 静的メンバ関数
 	static CRetentionManager *Create(void);	// 生成

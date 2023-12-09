@@ -148,7 +148,6 @@ HRESULT CSceneGame::Init(void)
 	case 2:
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME_2);
 		break;
-
 	default:
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
 		break;

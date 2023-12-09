@@ -602,20 +602,20 @@ void CMiddleResultManager::Update(void)
 		if (CManager::GetInstance()->GetFade()->GetState() == CFade::FADE_NONE)
 		{ // フェード中ではない場合
 
-			//if ()
-			{ // 勝者が決まっていない場合
+			CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
-				// TODO：勝者が決まり次第リザルト移行
+			if (pRetention->GetPlayerWin(pRetention->GetWinRank1st()) >= pRetention->GetWinPoint())
+			{ // 勝者が決まった場合
+
+				// リザルトに遷移
+				CManager::GetInstance()->SetScene(CScene::MODE_RESULT, WAIT_FRAME);
+			}
+			else
+			{ // 勝者が決まっていない場合
 
 				// ゲームに遷移
 				CManager::GetInstance()->SetScene(CScene::MODE_GAME, WAIT_FRAME);
 			}
-			//else
-			//{ // 勝者が決まった場合
-
-			//	// リザルトに遷移
-			//	CManager::GetInstance()->SetScene(CScene::MODE_RESULT, WAIT_FRAME);
-			//}
 		}
 
 		break;

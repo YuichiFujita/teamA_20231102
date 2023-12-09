@@ -294,16 +294,109 @@ void CRetentionManager::InitWinRank(void)
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤーの最大数分繰り返す
 
-		m_aWinRank[nCntPlayer] = NONE_IDX;
+		m_aWinRank[nCntPlayer] = RANK_4TH;
 	}
 }
 
 //============================================================
-//	勝利ランキングソート処理
+//	勝利ランキング設定処理
 //============================================================
-void CRetentionManager::SortWinRank(void)
+void CRetentionManager::SetWinRank(void)
 {
-	// TODO：勝利ランキングのソート作成
+	// 変数配列を宣言
+	SSortData aSortData[MAX_PLAYER];	// ソート情報代入用
+	for (int i = 0; i < MAX_PLAYER; i++)
+	{ // プレイヤー最大数分繰り返す
+
+		// ソート情報を初期化
+		aSortData[i].nWinPoint = m_aPlayerWin[i];	// 勝利ポイント保持数
+		aSortData[i].nPlayerID = i;					// プレイヤー番号
+	}
+
+	// ソート情報を用いて勝利ランキングを更新
+	{
+		// 変数を宣言
+		SSortData keepData;	// ソート用
+		int	nCurrentMaxID;	// 最大値のインデックス
+
+		for (int nCntKeep = 0; nCntKeep < (MAX_PLAYER - 1); nCntKeep++)
+		{ // 入れ替える値の総数 -1回分繰り返す
+
+			// 現在の繰り返し数を代入 (要素1とする)
+			nCurrentMaxID = nCntKeep;
+
+			for (int nCntSort = nCntKeep + 1; nCntSort < MAX_PLAYER; nCntSort++)
+			{ // 入れ替える値の総数 -nCntKeep分繰り返す
+
+				if (aSortData[nCurrentMaxID].nWinPoint < aSortData[nCntSort].nWinPoint)
+				{ // 最大値に設定されている値より、現在の値のほうが大きい場合
+
+					// 現在の要素番号を最大値に設定
+					nCurrentMaxID = nCntSort;
+				}
+			}
+
+			if (nCntKeep != nCurrentMaxID)
+			{ // 最大値の要素番号に変動があった場合
+
+				// 要素の入れ替え
+				keepData = aSortData[nCntKeep];
+				aSortData[nCntKeep] = aSortData[nCurrentMaxID];
+				aSortData[nCurrentMaxID] = keepData;
+			}
+		}
+	}
+
+	// 更新した勝利ランキングを元にプレイヤーごとの順位を設定
+	{
+		// 変数を宣言
+		int nOldPoint = NONE_IDX;		// 一つ後のプレイヤーの獲得ポイント数
+		int nCurrentRank = NONE_IDX;	// 現在の最高ランキング
+
+		for (int nCntRank = 0; nCntRank < m_nNumPlayer; nCntRank++)
+		{ // プレイヤーの人数分繰り返す
+
+			if (nOldPoint == aSortData[nCntRank].nWinPoint)
+			{ // 同じ獲得ポイント数の場合
+
+				// 前回の順位を保持しているプレイヤー番号の配列要素に設定
+				m_aWinRank[aSortData[nCntRank].nPlayerID] = nCurrentRank;
+			}
+			else
+			{ // 同じ獲得ポイント数ではない場合
+
+				// 現在の最高ランキングを下げる
+				nCurrentRank++;
+
+				// 今回の順位を保持しているプレイヤー番号の配列要素に設定
+				m_aWinRank[aSortData[nCntRank].nPlayerID] = nCurrentRank;
+			}
+
+			// 現在のプレイヤーの獲得ポイント数を保存
+			nOldPoint = aSortData[nCntRank].nWinPoint;
+		}
+	}
+}
+
+//============================================================
+//	勝利ランキング一位プレイヤーのインデックス取得処理
+//============================================================
+int CRetentionManager::GetWinRank1st(void) const
+{
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (m_aWinRank[nCntPlayer] == RANK_1ST)
+		{ // 現在のインデックスがランキング一位の場合
+
+			// 一位プレイヤーのインデックスを返す
+			return nCntPlayer;
+		}
+	}
+
+	// ランキング1位が存在しない
+	assert(false);
+	return NONE_IDX;	// 例外を返す
 }
 
 //============================================================
@@ -341,7 +434,10 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 			{ // だれも生存していない場合
 
 				// 生存ランキング1位プレイヤーの勝利ポイントを加算
-				m_aPlayerWin[m_aSurvivalRank[SURVIVAL_1ST]]++;
+				m_aPlayerWin[m_aSurvivalRank[RANK_1ST]]++;
+
+				// 勝利ランキング設定 (更新)
+				SetWinRank();
 			}
 
 			// 処理を抜ける
@@ -353,7 +449,7 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 //============================================================
 //	生存ランキング取得処理
 //============================================================
-CRetentionManager::ESurvival CRetentionManager::GetSurvivalRank(const int nID) const
+CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
 {
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤーの最大数分繰り返す
@@ -362,13 +458,13 @@ CRetentionManager::ESurvival CRetentionManager::GetSurvivalRank(const int nID) c
 		{ // ランキングが設定されていない場合
 
 			// 引数のプレイヤーインデックスを設定
-			return (ESurvival)nCntPlayer;
+			return (ERank)nCntPlayer;
 		}
 	}
 
 	// 4位を返す (例外)
 	assert(false);
-	return SURVIVAL_4TH;
+	return RANK_4TH;
 }
 
 //============================================================
@@ -382,5 +478,5 @@ int CRetentionManager::GetPlayerWin(const int nID) const
 		// 引数プレイヤーのポイントを返す
 		return m_aPlayerWin[nID];
 	}
-	else { assert(false); }	// 範囲外
+	else { assert(false); return NONE_IDX; }	// 範囲外
 }
