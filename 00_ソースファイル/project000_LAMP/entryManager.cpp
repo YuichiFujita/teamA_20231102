@@ -24,7 +24,7 @@
 //************************************************************
 namespace
 {
-	const int PRIORITY = 14;	// エントリーの優先順位
+	const int PRIORITY = 13;	// エントリーの優先順位
 
 	const D3DXCOLOR COL_ENTRY	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 参加中カラー
 	const D3DXCOLOR COL_UNENTRY	= D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);	// 非参加中カラー
