@@ -19,6 +19,7 @@
 //	前方宣言
 //************************************************************
 class CObject2D;	// オブジェクト2Dクラス
+class CAnim2D;		// アニメーション2Dクラス
 class CMultiValue;	// マルチ数字クラス
 
 //************************************************************
@@ -31,11 +32,18 @@ public:
 	// テクスチャ列挙
 	enum ETexture
 	{
-		TEXTURE_PLAYER = 0,	// PLAYERテクスチャ
-		TEXTURE_FRAME,		// フレームテクスチャ
-		TEXTURE_CONTROL,	// 操作表示テクスチャ
-		TEXTURE_START,		// 開始表示テクスチャ
-		TEXTURE_MAX			// この列挙型の総数
+		TEXTURE_ = 0,	// テクスチャ
+		TEXTURE_MAX		// この列挙型の総数
+	};
+
+	// 状態列挙
+	enum EState
+	{
+		STATE_FADEIN = 0,	// フェードイン状態
+		STATE_WAIT,			// 待機状態
+		STATE_FADEOUT,		// フェードアウト状態
+		STATE_ENTRYBACK,	// エントリー戻し状態
+		STATE_MAX			// この列挙型の総数
 	};
 
 	// コンストラクタ
@@ -55,14 +63,15 @@ public:
 
 private:
 	// メンバ関数
-
+	void UpdateFadeIn(void);	// フェードイン更新
+	void UpdateFadeOut(void);	// フェードアウト更新
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
-	CObject2D *m_pControl;	// 操作表示の情報
-	CObject2D *m_pStart;	// 開始表示の情報
+	CObject2D *m_pFade;	// フェードの情報
+	EState m_state;		// 状態
 };
 
 #endif	// _ENTRYRULE_MANAGER_H_

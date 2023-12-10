@@ -16,6 +16,7 @@
 #include "valueUI.h"
 #include "object2D.h"
 #include "multiValue.h"
+#include "entryRuleManager.h"
 #include "retentionManager.h"
 #include "fade.h"
 
@@ -82,8 +83,10 @@ CEntryManager::CEntryManager()
 	// メンバ変数をクリア
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
+	m_pRuleManager	= NULL;		// エントリールールの情報
+	m_pControl	= NULL;			// 操作表示の情報
+	m_pStart	= NULL;			// 開始表示の情報
+	m_state		= STATE_ENTRY;	// 状態
 }
 
 //============================================================
@@ -102,8 +105,10 @@ HRESULT CEntryManager::Init(void)
 	// メンバ変数を初期化
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
+	m_pRuleManager	= NULL;		// エントリールールの情報
+	m_pControl	= NULL;			// 操作表示の情報
+	m_pStart	= NULL;			// 開始表示の情報
+	m_state		= STATE_ENTRY;	// 状態
 
 	// ゲーム情報を初期化
 	CManager::GetInstance()->GetRetentionManager()->InitGame();
@@ -219,6 +224,17 @@ HRESULT CEntryManager::Init(void)
 //============================================================
 HRESULT CEntryManager::Uninit(void)
 {
+	if (m_pRuleManager != NULL)
+	{
+		// エントリールールの破棄
+		if (FAILED(CEntryRuleManager::Release(m_pRuleManager)))
+		{ // 失敗した場合
+
+			// 失敗を返す
+			return E_FAIL;
+		}
+	}
+
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
@@ -251,27 +267,104 @@ void CEntryManager::Update(void)
 		return;
 	}
 
-	// エントリーの更新
-	UpdateEntry();
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_ENTRY:
 
-	// 開始の更新
-	UpdateStart();
+		// エントリーの更新
+		UpdateEntry();
 
-	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
-	{ // プレイヤーの最大数分繰り返す
+		// 開始の更新
+		UpdateStart();
 
-		// プレイヤーナンバーの更新
-		m_apNumber[nCntEntry]->Update();
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
 
-		// プレイヤーフレームの更新
-		m_apFrame[nCntEntry]->Update();
+			// プレイヤーナンバーの更新
+			m_apNumber[nCntEntry]->Update();
+
+			// プレイヤーフレームの更新
+			m_apFrame[nCntEntry]->Update();
+		}
+
+		// 操作表示の更新
+		m_pControl->Update();
+
+		// 開始表示の更新
+		m_pStart->Update();
+
+		break;
+
+	case STATE_RULE:
+
+		if (m_pRuleManager != NULL)
+		{
+			// エントリールールの更新
+			m_pRuleManager->Update();
+		}
+
+		break;
+
+	case STATE_END:
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+//============================================================
+//	状態の設定処理
+//============================================================
+HRESULT CEntryManager::SetState(const EState state)
+{
+	// 引数の状態を設定
+	m_state = state;
+
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_ENTRY:
+
+		if (m_pRuleManager != NULL)
+		{
+			// エントリールールの破棄
+			if (FAILED(CEntryRuleManager::Release(m_pRuleManager)))
+			{ // 失敗した場合
+
+				// 失敗を返す
+				return E_FAIL;
+			}
+		}
+
+		break;
+
+	case STATE_RULE:
+
+		if (m_pRuleManager == NULL)
+		{
+			// エントリールールの生成
+			m_pRuleManager = CEntryRuleManager::Create();
+			if (m_pRuleManager == NULL)
+			{ // 失敗した場合
+
+				// 失敗を返す
+				return E_FAIL;
+			}
+		}
+
+		break;
+
+	case STATE_END:
+		break;
+
+	default:
+		assert(false);
+		break;
 	}
 
-	// 操作表示の更新
-	m_pControl->Update();
-
-	// 開始表示の更新
-	m_pStart->Update();
+	// 成功を返す
+	return S_OK;
 }
 
 //============================================================
@@ -406,19 +499,18 @@ void CEntryManager::UpdateEntry(void)
 void CEntryManager::UpdateStart(void)
 {
 	// ポインタを宣言
-	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
-	{ // プレイヤーの最大数分繰り返す
+	if (pKeyboard->IsTrigger(DIK_RETURN)
+	||  pKeyboard->IsTrigger(DIK_SPACE)
+	||  pPad->IsTriggerAll(CInputPad::KEY_START))
+	{
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumPlayer() >= 2)
+		{ // エントリー数が二人以上の場合
 
-		if (pPad->IsTrigger(CInputPad::KEY_START, nCntEntry))
-		{
-			if (CManager::GetInstance()->GetRetentionManager()->GetNumPlayer() >= 2)
-			{ // エントリー数が二人以上の場合
-
-				// シーンの設定
-				CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
-			}
+			// ルール設定状態にする
+			SetState(STATE_RULE);
 		}
 	}
 }

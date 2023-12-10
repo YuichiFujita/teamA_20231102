@@ -17,45 +17,23 @@
 #include "multiValue.h"
 #include "retentionManager.h"
 #include "fade.h"
+#include "sceneEntry.h"
+#include "entryManager.h"
 
 //************************************************************
 //	定数宣言
 //************************************************************
 namespace
 {
-	const int PRIORITY = 13;	// エントリーの優先順位
+	const int PRIORITY = 14;	// エントリーの優先順位
 
-	const D3DXCOLOR COL_RULE	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 参加中カラー
-	const D3DXCOLOR COL_UNRULE	= D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);	// 非参加中カラー
-
-	namespace number
+	namespace fade
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(165.0f, 90.0f, 0.0f);		// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// タイトル大きさ
-		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
-		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);		// タイトル空白
-		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;							// 数字空白
-		const int			DIGIT		= 1;									// 桁数
-	}
+		const D3DXCOLOR INIT_COL	= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);	// 初期化色
+		const D3DXCOLOR SET_COL		= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);	// 設定色
 
-	namespace frame
-	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 360.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 440.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
-	}
-
-	namespace control
-	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 630.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(505.0f, 84.0f, 0.0f);			// 大きさ
-	}
-
-	namespace start
-	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(1100.0f, 600.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(300.0f, 180.0f, 0.0f);	// 大きさ
+		const float	ADD_ALPHA	= 0.025f;	// 透明度の加算量
+		const float	SUB_ALPHA	= 0.025f;	// 透明度の減算量
 	}
 }
 
@@ -64,10 +42,7 @@ namespace
 //************************************************************
 const char *CEntryRuleManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\entry_player.png",	// PLAYERテクスチャ
-	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
-	"data\\TEXTURE\\entry002.png",	// 操作表示テクスチャ
-	"data\\TEXTURE\\entry003.png",	// 開始表示テクスチャ
+	NULL,	// テクスチャ
 };
 
 //************************************************************
@@ -79,8 +54,8 @@ const char *CEntryRuleManager::mc_apTextureFile[] =	// テクスチャ定数
 CEntryRuleManager::CEntryRuleManager()
 {
 	// メンバ変数をクリア
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
+	m_pFade	= NULL;			// フェードの情報
+	m_state	= STATE_FADEIN;	// 状態
 }
 
 //============================================================
@@ -97,19 +72,18 @@ CEntryRuleManager::~CEntryRuleManager()
 HRESULT CEntryRuleManager::Init(void)
 {
 	// メンバ変数を初期化
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
-
-	// ゲーム情報を初期化
-	CManager::GetInstance()->GetRetentionManager()->InitGame();
+	m_pFade	= NULL;			// フェードの情報
+	m_state	= STATE_FADEIN;	// 状態
 
 	// 操作表示の生成
-	m_pControl = CObject2D::Create
+	m_pFade = CObject2D::Create
 	( // 引数
-		control::POS,	// 位置
-		control::SIZE	// 大きさ
+		SCREEN_CENT,	// 位置
+		SCREEN_SIZE,	// 大きさ
+		VEC3_ZERO,		// 向き
+		fade::INIT_COL	// 色
 	);
-	if (m_pControl == NULL)
+	if (m_pFade == NULL)
 	{ // 生成に失敗した場合
 
 		// 失敗を返す
@@ -117,37 +91,8 @@ HRESULT CEntryRuleManager::Init(void)
 		return E_FAIL;
 	}
 
-	// テクスチャを登録・割当
-	m_pControl->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
-
 	// 優先順位を設定
-	m_pControl->SetPriority(PRIORITY);
-
-	// 開始表示の生成
-	m_pStart = CObject2D::Create
-	( // 引数
-		start::POS,	// 位置
-		start::SIZE	// 大きさ
-	);
-	if (m_pStart == NULL)
-	{ // 生成に失敗した場合
-
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-
-	// テクスチャを登録・割当
-	m_pStart->BindTexture(mc_apTextureFile[TEXTURE_START]);
-
-	// 優先順位を設定
-	m_pStart->SetPriority(PRIORITY);
-
-	// プレイ人数を初期化
-	CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(0);
-
-	// エントリーを初期化
-	CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(false);
+	m_pFade->SetPriority(PRIORITY);
 
 	// 成功を返す
 	return S_OK;
@@ -158,11 +103,8 @@ HRESULT CEntryRuleManager::Init(void)
 //============================================================
 HRESULT CEntryRuleManager::Uninit(void)
 {
-	// 操作表示の終了
-	m_pControl->Uninit();
-
-	// 開始表示の終了
-	m_pStart->Uninit();
+	// フェードの終了
+	m_pFade->Uninit();
 
 	// 成功を返す
 	return S_OK;
@@ -180,11 +122,43 @@ void CEntryRuleManager::Update(void)
 		return;
 	}
 
-	// 操作表示の更新
-	m_pControl->Update();
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_FADEIN:
 
-	// 開始表示の更新
-	m_pStart->Update();
+		// フェードインの更新
+		UpdateFadeIn();
+
+		break;
+
+	case STATE_WAIT:
+
+
+
+		break;
+
+	case STATE_FADEOUT:
+
+		// フェードアウトの更新
+		UpdateFadeOut();
+
+		break;
+
+	case STATE_ENTRYBACK:
+
+		// エントリー状態に戻る
+		CSceneEntry::GetEntryManager()->SetState(CEntryManager::STATE_ENTRY);
+
+		// 関数を抜ける
+		return;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	// フェードの更新
+	m_pFade->Update();
 }
 
 //============================================================
@@ -253,4 +227,54 @@ HRESULT CEntryRuleManager::Release(CEntryRuleManager *&prEntryRuleManager)
 		return S_OK;
 	}
 	else { assert(false); return E_FAIL; }	// 非使用中
+}
+
+//============================================================
+//	フェードインの更新処理
+//============================================================
+void CEntryRuleManager::UpdateFadeIn(void)
+{
+	// 変数を宣言
+	D3DXCOLOR colFade = m_pFade->GetColor();	// フェードの色
+
+	// 透明度を加算
+	colFade.a += fade::ADD_ALPHA;
+
+	if (colFade.a >= fade::SET_COL.a)
+	{ // 透明度が上がりきった場合
+
+		// 透明度を補正
+		colFade.a = fade::SET_COL.a;
+
+		// 待機状態にする
+		m_state = STATE_WAIT;
+	}
+
+	// 透明度を反映
+	m_pFade->SetColor(colFade);
+}
+
+//============================================================
+//	フェードアウトの更新処理
+//============================================================
+void CEntryRuleManager::UpdateFadeOut(void)
+{
+	// 変数を宣言
+	D3DXCOLOR colFade = m_pFade->GetColor();	// フェードの色
+
+	// 透明度を減算
+	colFade.a -= fade::SUB_ALPHA;
+
+	if (colFade.a <= fade::INIT_COL.a)
+	{ // 透明度が下がりきった場合
+
+		// 透明度を補正
+		colFade.a = fade::INIT_COL.a;
+
+		// エントリー戻し状態にする
+		m_state = STATE_ENTRYBACK;
+	}
+
+	// 透明度を反映
+	m_pFade->SetColor(colFade);
 }
