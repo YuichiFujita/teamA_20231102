@@ -111,8 +111,6 @@ HRESULT CFlail::Init(void)
 //============================================================
 void CFlail::Uninit(void)
 {
-	// オブジェクトモデルの終了
-	CObjectModel::Uninit();
 	if (m_pOrbit != NULL)
 	{
 		m_pOrbit->Uninit();
@@ -124,6 +122,9 @@ void CFlail::Uninit(void)
 		// モデルの終了
 		m_chain[nCntChain].multiModel->Uninit();
 	}
+
+	// オブジェクトモデルの終了
+	CObjectModel::Uninit();
 }
 
 //============================================================

@@ -187,9 +187,13 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void SetVibration(EType type, int nPlayer = 0);	// バイブ設定
-	bool IsPress(EKey joyKey, int nPlayer = 0);		// プレス取得   (ボタン)
-	bool IsTrigger(EKey joyKey, int nPlayer = 0);	// トリガー取得 (ボタン)
-	bool IsRelease(EKey joyKey, int nPlayer = 0);	// リリース取得 (ボタン)
+	bool IsPress(EKey joyKey, int nPlayer = 0);		// プレス取得	(ボタン)
+	bool IsTrigger(EKey joyKey, int nPlayer = 0);	// トリガー取得	(ボタン)
+	bool IsRelease(EKey joyKey, int nPlayer = 0);	// リリース取得	(ボタン)
+
+	bool IsPressAll(EKey joyKey);	// 全プレス取得		(ボタン)
+	bool IsTriggerAll(EKey joyKey);	// 全トリガー取得	(ボタン)
+	bool IsReleaseAll(EKey joyKey);	// 全リリース取得	(ボタン)
 
 	SHORT GetPressLStickX(int nPlayer = 0);		// プレス取得 (LスティックX)
 	SHORT GetPressLStickY(int nPlayer = 0);		// プレス取得 (LスティックY)
