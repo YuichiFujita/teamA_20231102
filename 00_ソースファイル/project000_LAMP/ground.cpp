@@ -242,7 +242,7 @@ CGround *CGround::Create
 		// テクスチャの分割数Xを設定
 		if (type == TYPE_GRASS)
 		{
-			nSprit = 5;
+			nSprit = 6;
 		}
 		else
 		{

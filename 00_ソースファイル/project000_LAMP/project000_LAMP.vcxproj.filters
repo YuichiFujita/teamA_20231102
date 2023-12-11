@@ -589,5 +589,11 @@
     <FxCompile Include="data\SHADER\ZTexCreator.fx">
       <Filter>エフェクトファイル</Filter>
     </FxCompile>
+    <FxCompile Include="data\SHADER\BrightCheck.fx">
+      <Filter>エフェクトファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="data\SHADER\Gauss.fx">
+      <Filter>エフェクトファイル</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
