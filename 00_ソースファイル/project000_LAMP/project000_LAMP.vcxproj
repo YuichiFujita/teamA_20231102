@@ -163,6 +163,7 @@
     <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="editBlock.cpp" />
     <ClCompile Include="editGround.cpp" />
+    <ClCompile Include="ItemSpawnPoint.cpp" />
     <ClCompile Include="editObstacle.cpp" />
     <ClCompile Include="editSpawnPoint.cpp" />
     <ClCompile Include="editStage.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="gameManager.cpp" />
     <ClCompile Include="ground.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="itemspawn.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="liquid.cpp" />
@@ -261,6 +263,7 @@
     <ClInclude Include="DepthShadow.h" />
     <ClInclude Include="editBlock.h" />
     <ClInclude Include="editGround.h" />
+    <ClInclude Include="ItemSpawnPoint.h" />
     <ClInclude Include="editObstacle.h" />
     <ClInclude Include="editSpawnPoint.h" />
     <ClInclude Include="editStage.h" />

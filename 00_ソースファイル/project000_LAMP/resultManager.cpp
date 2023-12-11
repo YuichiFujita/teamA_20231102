@@ -255,8 +255,8 @@ HRESULT CResultManager::Init(void)
 					Win::INIT_SIZE
 				);
 
-				//ここで勝利者の番号を出す
-				m_apWinLog[nCnt]->SetPattern(0);
+				//ここで勝利者の番号を出す(１位のプレイヤーの番号を取得してくる)
+				m_apWinLog[nCnt]->SetPattern(CManager::GetInstance()->GetRetentionManager()->GetWinRank1st());
 
 			break;
 
