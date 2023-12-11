@@ -146,7 +146,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_pD3DDevice->SetTextureStageState(1, D3DTSS_ALPHAARG2,	D3DTA_CURRENT);
 #endif
 
-	// シェーダー用の初期化は以下
+	// シェーダー用の初期化は以下zz
 	// Z値テクスチャ生成オブジェクトの生成と初期化
 	m_pDev = m_pD3DDevice;
 	D3DXCreateSprite(m_pD3DDevice, &m_pSprite);// スプライト作成
