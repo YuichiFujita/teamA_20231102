@@ -303,6 +303,9 @@
     <ClCompile Include="entryRuleManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="ItemSpawnPoint.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anim2D.h">
@@ -590,18 +593,15 @@
     <ClInclude Include="entryRuleManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="ItemSpawnPoint.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="data\SHADER\DepthBufShadowEffect.fx">
       <Filter>エフェクトファイル</Filter>
     </FxCompile>
     <FxCompile Include="data\SHADER\ZTexCreator.fx">
-      <Filter>エフェクトファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="data\SHADER\BrightCheck.fx">
-      <Filter>エフェクトファイル</Filter>
-    </FxCompile>
-    <FxCompile Include="data\SHADER\Gauss.fx">
       <Filter>エフェクトファイル</Filter>
     </FxCompile>
   </ItemGroup>
