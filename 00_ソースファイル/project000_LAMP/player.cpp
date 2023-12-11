@@ -157,7 +157,9 @@ HRESULT CPlayer::Init(void)
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= true;			// ジャンプ状況
-
+	m_SItemPermanent[0] = {};
+	m_SItemPermanent[1] = {};
+	m_SItemTemporary = {};
 	// オブジェクトキャラクターの初期化
 	if (FAILED(CObjectChara::Init()))
 	{ // 初期化に失敗した場合
@@ -316,6 +318,16 @@ void CPlayer::Update(void)
 		assert(false);
 		break;
 	}
+	if (m_SItemTemporary.type != ITEM_EMPTY)
+	{
+		m_SItemTemporary.nLife--;
+		if (m_SItemTemporary.nLife <= 0)
+		{
+			m_SItemTemporary.type = ITEM_EMPTY;
+			m_SItemTemporary.nLife = 0;
+		}
+	}
+
 
 	// フレイルの更新
 	m_pFlail->Update();
@@ -364,9 +376,69 @@ void CPlayer::Draw(void)
 //============================================================
 void CPlayer::Hit(void)
 {
-	// TANNO：アイテムヒット作って
+	EItem Item = ITEM_EMPTY;
+	while (Item == ITEM_EMPTY)
+	{
+		Item = (EItem)(rand() % ITEM_MAX);
+	}
+	switch (Item)
+	{
+	case CPlayer::ITEM_EMPTY:
+		break;
+	case CPlayer::ITEM_HEAL:
+		m_pStatus->SetNumLife(m_pStatus->GetNumLife() + 20);
+		m_pStatus->SetNumRate(m_pStatus->GetNumRate() - 20);
+		break;
+	case CPlayer::ITEM_BOOST_ATTACK:
+		m_SItemTemporary.type = ITEM_BOOST_ATTACK;
+		m_SItemTemporary.nLife = 600;
+		break;
+	case CPlayer::ITEM_BOOST_KNOCKBACK:
+		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
+		m_SItemTemporary.nLife = 600;
+		break;
+	case CPlayer::ITEM_SUPERARMOR:
+		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
+		m_SItemTemporary.nLife = 450;
+		break;
+	case CPlayer::ITEM_BIGFLAIL:
+		SetItemPermanent(ITEM_BIGFLAIL);
+		break;
+	case CPlayer::ITEM_LONGFLAIL:
+		SetItemPermanent(ITEM_LONGFLAIL);
+		break;
+	case CPlayer::ITEM_GHOSTFLAIL:
+		SetItemPermanent(ITEM_GHOSTFLAIL);
+		break;
+	case CPlayer::ITEM_MULTIFLAIL:
+		SetItemPermanent(ITEM_MULTIFLAIL);
+		break;
+	case CPlayer::ITEM_BURNINGFLAIL:
+		SetItemPermanent(ITEM_BURNINGFLAIL);
+		break;
+	case CPlayer::ITEM_MAX:
+		break;
+	default:
+		break;
+	}
 }
-
+//============================================================
+//アイテムの効果設定
+//============================================================
+void CPlayer::SetItemPermanent(EItem Item)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_SItemPermanent[i].type == ITEM_EMPTY)
+		{
+			m_SItemPermanent[i].type = Item;
+			return;
+		}
+	}
+	
+	m_SItemPermanent[0].type = m_SItemPermanent[1].type;
+	m_SItemPermanent[1].type = Item;
+}
 //============================================================
 //	ノックバックヒット処理
 //============================================================

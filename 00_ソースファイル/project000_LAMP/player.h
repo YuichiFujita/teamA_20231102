@@ -96,7 +96,27 @@ public:
 		AXIS_Z,		// Z軸
 		AXIS_MAX	// この列挙型の総数
 	};
+	//アイテム効果
+	enum EItem
+	{
+		ITEM_EMPTY = 0,
+		ITEM_HEAL ,// 回復
+		ITEM_BOOST_ATTACK,
+		ITEM_BOOST_KNOCKBACK,
+		ITEM_SUPERARMOR,
+		ITEM_BIGFLAIL,
+		ITEM_LONGFLAIL,
+		ITEM_GHOSTFLAIL,
+		ITEM_MULTIFLAIL,
+		ITEM_BURNINGFLAIL,
+		ITEM_MAX
+	};
 
+	struct SItemEffect
+	{
+		EItem type;	//種別
+		int nLife;	//効果時間
+	};
 	// コンストラクタ
 	explicit CPlayer(const int nPad);
 
@@ -132,7 +152,7 @@ public:
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
-
+	void SetItemPermanent(EItem Item);
 protected:
 	// メンバ関数
 	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
@@ -166,6 +186,8 @@ private:
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
+	SItemEffect m_SItemPermanent[2];//永続的なアイテムの効果
+	SItemEffect m_SItemTemporary;	//一時的なアイテムの効果
 	CStatusManager *m_pStatus;		// ステータスの情報
 	CFlail		*m_pFlail;			// フレイルの情報
 	CPlayerAI	*m_pAI;				// AI情報
