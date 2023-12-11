@@ -108,6 +108,7 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+	void Hit(void) override;		// アイテムヒット
 	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock) override;	// ノックバックヒット
 
 	void SetState(const int nState) override;	// 状態設定

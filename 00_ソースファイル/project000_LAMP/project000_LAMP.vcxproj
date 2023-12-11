@@ -177,6 +177,7 @@
     <ClCompile Include="gameManager.cpp" />
     <ClCompile Include="ground.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="itemspawn.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="liquid.cpp" />
