@@ -356,6 +356,10 @@ HRESULT CEntryManager::SetState(const EState state)
 		break;
 
 	case STATE_END:
+
+		// ƒV[ƒ“‚Ìİ’è
+		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ƒQ[ƒ€‰æ–Ê
+
 		break;
 
 	default:

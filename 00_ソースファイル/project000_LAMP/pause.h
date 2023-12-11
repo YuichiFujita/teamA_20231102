@@ -32,7 +32,6 @@ public:
 	enum ESelect
 	{
 		SELECT_RESUME = 0,	// 再開
-		SELECT_RETRY,		// リトライ
 		SELECT_EXIT,		// 終了
 		SELECT_MAX			// この列挙型の総数
 	};

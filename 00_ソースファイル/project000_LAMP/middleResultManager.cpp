@@ -144,11 +144,11 @@ namespace
 const char *CMiddleResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\middleResult000.png",	// フェードテクスチャ
-	"data\\TEXTURE\\Mid_result.png",	// ランキングタイトルテクスチャ
-	"data\\TEXTURE\\white_flame.png",				// 勝利ポイント背景テクスチャ
-	"data\\TEXTURE\\target_score.png",	// 勝利ポイントタイトルテクスチャ
+	"data\\TEXTURE\\Mid_result.png",		// ランキングタイトルテクスチャ
+	"data\\TEXTURE\\white_flame.png",		// 勝利ポイント背景テクスチャ
+	"data\\TEXTURE\\target_score.png",		// 勝利ポイントタイトルテクスチャ
 	"data\\TEXTURE\\entry_player.png",		// プレイヤーテクスチャ
-	"data\\TEXTURE\\Score.png",	// 勝利ポイントテクスチャ
+	"data\\TEXTURE\\Score.png",				// 勝利ポイントテクスチャ
 	"data\\TEXTURE\\entry_flame.png",		// フレームテクスチャ
 	"data\\TEXTURE\\Press_Start_Crack.png",	// 操作方法テクスチャ
 };
