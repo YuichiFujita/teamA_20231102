@@ -150,6 +150,9 @@ void CGameManager::Update(void)
 			if (m_nCounterState >= WAIT_RESULT_FRAME)
 			{ // 余韻が経過した場合
 
+				// リザルト情報を設定
+				m_pMiddleResult->SetResultData();
+
 				// カウンターを初期化
 				m_nCounterState = 0;
 

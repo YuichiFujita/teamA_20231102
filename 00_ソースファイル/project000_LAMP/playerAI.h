@@ -112,7 +112,9 @@ private:
 	// ƒƒ“ƒo•Ï”
 	CFlail* m_pFlail;
 	D3DXVECTOR3 m_pDashRot;
+	D3DXVECTOR3 m_oldPos;
 	EStateAI m_stateAI;
+	CPlayer::EMotion m_currentMotion;
 	int m_nCounterFlail;
 	int m_nMotionOld;
 	int m_nPadID;

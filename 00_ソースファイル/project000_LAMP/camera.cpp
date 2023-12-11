@@ -16,6 +16,7 @@
 #include "stage.h"
 #include "retentionManager.h"
 #include "DepthShadow.h"
+
 //************************************************************
 //	定数宣言
 //************************************************************
@@ -37,11 +38,11 @@ namespace
 	namespace entry
 	{
 		const D3DXVECTOR3 INIT_VECU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトルの初期値
-		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(360.0f, 100.0f, -700.0f);	// 視点の初期値
-		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(360.0f, 100.0f, 0.0f);	// 注視点の初期値
+		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(406.0f, 140.0f, -1200.0f);	// 視点の初期値
+		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(406.0f, 140.0f, 0.0f);	// 注視点の初期値
 
-		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.75f;		// 画面の横幅
-		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.75f;	// 画面の縦幅
+		const float VIEW_WIDTH	= SCREEN_WIDTH * 0.85f;		// 画面の横幅
+		const float VIEW_HEIGHT	= SCREEN_HEIGHT * 0.85f;	// 画面の縦幅
 	}
 
 	// 回転カメラ情報
@@ -59,7 +60,7 @@ namespace
 	{
 		const D3DXVECTOR3 INIT_ROT	= D3DXVECTOR3(2.45f, 0.0f, 0.0f);	// 見下ろしカメラの向きX初期値
 		const float INIT_DIS	= 1800.0f;	// 見下ろしカメラの距離
-		const float MUL_DIS		= 0.5f;		// 加算距離の乗算量
+		const float MUL_DIS		= 0.75f;	// 加算距離の乗算量
 		const float REV_POS		= 0.05f;	// カメラ位置の補正係数
 		const float REV_ROT		= 0.045f;	// カメラ向きの補正係数
 	}
@@ -372,13 +373,12 @@ void CCamera::SetDestLookDown(void)
 	//	注視点の位置を計算
 	//----------------------------------------------------
 	{
-		int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
 		bool bInit = false;				// 初期化状況
 		D3DXVECTOR3 posMin = VEC3_ZERO;	// 最小の位置
 		D3DXVECTOR3 posMax = VEC3_ZERO;	// 最大の位置
 
-		for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
-		{ // プレイヤー数分繰り返す
+		for (int nCntCamera = 0; nCntCamera < MAX_PLAYER; nCntCamera++)
+		{ // プレイヤーの最大数分繰り返す
 
 			CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);	// プレイヤー情報
 
@@ -429,7 +429,6 @@ void CCamera::SetDestLookDown(void)
 					}
 				}
 			}
-			else { assert(false); }	// 非使用中
 		}
 
 		// 注視点の位置を平均で求める
@@ -672,13 +671,12 @@ void CCamera::LookDown(void)
 	D3DXVECTOR3 diffRot  = VEC3_ZERO;	// 差分向き
 	float fDis = lookdown::INIT_DIS;	// 距離
 	bool bInit = false;					// 初期化状況
-	int nNumPlayer = CManager::GetInstance()->GetRetentionManager()->GetNumPlayer();	// 参加プレイヤー数
 
 	//----------------------------------------------------
 	//	注視点の位置を計算
 	//----------------------------------------------------
-	for (int nCntCamera = 0; nCntCamera < nNumPlayer; nCntCamera++)
-	{ // プレイヤー数分繰り返す
+	for (int nCntCamera = 0; nCntCamera < MAX_PLAYER; nCntCamera++)
+	{ // プレイヤーの最大数分繰り返す
 
 		CPlayer *pPlayer = CScene::GetPlayer(nCntCamera);	// プレイヤー情報
 
@@ -729,7 +727,6 @@ void CCamera::LookDown(void)
 				}
 			}
 		}
-		else { assert(false); }	// 非使用中
 	}
 
 	// 注視点の位置を平均で求める

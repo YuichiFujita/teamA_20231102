@@ -19,8 +19,9 @@
 //************************************************************
 //	前方宣言
 //************************************************************
-class CValueUI;		// 数字UIクラス
-class CObject2D;	// オブジェクト2Dクラス
+class CValueUI;				// 数字UIクラス
+class CObject2D;			// オブジェクト2Dクラス
+class CEntryRuleManager;	// エントリールールマネージャークラス
 
 //************************************************************
 //	クラス定義
@@ -39,6 +40,15 @@ public:
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
+	// 状態列挙
+	enum EState
+	{
+		STATE_ENTRY = 0,	// エントリー受付状態
+		STATE_RULE,			// ルール設定状態
+		STATE_END,			// 終了状態
+		STATE_MAX			// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CEntryManager();
 
@@ -49,6 +59,7 @@ public:
 	HRESULT Init(void);		// 初期化
 	HRESULT Uninit(void);	// 終了
 	void Update(void);		// 更新
+	HRESULT SetState(const EState state);	// 状態設定
 
 	// 静的メンバ関数
 	static CEntryManager *Create(void);	// 生成
@@ -63,10 +74,12 @@ private:
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
+	CEntryRuleManager *m_pRuleManager;	// エントリールールの情報
 	CValueUI *m_apNumber[MAX_PLAYER];	// プレイヤーナンバーの情報
 	CObject2D *m_apFrame[MAX_PLAYER];	// プレイヤーフレームの情報
 	CObject2D *m_pControl;	// 操作表示の情報
 	CObject2D *m_pStart;	// 開始表示の情報
+	EState m_state;			// 状態
 };
 
 #endif	// _ENTRY_MANAGER_H_

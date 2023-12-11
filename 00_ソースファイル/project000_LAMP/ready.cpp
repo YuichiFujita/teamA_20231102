@@ -104,14 +104,20 @@ void CReady::Update(void)
 			if (m_nStateCount <= -60)
 			{
 				
-					CSceneGame::GetGameManager()->SetState(CGameManager::STATE_NORMAL);
+				CSceneGame::GetGameManager()->SetState(CGameManager::STATE_NORMAL);
 
-					for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
-					{ // プレイヤー数分繰り返す
+				for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+				{ // プレイヤー数分繰り返す
+
+					CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+					if (pPlayer != NULL)
+					{ // プレイヤーが存在する場合
 
 						// プレイヤーを出現
-						CScene::GetPlayer(nCntPlayer)->SetSpawn();
+						pPlayer->SetSpawn();
 					}
+				}
 				
 				Uninit();
 			}

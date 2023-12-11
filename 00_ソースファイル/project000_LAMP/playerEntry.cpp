@@ -57,6 +57,10 @@ HRESULT CPlayerEntry::Init(void)
 	// エントリーの設定
 	SetEntry();
 
+	// 影の表示をOFFにする
+	SetEnableDepthShadow(false);
+	SetEnableZTex(false);
+
 	// 成功を返す
 	return S_OK;
 }

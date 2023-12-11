@@ -16,6 +16,7 @@
 #include "valueUI.h"
 #include "object2D.h"
 #include "multiValue.h"
+#include "entryRuleManager.h"
 #include "retentionManager.h"
 #include "fade.h"
 
@@ -24,7 +25,7 @@
 //************************************************************
 namespace
 {
-	const int PRIORITY = 14;	// エントリーの優先順位
+	const int PRIORITY = 13;	// エントリーの優先順位
 
 	const D3DXCOLOR COL_ENTRY	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 参加中カラー
 	const D3DXCOLOR COL_UNENTRY	= D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);	// 非参加中カラー
@@ -32,10 +33,10 @@ namespace
 	namespace number
 	{
 		const D3DXVECTOR3	POS			= D3DXVECTOR3(165.0f, 90.0f, 0.0f);		// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// タイトル大きさ
 		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
 		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);	// タイトル空白
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);		// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;							// 数字空白
 		const int			DIGIT		= 1;									// 桁数
 	}
@@ -82,8 +83,10 @@ CEntryManager::CEntryManager()
 	// メンバ変数をクリア
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
+	m_pRuleManager	= NULL;		// エントリールールの情報
+	m_pControl	= NULL;			// 操作表示の情報
+	m_pStart	= NULL;			// 開始表示の情報
+	m_state		= STATE_ENTRY;	// 状態
 }
 
 //============================================================
@@ -102,8 +105,13 @@ HRESULT CEntryManager::Init(void)
 	// メンバ変数を初期化
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
-	m_pControl	= NULL;	// 操作表示の情報
-	m_pStart	= NULL;	// 開始表示の情報
+	m_pRuleManager	= NULL;		// エントリールールの情報
+	m_pControl	= NULL;			// 操作表示の情報
+	m_pStart	= NULL;			// 開始表示の情報
+	m_state		= STATE_ENTRY;	// 状態
+
+	// ゲーム情報を初期化
+	CManager::GetInstance()->GetRetentionManager()->InitGame();
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -216,6 +224,17 @@ HRESULT CEntryManager::Init(void)
 //============================================================
 HRESULT CEntryManager::Uninit(void)
 {
+	if (m_pRuleManager != NULL)
+	{
+		// エントリールールの破棄
+		if (FAILED(CEntryRuleManager::Release(m_pRuleManager)))
+		{ // 失敗した場合
+
+			// 失敗を返す
+			return E_FAIL;
+		}
+	}
+
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
@@ -248,27 +267,104 @@ void CEntryManager::Update(void)
 		return;
 	}
 
-	// エントリーの更新
-	UpdateEntry();
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_ENTRY:
 
-	// 開始の更新
-	UpdateStart();
+		// エントリーの更新
+		UpdateEntry();
 
-	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
-	{ // プレイヤーの最大数分繰り返す
+		// 開始の更新
+		UpdateStart();
 
-		// プレイヤーナンバーの更新
-		m_apNumber[nCntEntry]->Update();
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
 
-		// プレイヤーフレームの更新
-		m_apFrame[nCntEntry]->Update();
+			// プレイヤーナンバーの更新
+			m_apNumber[nCntEntry]->Update();
+
+			// プレイヤーフレームの更新
+			m_apFrame[nCntEntry]->Update();
+		}
+
+		// 操作表示の更新
+		m_pControl->Update();
+
+		// 開始表示の更新
+		m_pStart->Update();
+
+		break;
+
+	case STATE_RULE:
+
+		if (m_pRuleManager != NULL)
+		{
+			// エントリールールの更新
+			m_pRuleManager->Update();
+		}
+
+		break;
+
+	case STATE_END:
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+//============================================================
+//	状態の設定処理
+//============================================================
+HRESULT CEntryManager::SetState(const EState state)
+{
+	// 引数の状態を設定
+	m_state = state;
+
+	switch (m_state)
+	{ // 状態ごとの処理
+	case STATE_ENTRY:
+
+		if (m_pRuleManager != NULL)
+		{
+			// エントリールールの破棄
+			if (FAILED(CEntryRuleManager::Release(m_pRuleManager)))
+			{ // 失敗した場合
+
+				// 失敗を返す
+				return E_FAIL;
+			}
+		}
+
+		break;
+
+	case STATE_RULE:
+
+		if (m_pRuleManager == NULL)
+		{
+			// エントリールールの生成
+			m_pRuleManager = CEntryRuleManager::Create();
+			if (m_pRuleManager == NULL)
+			{ // 失敗した場合
+
+				// 失敗を返す
+				return E_FAIL;
+			}
+		}
+
+		break;
+
+	case STATE_END:
+		break;
+
+	default:
+		assert(false);
+		break;
 	}
 
-	// 操作表示の更新
-	m_pControl->Update();
-
-	// 開始表示の更新
-	m_pStart->Update();
+	// 成功を返す
+	return S_OK;
 }
 
 //============================================================
@@ -388,6 +484,10 @@ void CEntryManager::UpdateEntry(void)
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー数]：%d\n", nNumPlayer);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー1]：%s\n", pRetention->IsEntry(0) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー2]：%s\n", pRetention->IsEntry(1) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー3]：%s\n", pRetention->IsEntry(2) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー4]：%s\n", pRetention->IsEntry(3) ? "true" : "false");
 
 	// プレイ人数を設定
 	pRetention->SetNumPlayer(nNumPlayer);
@@ -399,19 +499,18 @@ void CEntryManager::UpdateEntry(void)
 void CEntryManager::UpdateStart(void)
 {
 	// ポインタを宣言
-	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
-	{ // プレイヤーの最大数分繰り返す
+	if (pKeyboard->IsTrigger(DIK_RETURN)
+	||  pKeyboard->IsTrigger(DIK_SPACE)
+	||  pPad->IsTriggerAll(CInputPad::KEY_START))
+	{
+		if (CManager::GetInstance()->GetRetentionManager()->GetNumPlayer() >= 2)
+		{ // エントリー数が二人以上の場合
 
-		if (pPad->IsTrigger(CInputPad::KEY_START, nCntEntry))
-		{
-			if (CManager::GetInstance()->GetRetentionManager()->GetNumPlayer() >= 2)
-			{ // エントリー数が二人以上の場合
-
-				// シーンの設定
-				CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
-			}
+			// ルール設定状態にする
+			SetState(STATE_RULE);
 		}
 	}
 }

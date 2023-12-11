@@ -811,6 +811,66 @@ bool CInputPad::IsRelease(EKey joyKey, int nPlayer)
 }
 
 //============================================================
+//	全プレス取得処理 (ボタン)
+//============================================================
+bool CInputPad::IsPressAll(EKey joyKey)
+{
+	for (int nCntJoyKey = 0; nCntJoyKey < MAX_PLAYER; nCntJoyKey++)
+	{ // プレイヤーの最大人数分ループ
+
+		if (m_aKeyStatePress[nCntJoyKey].Gamepad.wButtons & (1 << joyKey))
+		{ // 現在のパッドで入力が確認された場合
+
+			// 入力情報ありを返す
+			return true;
+		}
+	}
+
+	// 入力情報無しを返す
+	return false;
+}
+
+//============================================================
+//	全トリガー取得処理 (ボタン)
+//============================================================
+bool CInputPad::IsTriggerAll(EKey joyKey)
+{
+	for (int nCntJoyKey = 0; nCntJoyKey < MAX_PLAYER; nCntJoyKey++)
+	{ // プレイヤーの最大人数分ループ
+
+		if (m_aKeyStateTrigger[nCntJoyKey].Gamepad.wButtons & (1 << joyKey))
+		{ // 現在のパッドで入力が確認された場合
+
+			// 入力情報ありを返す
+			return true;
+		}
+	}
+
+	// 入力情報無しを返す
+	return false;
+}
+
+//============================================================
+//	全リリース取得処理 (ボタン)
+//============================================================
+bool CInputPad::IsReleaseAll(EKey joyKey)
+{
+	for (int nCntJoyKey = 0; nCntJoyKey < MAX_PLAYER; nCntJoyKey++)
+	{ // プレイヤーの最大人数分ループ
+
+		if (m_aKeyStateRelease[nCntJoyKey].Gamepad.wButtons & (1 << joyKey))
+		{ // 現在のパッドで入力が確認された場合
+
+			// 入力情報ありを返す
+			return true;
+		}
+	}
+
+	// 入力情報無しを返す
+	return false;
+}
+
+//============================================================
 //	プレス取得処理 (LスティックX)
 //============================================================
 SHORT CInputPad::GetPressLStickX(int nPlayer)

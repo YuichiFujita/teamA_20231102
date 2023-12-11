@@ -120,7 +120,6 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
-	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_motionOld		= 0;			// 過去モーション
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
@@ -152,7 +151,6 @@ HRESULT CPlayer::Init(void)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
-	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
 	m_fPlusMove		= 0.0f;			// プラス移動量
@@ -215,6 +213,7 @@ HRESULT CPlayer::Init(void)
 	m_pGuide->SetEnableDraw(false);
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
+
 	// 成功を返す
 	return S_OK;
 }
@@ -233,7 +232,7 @@ void CPlayer::Uninit(void)
 
 	if (m_pAI != NULL)
 	{ // 使用中の場合
-	// メモリ開放
+		// メモリ開放
 		delete m_pAI;
 		m_pAI = NULL;
 	}
@@ -257,6 +256,17 @@ void CPlayer::Update(void)
 
 	// 過去位置の更新
 	UpdateOldPosition();
+
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
+	{ // 残り人数が1人の場合
+
+		if (m_state != STATE_DEATH)
+		{ // 死亡していない場合
+
+			// 生存ランキングを更新 (一位を設定)
+			CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+		}
+	}
 
 	switch (m_state)
 	{ // 状態ごとの処理
@@ -307,12 +317,6 @@ void CPlayer::Update(void)
 		break;
 	}
 
-	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
-	{ // 残り人数が1人の場合
-
-		// 生存ランキングを更新 (一位を設定)
-		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
-	}
 	// フレイルの更新
 	m_pFlail->Update();
 
@@ -321,7 +325,6 @@ void CPlayer::Update(void)
 
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
-
 }
 
 //============================================================
@@ -853,24 +856,6 @@ int CPlayer::GetCounterFlail(void) const
 }
 
 //============================================================
-//	勝利ポイントの加算処理
-//============================================================
-void CPlayer::AddWinPoint(void)
-{
-	// 勝利ポイントを加算
-	m_nWinPoint++;
-}
-
-//============================================================
-//	勝利ポイント取得処理
-//============================================================
-int CPlayer::GetWinPoint(void) const
-{
-	// 勝利ポイントを返す
-	return m_nWinPoint;
-}
-
-//============================================================
 //	フレイルカウンター設定処理
 //============================================================
 void CPlayer::SetCounterFlail(const int nCounterFlail)
@@ -1061,7 +1046,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	if (m_bAI)
 	{
 		// CPU操作
-		m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
+		currentMotion = m_pAI->playerAI(m_pFlail, GetVec3Position(), m_move, m_destRot, m_nCounterFlail, m_motionOld);
 	}
 	else
 	{
@@ -1077,7 +1062,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
-		/*m_pAI->AIDash
+		m_pAI->AIDash
 		(
 			GetVec3Position(),
 			m_move,
@@ -1085,7 +1070,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 			m_destRot,
 			m_fPlusMove,
 			m_bDash
-		);*/
+		);
 	}
 	else
 	{
@@ -1364,7 +1349,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 		// 目標向きを設定
 		m_destRot.y = atan2f(-m_move.x, -m_move.z);
-		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 	}
 
 	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
@@ -1487,6 +1471,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	{
 		// フレイルを強制的に所持
 		m_pFlail->CatchFlail();
+
+		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 
 		// カウンターアップ開始
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)

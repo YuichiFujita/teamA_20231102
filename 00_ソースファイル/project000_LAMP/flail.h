@@ -118,6 +118,7 @@ public:
 private:
 	//ƒƒ“ƒoŠÖ”
 	void Collision(D3DXVECTOR3& rPos);		// ’·‚³İ’è
+	void CollisionChain(D3DXVECTOR3& rPos);		// ’·‚³İ’è
 	bool CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	bool CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	bool CollisionObstacle(D3DXVECTOR3& rPos);		// áŠQ•¨‚Æ‚Ì“–‚½‚è”»’è
