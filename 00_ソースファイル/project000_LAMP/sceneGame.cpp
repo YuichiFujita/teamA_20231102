@@ -213,6 +213,11 @@ void CSceneGame::Update(void)
 		// カメラの操作状況を反転
 		SetEnableControlCamera((!m_bControlCamera) ? true : false);
 	}
+	else if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F6))
+	{
+		// ゲーム画面に遷移
+		CManager::GetInstance()->SetMode(CScene::MODE_GAME);
+	}
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
@@ -223,6 +228,7 @@ void CSceneGame::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F3]：UI描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F4]：ポーズ描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F5]：カメラ操作のON/OFF\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F6]：ゲームのリトライ\n");
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ情報]\n");

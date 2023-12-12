@@ -712,6 +712,9 @@ void CPlayer::SetSpawn(void)
 	// é©ìÆï`âÊÇONÇ…Ç∑ÇÈ
 	SetEnableDraw(true);
 
+	// ãOê’ÇÃèâä˙âª
+	m_pFlail->InitOrbit();
+
 	// ÉTÉEÉìÉhÇÃçƒê∂
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// ê∂ê¨âπ
 }

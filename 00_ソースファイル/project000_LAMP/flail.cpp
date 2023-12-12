@@ -19,8 +19,7 @@
 #include "scrollMeshField.h"
 #include "collision.h"
 #include "obstacle.h"
-#include "sound.h"	
-
+#include "sound.h"
 
 //************************************************************
 //	’è”éŒ¾
@@ -1335,4 +1334,22 @@ void CFlail::ShotFlail(const float rot)
 		// ƒ‚ƒfƒ‹‚ÌXV
 		m_chain[nCntChain].multiModel->Update();
 	}
+}
+
+//============================================================
+//	‹OÕ‚Ì‰Šú‰»
+//============================================================
+void CFlail::InitOrbit(void)
+{
+	// ‹OÕ‚ð’Êíó‘Ô‚É‚·‚é
+	m_pOrbit->SetState(CObjectOrbit::STATE_NORMAL);
+}
+
+//============================================================
+//	‹OÕ‚ÌÁŽ¸Ý’è
+//============================================================
+void CFlail::VanishOrbit(void)
+{
+	// ‹OÕ‚ðÁŽ¸ó‘Ô‚É‚·‚é
+	m_pOrbit->SetState(CObjectOrbit::STATE_VANISH);
 }
