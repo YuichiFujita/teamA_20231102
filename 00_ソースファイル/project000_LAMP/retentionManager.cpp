@@ -12,6 +12,11 @@
 #include "player.h"
 
 //************************************************************
+//	マクロ定義
+//************************************************************
+#define INIT_WINPOINT	(3)		// 初期勝利ポイント
+
+//************************************************************
 //	親クラス [CRetentionManager] のメンバ関数
 //************************************************************
 //============================================================
@@ -49,11 +54,11 @@ HRESULT CRetentionManager::Init(void)
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
-	m_stateKill		= KILL_LIFE;	// 討伐条件
-	m_stateWin		= WIN_SURVIVE;	// 勝利条件
-	m_nNumPlayer	= 0;			// プレイヤー数
-	m_nNumSurvival	= 0;			// 生存プレイヤー数
-	m_nWinPoint		= 0;			// 勝利ポイント数
+	m_stateKill		= KILL_LIFE;		// 討伐条件
+	m_stateWin		= WIN_SURVIVE;		// 勝利条件
+	m_nNumPlayer	= 0;				// プレイヤー数
+	m_nNumSurvival	= 0;				// 生存プレイヤー数
+	m_nWinPoint		= INIT_WINPOINT;	// 勝利ポイント数
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -237,9 +242,6 @@ int CRetentionManager::GetWinPoint(void) const
 //============================================================
 void CRetentionManager::InitGame(void)
 {
-	// 勝利ポイント数を初期化
-	m_nWinPoint = 0;
-
 	// 生存ランキングを初期化
 	InitSurvivalRank();
 
