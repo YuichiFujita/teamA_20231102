@@ -19,6 +19,7 @@
 #include "scrollMeshField.h"
 #include "collision.h"
 #include "obstacle.h"
+#include "block.h"
 #include "sound.h"
 
 //************************************************************
@@ -753,9 +754,38 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			CollisionBlock(CPlayer::AXIS_Z, rPos))
 		{
 			m_fLengthTarget = m_fLengthChain;
+
+			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
+			{
+				int IDParent = nCntChain - 1;
+				D3DXVECTOR3 rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
+
+				if (nCntChain == 0)
+				{
+					
+				}
+				else if (nCntChain == 1)
+				{
+					rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
+				}
+				else
+				{
+					rot.y = m_chain[IDParent].rotOld.y * 0.0f;
+				}
+
+				m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
+			}
+
+			if (m_fLengthTarget > flail::FLAIL_RADIUS * (m_nNumChain - 1) && m_fLengthChain == flail::FLAIL_RADIUS * (m_nNumChain - 1))
+			{
+				rPos.y += 10.0f;
+			}
 		}
 
-		CollisionGround(CPlayer::AXIS_Y, rPos);
+		if (CollisionGround(CPlayer::AXIS_Y, rPos))
+		{
+			
+		}
 
 		if (CollisionGround(CPlayer::AXIS_X, rPos) ||
 			CollisionGround(CPlayer::AXIS_Z, rPos))
@@ -763,6 +793,29 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			if (m_fLengthTarget > flail::FLAIL_RADIUS * (m_nNumChain - 1) && m_fLengthChain == flail::FLAIL_RADIUS * (m_nNumChain - 1))
 			{
 				rPos.y += 10.0f;
+			}
+
+			m_fLengthTarget = m_fLengthChain;
+			m_fChainRotMove *= 0.0f;
+
+			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
+			{
+				int IDParent = nCntChain - 1;
+				D3DXVECTOR3 rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
+
+				if (nCntChain == 0)
+				{
+
+				}
+				else if (nCntChain == 1)
+				{
+					rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
+				}
+				else
+				{
+					rot.y = m_chain[IDParent].rotOld.y * 0.0f;
+				}
+				m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
 			}
 		}
 	}
@@ -916,8 +969,6 @@ bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				if (bHitBox)
 				{
 					bHitBoxCheck = true;
-
-					m_fChainRotMove *= 0.5f;
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -1028,7 +1079,14 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 					// Hit処理
 					pObjCheck->Hit();
 
-					m_fChainRotMove *= 0.5f;
+					if (pObjCheck->GetState() == CBlock::BREAK_TRUE)
+					{
+						m_fChainRotMove *= 0.5f;
+					}
+					else
+					{
+						m_fChainRotMove *= 0.0f;
+					}
 
 					bHitCheck = true;
 				}
@@ -1105,7 +1163,14 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 					// HIT処理
 					pObjCheck->Hit();
 
-					m_fChainRotMove *= 0.5f;
+					if (pObjCheck->GetState() == CObstacle::BREAK_TRUE)
+					{
+						m_fChainRotMove *= 0.5f;
+					}
+					else
+					{
+						m_fChainRotMove *= 0.0f;
+					}
 
 					bHitBoxCheck = true;
 				}
