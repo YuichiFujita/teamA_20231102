@@ -14,6 +14,7 @@
 #include "editBlock.h"
 #include "editObstacle.h"
 #include "editSpawnPoint.h"
+#include "editItemPoint.h"
 
 //************************************************************
 //	親クラス [CEditStage] のメンバ関数
@@ -70,6 +71,10 @@ CEditStage *CEditStage::Create(CEditStageManager *pEdit, const EThing thing)
 
 		case THING_SPAWNPOINT:
 			pEditStage = new CEditSpawnPoint;	// エディット生成位置
+			break;
+
+		case THING_ITEMPOINT:
+			pEditStage = new CEditItemPoint;	// エディットアイテム生成位置
 			break;
 
 		default:
