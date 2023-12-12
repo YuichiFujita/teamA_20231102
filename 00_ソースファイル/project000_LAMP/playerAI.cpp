@@ -570,22 +570,22 @@ CPlayer::EMotion CPlayerAI::AImove
 		D3DXVECTOR3 movePos = VEC3_ZERO;
 
 		// 移動量を更新
-		movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 15.35f;
+		movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 75.0f;
 		movePos.y = -1.0f;
-		movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 15.35f;
+		movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 75.0f;
 
 		/*CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動位置]：%f %f %f\n", rPos.x, rPos.y, rPos.z);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動予測位置]：%f %f %f\n", movePos.x, movePos.y, movePos.z);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[移動予測位置差分]：%f %f %f\n", movePos.x - rPos.x, movePos.y - rPos.y, movePos.z - rPos.z);*/
 
-		if (CollisionGround(CPlayer::AXIS_X, rPos))
+		if (CollisionGround(CPlayer::AXIS_X, movePos))
 		{
 			// 移動量を更新
-			movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 150.35f;
+			movePos.x = rPos.x + sinf(m_fRotstickL + D3DX_PI) * 75.0f;
 			movePos.y = 1.0f;
-			movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 150.35f;
+			movePos.z = rPos.z + cosf(m_fRotstickL + D3DX_PI) * 75.0f;
 
-			if (CollisionBlock(CPlayer::AXIS_X, rPos))
+			if (CollisionBlock(CPlayer::AXIS_X, movePos))
 			{
 				float fRotDiff = 0.0f;
 
@@ -598,9 +598,9 @@ CPlayer::EMotion CPlayerAI::AImove
 					useful::NormalizeRot(colRot);
 
 					// 移動量を更新
-					movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 150.35f;
+					movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 75.0f;
 					movePos.y = -1.0f;
-					movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 150.35f;
+					movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 75.0f;
 
 					if (Collision(movePos))
 					{
@@ -612,7 +612,7 @@ CPlayer::EMotion CPlayerAI::AImove
 			}
 			else
 			{
-				if (CollisionObstacle(rPos))
+				if (CollisionObstacle(movePos))
 				{
 					float fRotDiff = 0.0f;
 
@@ -625,9 +625,9 @@ CPlayer::EMotion CPlayerAI::AImove
 						useful::NormalizeRot(colRot);
 
 						// 移動量を更新
-						movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 150.35f;
+						movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 75.0f;
 						movePos.y = -1.0f;
-						movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 150.35f;
+						movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 75.0f;
 
 						if (Collision(movePos))
 						{
@@ -656,9 +656,9 @@ CPlayer::EMotion CPlayerAI::AImove
 				useful::NormalizeRot(colRot);
 
 				// 移動量を更新
-				movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 150.35f;
+				movePos.x = rPos.x + sinf(colRot + D3DX_PI) * 75.0f;
 				movePos.y = -1.0f;
-				movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 150.35f;
+				movePos.z = rPos.z + cosf(colRot + D3DX_PI) * 75.0f;
 
 				if (Collision(movePos))
 				{

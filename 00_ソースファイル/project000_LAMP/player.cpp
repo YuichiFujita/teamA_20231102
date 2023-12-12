@@ -1510,14 +1510,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	{
 		m_pGuide->SetEnableDraw(false);
 	}
+
 	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
-	
 	// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
 
-		if ((CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= flail::FLAIL_CHARGE)
+		if ((CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= flail::FLAIL_CHARGE)
 		{// 投げるボタンが押されている時
 		 // カウンターアップ
 			m_nCounterFlail++;
@@ -1537,15 +1537,18 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x *= 1.0f - (0.0042f * m_nCounterFlail);
 			m_move.z *= 1.0f - (0.0042f * m_nCounterFlail);
 
-			// 目標向きを設定
-			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
+			if (DEAD_ZONE < fStick)
+			{
+				// 目標向きを設定
+				m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
+			}
 
 			// チャージモーションを設定
 			currentMotion = MOTION_CHARGE;
 		}
 
 		// 投擲
-		if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != flail::FLAIL_THROW)
+		if ((CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != flail::FLAIL_THROW)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
@@ -1560,6 +1563,11 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				posFlail.y = 0.0f;
 				m_pFlail->SetVec3Position(posFlail);
+
+				if (m_pFlail->GetVec3Position() == VEC3_ZERO)
+				{
+					assert(false);
+				}
 			}
 
 			if (DEAD_ZONE < fStick)
@@ -1602,6 +1610,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x = 0.0f;
 			m_move.z = 0.0f;
 
+			m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
+
 			// フレイルが止まったらカウンターを次の段階へ
 			if (m_pFlail->GetLengthChain() >= m_pFlail->GetLengthTarget())
 			{
@@ -1620,7 +1630,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		m_pFlail->SetChainRotTarget(m_destRot.y + D3DX_PI);
 
 		// カウンターアップ開始
-		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
+		if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
 		{
 			m_nCounterFlail++;
 		}
@@ -1637,7 +1647,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		else
 		{
 			// 引き戻す
-			if (CManager::GetInstance()->GetKeyboard()->IsPress(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
+			if (CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 			{
 				m_nCounterFlail -= 1;
 
@@ -1687,7 +1697,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			// 投擲
-			if ((CManager::GetInstance()->GetKeyboard()->IsRelease(DIK_SPACE) == TRUE || CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
+			if ((CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE))
 			{
 				D3DXVECTOR3 vecPtoFTarget = VEC3_ZERO;
 				float lengthPtoFTarget = 0.0f;
