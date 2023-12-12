@@ -163,6 +163,7 @@
     <ClCompile Include="DepthShadow.cpp" />
     <ClCompile Include="editBlock.cpp" />
     <ClCompile Include="editGround.cpp" />
+    <ClCompile Include="editItemPoint.cpp" />
     <ClCompile Include="ItemSpawnPoint.cpp" />
     <ClCompile Include="editObstacle.cpp" />
     <ClCompile Include="editSpawnPoint.cpp" />
