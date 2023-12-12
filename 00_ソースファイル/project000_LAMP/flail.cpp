@@ -135,14 +135,7 @@ void CFlail::Update(void)
 	m_oldPos = GetVec3Position();
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 	m_fLengthChain = 0.0f;
-	if (player->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
-	{
-		m_nDamage = 20;
-	}
-	else
-	{
-		m_nDamage = HIT_DAMAGE;
-	}
+	
 	// äpìxèCê≥
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotTarget);
@@ -155,7 +148,14 @@ void CFlail::Update(void)
 		m_move.x = 0.0f;
 		m_move.z = 0.0f;
 	}
-	m_nDamage = HIT_DAMAGE;
+	if (player->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
+	{
+		m_nDamage = 20;
+	}
+	else
+	{
+		m_nDamage = HIT_DAMAGE;
+	}
 	// äpìxèCê≥
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotTarget);
