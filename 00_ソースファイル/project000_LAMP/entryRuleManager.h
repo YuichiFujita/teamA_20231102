@@ -86,13 +86,14 @@ private:
 	void UpdateFadeIn(void);	// フェードイン更新
 	void UpdateFadeOut(void);	// フェードアウト更新
 	void UpdateControl(void);	// 操作更新
+	void UpdateArrow(void);		// 矢印更新
 
 	void Select(void);		// 選択操作
 	void Decide(void);		// 決定操作
 	void ChangeRule(void);	// ルール変更操作
 	void SetRule(void);		// ルール変更反映
-	void SetEnableUI(const bool bDraw);		// UI描画設定
-	void SetAlphaUI(const float fAlpha);	// UI透明度設定
+	void SetEnableUI(const bool bDraw);	// UI描画設定
+	void SetAlphaUI(const float fAlpha, const bool bFadeOut);	// UI透明度設定
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
@@ -110,7 +111,8 @@ private:
 	EState	m_state;			// 状態
 	int		m_nSelect;			// 現在の選択
 	int		m_nOldSelect;		// 前回の選択
-	float	m_fSinAlpha;		// 透明向き
+	float	m_fSinControlAlpha;	// 操作表示の透明向き
+	float	m_fSinArrowAlpha;	// 矢印表示の透明向き
 };
 
 #endif	// _ENTRYRULE_MANAGER_H_
