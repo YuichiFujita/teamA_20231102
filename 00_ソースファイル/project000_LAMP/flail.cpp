@@ -59,6 +59,8 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	m_oldPos = VEC3_ZERO;
 	m_move = VEC3_ZERO;
 	m_nNumChain = 0;
+	m_nfulChainF = 0;
+	m_nfulChainP = 0;
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
 	m_fLengthTarget = 0.0f;
@@ -134,6 +136,7 @@ void CFlail::Update(void)
 	m_oldPos = GetVec3Position();
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 	m_fLengthChain = 0.0f;
+	m_fChainRotOld = m_fChainRot;
 
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
@@ -250,6 +253,53 @@ void CFlail::UpdateFlailPos(void)
 	SetVec3Position(pos);
 }
 
+void CFlail::UpdateDropFlailPos(float& rRot)
+{
+	D3DXVECTOR3 vecPtoF = VEC3_ZERO;
+	D3DXVECTOR3 vecPtoFTarget = VEC3_ZERO;
+	D3DXVECTOR3 flailPos = VEC3_ZERO;
+	float lengthPtoF = 0.0f;
+	float lengthPtoFTarget = 0.0f;
+
+	vecPtoFTarget.x = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_41 - GetVec3Position().x;
+	vecPtoFTarget.y = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_42 - GetVec3Position().y;
+	vecPtoFTarget.z = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_43 - GetVec3Position().z;
+
+	vecPtoF.x = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_41 - GetVec3Position().x;
+	vecPtoF.z = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_43 - GetVec3Position().z;
+
+	rRot = atan2f(vecPtoFTarget.x, vecPtoFTarget.z) + D3DX_PI * 0.5f;
+
+	lengthPtoF = D3DXVec3Length(&vecPtoF);
+	lengthPtoFTarget = D3DXVec3Length(&vecPtoFTarget);
+
+	if (lengthPtoF > flail::FLAIL_RADIUS * (m_nNumChain - 1))
+	{
+		lengthPtoF = flail::FLAIL_RADIUS * (m_nNumChain - 1);
+	}
+	else if (lengthPtoF < 0.0f)
+	{
+		lengthPtoF = 0.0f;
+	}
+
+	if (lengthPtoFTarget < 0.0f)
+	{
+		lengthPtoFTarget = 0.0f;
+	}
+
+	m_fLengthTarget = lengthPtoFTarget;
+
+	if (lengthPtoFTarget >= flail::FLAIL_RADIUS * (m_nNumChain - m_nfulChainF - 1))
+	{
+		flailPos = GetVec3Position();
+
+		flailPos.x = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_41 + (sinf(rRot + D3DX_PI * 0.5f) * lengthPtoF);
+		flailPos.z = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_43 + (cosf(rRot + D3DX_PI * 0.5f) * lengthPtoF);
+
+		SetVec3Position(flailPos);
+	}
+}
+
 //============================================================
 //	鎖の更新処理
 //============================================================
@@ -257,6 +307,8 @@ void CFlail::UpdateChain(void)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
+	D3DXVECTOR3 posCol = VEC3_ZERO;
+	
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
@@ -286,50 +338,20 @@ void CFlail::UpdateChain(void)
 
 		if (nCntChain == 0)
 		{
-			if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
+			if (nCntChain == m_nfulChainF)
 			{
-				D3DXVECTOR3 vecPtoF = VEC3_ZERO;
-				D3DXVECTOR3 vecPtoFTarget = VEC3_ZERO;
-				float lengthPtoF = 0.0f;
-				float lengthPtoFTarget = 0.0f;
-
-				vecPtoFTarget.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 - GetVec3Position().x;
-				vecPtoFTarget.y = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_42 - GetVec3Position().y;
-				vecPtoFTarget.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43 - GetVec3Position().z;
-
-				vecPtoF.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 - GetVec3Position().x;
-				vecPtoF.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43 - GetVec3Position().z;
-
-				m_fChainRot = atan2f(vecPtoFTarget.x, vecPtoFTarget.z) + D3DX_PI * 0.5f;
-
-				lengthPtoF = D3DXVec3Length(&vecPtoF);
-				lengthPtoFTarget = D3DXVec3Length(&vecPtoFTarget);
-
-				if (lengthPtoF > flail::FLAIL_RADIUS * (m_nNumChain - 1))
+				if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
 				{
-					lengthPtoF = flail::FLAIL_RADIUS * (m_nNumChain - 1);
+					UpdateDropFlailPos(m_fChainRot);
 				}
-				else if (lengthPtoF < 0.0f)
-				{
-					lengthPtoF = 0.0f;
-				}
+			}
+			else if (nCntChain == m_nfulChainP)
+			{
 
-				if (lengthPtoFTarget < 0.0f)
-				{
-					lengthPtoFTarget = 0.0f;
-				}
+			}
+			else
+			{
 
-				m_fLengthTarget = lengthPtoFTarget;
-
-				if (lengthPtoFTarget >= flail::FLAIL_RADIUS * (m_nNumChain - 1))
-				{
-					pos = GetVec3Position();
-
-					pos.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 + (sinf(m_fChainRot + D3DX_PI * 0.5f) * lengthPtoF);
-					pos.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43 + (cosf(m_fChainRot + D3DX_PI * 0.5f) * lengthPtoF);
-
-					SetVec3Position(pos);
-				}
 			}
 
 			rot.x = 0.0f;
@@ -344,13 +366,29 @@ void CFlail::UpdateChain(void)
 		{
 			int IDParent = nCntChain - 1;
 
-			if (nCntChain == 1)
+			if (nCntChain == m_nfulChainF)
 			{
-				rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
+				rot.y += m_fChainRotMove;
+
+				if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
+				{
+					UpdateDropFlailPos(rot.y);
+				}
+			}
+			else if (nCntChain == m_nfulChainP)
+			{
+
 			}
 			else
 			{
-				rot.y = m_chain[IDParent].rotOld.y * 0.8f;
+				if (nCntChain == 1)
+				{
+					rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
+				}
+				else
+				{
+					rot.y = m_chain[IDParent].rotOld.y * 0.7f;
+				}
 			}
 
 			if (player->GetCounterFlail() <= flail::FLAIL_CHARGE && player->GetCounterFlail() > flail::FLAIL_DEF)
@@ -411,20 +449,42 @@ void CFlail::UpdateChain(void)
 
 			if (player->GetCounterFlail() < flail::FLAIL_DROP)
 			{
-				if (m_chain[IDParent].multiModel->GetVec3Position().x <= 0.0f)
+				if (nCntChain < flail::FLAIL_NUM_MAX -1)
 				{
-					float speed = -0.5f * player->GetCounterFlail();
-
-					if (speed > 10.0f)
+					if (m_chain[nCntChain + 1].multiModel->GetVec3Position().x <= 0.0f)
 					{
-						speed = 10.0f;  
+						float speed = -0.5f * player->GetCounterFlail();
+
+						if (speed > 20.0f)
+						{
+							speed = 20.0f;
+						}
+
+						pos.x -= speed;
+
+						if (pos.x < 0.0f)
+						{
+							pos.x = 0.0f;
+						}
 					}
-
-					pos.x -= speed;
-					
-					if (pos.x < 0.0f)
+				}
+				else
+				{
+					if (m_chain[0].multiModel->GetVec3Position().x <= 0.0f)
 					{
-						pos.x = 0.0f;
+						float speed = -0.5f * player->GetCounterFlail();
+
+						if (speed > 20.0f)
+						{
+							speed = 20.0f;
+						}
+
+						pos.x -= speed;
+
+						if (pos.x < 0.0f)
+						{
+							pos.x = 0.0f;
+						}
 					}
 				}
 			}
@@ -434,8 +494,6 @@ void CFlail::UpdateChain(void)
 				//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "鎖位置[%d] %f %f %f\n", nCntChain, rot.x, rot.y, rot.z);
 			}
 		}
-
-		//CollisionChain(pos);
 
 		m_chain[nCntChain].multiModel->SetVec3Position(pos);
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
@@ -687,7 +745,6 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			CollisionBlock(CPlayer::AXIS_Z, rPos))
 		{
 			m_fLengthTarget = m_fLengthChain;
-			m_fChainRotMove = 0.0f;
 		}
 
 		CollisionGround(CPlayer::AXIS_Y, rPos);
@@ -702,21 +759,23 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		}
 	}
 }
-void CFlail::CollisionChain(D3DXVECTOR3& rPos)
+bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		// 障害物との当たり判定
-		CollisionObstacle(rPos);
-		CollisionBlock(CPlayer::AXIS_X, rPos);
-		CollisionBlock(CPlayer::AXIS_Z, rPos);
-
-		CollisionGround(CPlayer::AXIS_Y, rPos);
-		CollisionGround(CPlayer::AXIS_X, rPos);
-		CollisionGround(CPlayer::AXIS_Z, rPos);
+		if (CollisionObstacle(rPos) ||
+		CollisionBlock(CPlayer::AXIS_X, rPos) || 
+		CollisionBlock(CPlayer::AXIS_Z, rPos)
+		)
+		{
+			return true;
+		}
 	}
+
+	return false;
 }
 bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 {
@@ -849,6 +908,8 @@ bool CFlail::CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 				if (bHitBox)
 				{
 					bHitBoxCheck = true;
+
+					m_fChainRotMove *= 0.5f;
 				}
 
 				// 次のオブジェクトへのポインタを代入
@@ -959,6 +1020,8 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 					// Hit処理
 					pObjCheck->Hit();
 
+					m_fChainRotMove *= 0.5f;
+
 					bHitCheck = true;
 				}
 
@@ -1033,6 +1096,8 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 				{
 					// HIT処理
 					pObjCheck->Hit();
+
+					m_fChainRotMove *= 0.5f;
 
 					bHitBoxCheck = true;
 				}
@@ -1287,7 +1352,7 @@ void CFlail::CatchFlail()
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
 	m_fLengthTarget = 0.0f;
-	m_fChainRotTarget = 0.0f;
+	//m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
 }
 
