@@ -138,6 +138,7 @@ private:
 	D3DXVECTOR3	m_move;							// 移動量
 	int			m_nPlayerID;					// プレイヤーID
 	int			m_nNumChain;					// 鎖の数
+	int			m_nDamage;						// ダメージ
 	float		m_fChainRot;					// 角度
 	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度

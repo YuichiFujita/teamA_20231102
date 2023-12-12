@@ -153,6 +153,7 @@ public:
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
 	void SetItemPermanent(EItem Item);
+	SItemEffect GetTemporaryItem() { return m_SItemTemporary; }
 protected:
 	// メンバ関数
 	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
