@@ -48,12 +48,12 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 	},
 
 	{ // レンガテクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 左テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 右テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 下テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 上テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 前テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 後テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 左テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 右テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 下テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 上テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 前テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 後テクスチャ
 	},
 
 	{ // コンクリートテクスチャ
