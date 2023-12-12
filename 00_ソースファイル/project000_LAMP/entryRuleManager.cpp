@@ -68,7 +68,7 @@ namespace
 	// 撃破条件情報
 	namespace kill
 	{
-		const POSGRID2		PART	= POSGRID2(1, CRetentionManager::KILL_MAX);						// テクスチャ分割数
+		const POSGRID2		PART	= POSGRID2(CRetentionManager::KILL_MAX, 1);						// テクスチャ分割数
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(880.0f, winpoint::POS.y + rule::SPACE.y, 0.0f);	// 位置
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);							// 大きさ
 	}
@@ -76,7 +76,7 @@ namespace
 	// 勝利条件情報
 	namespace win
 	{
-		const POSGRID2		PART	= POSGRID2(1, CRetentionManager::WIN_MAX);								// テクスチャ分割数
+		const POSGRID2		PART	= POSGRID2(CRetentionManager::WIN_MAX, 1);								// テクスチャ分割数
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(880.0f, winpoint::POS.y + (rule::SPACE.y * 2.0f), 0.0f);	// 位置
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);									// 大きさ
 	}
@@ -105,7 +105,7 @@ namespace
 		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
 		const float	SPACE_EDGE		= 50.0f;	// 縁の空白
 
-		const POSGRID2		PART	= POSGRID2(1, MAX_ARROW);			// テクスチャ分割数
+		const POSGRID2		PART	= POSGRID2(MAX_ARROW, 1);			// テクスチャ分割数
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(90.0f, 90.0f, 9.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(select::POS.x - (select::SIZE_RULE.x * 0.5f) - SPACE_EDGE, select::POS.y, 0.0f);	// 位置
@@ -132,12 +132,12 @@ namespace
 //************************************************************
 const char *CEntryRuleManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\ruleTitle000.png",	// ルールタイトルテクスチャ
-	"data\\TEXTURE\\rule000.png",		// 撃破条件テクスチャ
-	"data\\TEXTURE\\rule001.png",		// 勝利条件テクスチャ
-	NULL,								// 開始ボタンテクスチャ
-	NULL,								// 操作表示テクスチャ
-	NULL,								// 矢印テクスチャ
+	"data\\TEXTURE\\Choices.png",		// ルールタイトルテクスチャ
+	"data\\TEXTURE\\battlerule.png",	// 撃破条件テクスチャ
+	"data\\TEXTURE\\win_conditions.png",// 勝利条件テクスチャ
+	"data\\TEXTURE\\Battle_Start.png",// 開始ボタンテクスチャ
+	"data\\TEXTURE\\Battle_Start.png",// 操作表示テクスチャ
+	"data\\TEXTURE\\Arrow_Twin.png",// 矢印テクスチャ
 };
 
 //************************************************************
