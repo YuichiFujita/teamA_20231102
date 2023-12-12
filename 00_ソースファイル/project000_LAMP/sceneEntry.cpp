@@ -119,7 +119,7 @@ void CSceneEntry::Update(void)
 		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(2);
 #endif
 		// シーンの設定
-		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
+		//CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
 	}
 #endif
 
