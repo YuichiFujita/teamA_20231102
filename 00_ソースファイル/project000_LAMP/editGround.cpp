@@ -500,7 +500,7 @@ void CEditGround::CreateGround(void)
 		//	新しい地盤の生成
 		//----------------------------------------------------
 		// 地盤の生成
-		m_pGround = m_pGround = CGround::Create
+		m_pGround = CGround::Create
 		( // 引数
 			m_ground.type,	// 種類
 			posEdit,		// 位置

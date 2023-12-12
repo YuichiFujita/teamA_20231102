@@ -77,9 +77,11 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
-	void Hit(void) override;				// ヒット
-	void SetType(const int nType) override;	// 種類設定
-	int GetType(void) const override;		// 種類取得
+	void Hit(void) override;		// ヒット
+	void SetType(const int nType) override;		// 種類設定
+	int GetType(void) const override;			// 種類取得
+	void SetState(const int nState) override;	// 破壊状況設定
+	int GetState(void) const override;			// 破壊状況取得
 
 	// 静的メンバ関数
 	static CObstacle *Create	// 生成

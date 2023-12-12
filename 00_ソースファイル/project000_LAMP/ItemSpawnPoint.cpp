@@ -16,7 +16,7 @@ int CItemSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
 //<==================================
 //コンストラクタ
 //<==================================
-CItemSpawnPoint::CItemSpawnPoint() : CObject(CObject::LABEL_SPAWNPOINT, 0), m_nIdx(m_nNumIdx)
+CItemSpawnPoint::CItemSpawnPoint() : CObject(CObject::LABEL_ITEMPOINT, 0), m_nIdx(m_nNumIdx)
 {
 	//値の初期化
 	m_pos = VEC3_ZERO;

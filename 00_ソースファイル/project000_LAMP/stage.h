@@ -127,6 +127,7 @@ private:
 	static HRESULT LoadBlock(const char* pString, FILE *pFile, CStage *pStage);			// ブロック情報の読込
 	static HRESULT LoadObstacle(const char* pString, FILE *pFile, CStage *pStage);		// 障害物情報の読込
 	static HRESULT LoadSpawnPoint(const char* pString, FILE *pFile, CStage *pStage);	// 生成位置情報の読込
+	static HRESULT LoadItemPoint(const char* pString, FILE *pFile, CStage *pStage);		// アイテム生成位置情報の読込
 
 	// メンバ変数
 	SStageLimit	m_stageLimit;	// 範囲情報

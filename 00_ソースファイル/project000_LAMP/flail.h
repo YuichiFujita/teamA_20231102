@@ -68,6 +68,7 @@ public:
 		CMultiModel *multiModel;
 		D3DXVECTOR3 posOld;
 		D3DXVECTOR3 rotOld;
+		bool collision;
 	};
 	
 	// オーバーライド関数
@@ -121,13 +122,14 @@ public:
 private:
 	//メンバ関数
 	void Collision(D3DXVECTOR3& rPos);		// 長さ設定
-	void CollisionChain(D3DXVECTOR3& rPos);		// 長さ設定
+	bool CollisionChain(D3DXVECTOR3& rPos);		// 長さ設定
 	bool CollisionGround(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	bool CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos);
 	bool CollisionObstacle(D3DXVECTOR3& rPos);		// 障害物との当たり判定
 	void BindParent(const CPlayer& rPlayer);
 	void UpdateChain(void);		// 更新
 	void UpdateFlailPos(void);	// 更新
+	void UpdateDropFlailPos(float& rRot);	// 更新
 
 	// 静的メンバ変数
 	static const char *mc_apModelFileFlail[];	// モデル定数
@@ -142,7 +144,10 @@ private:
 	int			m_nPlayerID;					// プレイヤーID
 	int			m_nNumChain;					// 鎖の数
 	int			m_nDamage;						// ダメージ
+	int			m_nfulChainF;					// 鎖の数
+	int			m_nfulChainP;					// 鎖の数
 	float		m_fChainRot;					// 角度
+	float		m_fChainRotOld;					// 角度
 	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
