@@ -62,6 +62,7 @@ public:
 		MOTION_PULL,		// 引きずりモーション
 		MOTION_KNOCK,		// 吹っ飛びモーション
 		MOTION_LAND,		// 着地モーション
+		MOTION_DROWN,		// 溺れモーション
 		MOTION_DEATH,		// 死亡モーション
 		MOTION_MAX			// この列挙型の総数
 	};
@@ -84,6 +85,7 @@ public:
 		STATE_NORMAL,	// 通常状態
 		STATE_KNOCK,	// ノック状態
 		STATE_INVULN,	// 無敵状態
+		STATE_DROWN,	// 溺れ状態
 		STATE_DEATH,	// 死亡状態
 		STATE_MAX		// この列挙型の総数
 	};
@@ -146,6 +148,7 @@ private:
 	EMotion UpdateNormal(void);	// 通常状態時の更新
 	EMotion UpdateKnock(void);	// ノック状態時の更新
 	EMotion UpdateInvuln(void);	// 無敵状態時の更新
+	EMotion UpdateDrown(void);	// 溺れ状態時の更新
 	void UpdateDeath(void);		// 死亡状態時の更新
 
 	void UpdateOldPosition(void);			// 過去位置の更新
