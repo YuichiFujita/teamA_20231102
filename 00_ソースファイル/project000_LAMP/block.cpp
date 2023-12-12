@@ -48,12 +48,12 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 	},
 
 	{ // レンガテクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 左テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 右テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 下テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 上テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 前テクスチャ
-		"data\\TEXTURE\\Brick000.png",	// 後テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 左テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 右テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 下テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 上テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 前テクスチャ
+		"data\\TEXTURE\\Brick.png",	// 後テクスチャ
 	},
 
 	{ // コンクリートテクスチャ
@@ -273,6 +273,24 @@ int CBlock::GetType(void) const
 {
 	// 種類を返す
 	return m_type;
+}
+
+//============================================================
+//	破壊状況の設定処理
+//============================================================
+void CBlock::SetState(const int nState)
+{
+	// 破壊状況を設定
+	m_status.state = (EBreak)nState;
+}
+
+//============================================================
+//	破壊状況取得処理
+//============================================================
+int CBlock::GetState(void) const
+{
+	// 破壊状況を返す
+	return m_status.state;
 }
 
 //============================================================

@@ -328,6 +328,11 @@ void CObjectModel::SetAllMaterial(const D3DXMATERIAL& rMat)
 //============================================================
 void CObjectModel::ResetMaterial(void)
 {
+	if (IsDeath())
+	{ // 死んでいる場合
+		return;
+	}
+
 	// ポインタを宣言
 	D3DXMATERIAL *pOriginMat;	// マテリアルデータへのポインタ
 

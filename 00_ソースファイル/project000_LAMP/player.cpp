@@ -69,6 +69,7 @@ namespace
 	const float MAX_KNOCK_RATE	= 4.0f;		// 最大吹っ飛び倍率
 	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
 	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
+	const int	DROWN_CNT		= 120;		// 溺れ時間のフレーム数
 	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
@@ -120,7 +121,6 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
-	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_motionOld		= 0;			// 過去モーション
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
@@ -152,14 +152,15 @@ HRESULT CPlayer::Init(void)
 	m_destRot		= VEC3_ZERO;	// 目標向き
 	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
 	m_state			= STATE_NONE;	// 状態
-	m_nWinPoint		= 0;			// 勝利ポイント数
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nCounterFlail	= 0;			// フレイル管理カウンター
 	m_fPlusMove		= 0.0f;			// プラス移動量
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= true;			// ジャンプ状況
-
+	m_SItemPermanent[0] = {};
+	m_SItemPermanent[1] = {};
+	m_SItemTemporary = {};
 	// オブジェクトキャラクターの初期化
 	if (FAILED(CObjectChara::Init()))
 	{ // 初期化に失敗した場合
@@ -215,6 +216,7 @@ HRESULT CPlayer::Init(void)
 	m_pGuide->SetEnableDraw(false);
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
+
 	// 成功を返す
 	return S_OK;
 }
@@ -233,7 +235,7 @@ void CPlayer::Uninit(void)
 
 	if (m_pAI != NULL)
 	{ // 使用中の場合
-	// メモリ開放
+		// メモリ開放
 		delete m_pAI;
 		m_pAI = NULL;
 	}
@@ -257,6 +259,17 @@ void CPlayer::Update(void)
 
 	// 過去位置の更新
 	UpdateOldPosition();
+
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
+	{ // 残り人数が1人の場合
+
+		if (m_state != STATE_DEATH)
+		{ // 死亡していない場合
+
+			// 生存ランキングを更新 (一位を設定)
+			CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+		}
+	}
 
 	switch (m_state)
 	{ // 状態ごとの処理
@@ -295,6 +308,13 @@ void CPlayer::Update(void)
 
 		break;
 
+	case STATE_DROWN:	// 溺れ状態
+
+		// 溺れ状態時の更新
+		currentMotion = UpdateDrown();
+
+		break;
+
 	case STATE_DEATH:	// 死亡状態
 
 		// 死亡状態時の更新
@@ -306,13 +326,17 @@ void CPlayer::Update(void)
 		assert(false);
 		break;
 	}
-
-	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
-	{ // 残り人数が1人の場合
-
-		// 生存ランキングを更新 (一位を設定)
-		CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
+	if (m_SItemTemporary.type != ITEM_EMPTY)
+	{
+		m_SItemTemporary.nLife--;
+		if (m_SItemTemporary.nLife <= 0)
+		{
+			m_SItemTemporary.type = ITEM_EMPTY;
+			m_SItemTemporary.nLife = 0;
+		}
 	}
+
+
 	// フレイルの更新
 	m_pFlail->Update();
 
@@ -321,7 +345,6 @@ void CPlayer::Update(void)
 
 	// モーション・オブジェクトキャラクターの更新
 	UpdateMotion(currentMotion);
-
 }
 
 //============================================================
@@ -356,6 +379,74 @@ void CPlayer::Draw(void)
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 }
 
+//============================================================
+//	ヒット処理
+//============================================================
+void CPlayer::Hit(void)
+{
+	EItem Item = ITEM_EMPTY;
+	while (Item == ITEM_EMPTY)
+	{
+		Item = (EItem)(rand() % ITEM_MAX);
+	}
+	switch (Item)
+	{
+	case CPlayer::ITEM_EMPTY:
+		break;
+	case CPlayer::ITEM_HEAL:
+		m_pStatus->SetNumLife(m_pStatus->GetNumLife() + 20);
+		m_pStatus->SetNumRate(m_pStatus->GetNumRate() - 20);
+		break;
+	case CPlayer::ITEM_BOOST_ATTACK:
+		m_SItemTemporary.type = ITEM_BOOST_ATTACK;
+		m_SItemTemporary.nLife = 600;
+		break;
+	case CPlayer::ITEM_BOOST_KNOCKBACK:
+		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
+		m_SItemTemporary.nLife = 600;
+		break;
+	case CPlayer::ITEM_SUPERARMOR:
+		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
+		m_SItemTemporary.nLife = 450;
+		break;
+	case CPlayer::ITEM_BIGFLAIL:
+		SetItemPermanent(ITEM_BIGFLAIL);
+		break;
+	case CPlayer::ITEM_LONGFLAIL:
+		SetItemPermanent(ITEM_LONGFLAIL);
+		break;
+	case CPlayer::ITEM_GHOSTFLAIL:
+		SetItemPermanent(ITEM_GHOSTFLAIL);
+		break;
+	case CPlayer::ITEM_MULTIFLAIL:
+		SetItemPermanent(ITEM_MULTIFLAIL);
+		break;
+	case CPlayer::ITEM_BURNINGFLAIL:
+		SetItemPermanent(ITEM_BURNINGFLAIL);
+		break;
+	case CPlayer::ITEM_MAX:
+		break;
+	default:
+		break;
+	}
+}
+//============================================================
+//アイテムの効果設定
+//============================================================
+void CPlayer::SetItemPermanent(EItem Item)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_SItemPermanent[i].type == ITEM_EMPTY)
+		{
+			m_SItemPermanent[i].type = Item;
+			return;
+		}
+	}
+	
+	m_SItemPermanent[0].type = m_SItemPermanent[1].type;
+	m_SItemPermanent[1].type = Item;
+}
 //============================================================
 //	ノックバックヒット処理
 //============================================================
@@ -432,7 +523,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			SetMotion(MOTION_DEATH);
 
 			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+		
+
 		}
 		else
 		{ // 死亡していない場合
@@ -463,6 +555,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
 			// 爆発パーティクルを生成
 
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f,0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
 		}
 
 		// サウンドの再生
@@ -691,6 +784,9 @@ void CPlayer::SetSpawn(void)
 	// 自動描画をONにする
 	SetEnableDraw(true);
 
+	// 軌跡の初期化
+	m_pFlail->InitOrbit();
+
 	// サウンドの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// 生成音
 }
@@ -820,8 +916,11 @@ void CPlayer::HitKillY(const int nDmg)
 		else
 		{ // 死亡していない場合
 
-			// 再出現させる
-			SetSpawn();
+			// 溺れ状態を設定
+			SetState(STATE_DROWN);
+
+			// 溺れモーションを設定
+			SetMotion(MOTION_DROWN);
 
 			// 爆発パーティクルを生成
 			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
@@ -848,24 +947,6 @@ int CPlayer::GetCounterFlail(void) const
 {
 	// フレイルカウンターを返す
 	return m_nCounterFlail;
-}
-
-//============================================================
-//	勝利ポイントの加算処理
-//============================================================
-void CPlayer::AddWinPoint(void)
-{
-	// 勝利ポイントを加算
-	m_nWinPoint++;
-}
-
-//============================================================
-//	勝利ポイント取得処理
-//============================================================
-int CPlayer::GetWinPoint(void) const
-{
-	// 勝利ポイントを返す
-	return m_nWinPoint;
 }
 
 //============================================================
@@ -983,10 +1064,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_IDOL:	// 待機モーション：ループON
 	case MOTION_CHARGE:	// チャージモーション：ループON
 	case MOTION_PULL:	// 引きずりモーション：ループON
-
-		break;
-
 	case MOTION_MOVE:	// 移動モーション：ループON
+	case MOTION_DROWN:	// 溺れモーション：ループON
 
 		break;
 
@@ -1211,6 +1290,59 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 
 	// 通常状態の処理を行い、その返り値のモーションを返す
 	return UpdateNormal();
+}
+
+//============================================================
+//	溺れ状態時の更新処理
+//============================================================
+CPlayer::EMotion CPlayer::UpdateDrown(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
+
+	// ポインタを宣言
+	CStage *pStage = CScene::GetStage();	// ステージ情報
+	if (pStage == NULL)
+	{ // ステージが使用されていない場合
+
+		// 処理を抜ける
+		assert(false);
+	}
+
+	// フレイルを強制的に所持
+	m_pFlail->CatchFlail();
+
+	// 重力の更新
+	UpdateGravity();
+
+	// 着地判定 (位置更新)
+	UpdateLanding(posPlayer);
+
+	// 向き更新
+	UpdateRotation(rotPlayer);
+
+	// 波に着地させる
+	pStage->GetLiquid()->GetScrollMeshField(0)->LandPosition(posPlayer, m_move);
+
+	// 位置を反映
+	SetVec3Position(posPlayer);
+
+	// 向きを反映
+	SetVec3Rotation(rotPlayer);
+
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState > DROWN_CNT)
+	{ // 溺れ時間の終了カウントになった場合
+
+		// 再出現させる
+		SetSpawn();
+	}
+
+	// 溺れモーションを返す
+	return MOTION_DROWN;
 }
 
 //============================================================

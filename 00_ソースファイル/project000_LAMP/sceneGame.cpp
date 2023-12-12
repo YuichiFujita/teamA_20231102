@@ -111,12 +111,18 @@ HRESULT CSceneGame::Init(void)
 	// カメラを設定
 	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
 
-	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤー数分繰り返す
 
-		// プレイヤーを出現
-		CScene::GetPlayer(nCntPlayer)->SetSpawn();
-		CScene::GetPlayer(nCntPlayer)->SetState(CPlayer::STATE_NONE);
+		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが存在する場合
+
+			// プレイヤーを出現
+			pPlayer->SetSpawn();
+			pPlayer->SetState(CPlayer::STATE_NONE);
+		}
 	}
 
 	// 見下ろしカメラの目標位置の設定
@@ -142,7 +148,6 @@ HRESULT CSceneGame::Init(void)
 	case 2:
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME_2);
 		break;
-
 	default:
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
 		break;
@@ -208,6 +213,11 @@ void CSceneGame::Update(void)
 		// カメラの操作状況を反転
 		SetEnableControlCamera((!m_bControlCamera) ? true : false);
 	}
+	else if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F6))
+	{
+		// ゲーム画面に遷移
+		CManager::GetInstance()->SetMode(CScene::MODE_GAME);
+	}
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
@@ -218,6 +228,7 @@ void CSceneGame::Update(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F3]：UI描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F4]：ポーズ描画のON/OFF\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F5]：カメラ操作のON/OFF\n");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[F6]：ゲームのリトライ\n");
 
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "　[デバッグ情報]\n");
@@ -303,11 +314,17 @@ void CSceneGame::SetEnableDrawUI(const bool bDraw)
 	// 引数のUIの描画状況を設定
 	m_bDrawUI = bDraw;
 
-	for (int nCntPlayer = 0; nCntPlayer < CManager::GetInstance()->GetRetentionManager()->GetNumPlayer(); nCntPlayer++)
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤー数分繰り返す
 
-		// プレイヤーの描画状況を設定
-		CScene::GetPlayer(nCntPlayer)->SetEnableDrawUI(bDraw);
+		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが存在する場合
+
+			// プレイヤーの描画状況を設定
+			pPlayer->SetEnableDrawUI(bDraw);
+		}
 	}
 }
 

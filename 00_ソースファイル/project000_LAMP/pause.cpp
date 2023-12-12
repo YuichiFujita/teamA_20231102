@@ -23,7 +23,7 @@
 //************************************************************
 #define PAUSE_PRIO	(14)	// ポーズ表示の優先順位
 
-#define PAUSE_POS	(D3DXVECTOR3(640.0f, 210.0f, 0.0f))	// セレクトメニューの位置
+#define PAUSE_POS	(D3DXVECTOR3(640.0f, 285.0f, 0.0f))	// セレクトメニューの位置
 #define PAUSE_SIZE	(D3DXVECTOR3(440.0f, 110.0f, 0.0f))	// セレクトメニューの大きさ
 #define PAUSE_SPACE	(D3DXVECTOR3(0.0f, 150.0f, 0.0f))	// セレクトメニューの空白
 
@@ -37,8 +37,7 @@
 const char *CPause::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\pause000.png",	// 再開テクスチャ
-	"data\\TEXTURE\\pause001.png",	// リトライテクスチャ
-	"data\\TEXTURE\\pause002.png",	// 終了テクスチャ
+	"data\\TEXTURE\\pause001.png",	// 終了テクスチャ
 };
 
 //************************************************************
@@ -353,15 +352,6 @@ void CPause::Select(void)
 				// 描画状況の設定
 				SetEnableDraw(m_bPause);
 
-				// 処理を抜ける
-				break;
-
-			case SELECT_RETRY:	// リトライ
-
-				// シーンの設定
-				CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
-
-				// 処理を抜ける
 				break;
 
 			case SELECT_EXIT:	// 終了
@@ -369,7 +359,6 @@ void CPause::Select(void)
 				// シーンの設定
 				CManager::GetInstance()->SetScene(CScene::MODE_TITLE);	// タイトル画面
 
-				// 処理を抜ける
 				break;
 			}
 		}

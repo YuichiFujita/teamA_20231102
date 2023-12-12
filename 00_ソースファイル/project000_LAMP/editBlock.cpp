@@ -499,7 +499,7 @@ void CEditBlock::CreateBlock(void)
 		//	新しいブロックの生成
 		//----------------------------------------------------
 		// ブロックの生成
-		m_pBlock = m_pBlock = CBlock::Create
+		m_pBlock = CBlock::Create
 		( // 引数
 			m_block.type,	// 種類
 			posEdit,		// 位置

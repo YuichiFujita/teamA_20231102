@@ -19,8 +19,7 @@
 #include "scrollMeshField.h"
 #include "collision.h"
 #include "obstacle.h"
-#include "sound.h"	
-
+#include "sound.h"
 
 //************************************************************
 //	定数宣言
@@ -113,8 +112,6 @@ HRESULT CFlail::Init(void)
 //============================================================
 void CFlail::Uninit(void)
 {
-	// オブジェクトモデルの終了
-	CObjectModel::Uninit();
 	if (m_pOrbit != NULL)
 	{
 		m_pOrbit->Uninit();
@@ -126,6 +123,9 @@ void CFlail::Uninit(void)
 		// モデルの終了
 		m_chain[nCntChain].multiModel->Uninit();
 	}
+
+	// オブジェクトモデルの終了
+	CObjectModel::Uninit();
 }
 
 //============================================================
@@ -136,6 +136,7 @@ void CFlail::Update(void)
 	m_oldPos = GetVec3Position();
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 	m_fLengthChain = 0.0f;
+	
 	m_fChainRotOld = m_fChainRot;
 
 	// 角度修正
@@ -150,7 +151,14 @@ void CFlail::Update(void)
 		m_move.x = 0.0f;
 		m_move.z = 0.0f;
 	}
-	
+	if (player->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
+	{
+		m_nDamage = 20;
+	}
+	else
+	{
+		m_nDamage = HIT_DAMAGE;
+	}
 	// 角度修正
 	useful::NormalizeRot(m_fChainRot);
 	useful::NormalizeRot(m_fChainRotTarget);
@@ -731,7 +739,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				if (length < (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
 				{
 					// ダメージヒット処理
-					player->HitKnockBack(HIT_DAMAGE, vec);
+					player->HitKnockBack(m_nDamage, vec);
 				}
 			}
 		}
@@ -1399,4 +1407,22 @@ void CFlail::ShotFlail(const float rot)
 		// モデルの更新
 		m_chain[nCntChain].multiModel->Update();
 	}
+}
+
+//============================================================
+//	軌跡の初期化
+//============================================================
+void CFlail::InitOrbit(void)
+{
+	// 軌跡を通常状態にする
+	m_pOrbit->SetState(CObjectOrbit::STATE_NORMAL);
+}
+
+//============================================================
+//	軌跡の消失設定
+//============================================================
+void CFlail::VanishOrbit(void)
+{
+	// 軌跡を消失状態にする
+	m_pOrbit->SetState(CObjectOrbit::STATE_VANISH);
 }

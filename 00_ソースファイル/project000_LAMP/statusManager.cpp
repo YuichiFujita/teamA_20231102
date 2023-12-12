@@ -137,7 +137,9 @@ HRESULT CStatusManager::Uninit(void)
 	// ‚Á”ò‚Ñ—¦‚ÌI—¹
 	m_pKnockRate->Uninit();
 
+	// ”wŒi‚ÌI—¹
 	m_pUI->Uninit();
+
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

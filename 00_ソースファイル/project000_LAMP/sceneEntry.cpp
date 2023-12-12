@@ -105,16 +105,23 @@ HRESULT CSceneEntry::Uninit(void)
 //============================================================
 void CSceneEntry::Update(void)
 {
+#if _DEBUG
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_F2))
 	{
+#if 1
 		// プレイヤーを全参加させる
-		//CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(0, true);
 		CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true);
 		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(4);
-
+#else
+		// 一部プレイヤーを参加させる
+		CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(2, true);
+		CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(3, true);
+		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(2);
+#endif
 		// シーンの設定
-		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
+		//CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面
 	}
+#endif
 
 	// デバッグ表示
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "======================================\n");

@@ -62,6 +62,7 @@ public:
 		MOTION_PULL,		// 引きずりモーション
 		MOTION_KNOCK,		// 吹っ飛びモーション
 		MOTION_LAND,		// 着地モーション
+		MOTION_DROWN,		// 溺れモーション
 		MOTION_DEATH,		// 死亡モーション
 		MOTION_MAX			// この列挙型の総数
 	};
@@ -84,6 +85,7 @@ public:
 		STATE_NORMAL,	// 通常状態
 		STATE_KNOCK,	// ノック状態
 		STATE_INVULN,	// 無敵状態
+		STATE_DROWN,	// 溺れ状態
 		STATE_DEATH,	// 死亡状態
 		STATE_MAX		// この列挙型の総数
 	};
@@ -96,7 +98,27 @@ public:
 		AXIS_Z,		// Z軸
 		AXIS_MAX	// この列挙型の総数
 	};
+	//アイテム効果
+	enum EItem
+	{
+		ITEM_EMPTY = 0,
+		ITEM_HEAL ,// 回復
+		ITEM_BOOST_ATTACK,
+		ITEM_BOOST_KNOCKBACK,
+		ITEM_SUPERARMOR,
+		ITEM_BIGFLAIL,
+		ITEM_LONGFLAIL,
+		ITEM_GHOSTFLAIL,
+		ITEM_MULTIFLAIL,
+		ITEM_BURNINGFLAIL,
+		ITEM_MAX
+	};
 
+	struct SItemEffect
+	{
+		EItem type;	//種別
+		int nLife;	//効果時間
+	};
 	// コンストラクタ
 	explicit CPlayer(const int nPad);
 
@@ -108,6 +130,7 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+	void Hit(void) override;		// アイテムヒット
 	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock) override;	// ノックバックヒット
 
 	void SetState(const int nState) override;	// 状態設定
@@ -130,10 +153,9 @@ public:
 	void HitKillY(const int nDmg);			// キルY座標ヒット
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
-	void AddWinPoint(void);					// 勝利ポイント加算
-	int GetWinPoint(void) const;			// 勝利ポイント取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
-
+	void SetItemPermanent(EItem Item);
+	SItemEffect GetTemporaryItem() { return m_SItemTemporary; }
 protected:
 	// メンバ関数
 	void UpdateMotion(int nMotion);			// モーション・オブジェクトキャラクターの更新
@@ -147,6 +169,7 @@ private:
 	EMotion UpdateNormal(void);	// 通常状態時の更新
 	EMotion UpdateKnock(void);	// ノック状態時の更新
 	EMotion UpdateInvuln(void);	// 無敵状態時の更新
+	EMotion UpdateDrown(void);	// 溺れ状態時の更新
 	void UpdateDeath(void);		// 死亡状態時の更新
 
 	void UpdateOldPosition(void);			// 過去位置の更新
@@ -167,6 +190,8 @@ private:
 	static const char *mc_apModelFile[];	// モデル定数
 
 	// メンバ変数
+	SItemEffect m_SItemPermanent[2];//永続的なアイテムの効果
+	SItemEffect m_SItemTemporary;	//一時的なアイテムの効果
 	CStatusManager *m_pStatus;		// ステータスの情報
 	CFlail		*m_pFlail;			// フレイルの情報
 	CPlayerAI	*m_pAI;				// AI情報
@@ -176,7 +201,6 @@ private:
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
 	CObject3D * m_pGuide;			// 投擲方向
-	int			m_nWinPoint;		// 勝利ポイント数
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

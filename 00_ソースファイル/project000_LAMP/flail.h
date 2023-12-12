@@ -107,6 +107,9 @@ public:
 	void CatchFlail(void);
 	void ShotFlail(const float rot);
 
+	void InitOrbit(void);	// 軌跡初期化
+	void VanishOrbit(void);	// 軌跡消失
+
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
 	( // 引数
@@ -140,6 +143,7 @@ private:
 	D3DXVECTOR3	m_move;							// 移動量
 	int			m_nPlayerID;					// プレイヤーID
 	int			m_nNumChain;					// 鎖の数
+	int			m_nDamage;						// ダメージ
 	int			m_nfulChainF;					// 鎖の数
 	int			m_nfulChainP;					// 鎖の数
 	float		m_fChainRot;					// 角度

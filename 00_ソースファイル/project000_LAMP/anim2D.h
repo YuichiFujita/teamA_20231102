@@ -59,6 +59,7 @@ public:
 	void SetCounter(const int nCntChange);			// カウンターの設定
 	void SetEnableStop(const bool bStop);			// 停止状況の設定
 	void SetEnablePlayBack(const bool bPlayBack);	// 逆再生状況の設定
+	int  GetPattern(void) const;					// パターンの取得
 	int  GetLoopAnimation(void) const;				// パターン繰り返し数の取得
 
 private:
