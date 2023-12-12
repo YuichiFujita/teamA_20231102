@@ -106,6 +106,9 @@ public:
 	void CatchFlail(void);
 	void ShotFlail(const float rot);
 
+	void InitOrbit(void);	// ‹OÕ‰Šú‰»
+	void VanishOrbit(void);	// ‹OÕÁ¸
+
 	// Ã“Iƒƒ“ƒoŠÖ”
 	static CFlail *Create	// ¶¬
 	( // ˆø”

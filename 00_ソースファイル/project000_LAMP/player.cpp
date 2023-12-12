@@ -69,6 +69,7 @@ namespace
 	const float MAX_KNOCK_RATE	= 4.0f;		// 最大吹っ飛び倍率
 	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
 	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
+	const int	DROWN_CNT		= 120;		// 溺れ時間のフレーム数
 	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
@@ -127,7 +128,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_fSinAlpha		= 0.0f;			// 透明向き
 	m_bDash			= false;		// ダッシュ状況
 	m_bJump			= false;		// ジャンプ状況
-	m_bAI			= true;
+	m_bAI			= false;
 }
 
 //============================================================
@@ -304,6 +305,13 @@ void CPlayer::Update(void)
 
 		// 無敵状態時の更新
 		currentMotion = UpdateInvuln();
+
+		break;
+
+	case STATE_DROWN:	// 溺れ状態
+
+		// 溺れ状態時の更新
+		currentMotion = UpdateDrown();
 
 		break;
 
@@ -776,6 +784,9 @@ void CPlayer::SetSpawn(void)
 	// 自動描画をONにする
 	SetEnableDraw(true);
 
+	// 軌跡の初期化
+	m_pFlail->InitOrbit();
+
 	// サウンドの再生
 	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SPAWN);	// 生成音
 }
@@ -905,8 +916,11 @@ void CPlayer::HitKillY(const int nDmg)
 		else
 		{ // 死亡していない場合
 
-			// 再出現させる
-			SetSpawn();
+			// 溺れ状態を設定
+			SetState(STATE_DROWN);
+
+			// 溺れモーションを設定
+			SetMotion(MOTION_DROWN);
 
 			// 爆発パーティクルを生成
 			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
@@ -1050,10 +1064,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_IDOL:	// 待機モーション：ループON
 	case MOTION_CHARGE:	// チャージモーション：ループON
 	case MOTION_PULL:	// 引きずりモーション：ループON
-
-		break;
-
 	case MOTION_MOVE:	// 移動モーション：ループON
+	case MOTION_DROWN:	// 溺れモーション：ループON
 
 		break;
 
@@ -1278,6 +1290,59 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 
 	// 通常状態の処理を行い、その返り値のモーションを返す
 	return UpdateNormal();
+}
+
+//============================================================
+//	溺れ状態時の更新処理
+//============================================================
+CPlayer::EMotion CPlayer::UpdateDrown(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
+
+	// ポインタを宣言
+	CStage *pStage = CScene::GetStage();	// ステージ情報
+	if (pStage == NULL)
+	{ // ステージが使用されていない場合
+
+		// 処理を抜ける
+		assert(false);
+	}
+
+	// フレイルを強制的に所持
+	m_pFlail->CatchFlail();
+
+	// 重力の更新
+	UpdateGravity();
+
+	// 着地判定 (位置更新)
+	UpdateLanding(posPlayer);
+
+	// 向き更新
+	UpdateRotation(rotPlayer);
+
+	// 波に着地させる
+	pStage->GetLiquid()->GetScrollMeshField(0)->LandPosition(posPlayer, m_move);
+
+	// 位置を反映
+	SetVec3Position(posPlayer);
+
+	// 向きを反映
+	SetVec3Rotation(rotPlayer);
+
+	// カウンターを加算
+	m_nCounterState++;
+
+	if (m_nCounterState > DROWN_CNT)
+	{ // 溺れ時間の終了カウントになった場合
+
+		// 再出現させる
+		SetSpawn();
+	}
+
+	// 溺れモーションを返す
+	return MOTION_DROWN;
 }
 
 //============================================================
