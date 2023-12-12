@@ -52,7 +52,7 @@ namespace
 	namespace start
 	{
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 580.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(380.0f, 140.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(440.0f, 140.0f, 0.0f);		// 大きさ
 	}
 
 	// 勝利ポイント数情報
@@ -99,13 +99,18 @@ namespace
 	// 矢印情報
 	namespace arrow
 	{
-		const float	SPACE_EDGE = 65.0f;	// 縁の空白
+		const float	ADD_ALPHA		= 0.02f;	// 透明度の加算量
+		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+		const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
+		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
+		const float	SPACE_EDGE		= 50.0f;	// 縁の空白
 
 		const POSGRID2		PART	= POSGRID2(1, MAX_ARROW);			// テクスチャ分割数
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(90.0f, 90.0f, 9.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(select::POS.x - (select::SIZE_RULE.x * 0.5f) - SPACE_EDGE, select::POS.y, 0.0f);	// 位置
 		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(select::SIZE_RULE.x + (SPACE_EDGE * 2.0f), 0.0f, 0.0f);	// 空白
+		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);	// 色
 	}
 
 	// 操作情報
@@ -153,7 +158,8 @@ CEntryRuleManager::CEntryRuleManager()
 	m_pStart	= NULL;	// 開始ボタンの情報
 	m_pControl	= NULL;	// 操作表示の情報
 	m_pFade		= NULL;	// フェードの情報
-	m_fSinAlpha		= 0.0f;				// 透明向き
+	m_fSinControlAlpha	= 0.0f;			// 操作表示の透明向き
+	m_fSinArrowAlpha	= 0.0f;			// 矢印表示の透明向き
 	m_state			= STATE_INIT;		// 状態
 	m_nSelect		= RULE_WINPOINT;	// 現在の選択
 	m_nOldSelect	= RULE_WINPOINT;	// 前回の選択
@@ -182,7 +188,8 @@ HRESULT CEntryRuleManager::Init(void)
 	m_pStart	= NULL;	// 開始ボタンの情報
 	m_pControl	= NULL;	// 操作表示の情報
 	m_pFade		= NULL;	// フェードの情報
-	m_fSinAlpha		= -HALF_PI;			// 透明向き
+	m_fSinControlAlpha	= -HALF_PI;		// 操作表示の透明向き
+	m_fSinArrowAlpha	= -HALF_PI;		// 矢印表示の透明向き
 	m_state			= STATE_INIT;		// 状態
 	m_nSelect		= RULE_WINPOINT;	// 現在の選択
 	m_nOldSelect	= RULE_WINPOINT;	// 前回の選択
@@ -251,7 +258,9 @@ HRESULT CEntryRuleManager::Init(void)
 				arrow::PART.x,	// テクスチャ横分割数
 				arrow::PART.y,	// テクスチャ縦分割数
 				arrow::POS + ((float)i * arrow::SPACE),	// 位置
-				arrow::SIZE								// 大きさ
+				arrow::SIZE,	// 大きさ
+				VEC3_ZERO,		// 向き
+				XCOL_AWHITE		// 色
 			);
 			if (m_apArrow[i] == NULL)
 			{ // 生成に失敗した場合
@@ -529,6 +538,9 @@ void CEntryRuleManager::Update(void)
 		// 操作更新
 		UpdateControl();
 
+		// 矢印更新
+		UpdateArrow();
+
 		break;
 
 	case STATE_FADEOUT:
@@ -680,9 +692,7 @@ void CEntryRuleManager::UpdateFadeIn(void)
 	}
 
 	// UIの透明度の設定
-	SetAlphaUI(colFade.a * 2.0f);
-	D3DXCOLOR col = m_pControl->GetColor();
-	m_pControl->SetColor(D3DXCOLOR(col.r, col.g, col.b, 0.0f));	// 操作表示は透明にする
+	SetAlphaUI(colFade.a * 2.0f, false);
 
 	// 透明度を反映
 	m_pFade->SetColor(colFade);
@@ -710,9 +720,7 @@ void CEntryRuleManager::UpdateFadeOut(void)
 	}
 
 	// UIの透明度の設定
-	SetAlphaUI(colFade.a * 2.0f);
-	D3DXCOLOR col = m_pControl->GetColor();
-	m_pControl->SetColor(D3DXCOLOR(col.r, col.g, col.b, 0.0f));	// 操作表示は透明にする
+	SetAlphaUI(colFade.a * 2.0f, true);
 
 	// 透明度を反映
 	m_pFade->SetColor(colFade);
@@ -749,14 +757,60 @@ void CEntryRuleManager::UpdateControl(void)
 		float fAddAlpha = 0.0f;	// 透明度の加算量
 
 		// 透明度を上げる
-		m_fSinAlpha += control::ADD_SINROT;
-		useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
+		m_fSinControlAlpha += control::ADD_SINROT;
+		useful::NormalizeRot(m_fSinControlAlpha);	// 向き正規化
 
 		// 透明度加算量を求める
-		fAddAlpha = (control::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
+		fAddAlpha = (control::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinControlAlpha) - 1.0f);
 
 		// 操作表示色を設定
 		m_pControl->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, control::BASIC_ALPHA + fAddAlpha));
+	}
+}
+
+//============================================================
+//	矢印の更新処理
+//============================================================
+void CEntryRuleManager::UpdateArrow(void)
+{
+	for (int i = 0; i < MAX_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 変数を宣言
+		D3DXCOLOR colArrow = m_apArrow[i]->GetColor();	// 矢印色
+
+		if (colArrow.a < arrow::MIN_COL.a)
+		{ // 透明度が最低限より低い場合
+
+			// 透明度を加算
+			colArrow.a += arrow::ADD_ALPHA;
+
+			if (colArrow.a > arrow::MIN_COL.a)
+			{ // 透明度が超過した場合
+
+				// 透明度を補正
+				colArrow.a = arrow::MIN_COL.a;
+			}
+
+			// 矢印色を設定
+			m_apArrow[i]->SetColor(colArrow);
+		}
+		else
+		{ // 透明度が最低限以上の場合
+
+			// 変数を宣言
+			float fAddAlpha = 0.0f;	// 透明度の加算量
+
+			// 透明度を上げる
+			m_fSinArrowAlpha += arrow::ADD_SINROT;
+			useful::NormalizeRot(m_fSinArrowAlpha);	// 向き正規化
+
+			// 透明度加算量を求める
+			fAddAlpha = (arrow::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinArrowAlpha) - 1.0f);
+
+			// 矢印色を設定
+			m_apArrow[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, arrow::BASIC_ALPHA + fAddAlpha));
+		}
 	}
 }
 
@@ -1071,6 +1125,13 @@ void CEntryRuleManager::SetEnableUI(const bool bDraw)
 		m_apRuleTitle[i]->SetEnableDraw(bDraw);
 	}
 
+	for (int i = 0; i < MAX_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の描画を設定
+		m_apArrow[i]->SetEnableDraw(bDraw);
+	}
+
 	// 選択の描画を設定
 	m_pSelect->SetEnableDraw(bDraw);
 
@@ -1093,7 +1154,7 @@ void CEntryRuleManager::SetEnableUI(const bool bDraw)
 //============================================================
 //	UIの透明度の設定処理
 //============================================================
-void CEntryRuleManager::SetAlphaUI(const float fAlpha)
+void CEntryRuleManager::SetAlphaUI(const float fAlpha, const bool bFadeOut)
 {
 	// 変数を宣言
 	D3DXCOLOR col = XCOL_WHITE;	// 色
@@ -1110,10 +1171,6 @@ void CEntryRuleManager::SetAlphaUI(const float fAlpha)
 	col = m_pStart->GetColor();
 	m_pStart->SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha));
 
-	// 操作表示の透明度を設定
-	col = m_pControl->GetColor();
-	m_pControl->SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha));
-
 	// 勝利ポイント数の透明度を設定
 	col = m_pWinPoint->GetColor();
 	m_pWinPoint->SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha));
@@ -1125,4 +1182,55 @@ void CEntryRuleManager::SetAlphaUI(const float fAlpha)
 	// 勝利条件の透明度を設定
 	col = m_pWin->GetColor();
 	m_pWin->SetColor(D3DXCOLOR(col.r, col.g, col.b, fAlpha));
+
+	if (bFadeOut)
+	{ // フェードアウト時の場合
+
+		// 変数を宣言
+		float fSetAlpha = 0.0f;	// 設定透明度
+		float fMaxAlpha = 0.0f;	// 最大透明度
+
+		for (int i = 0; i < MAX_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 色情報を設定
+			col = m_apArrow[i]->GetColor();	// 色
+			fMaxAlpha = col.a;				// 最大透明度
+			fSetAlpha = fAlpha;				// 設定透明度
+
+			// 透明度を制限
+			useful::LimitNum(fSetAlpha, 0.0f, fMaxAlpha);
+
+			// 矢印の透明度を設定
+			m_apArrow[i]->SetColor(D3DXCOLOR(col.r, col.g, col.b, fSetAlpha));
+		}
+
+		// 選択の透明度を設定
+		{
+			// 色情報を設定
+			col = m_pSelect->GetColor();	// 色
+			fMaxAlpha = col.a;				// 最大透明度
+			fSetAlpha = fAlpha;				// 設定透明度
+
+			// 透明度を制限
+			useful::LimitNum(fSetAlpha, 0.0f, fMaxAlpha);
+
+			// 選択の透明度を設定
+			m_pSelect->SetColor(D3DXCOLOR(col.r, col.g, col.b, fSetAlpha));
+		}
+
+		// 操作表示の透明度を設定
+		{
+			// 色情報を設定
+			col = m_pControl->GetColor();	// 色
+			fMaxAlpha = col.a;				// 最大透明度
+			fSetAlpha = fAlpha;				// 設定透明度
+
+			// 透明度を制限
+			useful::LimitNum(fSetAlpha, 0.0f, fMaxAlpha);
+
+			// 操作表示の透明度を設定
+			m_pControl->SetColor(D3DXCOLOR(col.r, col.g, col.b, fSetAlpha));
+		}
+	}
 }
