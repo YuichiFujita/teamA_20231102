@@ -305,6 +305,13 @@ void CPlayer::Update(void)
 
 		break;
 
+	case STATE_DROWN:	// 溺れ状態
+
+		// 溺れ状態時の更新
+		currentMotion = UpdateDrown();
+
+		break;
+
 	case STATE_DEATH:	// 死亡状態
 
 		// 死亡状態時の更新
@@ -978,10 +985,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_IDOL:	// 待機モーション：ループON
 	case MOTION_CHARGE:	// チャージモーション：ループON
 	case MOTION_PULL:	// 引きずりモーション：ループON
-
-		break;
-
 	case MOTION_MOVE:	// 移動モーション：ループON
+	case MOTION_DROWN:	// 溺れモーション：ループON
 
 		break;
 
@@ -1206,6 +1211,15 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 
 	// 通常状態の処理を行い、その返り値のモーションを返す
 	return UpdateNormal();
+}
+
+//============================================================
+//	溺れ状態時の更新処理
+//============================================================
+CPlayer::EMotion CPlayer::UpdateDrown(void)
+{
+	// 溺れモーションを返す
+	return MOTION_DROWN;
 }
 
 //============================================================
