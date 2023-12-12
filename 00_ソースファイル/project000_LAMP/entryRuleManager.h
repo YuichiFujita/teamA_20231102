@@ -16,6 +16,11 @@
 #include "main.h"
 
 //************************************************************
+//	マクロ定義
+//************************************************************
+#define MAX_ARROW	(2)	// 矢印の総数
+
+//************************************************************
 //	前方宣言
 //************************************************************
 class CObject2D;	// オブジェクト2Dクラス
@@ -35,6 +40,9 @@ public:
 		TEXTURE_RULE_TITLE = 0,	// ルールタイトルテクスチャ
 		TEXTURE_KILL,			// 撃破条件テクスチャ
 		TEXTURE_WIN,			// 勝利条件テクスチャ
+		TEXTURE_START,			// 開始ボタンテクスチャ
+		TEXTURE_CONTROL,		// 操作表示テクスチャ
+		TEXTURE_ARROW,			// 矢印テクスチャ
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -91,6 +99,7 @@ private:
 
 	// メンバ変数
 	CAnim2D *m_apRuleTitle[RULE_MAX];	// ルールタイトルの情報
+	CAnim2D *m_apArrow[MAX_ARROW];		// 矢印の情報
 	CMultiValue	*m_pWinPoint;	// 勝利ポイント数の情報
 	CAnim2D		*m_pKill;		// 撃破条件の情報
 	CAnim2D		*m_pWin;		// 勝利条件の情報

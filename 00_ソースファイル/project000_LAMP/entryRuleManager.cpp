@@ -96,6 +96,18 @@ namespace
 		const D3DXCOLOR DEFAULT_COL	= D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f);	// 非選択中カラー
 	}
 
+	// 矢印情報
+	namespace arrow
+	{
+		const float	SPACE_EDGE = 65.0f;	// 縁の空白
+
+		const POSGRID2		PART	= POSGRID2(1, MAX_ARROW);			// テクスチャ分割数
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
+
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(select::POS.x - (select::SIZE_RULE.x * 0.5f) - SPACE_EDGE, select::POS.y, 0.0f);	// 位置
+		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(select::SIZE_RULE.x + (SPACE_EDGE * 2.0f), 0.0f, 0.0f);	// 空白
+	}
+
 	// 操作情報
 	namespace control
 	{
@@ -118,6 +130,9 @@ const char *CEntryRuleManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\ruleTitle000.png",	// ルールタイトルテクスチャ
 	"data\\TEXTURE\\rule000.png",		// 撃破条件テクスチャ
 	"data\\TEXTURE\\rule001.png",		// 勝利条件テクスチャ
+	NULL,								// 開始ボタンテクスチャ
+	NULL,								// 操作表示テクスチャ
+	NULL,								// 矢印テクスチャ
 };
 
 //************************************************************
@@ -130,6 +145,7 @@ CEntryRuleManager::CEntryRuleManager()
 {
 	// メンバ変数をクリア
 	memset(&m_apRuleTitle[0], 0, sizeof(m_apRuleTitle));	// ルールタイトルの情報
+	memset(&m_apArrow[0], 0, sizeof(m_apArrow));			// 矢印の情報
 	m_pWinPoint	= NULL;	// 勝利ポイント数の情報
 	m_pKill		= NULL;	// 撃破条件の情報
 	m_pWin		= NULL;	// 勝利条件の情報
@@ -158,6 +174,7 @@ HRESULT CEntryRuleManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_apRuleTitle[0], 0, sizeof(m_apRuleTitle));	// ルールタイトルの情報
+	memset(&m_apArrow[0], 0, sizeof(m_apArrow));			// 矢印の情報
 	m_pWinPoint	= NULL;	// 勝利ポイント数の情報
 	m_pKill		= NULL;	// 撃破条件の情報
 	m_pWin		= NULL;	// 勝利条件の情報
@@ -223,6 +240,38 @@ HRESULT CEntryRuleManager::Init(void)
 		}
 	}
 
+	// 矢印の生成
+	{
+		for (int i = 0; i < MAX_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 矢印の生成
+			m_apArrow[i] = CAnim2D::Create
+			( // 引数
+				arrow::PART.x,	// テクスチャ横分割数
+				arrow::PART.y,	// テクスチャ縦分割数
+				arrow::POS + ((float)i * arrow::SPACE),	// 位置
+				arrow::SIZE								// 大きさ
+			);
+			if (m_apArrow[i] == NULL)
+			{ // 生成に失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// テクスチャを登録・割当
+			m_apArrow[i]->BindTexture(mc_apTextureFile[TEXTURE_ARROW]);
+
+			// 優先順位を設定
+			m_apArrow[i]->SetPriority(PRIORITY);
+
+			// パターンを設定
+			m_apArrow[i]->SetPattern(i);
+		}
+	}
+
 	// 選択の生成
 	{
 		m_pSelect = CObject2D::Create
@@ -261,6 +310,9 @@ HRESULT CEntryRuleManager::Init(void)
 			return E_FAIL;
 		}
 
+		// テクスチャを登録・割当
+		m_pStart->BindTexture(mc_apTextureFile[TEXTURE_START]);
+
 		// 優先順位を設定
 		m_pStart->SetPriority(PRIORITY);
 	}
@@ -281,6 +333,9 @@ HRESULT CEntryRuleManager::Init(void)
 			assert(false);
 			return E_FAIL;
 		}
+
+		// テクスチャを登録・割当
+		m_pStart->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
 
 		// 優先順位を設定
 		m_pControl->SetPriority(PRIORITY);
@@ -397,6 +452,13 @@ HRESULT CEntryRuleManager::Uninit(void)
 		m_apRuleTitle[i]->Uninit();
 	}
 
+	for (int i = 0; i < MAX_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の終了
+		m_apArrow[i]->Uninit();
+	}
+
 	// 選択の終了
 	m_pSelect->Uninit();
 
@@ -497,6 +559,13 @@ void CEntryRuleManager::Update(void)
 
 		// ルールタイトルの更新
 		m_apRuleTitle[i]->Update();
+	}
+
+	for (int i = 0; i < MAX_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の更新
+		m_apArrow[i]->Update();
 	}
 
 	// 選択の更新
@@ -729,6 +798,16 @@ void CEntryRuleManager::Select(void)
 
 			// 大きさを変更
 			sizeSelect = select::SIZE_RULE;
+
+			for (int i = 0; i < MAX_ARROW; i++)
+			{ // 矢印の総数分繰り返す
+
+				// 矢印の位置を変更
+				m_apArrow[i]->SetVec3Position(D3DXVECTOR3(arrow::POS.x + (arrow::SPACE.x * (float)i), arrow::POS.y + rule::SPACE.y * (float)m_nSelect, 0.0f));
+
+				// 自動描画をONにする
+				m_apArrow[i]->SetEnableDraw(true);
+			}
 		}
 		else
 		{ // 選択がゲーム遷移の場合
@@ -738,6 +817,13 @@ void CEntryRuleManager::Select(void)
 
 			// 大きさを変更
 			sizeSelect = select::SIZE_START;
+
+			for (int i = 0; i < MAX_ARROW; i++)
+			{ // 矢印の総数分繰り返す
+
+				// 自動描画をOFFにする
+				m_apArrow[i]->SetEnableDraw(false);
+			}
 		}
 
 		// サウンドの再生
@@ -760,6 +846,16 @@ void CEntryRuleManager::Select(void)
 
 			// 大きさを変更
 			sizeSelect = select::SIZE_RULE;
+
+			for (int i = 0; i < MAX_ARROW; i++)
+			{ // 矢印の総数分繰り返す
+
+				// 矢印の位置を変更
+				m_apArrow[i]->SetVec3Position(D3DXVECTOR3(arrow::POS.x + (arrow::SPACE.x * (float)i), arrow::POS.y + rule::SPACE.y * (float)m_nSelect, 0.0f));
+
+				// 自動描画をONにする
+				m_apArrow[i]->SetEnableDraw(true);
+			}
 		}
 		else
 		{ // 選択がゲーム遷移の場合
@@ -769,6 +865,13 @@ void CEntryRuleManager::Select(void)
 
 			// 大きさを変更
 			sizeSelect = select::SIZE_START;
+
+			for (int i = 0; i < MAX_ARROW; i++)
+			{ // 矢印の総数分繰り返す
+
+				// 自動描画をOFFにする
+				m_apArrow[i]->SetEnableDraw(false);
+			}
 		}
 
 		// サウンドの再生
