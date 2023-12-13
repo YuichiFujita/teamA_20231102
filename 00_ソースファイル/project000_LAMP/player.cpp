@@ -134,7 +134,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_bDash = false;		// ダッシュ状況
 	m_bJump = false;		// ジャンプ状況
 	m_bHook = false;
-	m_bAI = false;
+	m_bAI = true;
 }
 
 //============================================================
@@ -1422,6 +1422,7 @@ void CPlayer::UpdateDeath(void)
 
 	// フレイルを強制的に所持
 	m_pFlail->CatchFlail();
+	m_nCounterFlail = flail::FLAIL_DEF;
 
 	// 重力の更新
 	UpdateGravity();

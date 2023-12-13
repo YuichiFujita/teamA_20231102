@@ -67,6 +67,7 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	m_fLengthTarget = 0.0f;
 	m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
+	m_bHit = false;
 }
 
 //============================================================
@@ -771,16 +772,26 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				//ƒtƒŒƒCƒ‹“¯Žm‚Ì“–‚½‚è”»’è
 				if (flailLength < RADIUS * 3.0f && (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW))
 				{
-					CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 60, 60, 300, 1.0f, 0.99f);
+					if (!m_bHit)
+					{
+						CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 60, 60, 300, 1.0f, 0.99f);
+					}
+
 					float rotMove1, rotMove2;
 					rotMove1 = GetChainRotMove();
 					rotMove2 = player->GetFlail()->GetChainRotMove();
 
-					SetChainRotMove(rotMove2 * -0.4f);
+					SetChainRotMove(rotMove1 * -0.8f);
 					m_fLengthTarget = m_fLengthChain;
 
-					player->GetFlail()->SetChainRotMove(rotMove1 * -0.4f);
+					player->GetFlail()->SetChainRotMove(rotMove2 * -0.8f);
 					player->GetFlail()->SetLengthTarget(player->GetFlail()->GetLengthChain());
+
+					m_bHit = true;
+				}
+				else
+				{
+					m_bHit = false;
 				}
 			}
 		}
