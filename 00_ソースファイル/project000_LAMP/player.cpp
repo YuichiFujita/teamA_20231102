@@ -70,6 +70,7 @@ namespace
 	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
 	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
 	const int	DROWN_CNT		= 120;		// 溺れ時間のフレーム数
+	const int	FINALATTACK_CNT	= 600;		// 最後に攻撃したプレイヤーの保持時間のフレーム数
 	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
@@ -334,6 +335,7 @@ void CPlayer::Update(void)
 		assert(false);
 		break;
 	}
+
 	if (m_SItemTemporary.type != ITEM_EMPTY)
 	{
 		m_SItemTemporary.nLife--;
@@ -344,6 +346,16 @@ void CPlayer::Update(void)
 		}
 	}
 
+	// 攻撃の保持カウンターの管理
+	if (m_pFinalAttack != NULL)
+	{
+		m_nCounterAttack++;
+		if (m_nCounterAttack >= FINALATTACK_CNT)
+		{
+			m_pFinalAttack = NULL;
+			m_nCounterAttack = 0;
+		}
+	}
 
 	// フレイルの更新
 	m_pFlail->Update();
