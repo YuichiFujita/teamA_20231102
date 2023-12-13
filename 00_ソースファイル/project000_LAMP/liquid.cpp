@@ -31,8 +31,8 @@ const char *CLiquid::mc_apTextureFile[][LIQUID_MAX] =	// テクスチャ定数
 	},
 
 	{ // 溶岩テクスチャ
-		"data\\TEXTURE\\Lava000.png",	// 海(下)
-		"data\\TEXTURE\\Lava001.png",	// 海(上)
+		"data\\TEXTURE\\Lava002.png",	// 海(下)
+		"data\\TEXTURE\\Lava003.png",	// 海(上)
 	},
 };
 
