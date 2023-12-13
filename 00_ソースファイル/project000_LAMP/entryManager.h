@@ -67,8 +67,8 @@ public:
 
 private:
 	// メンバ関数
-	void UpdateEntry(void);		// エントリーの更新
-	void UpdateStart(void);		// 開始の更新
+	void UpdateEntry(void);	// エントリーの更新
+	void UpdateStart(void);	// 開始の更新
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
@@ -77,6 +77,7 @@ private:
 	CEntryRuleManager *m_pRuleManager;	// エントリールールの情報
 	CValueUI *m_apNumber[MAX_PLAYER];	// プレイヤーナンバーの情報
 	CObject2D *m_apFrame[MAX_PLAYER];	// プレイヤーフレームの情報
+	CObject2D *m_apJoin[MAX_PLAYER];	// プレイヤー参加の情報
 	CObject2D *m_pControl;	// 操作表示の情報
 	CObject2D *m_pStart;	// 開始表示の情報
 	EState m_state;			// 状態

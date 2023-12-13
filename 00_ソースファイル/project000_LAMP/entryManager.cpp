@@ -32,7 +32,7 @@ namespace
 
 	namespace number
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(165.0f, 90.0f, 0.0f);		// 位置
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(165.0f, 60.0f, 0.0f);		// 位置
 		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// タイトル大きさ
 		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);		// 数字大きさ
 		const D3DXVECTOR3	SPACE_POS	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 数字UI同士の空白
@@ -43,8 +43,15 @@ namespace
 
 	namespace frame
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 360.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 440.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 280.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 340.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
+	}
+
+	namespace join
+	{
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 480.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 70.0f, 0.0f);		// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
 
@@ -83,6 +90,7 @@ CEntryManager::CEntryManager()
 	// メンバ変数をクリア
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
+	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	m_pRuleManager	= NULL;		// エントリールールの情報
 	m_pControl	= NULL;			// 操作表示の情報
 	m_pStart	= NULL;			// 開始表示の情報
@@ -105,6 +113,7 @@ HRESULT CEntryManager::Init(void)
 	// メンバ変数を初期化
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
+	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	m_pRuleManager	= NULL;		// エントリールールの情報
 	m_pControl	= NULL;			// 操作表示の情報
 	m_pStart	= NULL;			// 開始表示の情報
@@ -115,28 +124,6 @@ HRESULT CEntryManager::Init(void)
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
-
-		// プレイヤーフレームの生成
-		m_apFrame[nCntEntry] = CObject2D::Create
-		( // 引数
-			frame::POS + (frame::SPACE * (float)nCntEntry),	// 位置
-			frame::SIZE,	// 大きさ
-			VEC3_ZERO,		// 向き
-			COL_UNENTRY		// 色
-		);
-		if (m_apFrame[nCntEntry] == NULL)
-		{ // 生成に失敗した場合
-
-			// 失敗を返す
-			assert(false);
-			return E_FAIL;
-		}
-
-		// テクスチャを登録・割当
-		m_apFrame[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
-
-		// 優先順位を設定
-		m_apFrame[nCntEntry]->SetPriority(PRIORITY);
 
 		// プレイヤーナンバーの生成
 		m_apNumber[nCntEntry] = CValueUI::Create
@@ -167,6 +154,45 @@ HRESULT CEntryManager::Init(void)
 
 		// 数字を設定
 		m_apNumber[nCntEntry]->GetMultiValue()->SetNum(nCntEntry + 1);
+
+		// プレイヤーフレームの生成
+		m_apFrame[nCntEntry] = CObject2D::Create
+		( // 引数
+			frame::POS + (frame::SPACE * (float)nCntEntry),	// 位置
+			frame::SIZE,	// 大きさ
+			VEC3_ZERO,		// 向き
+			COL_UNENTRY		// 色
+		);
+		if (m_apFrame[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを登録・割当
+		m_apFrame[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+
+		// 優先順位を設定
+		m_apFrame[nCntEntry]->SetPriority(PRIORITY);
+
+		// プレイヤー参加の生成
+		m_apJoin[nCntEntry] = CObject2D::Create
+		( // 引数
+			join::POS + (join::SPACE * (float)nCntEntry),	// 位置
+			join::SIZE	// 大きさ
+		);
+		if (m_apJoin[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// 優先順位を設定
+		m_apJoin[nCntEntry]->SetPriority(PRIORITY);
 	}
 
 	// 操作表示の生成
@@ -243,6 +269,9 @@ HRESULT CEntryManager::Uninit(void)
 
 		// プレイヤーフレームの終了
 		m_apFrame[nCntEntry]->Uninit();
+
+		// プレイヤー参加の終了
+		m_apJoin[nCntEntry]->Uninit();
 	}
 
 	// 操作表示の終了
@@ -285,6 +314,9 @@ void CEntryManager::Update(void)
 
 			// プレイヤーフレームの更新
 			m_apFrame[nCntEntry]->Update();
+
+			// プレイヤー参加の更新
+			m_apJoin[nCntEntry]->Update();
 		}
 
 		// 操作表示の更新
