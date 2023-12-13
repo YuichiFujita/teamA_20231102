@@ -74,12 +74,14 @@ namespace
 	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
-	const float	NORMAL_JUMP_REV = 0.16f;	// 通常状態時の空中の移動量の減衰係数
+	const float	NORMAL_JUMP_REV	= 0.16f;	// 通常状態時の空中の移動量の減衰係数
 	const float	NORMAL_LAND_REV = 0.16f;	// 通常状態時の地上の移動量の減衰係数
 
-	const float	KNOCK_REV = 0.08f;	// ノック状態時の移動量の減衰係数
-	const float	REV_ROTA = 0.15f;	// 向き変更の補正係数
-	const float	STICK_REV = 0.00015f;	// スティックの傾き量の補正係数
+	const float	HOOK_LAND_REV	= 0.06f;	// フックショット状態時の地上の移動量の減衰係数
+
+	const float	KNOCK_REV	= 0.08f;	// ノック状態時の移動量の減衰係数
+	const float	REV_ROTA	= 0.15f;	// 向き変更の補正係数
+	const float	STICK_REV	= 0.00015f;	// スティックの傾き量の補正係数
 
 	const float	DEAD_ZONE = (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
 	const float	SPAWN_ADD_ALPHA = 0.0075f;			// スポーン状態時の透明度の加算量
@@ -131,7 +133,8 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_fSinAlpha = 0.0f;			// 透明向き
 	m_bDash = false;		// ダッシュ状況
 	m_bJump = false;		// ジャンプ状況
-	m_bAI = false;
+	m_bHook = false;
+	m_bAI = true;
 }
 
 //============================================================
@@ -1225,6 +1228,11 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	// 障害物との当たり判定
 	CollisionObstacle(posPlayer);
 
+	if (m_bHook)
+	{
+		CollisionPlayer(posPlayer);
+	}
+
 	// ステージ範囲外の補正
 	pStage->LimitPosition(posPlayer, RADIUS);
 
@@ -1414,6 +1422,7 @@ void CPlayer::UpdateDeath(void)
 
 	// フレイルを強制的に所持
 	m_pFlail->CatchFlail();
+	m_nCounterFlail = flail::FLAIL_DEF;
 
 	// 重力の更新
 	UpdateGravity();
@@ -1486,14 +1495,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 #endif
 
 	// 変数を宣言
-	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
-	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
+	D3DXVECTOR3 vecStickL = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	float fStickL = sqrtf(vecStickL.x * vecStickL.x + vecStickL.y * vecStickL.y) * 0.5f;	// スティックの倒し量
 
-	if (DEAD_ZONE < fStick)
+	if (DEAD_ZONE < fStickL)
 	{ // デッドゾーン以上の場合
 
 	  // 変数を宣言
-		float fMove = fStick * STICK_REV;	// プレイヤー移動量
+		float fMove = fStickL * STICK_REV;	// プレイヤー移動量
 
 		if (!m_bDash)
 		{ // ダッシュ中ではない場合
@@ -1516,7 +1525,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			currentMotion = MOTION_DASH;
 		}
 
-		if (m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1) || m_motionOld == MOTION_PULL)
+		if ((m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1) || m_motionOld == MOTION_PULL) && m_nCounterFlail == flail::FLAIL_DROP)
 		{ // 引きずり距離の場合
 
 		  // 移動量を更新
@@ -1545,13 +1554,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		m_destRot.y = atan2f(-m_move.x, -m_move.z);
 	}
 
-	vecStick = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
+	D3DXVECTOR3 vecStickR = D3DXVECTOR3((float)pPad->GetPressRStickX(m_nPadID), (float)pPad->GetPressRStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	D3DXVECTOR3 vec;
 	//ガイド表示計算
-	D3DXVec3Normalize(&vec, &D3DXVECTOR3(vecStick.x, 100.0f, -vecStick.y));
+	D3DXVec3Normalize(&vec, &D3DXVECTOR3(vecStickR.x, 100.0f, -vecStickR.y));
 	m_pGuide->SetVec3Position(GetVec3Position() + (vec * 300.0f));
-	m_pGuide->SetVec3Rotation(D3DXVECTOR3(0.0f, atan2f(vecStick.x, -vecStick.y), 0.0f));
-	if (vecStick != VEC3_ZERO)
+	m_pGuide->SetVec3Rotation(D3DXVECTOR3(0.0f, atan2f(vecStickR.x, -vecStickR.y), 0.0f));
+	if (vecStickR != VEC3_ZERO)
 	{
 		m_pGuide->SetEnableDraw(true);
 	}
@@ -1560,7 +1569,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		m_pGuide->SetEnableDraw(false);
 	}
 
-	fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
+	float fStickR = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y) * 0.5f;	// スティックの倒し量
+	m_bHook = false;
 
 																				// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
@@ -1575,6 +1585,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			if (m_nCounterFlail > flail::FLAIL_CHARGE)
 			{
 				m_nCounterFlail = flail::FLAIL_CHARGE;
+
+				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_CHAGE, m_nPadID);
 			}
 
 			// 溜めてる間鉄球を振り回す
@@ -1586,7 +1598,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x *= 1.0f - (0.0042f * m_nCounterFlail);
 			m_move.z *= 1.0f - (0.0042f * m_nCounterFlail);
 
-			if (DEAD_ZONE < fStick)
+			if (DEAD_ZONE < fStickR)
 			{
 				// 目標向きを設定
 				m_destRot.y = m_pFlail->GetChainRotTarget() + D3DX_PI;
@@ -1619,7 +1631,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				}
 			}
 
-			if (DEAD_ZONE < fStick)
+			if (DEAD_ZONE < fStickR)
 			{
 				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
 
@@ -1643,6 +1655,15 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			m_pFlail->SetLengthTarget(lengthTarget);
+
+			if (m_nCounterFlail == flail::FLAIL_CHARGE)
+			{
+				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_FULL, m_nPadID);
+			}
+			else
+			{
+				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_SHOT, m_nPadID);
+			}
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;
@@ -1713,18 +1734,18 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						m_nCounterFlail = -60;
 					}
 
-					if (m_nCounterFlail == -2)
+					if (m_nCounterFlail == -3)
 					{
-						float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
-						float rot2 = m_destRot.y;
+						float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID);
+						float rot2 = m_pFlail->GetChainRot();
 						float rot3 = rot2 - rot1;
 
 						useful::NormalizeRot(rot3);
 
-						if (DEAD_ZONE < fStick)
+						if (DEAD_ZONE < fStickR)
 						{ // デッドゾーン以上の場合
 
-							if (rot3 > 0.0f)
+							if (rot3 < 0.0f)
 							{
 								// 溜めてる間鉄球を振り回す
 								m_pFlail->SetChainRotMove(0.03f);
@@ -1754,14 +1775,22 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				if (m_nCounterFlail == flail::FLAIL_DROP)
 				{
 					D3DXVECTOR3 vecFlail = GetVec3Position() - m_pFlail->GetVec3Position();
-					float rotFlail;
+					vecFlail.y = 0.0f;
 
-					rotFlail = atan2f(vecFlail.x, vecFlail.z);
+					if (D3DXVec3Length(&vecFlail) > flail::FLAIL_RADIUS * 7.0f)
+					{
+						float rotFlail;
+						rotFlail = atan2f(vecFlail.x, vecFlail.z);
 
-					// 移動量を更新
-					m_move.x += sinf(rotFlail + D3DX_PI) * 10.0f;
-					m_move.y = 1.0f;
-					m_move.z += cosf(rotFlail + D3DX_PI) * 10.0f;
+						// 移動量を更新
+						m_move.x += sinf(rotFlail + D3DX_PI) * 10.0f;
+						m_move.y = 1.0f;
+						m_move.z += cosf(rotFlail + D3DX_PI) * 10.0f;
+
+						m_destRot.y = rotFlail;
+
+						m_bHook = true;
+					}
 				}
 			}
 
@@ -1784,7 +1813,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		}
 	}
 
-	if (DEAD_ZONE < fStick)
+	if (DEAD_ZONE < fStickR)
 	{ // デッドゾーン以上の場合
 		m_pFlail->SetChainRotTarget(CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f);
 	}
@@ -2368,6 +2397,47 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 
 				// 次のオブジェクトへのポインタを代入
 				pObjCheck = pObjectNext;
+			}
+		}
+	}
+
+	// 判定情報を返す
+	return bHit;
+}
+
+//============================================================
+//	プレイヤーとの当たり判定
+//============================================================
+bool CPlayer::CollisionPlayer(D3DXVECTOR3& rPos)
+{
+	CPlayer *playerthis = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+
+	// 変数を宣言
+	bool bHit = false;	// 着地の判定情報
+
+	for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
+	{
+		CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(nCntPlayer);
+
+		if (player != NULL && nCntPlayer != m_nPadID && player->GetState() != CPlayer::STATE_DEATH)
+		{
+			D3DXVECTOR3 vec;
+			float length;
+
+			// プレイヤーとフレイルのベクトルを求める
+			vec = player->GetVec3Position() - GetVec3Position();
+			vec.y = 0.0f;	// Yは無視
+
+							// 距離を求める
+			length = D3DXVec3Length(&vec);
+
+			// 吹っ飛びベクトルを正規化
+			D3DXVec3Normalize(&vec, &vec);
+
+			if (length < (player->GetRadius()) * 3.0f)
+			{
+				// ダメージヒット処理
+				player->HitKnockBack(20, vec, playerthis);
 			}
 		}
 	}

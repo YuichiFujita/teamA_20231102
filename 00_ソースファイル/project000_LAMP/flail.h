@@ -152,6 +152,7 @@ private:
 	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
 	float		m_fLengthTarget;				// 鎖の長さ目標
+	bool		m_bHit;							// 鎖の衝突チェック
 
 };
 

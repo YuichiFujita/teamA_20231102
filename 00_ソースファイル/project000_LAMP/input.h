@@ -167,6 +167,9 @@ public:
 		TYPE_BIG_DAMAGE,	// 大ダメージ
 		TYPE_DEATH,			// 死亡
 		TYPE_WALLDASH,		// 壁走り
+		TYPE_FLAIL_CHAGE,	// フレイルの溜め
+		TYPE_FLAIL_SHOT,	// フレイル投げ
+		TYPE_FLAIL_FULL,	// フレイル最大溜め投げ
 		TYPE_MAX			// この列挙型の総数
 	};
 
