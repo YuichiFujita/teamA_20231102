@@ -754,6 +754,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				//ƒtƒŒƒCƒ‹“®ŽŒ‚Ì“–‚½‚è”»’è
 				if (flailLength < RADIUS * 3.0f)
 				{
+					CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 60, 60, 300, 1.0f, 0.99f);
 					float rotMove1, rotMove2;
 					rotMove1 = GetChainRotMove();
 					rotMove2 = player->GetFlail()->GetChainRotMove();
