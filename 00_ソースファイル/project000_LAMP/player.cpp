@@ -2409,6 +2409,8 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 //============================================================
 bool CPlayer::CollisionPlayer(D3DXVECTOR3& rPos)
 {
+	CPlayer *playerthis = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+
 	// 変数を宣言
 	bool bHit = false;	// 着地の判定情報
 
@@ -2434,7 +2436,7 @@ bool CPlayer::CollisionPlayer(D3DXVECTOR3& rPos)
 			if (length < (player->GetRadius()) * 3.0f)
 			{
 				// ダメージヒット処理
-				player->HitKnockBack(20, vec);
+				player->HitKnockBack(20, vec, playerthis);
 			}
 		}
 	}
