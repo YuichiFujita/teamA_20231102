@@ -21,6 +21,7 @@
 #include "obstacle.h"
 #include "block.h"
 #include "sound.h"
+#include "orbitalParticle.h"
 
 //************************************************************
 //	íËêîêÈåæ
@@ -753,6 +754,12 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			CollisionBlock(CPlayer::AXIS_X, rPos) ||
 			CollisionBlock(CPlayer::AXIS_Z, rPos))
 		{
+			int nParticle = (int)(m_move.x + m_move.y + m_move.z);
+			nParticle *= 0.05f;
+		
+			nParticle += 15;
+			
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 600, 60, 120, nParticle, 0.5f, 0.99f);
 			m_fLengthTarget = m_fLengthChain;
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
