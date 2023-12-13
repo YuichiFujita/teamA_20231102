@@ -453,9 +453,21 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 					CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
 
 					if (pPlayer->GetPadID() == nPlayerID)
-					{ // パッドインデックスが同一の場合
+					{ // 今回死亡したプレイヤーの場合
 
-						int a = 0;
+						CPlayer *pPlayerAttack = pPlayer->GetLastAttackPlayer();	// 最終攻撃プレイヤー情報
+						if (pPlayerAttack == NULL)
+						{ // 攻撃されていない場合
+
+							break;
+						}
+
+						if (pPlayerAttack->GetState() != CPlayer::STATE_DEATH)
+						{ // 最後に攻撃してきたプレイヤーが生きている場合
+
+							// 最終攻撃を与えたプレイヤーの勝利ポイントを加算
+							m_aPlayerWin[pPlayerAttack->GetPadID()]++;
+						}
 					}
 				}
 

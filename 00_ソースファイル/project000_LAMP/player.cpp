@@ -52,24 +52,25 @@ namespace
 {
 	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
 
-	const int	PRIORITY	= 3;		// プレイヤーの優先順位
-	const float	GRAVITY		= 1.0f;		// 重力
-	const float	RADIUS		= 50.0f;	// 半径
-	const float	HEIGHT		= 100.0f;	// 縦幅
+	const int	PRIORITY = 3;		// プレイヤーの優先順位
+	const float	GRAVITY = 1.0f;		// 重力
+	const float	RADIUS = 50.0f;	// 半径
+	const float	HEIGHT = 100.0f;	// 縦幅
 
-	const float	DASH_UP			= 10.0f;	// ダッシュ上昇量
-	const float	DASH_SIDE		= 15.0f;	// ダッシュ横移動量
-	const float	DASH_REV		= 0.25f;	// ダッシュの減算係数
-	const float	DASH_MINMOVE	= 0.06f;	// ダッシュ再度可能になる移動量
+	const float	DASH_UP = 10.0f;	// ダッシュ上昇量
+	const float	DASH_SIDE = 15.0f;	// ダッシュ横移動量
+	const float	DASH_REV = 0.25f;	// ダッシュの減算係数
+	const float	DASH_MINMOVE = 0.06f;	// ダッシュ再度可能になる移動量
 
-	const float	KNOCK_UP	= 15.0f;	// ノック上昇量
-	const float	KNOCK_SIDE	= 35.0f;	// ノック横移動量
-	const int	DMG_KILLY	= 50;		// キルY座標のダメージ量
+	const float	KNOCK_UP = 15.0f;	// ノック上昇量
+	const float	KNOCK_SIDE = 35.0f;	// ノック横移動量
+	const int	DMG_KILLY = 50;		// キルY座標のダメージ量
 
 	const float MAX_KNOCK_RATE	= 4.0f;		// 最大吹っ飛び倍率
 	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
 	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
 	const int	DROWN_CNT		= 120;		// 溺れ時間のフレーム数
+	const int	FINALATTACK_CNT	= 600;		// 最後に攻撃したプレイヤーの保持時間のフレーム数
 	const float	ADD_SINROT		= 0.25f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 	const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 
@@ -82,8 +83,8 @@ namespace
 	const float	REV_ROTA	= 0.15f;	// 向き変更の補正係数
 	const float	STICK_REV	= 0.00015f;	// スティックの傾き量の補正係数
 
-	const float	DEAD_ZONE	= (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
-	const float	SPAWN_ADD_ALPHA		= 0.0075f;			// スポーン状態時の透明度の加算量
+	const float	DEAD_ZONE = (float)USHRT_MAX * 0.01f;	// スティックの無視する傾き量
+	const float	SPAWN_ADD_ALPHA = 0.0075f;			// スポーン状態時の透明度の加算量
 }
 
 //************************************************************
@@ -116,22 +117,24 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPadID(nPad)
 {
 	// メンバ変数をクリア
-	m_pStatus		= NULL;			// ステータスの情報
-	m_pFlail		= NULL;			// フレイルの情報
-	m_oldPos		= VEC3_ZERO;	// 過去位置
-	m_move			= VEC3_ZERO;	// 移動量
-	m_destRot		= VEC3_ZERO;	// 目標向き
-	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
-	m_state			= STATE_NONE;	// 状態
-	m_motionOld		= 0;			// 過去モーション
-	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nCounterFlail	= 0;			// フレイル管理カウンター
-	m_fPlusMove		= 0.0f;			// プラス移動量
-	m_fSinAlpha		= 0.0f;			// 透明向き
-	m_bDash			= false;		// ダッシュ状況
-	m_bJump			= false;		// ジャンプ状況
-	m_bHook			= false;
-	m_bAI			= false;
+	m_pStatus = NULL;			// ステータスの情報
+	m_pFlail = NULL;			// フレイルの情報
+	m_pFinalAttack = NULL;			// 攻撃者の情報
+	m_oldPos = VEC3_ZERO;	// 過去位置
+	m_move = VEC3_ZERO;	// 移動量
+	m_destRot = VEC3_ZERO;	// 目標向き
+	m_dashRot = VEC3_ZERO;	// ダッシュ向き
+	m_state = STATE_NONE;	// 状態
+	m_motionOld = 0;			// 過去モーション
+	m_nCounterState = 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
+	m_nCounterAttack = 0;			// 最終攻撃カウンター
+	m_fPlusMove = 0.0f;			// プラス移動量
+	m_fSinAlpha = 0.0f;			// 透明向き
+	m_bDash = false;		// ダッシュ状況
+	m_bJump = false;		// ジャンプ状況
+	m_bHook = false;
+	m_bAI = false;
 }
 
 //============================================================
@@ -148,27 +151,31 @@ CPlayer::~CPlayer()
 HRESULT CPlayer::Init(void)
 {
 	// メンバ変数を初期化
-	m_pStatus		= NULL;			// ステータスの情報
-	m_pFlail		= NULL;			// フレイルの情報
-	m_oldPos		= VEC3_ZERO;	// 過去位置
-	m_move			= VEC3_ZERO;	// 移動量
-	m_destRot		= VEC3_ZERO;	// 目標向き
-	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
-	m_state			= STATE_NONE;	// 状態
-	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nCounterFlail	= 0;			// フレイル管理カウンター
-	m_fPlusMove		= 0.0f;			// プラス移動量
-	m_fSinAlpha		= 0.0f;			// 透明向き
-	m_bDash			= false;		// ダッシュ状況
-	m_bJump			= true;			// ジャンプ状況
+	m_pStatus = NULL;			// ステータスの情報
+	m_pFlail = NULL;			// フレイルの情報
+	m_pFinalAttack = NULL;			// 攻撃者の情報
+	m_oldPos = VEC3_ZERO;	// 過去位置
+	m_move = VEC3_ZERO;	// 移動量
+	m_destRot = VEC3_ZERO;	// 目標向き
+	m_dashRot = VEC3_ZERO;	// ダッシュ向き
+	m_state = STATE_NONE;	// 状態
+	m_nCounterState = 0;			// 状態管理カウンター
+	m_nCounterFlail = 0;			// フレイル管理カウンター
+	m_nCounterAttack = 0;			// 最終攻撃カウンター
+	m_fPlusMove = 0.0f;			// プラス移動量
+	m_fSinAlpha = 0.0f;			// 透明向き
+	m_bDash = false;		// ダッシュ状況
+	m_bJump = true;			// ジャンプ状況
+
 	m_SItemPermanent[0] = {};
 	m_SItemPermanent[1] = {};
 	m_SItemTemporary = {};
+
 	// オブジェクトキャラクターの初期化
 	if (FAILED(CObjectChara::Init()))
 	{ // 初期化に失敗した場合
 
-		// 失敗を返す
+	  // 失敗を返す
 		assert(false);
 		return E_FAIL;
 	}
@@ -184,17 +191,17 @@ HRESULT CPlayer::Init(void)
 	if (m_pStatus == NULL)
 	{ // 非使用中の場合
 
-		// 失敗を返す
+	  // 失敗を返す
 		assert(false);
 		return E_FAIL;
 	}
 
 	// フレイルの生成
-	m_pFlail = CFlail::Create(*this,VEC3_ZERO);
+	m_pFlail = CFlail::Create(*this, VEC3_ZERO);
 	if (m_pFlail == NULL)
 	{ // 非使用中の場合
 
-		// 失敗を返す
+	  // 失敗を返す
 		assert(false);
 		return E_FAIL;
 	}
@@ -233,14 +240,16 @@ void CPlayer::Uninit(void)
 {
 	// ステータス情報の破棄
 	if (FAILED(m_pStatus->Release(m_pStatus)))
-	{ assert(false); }	// 破棄失敗
+	{
+		assert(false);
+	}	// 破棄失敗
 
-	// フレイルの終了
+		// フレイルの終了
 	m_pFlail->Uninit();
 
 	if (m_pAI != NULL)
 	{ // 使用中の場合
-		// メモリ開放
+	  // メモリ開放
 		delete m_pAI;
 		m_pAI = NULL;
 	}
@@ -271,7 +280,7 @@ void CPlayer::Update(void)
 		if (m_state != STATE_DEATH)
 		{ // 死亡していない場合
 
-			// 生存ランキングを更新 (一位を設定)
+		  // 生存ランキングを更新 (一位を設定)
 			CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 		}
 	}
@@ -331,6 +340,7 @@ void CPlayer::Update(void)
 		assert(false);
 		break;
 	}
+
 	if (m_SItemTemporary.type != ITEM_EMPTY)
 	{
 		m_SItemTemporary.nLife--;
@@ -341,6 +351,16 @@ void CPlayer::Update(void)
 		}
 	}
 
+	// 攻撃の保持カウンターの管理
+	if (m_pFinalAttack != NULL)
+	{
+		m_nCounterAttack++;
+		if (m_nCounterAttack >= FINALATTACK_CNT)
+		{
+			m_pFinalAttack = NULL;
+			m_nCounterAttack = 0;
+		}
+	}
 
 	// フレイルの更新
 	m_pFlail->Update();
@@ -362,10 +382,10 @@ void CPlayer::Draw(void)
 
 	// ステンシルテストを有効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
-	
+
 	// 比較参照値を設定する
 	pDevice->SetRenderState(D3DRS_STENCILREF, 1);
-	
+
 	// ステンシルマスクを指定する 
 	pDevice->SetRenderState(D3DRS_STENCILMASK, 255);
 
@@ -373,9 +393,9 @@ void CPlayer::Draw(void)
 	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_GREATEREQUAL);
 
 	// ステンシル結果に対しての反映設定
-	pDevice->SetRenderState(D3DRS_STENCILPASS,	D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
-	pDevice->SetRenderState(D3DRS_STENCILFAIL,	D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL,	D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
 
 	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
@@ -448,128 +468,9 @@ void CPlayer::SetItemPermanent(EItem Item)
 			return;
 		}
 	}
-	
+
 	m_SItemPermanent[0].type = m_SItemPermanent[1].type;
 	m_SItemPermanent[1].type = Item;
-}
-//============================================================
-//	ノックバックヒット処理
-//============================================================
-void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
-{
-	
-	if (IsDeath())
-	{ // 死亡フラグが立っている場合
-
-		return;
-	}
-
-	if (m_state != STATE_NORMAL)
-	{ // 通常状態ではない場合
-
-		return;
-	}
-
-	// 変数を宣言
-	bool bDeath = false;	// 死亡状況
-
-	// 死亡状況の設定
-	{
-		// ポインタを宣言
-		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-
-		switch (pRetention->GetKillState())
-		{ // 討伐条件ごとの処理
-		case CRetentionManager::KILL_LIFE:	// 体力制
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がすでにない場合
-
-				return;
-			}
-
-			// 体力にダメージを与える
-			m_pStatus->AddNumLife(-nDmg);
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がなくなった場合
-
-				// 死亡状態にする
-				bDeath = true;
-			}
-
-			break;
-
-		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
-			break;
-
-		default:
-			assert(false);
-			break;
-		}
-	}
-
-	// 状態の設定
-	{
-		// 変数を宣言
-		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
-		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
-
-		// カウンターを初期化
-		m_nCounterState = 0;
-
-		if (bDeath)
-		{ // 死亡している場合
-
-			// 死亡状態を設定
-			SetState(STATE_DEATH);
-
-			// 死亡モーションを設定
-			SetMotion(MOTION_DEATH);
-
-			// 爆発パーティクルを生成
-		
-
-		}
-		else
-		{ // 死亡していない場合
-
-			// NAKAMURA：ふっとび量の決め方きもければ変えて
-			// 変数を宣言
-			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
-
-			// ノックバック移動量を設定
-			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
-			m_move.y = KNOCK_UP;
-			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
-
-			// ノックバック方向に向きを設定
-			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
-			m_destRot.y = rotPlayer.y;	// 目標向きを設定
-			SetVec3Rotation(rotPlayer);	// 向きを設定
-
-			// 空中状態にする
-			m_bJump = true;
-
-			// ノック状態を設定
-			SetState(STATE_KNOCK);
-
-			// 吹っ飛びモーションを設定
-			SetMotion(MOTION_KNOCK);
-
-			// 爆発パーティクルを生成
-
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f,0.99f);
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
-		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
-	}
-
-	// NAKAMURA：吹っ飛び率の決め方は任せます
-	// 吹っ飛び率を加算
-	m_pStatus->AddNumRate(100);
 }
 
 //============================================================
@@ -663,7 +564,7 @@ D3DXMATRIX CPlayer::GetMtxWorld(void) const
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-	// ワールドマトリックスの初期化
+												// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtxWorld);
 
 	// 向きを反映
@@ -689,7 +590,7 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 	if (pPlayer == NULL)
 	{ // 使用されていない場合
 
-		// モードオーバー
+	  // モードオーバー
 		assert(mode > NONE_IDX && mode < CScene::MODE_MAX);
 
 		switch (mode)
@@ -714,11 +615,11 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 	if (pPlayer != NULL)
 	{ // 使用されている場合
 
-		// プレイヤーの初期化
+	  // プレイヤーの初期化
 		if (FAILED(pPlayer->Init()))
 		{ // 初期化に失敗した場合
 
-			// メモリ開放
+		  // メモリ開放
 			delete pPlayer;
 			pPlayer = NULL;
 
@@ -732,6 +633,235 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 }
 
 //============================================================
+//	ノックバックヒット処理
+//============================================================
+void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer *pAttack)
+{
+	if (IsDeath())
+	{ // 死亡フラグが立っている場合
+
+		return;
+	}
+
+	if (m_state != STATE_NORMAL)
+	{ // 通常状態ではない場合
+
+		return;
+	}
+
+	// 変数を宣言
+	bool bDeath = false;	// 死亡状況
+
+							// 死亡状況の設定
+	{
+		// ポインタを宣言
+		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+
+		switch (pRetention->GetKillState())
+		{ // 討伐条件ごとの処理
+		case CRetentionManager::KILL_LIFE:	// 体力制
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がすでにない場合
+
+				return;
+			}
+
+			// 体力にダメージを与える
+			m_pStatus->AddNumLife(-nDmg);
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がなくなった場合
+
+			  // 死亡状態にする
+				bDeath = true;
+			}
+
+			break;
+
+		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	// 状態の設定
+	{
+		// 変数を宣言
+		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
+
+													// 攻撃者の情報を保存
+		m_pFinalAttack = pAttack;
+		m_nCounterAttack = 0;	// 最終攻撃カウンター
+
+								// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
+		if (bDeath)
+		{ // 死亡している場合
+
+		  // 死亡状態を設定
+			SetState(STATE_DEATH);
+
+			// 死亡モーションを設定
+			SetMotion(MOTION_DEATH);
+		}
+		else
+		{ // 死亡していない場合
+
+		  // NAKAMURA：ふっとび量の決め方きもければ変えて
+		  // 変数を宣言
+			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
+
+																																// ノックバック移動量を設定
+			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
+			m_move.y = KNOCK_UP;
+			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
+
+			// ノックバック方向に向きを設定
+			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
+			m_destRot.y = rotPlayer.y;	// 目標向きを設定
+			SetVec3Rotation(rotPlayer);	// 向きを設定
+
+										// 空中状態にする
+			m_bJump = true;
+
+			// ノック状態を設定
+			SetState(STATE_KNOCK);
+
+			// 吹っ飛びモーションを設定
+			SetMotion(MOTION_KNOCK);
+
+			// 爆発パーティクルを生成
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
+		}
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
+	}
+
+	// NAKAMURA：吹っ飛び率の決め方は任せます
+	// 吹っ飛び率を加算
+	m_pStatus->AddNumRate(100);
+}
+
+//============================================================
+//	キルY座標ヒット処理
+//============================================================
+void CPlayer::HitKillY(const int nDmg)
+{
+	if (IsDeath())
+	{ // 死亡フラグが立っている場合
+
+		return;
+	}
+
+	if (m_state != STATE_NORMAL
+		&&  m_state != STATE_KNOCK
+		&&  m_state != STATE_INVULN)
+	{ // 通常・ノック・無敵状態ではない場合
+
+		return;
+	}
+
+	// 変数を宣言
+	bool bDeath = false;	// 死亡状況
+
+							// 死亡状況の設定
+	{
+		// ポインタを宣言
+		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+		if (CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetType() == CLiquid::TYPE_SEA)
+		{
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 300, 0.2f, 0.99f);
+		}
+		else
+		{
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(15.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.1f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -2.5f, 0.0f), 12, 600, 60, 120, 150, 0.2f, 0.99f);
+		}
+
+		switch (pRetention->GetKillState())
+		{ // 討伐条件ごとの処理
+		case CRetentionManager::KILL_LIFE:	// 体力制
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がすでにない場合
+
+				return;
+			}
+
+			// 体力にダメージを与える
+			m_pStatus->AddNumLife(-nDmg);
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がなくなった場合
+
+			  // 死亡状態にする
+				bDeath = true;
+			}
+
+			break;
+
+		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
+
+											// 死亡状態にする
+			bDeath = true;
+
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	// 状態の設定
+	{
+		// 変数を宣言
+		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+
+													// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
+		if (bDeath)
+		{ // 死亡している場合
+
+		  // 死亡状態を設定
+			SetState(STATE_DEATH);
+
+			// 死亡モーションを設定
+			SetMotion(MOTION_DEATH);
+
+		}
+		else
+		{ // 死亡していない場合
+
+		  // 溺れ状態を設定
+			SetState(STATE_DROWN);
+
+			// 溺れモーションを設定
+			SetMotion(MOTION_DROWN);
+
+
+		}
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
+	}
+}
+
+//============================================================
 //	出現の設定処理
 //============================================================
 void CPlayer::SetSpawn(void)
@@ -741,7 +871,7 @@ void CPlayer::SetSpawn(void)
 	if (pSpawnPoint != NULL)
 	{ // スポーンポイントがある場合
 
-		// 位置を設定
+	  // 位置を設定
 		SetVec3Position(pSpawnPoint->GetVec3Position());
 
 		// 向きを設定
@@ -753,7 +883,7 @@ void CPlayer::SetSpawn(void)
 	else
 	{ // スポーンポイントがない場合
 
-		// 位置を設定
+	  // 位置を設定
 		SetVec3Position(VEC3_ZERO);
 
 		// 向きを設定
@@ -765,10 +895,10 @@ void CPlayer::SetSpawn(void)
 	SetState(STATE_SPAWN);	// スポーン状態の設定
 	SetMotion(MOTION_IDOL);	// 待機モーションを設定
 
-	// カウンターを初期化
+							// カウンターを初期化
 	m_nCounterState = 0;	// 状態管理カウンター
 
-	// 移動量を初期化
+							// 移動量を初期化
 	m_move = VEC3_ZERO;
 
 	// フレイルを強制的に所持
@@ -779,7 +909,7 @@ void CPlayer::SetSpawn(void)
 
 	// マテリアルを再設定
 	ResetMaterial();
-	
+
 	// メインカラーを設定
 	SetMainMaterial();
 
@@ -804,12 +934,12 @@ void CPlayer::SetInvuln(void)
 	// 情報を初期化
 	SetState(STATE_INVULN);	// 無敵状態の設定
 
-	// カウンターを初期化
+							// カウンターを初期化
 	m_nCounterState = 0;	// 状態管理カウンター
 
-	// マテリアルを再設定
+							// マテリアルを再設定
 	ResetMaterial();
-	
+
 	// メインカラーを設定
 	SetMainMaterial();
 
@@ -832,105 +962,8 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
 	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 
-	// UIの描画状況を設定
+											// UIの描画状況を設定
 	m_pStatus->SetEnableDrawUI(bDraw);
-}
-
-//============================================================
-//	キルY座標ヒット処理
-//============================================================
-void CPlayer::HitKillY(const int nDmg)
-{
-	if (IsDeath())
-	{ // 死亡フラグが立っている場合
-
-		return;
-	}
-
-	if (m_state != STATE_NORMAL
-	&&  m_state != STATE_KNOCK
-	&&  m_state != STATE_INVULN)
-	{ // 通常・ノック・無敵状態ではない場合
-
-		return;
-	}
-
-	// 変数を宣言
-	bool bDeath = false;	// 死亡状況
-
-	// 死亡状況の設定
-	{
-		// ポインタを宣言
-		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-		CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 600, 0.2f, 0.99f);
-		switch (pRetention->GetKillState())
-		{ // 討伐条件ごとの処理
-		case CRetentionManager::KILL_LIFE:	// 体力制
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がすでにない場合
-
-				return;
-			}
-
-			// 体力にダメージを与える
-			m_pStatus->AddNumLife(-nDmg);
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がなくなった場合
-
-				// 死亡状態にする
-				bDeath = true;
-			}
-
-			break;
-
-		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
-
-			// 死亡状態にする
-			bDeath = true;
-
-			break;
-
-		default:
-			assert(false);
-			break;
-		}
-	}
-
-	// 状態の設定
-	{
-		// 変数を宣言
-		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
-
-		// カウンターを初期化
-		m_nCounterState = 0;
-
-		if (bDeath)
-		{ // 死亡している場合
-
-			// 死亡状態を設定
-			SetState(STATE_DEATH);
-
-			// 死亡モーションを設定
-			SetMotion(MOTION_DEATH);
-
-		}
-		else
-		{ // 死亡していない場合
-
-			// 溺れ状態を設定
-			SetState(STATE_DROWN);
-
-			// 溺れモーションを設定
-			SetMotion(MOTION_DROWN);
-
-		
-		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
-	}
 }
 
 //============================================================
@@ -940,6 +973,14 @@ int CPlayer::GetPadID(void) const
 {
 	// パッドインデックスを返す
 	return m_nPadID;
+}
+
+//============================================================
+//	最後に攻撃してきたプレイヤーの取得処理
+//============================================================
+CPlayer *CPlayer::GetLastAttackPlayer(void) const
+{
+	return m_pFinalAttack;
 }
 
 //============================================================
@@ -975,7 +1016,7 @@ void CPlayer::SetMainMaterial(void)
 	for (int nCntPlayer = 0; nCntPlayer < MODEL_MAX; nCntPlayer++)
 	{ // パーツの最大数分繰り返す
 
-		// モデルの先頭マテリアルを設定
+	  // モデルの先頭マテリアルを設定
 		SetMaterial(GetMainMaterial(), nCntPlayer, 0);
 	}
 }
@@ -989,22 +1030,22 @@ D3DXMATERIAL CPlayer::GetMainMaterial(void)
 	{ // パッドインデックスごとの処理
 	case PLAYER_RED:	// プレイヤー1：赤
 
-		// 赤マテリアルを返す
+						// 赤マテリアルを返す
 		return material::Red();
 
 	case PLAYER_BLUE:	// プレイヤー2：青
 
-		// 青マテリアルを返す
+						// 青マテリアルを返す
 		return material::Blue();
 
 	case PLAYER_YELLOW:	// プレイヤー3：黄
 
-		// 黄マテリアルを返す
+						// 黄マテリアルを返す
 		return material::Yellow();
 
 	case PLAYER_GREEN:	// プレイヤー4：緑
 
-		// 緑マテリアルを返す
+						// 緑マテリアルを返す
 		return material::Green();
 
 	default:	// 例外処理
@@ -1032,7 +1073,7 @@ void CPlayer::UpdateMotion(int nMotion)
 			if (nAnimMotion != nMotion)
 			{ // 現在のモーションが再生中のモーションと一致しない場合
 
-				// 現在のモーションの設定
+			  // 現在のモーションの設定
 				SetMotion(nMotion);
 			}
 		}
@@ -1053,7 +1094,7 @@ void CPlayer::UpdateMotion(int nMotion)
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
 
-					// 現在のモーションの設定
+				  // 現在のモーションの設定
 					SetMotion(nMotion);
 				}
 
@@ -1085,7 +1126,7 @@ void CPlayer::UpdateMotion(int nMotion)
 		if (IsMotionFinish())
 		{ // モーションが終了していた場合
 
-			// 現在のモーションの設定
+		  // 現在のモーションの設定
 			SetMotion(nMotion);
 		}
 
@@ -1111,13 +1152,13 @@ CPlayer::EMotion CPlayer::UpdateSpawn(void)
 	// 変数を宣言
 	EMotion currentMotion = MOTION_IDOL;	// 現在のモーション
 
-	// フェードアウト状態時の更新
+											// フェードアウト状態時の更新
 	UpdateFadeOut(SPAWN_ADD_ALPHA);
 
 	if (GetAlpha() >= INVULN_ALPHA)
 	{ // 無敵時の透明度以上の場合
 
-		// 無敵の人にする
+	  // 無敵の人にする
 		SetInvuln();
 	}
 
@@ -1135,12 +1176,12 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-	// ポインタを宣言
+												// ポインタを宣言
 	CStage *pStage = CScene::GetStage();	// ステージ情報
 	if (pStage == NULL)
 	{ // ステージが使用されていない場合
 
-		// 処理を抜ける
+	  // 処理を抜ける
 		assert(false);
 		return MOTION_IDOL;
 	}
@@ -1205,7 +1246,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 	if (pStage->CollisionKillY(posPlayer))
 	{ // 死亡座標に到達していた場合
 
-		// キルY座標ヒット処理
+	  // キルY座標ヒット処理
 		HitKillY(DMG_KILLY);
 	}
 
@@ -1222,12 +1263,12 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-	// ポインタを宣言
+												// ポインタを宣言
 	CStage *pStage = CScene::GetStage();	// ステージ情報
 	if (pStage == NULL)
 	{ // ステージが使用されていない場合
 
-		// 処理を抜ける
+	  // 処理を抜ける
 		assert(false);
 		return MOTION_KNOCK;
 	}
@@ -1239,7 +1280,7 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 	if (UpdateLanding(posPlayer))
 	{ // 着地した場合
 
-		// 無敵の人にする
+	  // 無敵の人にする
 		SetInvuln();
 
 		// 着地モーションを設定
@@ -1265,7 +1306,7 @@ CPlayer::EMotion CPlayer::UpdateKnock(void)
 	if (pStage->CollisionKillY(posPlayer))
 	{ // 死亡座標に到達していた場合
 
-		// キルY座標ヒット処理
+	  // キルY座標ヒット処理
 		HitKillY(DMG_KILLY);
 	}
 
@@ -1281,11 +1322,11 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 	// 変数を宣言
 	float fAddAlpha = 0.0f;	// 透明度の加算量
 
-	// 透明度を上げる
+							// 透明度を上げる
 	m_fSinAlpha += ADD_SINROT;
 	useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
 
-	// 透明度加算量を求める
+										// 透明度加算量を求める
 	fAddAlpha = (MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
 
 	// 透明度を設定
@@ -1297,7 +1338,7 @@ CPlayer::EMotion CPlayer::UpdateInvuln(void)
 	if (m_nCounterState > INVULN_CNT)
 	{ // 無敵時間の終了カウントになった場合
 
-		// 通常状態を設定
+	  // 通常状態を設定
 		SetState(STATE_NORMAL);
 
 		// 透明度を不透明に再設定
@@ -1317,12 +1358,12 @@ CPlayer::EMotion CPlayer::UpdateDrown(void)
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-	// ポインタを宣言
+												// ポインタを宣言
 	CStage *pStage = CScene::GetStage();	// ステージ情報
 	if (pStage == NULL)
 	{ // ステージが使用されていない場合
 
-		// 処理を抜ける
+	  // 処理を抜ける
 		assert(false);
 	}
 
@@ -1353,7 +1394,7 @@ CPlayer::EMotion CPlayer::UpdateDrown(void)
 	if (m_nCounterState > DROWN_CNT)
 	{ // 溺れ時間の終了カウントになった場合
 
-		// 再出現させる
+	  // 再出現させる
 		SetSpawn();
 	}
 
@@ -1375,7 +1416,7 @@ void CPlayer::UpdateDeath(void)
 	if (pStage == NULL)
 	{ // ステージが使用されていない場合
 
-		// 処理を抜ける
+	  // 処理を抜ける
 		assert(false);
 	}
 
@@ -1418,14 +1459,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	EMotion currentMotion = MOTION_IDOL;		// 現在のモーション
 
-	// ポインタを宣言
-	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
-	CCamera			*pCamera	= CManager::GetInstance()->GetCamera();		// カメラ
+												// ポインタを宣言
+	CInputKeyboard	*pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad = CManager::GetInstance()->GetPad();		// パッド
+	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
 	if (pCamera == NULL) { assert(false); return MOTION_IDOL; }	// 非使用中
 
-	// PC操作
+																// PC操作
 #if 0
 	if (m_nPadID == 0)
 	{
@@ -1455,17 +1496,17 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	D3DXVECTOR3 vecStickL = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	float fStickL = sqrtf(vecStickL.x * vecStickL.x + vecStickL.y * vecStickL.y) * 0.5f;	// スティックの倒し量
-	
+
 	if (DEAD_ZONE < fStickL)
 	{ // デッドゾーン以上の場合
 
-		// 変数を宣言
+	  // 変数を宣言
 		float fMove = fStickL * STICK_REV;	// プレイヤー移動量
 
 		if (!m_bDash)
 		{ // ダッシュ中ではない場合
 
-			// 移動量を更新
+		  // 移動量を更新
 			m_move.x += sinf(pPad->GetPressLStickRot(m_nPadID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
 			m_move.z += cosf(pPad->GetPressLStickRot(m_nPadID) + pCamera->GetVec3Rotation().y + HALF_PI) * fMove;
 
@@ -1475,7 +1516,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		else
 		{ // ダッシュ中の場合
 
-			// 移動量を更新
+		  // 移動量を更新
 			m_move.x += sinf(m_dashRot.y) * fMove;
 			m_move.z += cosf(m_dashRot.y) * fMove;
 
@@ -1486,7 +1527,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		if ((m_pFlail->GetLengthChain() >= flail::FLAIL_RADIUS * (m_pFlail->GetNumChain() - 1) || m_motionOld == MOTION_PULL) && m_nCounterFlail == flail::FLAIL_DROP)
 		{ // 引きずり距離の場合
 
-			// 移動量を更新
+		  // 移動量を更新
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
 
@@ -1530,7 +1571,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	float fStickR = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y) * 0.5f;	// スティックの倒し量
 	m_bHook = false;
 
-	// カウンターの値によって挙動を変更
+																				// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
 
@@ -1793,13 +1834,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 void CPlayer::UpdateDash(void)
 {
 	// ポインタを宣言
-	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
-	CCamera			*pCamera	= CManager::GetInstance()->GetCamera();		// カメラ
+	CInputKeyboard	*pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad = CManager::GetInstance()->GetPad();		// パッド
+	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
 	if (pCamera == NULL) { assert(false); }	// 非使用中
 
-	// 変数を宣言
+											// 変数を宣言
 	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
@@ -1812,7 +1853,7 @@ void CPlayer::UpdateDash(void)
 			if (!m_bDash)
 			{ // ダッシュしていない場合
 
-				// 上移動量を加算
+			  // 上移動量を加算
 				m_move.y += DASH_UP;
 
 				// プラス移動量を加算
@@ -1838,7 +1879,7 @@ void CPlayer::UpdateDash(void)
 	if (m_bDash)
 	{ // ダッシュしている場合
 
-		// 移動量を更新
+	  // 移動量を更新
 		m_move.x += sinf(m_dashRot.y) * m_fPlusMove;
 		m_move.z += cosf(m_dashRot.y) * m_fPlusMove;
 
@@ -1848,7 +1889,7 @@ void CPlayer::UpdateDash(void)
 		if (fabsf(m_fPlusMove) < DASH_MINMOVE)
 		{ // 移動量が一定値より少なくなった場合
 
-			// 再ダッシュできるようにする
+		  // 再ダッシュできるようにする
 			m_fPlusMove = 0.0f;
 			m_bDash = false;
 		}
@@ -1872,7 +1913,7 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	bool bLand = false;	// 着地状況
 
-	// ジャンプしている状態にする
+						// ジャンプしている状態にする
 	m_bJump = true;
 
 	// 位置の更新
@@ -1880,7 +1921,7 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 	if (CollisionGroundBlock(rPos))
 	{ // 地盤に着地していた場合
 
-		// 着地している状態にする
+	  // 着地している状態にする
 		bLand = true;
 
 		// ジャンプしていない状態にする
@@ -1891,7 +1932,7 @@ bool CPlayer::UpdateLanding(D3DXVECTOR3& rPos)
 	if (CScene::GetStage()->LandFieldPosition(rPos, m_move))
 	{ // プレイヤーが着地していた場合
 
-		// 着地している状態にする
+	  // 着地している状態にする
 		bLand = true;
 
 		// ジャンプしていない状態にする
@@ -1910,7 +1951,7 @@ void CPlayer::UpdateRotation(D3DXVECTOR3& rRot)
 	// 変数を宣言
 	float fDiffRot = 0.0f;	// 差分向き
 
-	// 目標向きの正規化
+							// 目標向きの正規化
 	useful::NormalizeRot(m_destRot.y);
 
 	// 目標向きまでの差分を計算
@@ -1935,7 +1976,7 @@ bool CPlayer::UpdateFadeOut(const float fAdd)
 	bool bAlpha = false;		// 透明状況
 	float fAlpha = GetAlpha();	// 透明度
 
-	// プレイヤー自身の描画を再開
+								// プレイヤー自身の描画を再開
 	CObject::SetEnableDraw(true);
 
 	// 透明度を上げる
@@ -1944,7 +1985,7 @@ bool CPlayer::UpdateFadeOut(const float fAdd)
 	if (fAlpha >= GetMaxAlpha())
 	{ // 透明度が上がり切った場合
 
-		// 透明度を補正
+	  // 透明度を補正
 		fAlpha = GetMaxAlpha();
 
 		// 不透明になり切った状態にする
@@ -1967,13 +2008,13 @@ bool CPlayer::UpdateFadeIn(const float fSub)
 	bool bAlpha = false;		// 透明状況
 	float fAlpha = GetAlpha();	// 透明度
 
-	// 透明度を下げる
+								// 透明度を下げる
 	fAlpha -= fSub;
 
 	if (fAlpha <= 0.0f)
 	{ // 透明度が下がり切った場合
 
-		// 透明度を補正
+	  // 透明度を補正
 		fAlpha = 0.0f;
 
 		// 透明になり切った状態にする
@@ -2005,31 +2046,31 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
 
-		// ポインタを宣言
+	  // ポインタを宣言
 		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
 
 		if (pObjectTop != NULL)
 		{ // 先頭が存在する場合
 
-			// ポインタを宣言
+		  // ポインタを宣言
 			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
 
 			while (pObjCheck != NULL)
 			{ // オブジェクトが使用されている場合繰り返す
 
-				// 変数を宣言
+			  // 変数を宣言
 				D3DXVECTOR3 posGround = VEC3_ZERO;		// 地盤位置
 				D3DXVECTOR3 rotGround = VEC3_ZERO;		// 地盤向き
 				D3DXVECTOR3 sizeMinGround = VEC3_ZERO;	// 地盤最小大きさ
 				D3DXVECTOR3 sizeMaxGround = VEC3_ZERO;	// 地盤最大大きさ
 
-				// ポインタを宣言
+														// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
 				if (pObjCheck->GetLabel() != CObject::LABEL_GROUND)
 				{ // オブジェクトラベルが地盤ではない場合
 
-					// 次のオブジェクトへのポインタを代入
+				  // 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
 
 					// 次の繰り返しに移行
@@ -2046,7 +2087,7 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 				sizeMinGround = pObjCheck->GetVec3Sizing();
 				sizeMinGround.y *= 2.0f;	// 縦の大きさを倍にする
 
-				// 地盤の最大の大きさを設定
+											// 地盤の最大の大きさを設定
 				sizeMaxGround = pObjCheck->GetVec3Sizing();
 				sizeMaxGround.y = 0.0f;		// 縦の大きさを初期化
 
@@ -2054,7 +2095,7 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 				{ // 判定軸ごとの処理
 				case AXIS_X:	// X軸
 
-					// X軸の衝突判定
+								// X軸の衝突判定
 					collision::ResponseSingleX
 					( // 引数
 						rPos,			// 判定位置
@@ -2071,7 +2112,7 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 
 				case AXIS_Y:	// Y軸
 
-					// Y軸の衝突判定
+								// Y軸の衝突判定
 					collision::ResponseSingleY
 					( // 引数
 						rPos,			// 判定位置
@@ -2091,7 +2132,7 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 					if (bMax)
 					{ // 上から当たっていた場合
 
-						// 着地している状況にする
+					  // 着地している状況にする
 						bHit = true;
 					}
 
@@ -2099,7 +2140,7 @@ bool CPlayer::ResponseSingleGround(const EAxis axis, D3DXVECTOR3& rPos)
 
 				case AXIS_Z:	// Z軸
 
-					// Z軸の衝突判定
+								// Z軸の衝突判定
 					collision::ResponseSingleZ
 					( // 引数
 						rPos,			// 判定位置
@@ -2142,30 +2183,30 @@ bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
 
-		// ポインタを宣言
+	  // ポインタを宣言
 		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
 
 		if (pObjectTop != NULL)
 		{ // 先頭が存在する場合
 
-			// ポインタを宣言
+		  // ポインタを宣言
 			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
 
 			while (pObjCheck != NULL)
 			{ // オブジェクトが使用されている場合繰り返す
 
-				// 変数を宣言
+			  // 変数を宣言
 				D3DXVECTOR3 posBlock = VEC3_ZERO;	// ブロック位置
 				D3DXVECTOR3 rotBlock = VEC3_ZERO;	// ブロック向き
 				D3DXVECTOR3 sizeBlock = VEC3_ZERO;	// ブロック大きさ
 
-				// ポインタを宣言
+													// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
 				if (pObjCheck->GetLabel() != CObject::LABEL_BLOCK)
 				{ // オブジェクトラベルがブロックではない場合
 
-					// 次のオブジェクトへのポインタを代入
+				  // 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
 
 					// 次の繰り返しに移行
@@ -2185,7 +2226,7 @@ bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
 				{ // 判定軸ごとの処理
 				case AXIS_X:	// X軸
 
-					// X軸の衝突判定
+								// X軸の衝突判定
 					collision::ResponseSingleX
 					( // 引数
 						rPos,			// 判定位置
@@ -2203,7 +2244,7 @@ bool CPlayer::ResponseSingleBlock(const EAxis axis, D3DXVECTOR3& rPos)
 
 				case AXIS_Z:	// Z軸
 
-					// Z軸の衝突判定
+								// Z軸の衝突判定
 					collision::ResponseSingleZ
 					( // 引数
 						rPos,			// 判定位置
@@ -2243,7 +2284,7 @@ bool CPlayer::CollisionGroundBlock(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	bool bLand = false;	// 着地状況
 
-	// 移動量を加算
+						// 移動量を加算
 	rPos.x += m_move.x;
 
 	// X軸の当たり判定
@@ -2272,7 +2313,7 @@ bool CPlayer::CollisionGroundBlock(D3DXVECTOR3& rPos)
 	else
 	{ // それ以外の状態の場合
 
-		// 移動量を減衰
+	  // 移動量を減衰
 		if (m_bJump)
 		{ // 空中の場合
 
@@ -2302,32 +2343,32 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 	for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 	{ // 優先順位の総数分繰り返す
 
-		// ポインタを宣言
+	  // ポインタを宣言
 		CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
 
 		if (pObjectTop != NULL)
 		{ // 先頭が存在する場合
 
-			// ポインタを宣言
+		  // ポインタを宣言
 			CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
 
 			while (pObjCheck != NULL)
 			{ // オブジェクトが使用されている場合繰り返す
 
-				// 変数を宣言
+			  // 変数を宣言
 				CObstacle::SStatusInfo status;		// 障害物ステータス
 				D3DXVECTOR3 posObs = VEC3_ZERO;		// 障害物位置
 				D3DXVECTOR3 rotObs = VEC3_ZERO;		// 障害物向き
 				D3DXVECTOR3 sizeObsMin = VEC3_ZERO;	// 障害物大きさ
 				D3DXVECTOR3 sizeObsMax = VEC3_ZERO;	// 障害物大きさ
 
-				// ポインタを宣言
+													// ポインタを宣言
 				CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
 
 				if (pObjCheck->GetLabel() != CObject::LABEL_OBSTACLE)
 				{ // オブジェクトラベルが障害物ではない場合
 
-					// 次のオブジェクトへのポインタを代入
+				  // 次のオブジェクトへのポインタを代入
 					pObjCheck = pObjectNext;
 
 					// 次の繰り返しに移行
@@ -2411,20 +2452,20 @@ void CPlayer::LoadSetup(void)
 	CMotion::SMotionInfo info;		// ポーズの代入用
 	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
 	D3DXVECTOR3 rot = VEC3_ZERO;	// 向きの代入用
-	int nID			= 0;	// インデックスの代入用
-	int nParentID	= 0;	// 親インデックスの代入用
-	int nNowPose	= 0;	// 現在のポーズ番号
-	int nNowKey		= 0;	// 現在のキー番号
-	int nLoop		= 0;	// ループのON/OFFの変換用
-	int nEnd		= 0;	// テキスト読み込み終了の確認用
+	int nID = 0;	// インデックスの代入用
+	int nParentID = 0;	// 親インデックスの代入用
+	int nNowPose = 0;	// 現在のポーズ番号
+	int nNowKey = 0;	// 現在のキー番号
+	int nLoop = 0;	// ループのON/OFFの変換用
+	int nEnd = 0;	// テキスト読み込み終了の確認用
 
-	// 変数配列を宣言
+					// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
 
-	// ポインタを宣言
+								// ポインタを宣言
 	FILE *pFile;	// ファイルポインタ
 
-	// ポーズ代入用の変数を初期化
+					// ポーズ代入用の変数を初期化
 	memset(&info, 0, sizeof(info));
 
 	// ファイルを読み込み形式で開く
@@ -2436,17 +2477,17 @@ void CPlayer::LoadSetup(void)
 		do
 		{ // 読み込んだ文字列が EOF ではない場合ループ
 
-			// ファイルから文字列を読み込む
+		  // ファイルから文字列を読み込む
 			nEnd = fscanf(pFile, "%s", &aString[0]);	// テキストを読み込みきったら EOF を返す
 
-			// キャラクターの設定
+														// キャラクターの設定
 			if (strcmp(&aString[0], "CHARACTERSET") == 0)
 			{ // 読み込んだ文字列が CHARACTERSET の場合
 
 				do
 				{ // 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
 
-					// ファイルから文字列を読み込む
+				  // ファイルから文字列を読み込む
 					fscanf(pFile, "%s", &aString[0]);
 
 					if (strcmp(&aString[0], "PARTSSET") == 0)
@@ -2455,7 +2496,7 @@ void CPlayer::LoadSetup(void)
 						do
 						{ // 読み込んだ文字列が END_PARTSSET ではない場合ループ
 
-							// ファイルから文字列を読み込む
+						  // ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "INDEX") == 0)
@@ -2488,7 +2529,7 @@ void CPlayer::LoadSetup(void)
 							}
 						} while (strcmp(&aString[0], "END_PARTSSET") != 0);	// 読み込んだ文字列が END_PARTSSET ではない場合ループ
 
-						// パーツ情報の設定
+																			// パーツ情報の設定
 						CObjectChara::SetPartsInfo(nID, nParentID, pos, rot, mc_apModelFile[nID]);
 					}
 				} while (strcmp(&aString[0], "END_CHARACTERSET") != 0);		// 読み込んだ文字列が END_CHARACTERSET ではない場合ループ
@@ -2498,13 +2539,13 @@ void CPlayer::LoadSetup(void)
 			else if (strcmp(&aString[0], "MOTIONSET") == 0)
 			{ // 読み込んだ文字列が MOTIONSET の場合
 
-				// 現在のポーズ番号を初期化
+			  // 現在のポーズ番号を初期化
 				nNowPose = 0;
 
 				do
 				{ // 読み込んだ文字列が END_MOTIONSET ではない場合ループ
 
-					// ファイルから文字列を読み込む
+				  // ファイルから文字列を読み込む
 					fscanf(pFile, "%s", &aString[0]);
 
 					if (strcmp(&aString[0], "LOOP") == 0)
@@ -2513,7 +2554,7 @@ void CPlayer::LoadSetup(void)
 						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
 						fscanf(pFile, "%d", &nLoop);		// ループのON/OFFを読み込む
 
-						// 読み込んだ値をbool型に変換
+															// 読み込んだ値をbool型に変換
 						info.bLoop = (nLoop == 0) ? false : true;
 					}
 					else if (strcmp(&aString[0], "NUM_KEY") == 0)
@@ -2525,13 +2566,13 @@ void CPlayer::LoadSetup(void)
 					else if (strcmp(&aString[0], "KEYSET") == 0)
 					{ // 読み込んだ文字列が KEYSET の場合
 
-						// 現在のキー番号を初期化
+					  // 現在のキー番号を初期化
 						nNowKey = 0;
 
 						do
 						{ // 読み込んだ文字列が END_KEYSET ではない場合ループ
 
-							// ファイルから文字列を読み込む
+						  // ファイルから文字列を読み込む
 							fscanf(pFile, "%s", &aString[0]);
 
 							if (strcmp(&aString[0], "FRAME") == 0)
@@ -2546,7 +2587,7 @@ void CPlayer::LoadSetup(void)
 								do
 								{ // 読み込んだ文字列が END_KEY ではない場合ループ
 
-									// ファイルから文字列を読み込む
+								  // ファイルから文字列を読み込む
 									fscanf(pFile, "%s", &aString[0]);
 
 									if (strcmp(&aString[0], "POS") == 0)
@@ -2557,7 +2598,7 @@ void CPlayer::LoadSetup(void)
 										fscanf(pFile, "%f", &info.aKeyInfo[nNowPose].aKey[nNowKey].pos.y);	// Y位置を読み込む
 										fscanf(pFile, "%f", &info.aKeyInfo[nNowPose].aKey[nNowKey].pos.z);	// Z位置を読み込む
 
-										// 読み込んだ位置にパーツの初期位置を加算
+																											// 読み込んだ位置にパーツの初期位置を加算
 										info.aKeyInfo[nNowPose].aKey[nNowKey].pos += GetPartsPosition(nNowKey);
 									}
 									else if (strcmp(&aString[0], "ROT") == 0)
@@ -2568,7 +2609,7 @@ void CPlayer::LoadSetup(void)
 										fscanf(pFile, "%f", &info.aKeyInfo[nNowPose].aKey[nNowKey].rot.y);	// Y向きを読み込む
 										fscanf(pFile, "%f", &info.aKeyInfo[nNowPose].aKey[nNowKey].rot.z);	// Z向きを読み込む
 
-										// 読み込んだ向きにパーツの初期向きを加算
+																											// 読み込んだ向きにパーツの初期向きを加算
 										info.aKeyInfo[nNowPose].aKey[nNowKey].rot += GetPartsRotation(nNowKey);
 
 										// 初期向きを正規化
@@ -2579,28 +2620,28 @@ void CPlayer::LoadSetup(void)
 
 								} while (strcmp(&aString[0], "END_KEY") != 0);	// 読み込んだ文字列が END_KEY ではない場合ループ
 
-								// 現在のキー番号を加算
+																				// 現在のキー番号を加算
 								nNowKey++;
 							}
 						} while (strcmp(&aString[0], "END_KEYSET") != 0);	// 読み込んだ文字列が END_KEYSET ではない場合ループ
 
-						// 現在のポーズ番号を加算
+																			// 現在のポーズ番号を加算
 						nNowPose++;
 					}
 				} while (strcmp(&aString[0], "END_MOTIONSET") != 0);	// 読み込んだ文字列が END_MOTIONSET ではない場合ループ
 
-				// モーション情報の設定
+																		// モーション情報の設定
 				CObjectChara::SetMotionInfo(info);
 			}
 		} while (nEnd != EOF);	// 読み込んだ文字列が EOF ではない場合ループ
-		
-		// ファイルを閉じる
+
+								// ファイルを閉じる
 		fclose(pFile);
 	}
 	else
 	{ // ファイルが開けなかった場合
 
-		// エラーメッセージボックス
+	  // エラーメッセージボックス
 		MessageBox(NULL, "プレイヤーセットアップファイルの読み込みに失敗！", "警告！", MB_ICONWARNING);
 	}
 }

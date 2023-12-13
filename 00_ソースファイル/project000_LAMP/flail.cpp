@@ -716,9 +716,9 @@ CFlail *CFlail::Create
 //============================================================
 void CFlail::Collision(D3DXVECTOR3& rPos)
 {
-	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+	CPlayer *playerthis = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 	
-	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	if (playerthis->GetCounterFlail() < flail::FLAIL_DEF || playerthis->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
 		{
@@ -758,7 +758,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					}
 
 					// ダメージヒット処理
-					player->HitKnockBack(m_nDamage + nAddDamage, vec);
+					player->HitKnockBack(m_nDamage + nAddDamage, vec, playerthis);
 				}
 
 				D3DXVECTOR3 posFlail;
@@ -771,6 +771,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				//フレイル同士の当たり判定
 				if (flailLength < RADIUS * 3.0f && (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW))
 				{
+					CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 60, 60, 300, 1.0f, 0.99f);
 					float rotMove1, rotMove2;
 					rotMove1 = GetChainRotMove();
 					rotMove2 = player->GetFlail()->GetChainRotMove();
@@ -785,7 +786,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		}
 	}
 
-	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	if (playerthis->GetCounterFlail() < flail::FLAIL_DEF || playerthis->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		// 障害物との当たり判定
 		if (CollisionObstacle(rPos) ||
@@ -794,7 +795,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		{
 			int nParticle = 30;
 			
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, nParticle, 1.0f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 300, 20, 20, nParticle, 1.0f, 0.99f);
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 			{

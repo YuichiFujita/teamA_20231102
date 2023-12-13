@@ -88,7 +88,7 @@ HRESULT CStatusManager::Init(void)
 	// 優先順位を設定
 	m_pLife->SetPriority(PRIORITY);
 
-							// 吹っ飛び率の情報の設定
+	// 吹っ飛び率の情報の設定
 	m_pKnockRate = CMultiValue::Create
 	( // 引数
 		CValue::TEXTURE_UI,	// テクスチャ
@@ -120,7 +120,8 @@ HRESULT CStatusManager::Init(void)
 		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
 		m_pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
 	}
-	
+	// 優先順位を設定
+	m_pUI->SetPriority(PRIORITY);
 
 	// 成功を返す
 	return S_OK;

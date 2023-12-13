@@ -131,7 +131,6 @@ public:
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
 	void Hit(void) override;		// アイテムヒット
-	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock) override;	// ノックバックヒット
 
 	void SetState(const int nState) override;	// 状態設定
 	int GetState(void) const override;			// 状態取得
@@ -146,14 +145,15 @@ public:
 	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
 
 	// メンバ関数
+	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer *pAttack);	// ノックバックヒット
+	void HitKillY(const int nDmg);	// キルY座標ヒット
 	void SetSpawn(void);	// 出現設定
 	void SetInvuln(void);	// 無敵設定
 
-	void SetEnableDrawUI(const bool bDraw);	// UI描画状況設定
-	void HitKillY(const int nDmg);			// キルY座標ヒット
-
-	int GetPadID(void) const;				// パッドインデックス取得
-	int GetCounterFlail(void) const;		// フレイルカウンター取得
+	void SetEnableDrawUI(const bool bDraw);		// UI描画状況設定
+	int GetPadID(void) const;					// パッドインデックス取得
+	CPlayer *GetLastAttackPlayer(void) const;	// 最後に攻撃したプレイヤー取得
+	int GetCounterFlail(void) const;			// フレイルカウンター取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
 
 	CFlail *GetFlail(void) const;		// フレイルカウンター取得
@@ -199,6 +199,7 @@ private:
 	SItemEffect m_SItemTemporary;	//一時的なアイテムの効果
 	CStatusManager *m_pStatus;		// ステータスの情報
 	CFlail		*m_pFlail;			// フレイルの情報
+	CPlayer		*m_pFinalAttack;	// 攻撃者の情報
 	CPlayerAI	*m_pAI;				// AI情報
 	D3DXVECTOR3	m_oldPos;			// 過去位置
 	D3DXVECTOR3	m_move;				// 移動量
@@ -209,6 +210,7 @@ private:
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター
+	int			m_nCounterAttack;	// 最終攻撃カウンター
 	float		m_fPlusMove;		// プラス移動量
 	float		m_fSinAlpha;		// 透明向き
 	bool		m_bDash;			// ダッシュ状況
