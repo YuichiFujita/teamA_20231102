@@ -151,9 +151,13 @@ public:
 
 	void SetEnableDrawUI(const bool bDraw);	// UI描画状況設定
 	void HitKillY(const int nDmg);			// キルY座標ヒット
+
 	int GetPadID(void) const;				// パッドインデックス取得
 	int GetCounterFlail(void) const;		// フレイルカウンター取得
 	void SetCounterFlail(const int nCounterFlail);		// フレイルカウンター取得
+
+	CFlail *GetFlail(void) const;		// フレイルカウンター取得
+
 	void SetItemPermanent(EItem Item);
 	SItemEffect GetTemporaryItem() { return m_SItemTemporary; }
 protected:

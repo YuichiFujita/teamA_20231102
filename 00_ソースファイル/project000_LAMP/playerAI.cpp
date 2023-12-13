@@ -162,17 +162,35 @@ CPlayer::EMotion CPlayerAI::AIselect
 		{
 		case CPlayerAI::STATEAI_NONE:
 
-			if (nProb > 9500)
+			if (m_nCounterFlail == flail::FLAIL_DROP)
 			{
-				m_stateAI = STATEAI_NONE;
-			}
-			else if (nProb > 2000)
-			{
-				m_stateAI = STATEAI_MOVE;
+				if (nProb > 9500)
+				{
+					m_stateAI = STATEAI_NONE;
+				}
+				else if (nProb > 9000)
+				{
+					m_stateAI = STATEAI_MOVE;
+				}
+				else
+				{
+					m_stateAI = STATEAI_ATTACK;
+				}
 			}
 			else
 			{
-				m_stateAI = STATEAI_ATTACK;
+				if (nProb > 9500)
+				{
+					m_stateAI = STATEAI_NONE;
+				}
+				else if (nProb > 2000)
+				{
+					m_stateAI = STATEAI_MOVE;
+				}
+				else
+				{
+					m_stateAI = STATEAI_ATTACK;
+				}
 			}
 
 			break;
@@ -462,6 +480,9 @@ CPlayer::EMotion CPlayerAI::AIattack
 				player->SetMotion(m_currentMotion);
 
 				m_nCounterFlail = flail::FLAIL_DROP;
+
+				// AIも状態を設定
+				m_stateAI = STATEAI_NONE;
 			}
 		}
 	}
@@ -494,7 +515,7 @@ CPlayer::EMotion CPlayerAI::AIattack
 		else
 		{
 			// 引き戻す
-			if (true)
+			if (m_bAttack)
 			{
 				m_nCounterFlail -= 1;
 
@@ -527,12 +548,6 @@ CPlayer::EMotion CPlayerAI::AIattack
 						m_pFlail->SetChainRotMove(0.0f);
 					}
 				}
-
-				// 溜めた時間に応じて飛距離増加
-				D3DXVECTOR3 move = VEC3_ZERO;
-				move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-				move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-				m_pFlail->SetMove(move);
 
 				// 移動量を更新
 				rMove.x = 0.0f;
@@ -733,6 +748,7 @@ void CPlayerAI::AIDash
 	D3DXVECTOR3& rDashRot,
 	D3DXVECTOR3& rDestRot,
 	float& rPlusMove,
+	int& rCounterFlail,
 	bool& rDash
 )
 {
@@ -757,14 +773,17 @@ void CPlayerAI::AIDash
 		if (Collision(dashPos))
 		{
 			int nProb = rand() % 10000;
-
+			if (m_nCounterFlail > 60 && m_nCounterFlail <= flail::FLAIL_CHARGE)
+			{
+				bJumpSelect = true;
+			}
 			if (nProb > 9920)
 			{
 				bJumpSelect = true;
 			}
 			else
 			{
-				bJumpSelect = false;
+				//bJumpSelect = false;
 			}
 		}
 		else
@@ -798,6 +817,11 @@ void CPlayerAI::AIDash
 
 				// ダッシュしている状態にする
 				rDash = true;
+
+				if (rCounterFlail > flail::FLAIL_DEF && rCounterFlail <= flail::FLAIL_CHARGE)
+				{
+					rCounterFlail = flail::FLAIL_DEF;
+				}
 
 				// サウンドの再生
 				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// ジャンプ音

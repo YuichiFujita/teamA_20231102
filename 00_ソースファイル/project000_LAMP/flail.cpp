@@ -738,10 +738,31 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				// 吹っ飛びベクトルを正規化
 				D3DXVec3Normalize(&vec, &vec);
 
-				if (length < (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
+				if (length < 40.0f + (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
 				{
 					// ダメージヒット処理
 					player->HitKnockBack(m_nDamage, vec);
+				}
+
+				D3DXVECTOR3 posFlail;
+				float flailLength;
+				posFlail = GetVec3Position() - player->GetFlail()->GetVec3Position();
+				posFlail.y = 0;
+
+				flailLength = D3DXVec3Length(&posFlail);
+
+				//フレイル動詞の当たり判定
+				if (flailLength < RADIUS * 3.0f)
+				{
+					float rotMove1, rotMove2;
+					rotMove1 = GetChainRotMove();
+					rotMove2 = player->GetFlail()->GetChainRotMove();
+
+					SetChainRotMove(rotMove2 * -0.4f);
+					m_fLengthTarget = m_fLengthChain;
+
+					player->GetFlail()->SetChainRotMove(rotMove1 * -0.4f);
+					player->GetFlail()->SetLengthTarget(player->GetFlail()->GetLengthChain());
 				}
 			}
 		}
@@ -801,7 +822,6 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				rPos.y += 10.0f;
 			}
 
-			m_fLengthTarget = m_fLengthChain;
 			m_fChainRotMove *= 0.0f;
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
@@ -1087,7 +1107,7 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 
 					if (pObjCheck->GetState() == CBlock::BREAK_TRUE)
 					{
-						m_fChainRotMove *= 0.5f;
+						m_fChainRotMove *= 0.7f;
 					}
 					else
 					{
@@ -1171,7 +1191,7 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 
 					if (pObjCheck->GetState() == CObstacle::BREAK_TRUE)
 					{
-						m_fChainRotMove *= 0.5f;
+						m_fChainRotMove *= 0.7f;
 					}
 					else
 					{
