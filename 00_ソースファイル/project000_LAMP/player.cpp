@@ -859,7 +859,15 @@ void CPlayer::HitKillY(const int nDmg)
 	{
 		// ポインタを宣言
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-		CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 600, 0.2f, 0.99f);
+		if (CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetType() == CLiquid::TYPE_SEA)
+		{
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 300, 0.2f, 0.99f);
+		}
+		else
+		{
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(15.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.1f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -2.5f, 0.0f), 12, 600, 60, 120, 150, 0.2f, 0.99f);
+		}
+
 		switch (pRetention->GetKillState())
 		{ // 討伐条件ごとの処理
 		case CRetentionManager::KILL_LIFE:	// 体力制

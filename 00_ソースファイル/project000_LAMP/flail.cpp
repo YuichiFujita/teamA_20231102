@@ -758,7 +758,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		
 			int nParticle = 30;
 			
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, nParticle, 1.0f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 300, 20, 20, nParticle, 1.0f, 0.99f);
 			m_fLengthTarget = m_fLengthChain;
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
