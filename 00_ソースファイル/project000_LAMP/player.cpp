@@ -268,7 +268,7 @@ void CPlayer::Update(void)
 	// 変数を宣言
 	EMotion currentMotion = MOTION_DEATH;	// 現在のモーション
 
-											// 過去位置の更新
+	// 過去位置の更新
 	UpdateOldPosition();
 
 	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 1)
@@ -286,49 +286,49 @@ void CPlayer::Update(void)
 	{ // 状態ごとの処理
 	case STATE_NONE:	// 何もしない状態
 
-						// 待機モーションにする
+		// 待機モーションにする
 		currentMotion = MOTION_IDOL;
 
 		break;
 
 	case STATE_SPAWN:	// スポーン状態
 
-						// スポーン状態時の更新
+		// スポーン状態時の更新
 		currentMotion = UpdateSpawn();
 
 		break;
 
 	case STATE_NORMAL:	// 通常状態
 
-						// 通常状態の更新
+		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
 		break;
 
 	case STATE_KNOCK:	// ノック状態
 
-						// ノック状態の更新
+		// ノック状態の更新
 		currentMotion = UpdateKnock();
 
 		break;
 
 	case STATE_INVULN:	// 無敵状態
 
-						// 無敵状態時の更新
+		// 無敵状態時の更新
 		currentMotion = UpdateInvuln();
 
 		break;
 
 	case STATE_DROWN:	// 溺れ状態
 
-						// 溺れ状態時の更新
+		// 溺れ状態時の更新
 		currentMotion = UpdateDrown();
 
 		break;
 
 	case STATE_DEATH:	// 死亡状態
 
-						// 死亡状態時の更新
+		// 死亡状態時の更新
 		UpdateDeath();
 
 		break;
@@ -377,7 +377,7 @@ void CPlayer::Draw(void)
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 
-																						// ステンシルテストを有効にする
+	// ステンシルテストを有効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
 
 	// 比較参照値を設定する
@@ -394,7 +394,7 @@ void CPlayer::Draw(void)
 	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
 	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
 
-																		// オブジェクトキャラクターの描画
+	// オブジェクトキャラクターの描画
 	CObjectChara::Draw();
 
 	// ステンシルテストを無効にする
@@ -481,7 +481,7 @@ void CPlayer::SetState(const int nState)
 		if (m_state != STATE_DEATH)
 		{ // 死亡状態じゃない場合
 
-		  // マテリアルを再設定
+			// マテリアルを再設定
 			ResetMaterial();
 
 			// メインカラーを設定
@@ -496,7 +496,7 @@ void CPlayer::SetState(const int nState)
 			if (m_state == STATE_DEATH)
 			{ // 死亡状態の場合
 
-			  // 生存ランキングを更新
+				// 生存ランキングを更新
 				CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 			}
 		}

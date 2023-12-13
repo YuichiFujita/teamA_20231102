@@ -15,6 +15,7 @@
 #include "player.h"
 #include "retentionManager.h"
 #include "middleResultManager.h"
+#include "pause.h"
 
 #include "editStageManager.h"
 
@@ -141,23 +142,27 @@ void CGameManager::Update(void)
 
 	case STATE_NORMAL:
 
-		if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
-		{ // 生き残りがいない場合
+		if (!CSceneGame::GetPause()->IsPause())
+		{ // ポーズ中ではない場合
 
-			// カウンターを加算
-			m_nCounterState++;
+			if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() <= 0)
+			{ // 生き残りがいない場合
 
-			if (m_nCounterState >= WAIT_RESULT_FRAME)
-			{ // 余韻が経過した場合
+				// カウンターを加算
+				m_nCounterState++;
 
-				// リザルト情報を設定
-				m_pMiddleResult->SetResultData();
+				if (m_nCounterState >= WAIT_RESULT_FRAME)
+				{ // 余韻が経過した場合
 
-				// カウンターを初期化
-				m_nCounterState = 0;
+					// リザルト情報を設定
+					m_pMiddleResult->SetResultData();
 
-				// リザルトに移行
-				m_state = STATE_RESULT;
+					// カウンターを初期化
+					m_nCounterState = 0;
+
+					// リザルトに移行
+					m_state = STATE_RESULT;
+				}
 			}
 		}
 
