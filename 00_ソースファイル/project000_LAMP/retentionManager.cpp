@@ -432,11 +432,42 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 			// 生存人数を減算
 			m_nNumSurvival--;
 
+			switch (m_stateWin)
+			{ // 勝利条件ごとの処理
+			case WIN_SURVIVE:
+
+				if (m_nNumSurvival <= 0)
+				{ // だれも生存していない場合
+
+					// 生存ランキング1位プレイヤーの勝利ポイントを加算
+					m_aPlayerWin[m_aSurvivalRank[RANK_1ST]]++;
+				}
+
+				break;
+
+			case WIN_KILL:
+
+				for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+				{ // プレイヤーの最大数分繰り返す
+
+					CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+					if (pPlayer->GetPadID() == nPlayerID)
+					{ // パッドインデックスが同一の場合
+
+						int a = 0;
+					}
+				}
+
+				break;
+
+			default:
+				assert(false);
+				break;
+			}
+
 			if (m_nNumSurvival <= 0)
 			{ // だれも生存していない場合
-
-				// 生存ランキング1位プレイヤーの勝利ポイントを加算
-				m_aPlayerWin[m_aSurvivalRank[RANK_1ST]]++;
 
 				// 勝利ランキング設定 (更新)
 				SetWinRank();

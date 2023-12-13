@@ -16,8 +16,21 @@
 //============================================================
 // 静的メンバ変数
 //============================================================
-const char *CItem::ModelFileName = "data\\MODEL\\PLAYER\\02_head.x";
+const char *CItem::mc_apModelFile[TYPE::TYPE_MAX] =
+{
+	"data\\MODEL\\PLAYER\\02_head.x",				//回復アイテム
+	"data\\MODEL\\OBSTACLE\\Castle-Fence000.x",		//攻撃力アップ
+	"data\\MODEL\\OBSTACLE\\Castle-Fence001.x",		//ノックバック強化
+	"data\\MODEL\\OBSTACLE\\Conifer000.x",			//スーパーアーマー
+	"data\\MODEL\\OBSTACLE\\Fountain000.x",			//巨大鉄球
+	"data\\MODEL\\OBSTACLE\\Hardwood000.x",			//すり抜け鎖
+	"data\\MODEL\\OBSTACLE\\Jar000.x",				//ダブル鎖
+	"data\\MODEL\\OBSTACLE\\Jar001.x",				//燃えている鎖
+};
 
+//<***************************************************
+//名前宣言
+//<***************************************************
 namespace
 {
 	const float RADIUS = 50.0f;	//半径
@@ -28,7 +41,8 @@ namespace
 //============================================================
 CItem::CItem()
 {
-	
+	//値の初期化
+	m_nType = TYPE::TYPE_HEAL;
 }
 
 //============================================================
@@ -44,9 +58,14 @@ CItem::~CItem()
 //============================================================
 HRESULT CItem::Init(void)
 {
+	//抽出する(燃えている鎖～回復アイテムまで抽出)
+	m_nType = rand() % TYPE::TYPE_BURNING_FRAIL + TYPE::TYPE_HEAL;
+
+	//初期化を行う
+	CObjectModel::Init();
+
 	return S_OK;
 }
-
 //============================================================
 // 終了
 //============================================================
@@ -61,8 +80,8 @@ void CItem::Uninit(void)
 //============================================================
 void CItem::Update(void)
 {
-}
 
+}
 //============================================================
 // 描画
 //============================================================
@@ -129,6 +148,9 @@ CItem *CItem::Create(D3DXVECTOR3 pos)
 
 		// 位置設定
 		pItem->SetVec3Position(pos);
+
+		//ランダムでアイテムを生成する
+		pItem->BindModel(mc_apModelFile[pItem->m_nType]);
 	}
 
 	// ポインタを返す
