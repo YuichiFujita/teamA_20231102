@@ -31,7 +31,7 @@ namespace
 	const int	PRIORITY	= 3;		// フレイルの優先順位
 
 	const float	RADIUS		= 50.0f;	// 半径
-	const int	HIT_DAMAGE	= 30;		// ダメージ量
+	const int	HIT_DAMAGE	= 10;		// ダメージ量
 }
 
 //************************************************************
@@ -173,6 +173,7 @@ void CFlail::Update(void)
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", player->GetCounterFlail());*/
 		//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角速度]：%f\n", m_fChainRotMove);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル位置]：%f %f %f\n", GetVec3Position().x, GetVec3Position().y, GetVec3Position().z);
+		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル角度]：%f\n", m_fChainRot);
 	}
 
 	// オブジェクトモデルの更新
@@ -259,7 +260,7 @@ void CFlail::UpdateFlailPos(void)
 	}
 	
 	Collision(pos);
-
+	
 	SetVec3Position(pos);
 }
 
@@ -716,7 +717,7 @@ CFlail *CFlail::Create
 void CFlail::Collision(D3DXVECTOR3& rPos)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
-
+	
 	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
@@ -740,8 +741,24 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 
 				if (length < 40.0f + (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
 				{
+					float length = D3DXVec3Length(&(rPos - m_oldPos)) + 1.0f;
+					int nAddDamage;
+
+					if (length > 80.0f)
+					{
+						nAddDamage = 30;
+					}
+					else if (length > 10.0f)
+					{
+						nAddDamage = (int)(length * 0.1f) * 3;
+					}
+					else
+					{
+						nAddDamage = 0;
+					}
+
 					// ダメージヒット処理
-					player->HitKnockBack(m_nDamage, vec);
+					player->HitKnockBack(m_nDamage + nAddDamage, vec);
 				}
 
 				D3DXVECTOR3 posFlail;
@@ -751,8 +768,8 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 
 				flailLength = D3DXVec3Length(&posFlail);
 
-				//フレイル動詞の当たり判定
-				if (flailLength < RADIUS * 3.0f)
+				//フレイル同士の当たり判定
+				if (flailLength < RADIUS * 3.0f && (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW))
 				{
 					float rotMove1, rotMove2;
 					rotMove1 = GetChainRotMove();
@@ -775,12 +792,9 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			CollisionBlock(CPlayer::AXIS_X, rPos) ||
 			CollisionBlock(CPlayer::AXIS_Z, rPos))
 		{
-			
-		
 			int nParticle = 30;
 			
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, nParticle, 1.0f, 0.99f);
-			m_fLengthTarget = m_fLengthChain;
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 			{

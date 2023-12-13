@@ -23,6 +23,8 @@
 #define VIB_BIG_DAMAGE	((short)(USHRT_MAX * 0.8f))	// 大ダメージ時の振動レベル
 #define VIB_DEATH		(USHRT_MAX)					// 死亡時の振動レベル
 #define VIB_WALLDASH	((short)(USHRT_MAX * 0.6f))	// 壁走りの振動レベル
+#define VIB_FLAILCHAGE	((short)(USHRT_MAX * 0.4f))	// フレイル溜めの振動レベル
+#define VIB_FLAILSHOT	((short)(USHRT_MAX * 1.0f))	// フレイル投げの振動レベル
 
 //************************************************************
 //	静的メンバ変数宣言
@@ -774,6 +776,42 @@ void CInputPad::SetVibration(EType type, int nPlayer)
 
 		// 振動時間の設定
 		m_aVibration[nPlayer].nTime = 0;
+
+		// 処理を抜ける
+		break;
+
+	case TYPE_FLAIL_CHAGE:	// フレイル溜め状態
+
+		// 振動レベルの設定
+		m_aVibration[nPlayer].vibration.wLeftMotorSpeed = VIB_FLAILCHAGE;	// 左
+		m_aVibration[nPlayer].vibration.wRightMotorSpeed = VIB_FLAILCHAGE;	// 右
+
+		// 振動時間の設定
+		m_aVibration[nPlayer].nTime = 1;
+
+		// 処理を抜ける
+		break;
+
+	case TYPE_FLAIL_SHOT:	// フレイル投げ状態
+
+		// 振動レベルの設定
+		m_aVibration[nPlayer].vibration.wLeftMotorSpeed = VIB_FLAILCHAGE;	// 左
+		m_aVibration[nPlayer].vibration.wRightMotorSpeed = VIB_FLAILCHAGE;	// 右
+
+		// 振動時間の設定
+		m_aVibration[nPlayer].nTime = 30;
+
+		// 処理を抜ける
+		break;
+
+	case TYPE_FLAIL_FULL:	// フレイル最大溜め投げ状態
+
+		// 振動レベルの設定
+		m_aVibration[nPlayer].vibration.wLeftMotorSpeed = VIB_FLAILSHOT;	// 左
+		m_aVibration[nPlayer].vibration.wRightMotorSpeed = VIB_FLAILSHOT;	// 右
+
+		// 振動時間の設定
+		m_aVibration[nPlayer].nTime = 60;
 
 		// 処理を抜ける
 		break;
