@@ -214,6 +214,8 @@ HRESULT CPlayer::Init(void)
 
 	m_pGuide = CObject3D::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
 	m_pGuide->SetEnableDraw(false);
+	m_pGuide->SetEnableDepthShadow(false);
+	m_pGuide->SetEnableZTex(false);
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
 
@@ -1350,7 +1352,7 @@ void CPlayer::UpdateDeath(void)
 	// 変数を宣言
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
-
+	m_pGuide->SetEnableDraw(false);
 	// ポインタを宣言
 	CStage *pStage = CScene::GetStage();	// ステージ情報
 	if (pStage == NULL)

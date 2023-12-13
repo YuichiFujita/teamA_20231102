@@ -40,7 +40,8 @@ public:
 	// Ÿ—˜ðŒ—ñ‹“
 	enum EWin
 	{
-		WIN_SURVIVE = 0,	// ¶‚«Žc‚èŸ—˜
+		WIN_SURVIVE = 0,	// ¶‘¶”
+		WIN_KILL,			// ƒLƒ‹”
 		WIN_MAX				// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 
