@@ -21,6 +21,7 @@
 #include "obstacle.h"
 #include "block.h"
 #include "sound.h"
+#include "orbitalParticle.h"
 
 //************************************************************
 //	定数宣言
@@ -30,7 +31,7 @@ namespace
 	const int	PRIORITY	= 3;		// フレイルの優先順位
 
 	const float	RADIUS		= 50.0f;	// 半径
-	const int	HIT_DAMAGE	= 10;		// ダメージ量
+	const int	HIT_DAMAGE	= 30;		// ダメージ量
 }
 
 //************************************************************
@@ -774,6 +775,13 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			CollisionBlock(CPlayer::AXIS_X, rPos) ||
 			CollisionBlock(CPlayer::AXIS_Z, rPos))
 		{
+			
+		
+			int nParticle = 30;
+			
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, nParticle, 1.0f, 0.99f);
+			m_fLengthTarget = m_fLengthChain;
+
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 			{
 				int IDParent = nCntChain - 1;

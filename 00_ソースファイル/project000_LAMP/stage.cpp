@@ -22,6 +22,7 @@
 #include "block.h"
 #include "obstacle.h"
 #include "spawnPoint.h"
+#include "ItemSpawnPoint.h"
 
 //************************************************************
 //	定数宣言
@@ -30,15 +31,28 @@ namespace
 {
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
-		"data\\TXT\\Stages\\stage1.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage2.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage3.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage4.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage5.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage6.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage7.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage8.txt",	// ゲームステージ
-		"data\\TXT\\Stages\\stage9.txt",	// ゲームステージ
+		"data\\TXT\\Stages\\stage1.txt",
+		"data\\TXT\\Stages\\stage2.txt",
+		"data\\TXT\\Stages\\stage3.txt",
+		"data\\TXT\\Stages\\stage4.txt",
+		"data\\TXT\\Stages\\stage5.txt",
+		"data\\TXT\\Stages\\stage6.txt",
+		"data\\TXT\\Stages\\stage7.txt",
+		"data\\TXT\\Stages\\stage8.txt",
+		"data\\TXT\\Stages\\stage9.txt",
+		"data\\TXT\\Stages\\stage10.txt",
+		"data\\TXT\\Stages\\stage11.txt",
+		"data\\TXT\\Stages\\stage12.txt",
+		"data\\TXT\\Stages\\stage13.txt",
+		"data\\TXT\\Stages\\stage14.txt",
+		"data\\TXT\\Stages\\stage15.txt",
+		"data\\TXT\\Stages\\stage16.txt",
+		"data\\TXT\\Stages\\stage17.txt",
+		"data\\TXT\\Stages\\stage18.txt",
+		"data\\TXT\\Stages\\stage19.txt",
+		"data\\TXT\\Stages\\stage20.txt",
+		"data\\TXT\\Stages\\stage21.txt",
+		"data\\TXT\\Stages\\stage22.txt",
 	};
 }
 
@@ -553,6 +567,15 @@ HRESULT CStage::LoadSetup(CStage *pStage)
 
 			// 生成位置の読込
 			else if (FAILED(LoadSpawnPoint(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// アイテム生成位置の読込
+			else if (FAILED(LoadItemPoint(&aString[0], pFile, pStage)))
 			{ // 読み込みに失敗した場合
 
 				// 失敗を返す
@@ -1928,6 +1951,70 @@ HRESULT CStage::LoadSpawnPoint(const char* pString, FILE *pFile, CStage *pStage)
 				}
 			}
 		} while (strcmp(&aString[0], "END_STAGE_SPAWNPOINTSET") != 0);	// 読み込んだ文字列が END_STAGE_SPAWNPOINTSET ではない場合ループ
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	アイテム生成位置情報の読込処理
+//============================================================
+HRESULT CStage::LoadItemPoint(const char * pString, FILE * pFile, CStage * pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// アイテム生成位置の設定
+	if (strcmp(pString, "STAGE_ITEMPOINTSET") == 0)
+	{ // 読み込んだ文字列が STAGE_ITEMPOINTSET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_ITEMPOINTSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "ITEMPOINTSET") == 0)
+			{ // 読み込んだ文字列が ITEMPOINTSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_ITEMPOINTSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+				} while (strcmp(&aString[0], "END_ITEMPOINTSET") != 0);	// 読み込んだ文字列が END_ITEMPOINTSET ではない場合ループ
+
+				// アイテム生成位置オブジェクトの生成
+				if (CItemSpawnPoint::Create(pos) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_ITEMPOINTSET") != 0);	// 読み込んだ文字列が END_STAGE_ITEMPOINTSET ではない場合ループ
 	}
 
 	// 成功を返す

@@ -43,6 +43,7 @@ public:
 		TEXTURE_START,			// 開始ボタンテクスチャ
 		TEXTURE_CONTROL,		// 操作表示テクスチャ
 		TEXTURE_ARROW,			// 矢印テクスチャ
+		TEXTURE_SELECT,			// 選択テクスチャ
 		TEXTURE_MAX				// この列挙型の総数
 	};
 

@@ -433,7 +433,7 @@ void CTitleManager::UpdateMove(void)
 		CManager::GetInstance()->GetCamera()->SetEnableUpdate(true);
 
 		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// 決定音01
 	}
 }
 
@@ -461,7 +461,7 @@ void CTitleManager::UpdateStart(void)
 			SkipStaging();
 
 			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// 決定音01
 		}
 		else
 		{ // 遷移待機状態の場合
@@ -491,7 +491,7 @@ void CTitleManager::UpdateStart(void)
 				}
 
 				// サウンドの再生
-				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_000);	// 決定音00
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// 決定音00
 			}
 		}
 	}

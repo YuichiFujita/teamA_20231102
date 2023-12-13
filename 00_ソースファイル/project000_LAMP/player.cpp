@@ -214,6 +214,8 @@ HRESULT CPlayer::Init(void)
 
 	m_pGuide = CObject3D::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
 	m_pGuide->SetEnableDraw(false);
+	m_pGuide->SetEnableDepthShadow(false);
+	m_pGuide->SetEnableZTex(false);
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
 
@@ -857,7 +859,7 @@ void CPlayer::HitKillY(const int nDmg)
 	{
 		// ポインタを宣言
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-
+		CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 600, 0.2f, 0.99f);
 		switch (pRetention->GetKillState())
 		{ // 討伐条件ごとの処理
 		case CRetentionManager::KILL_LIFE:	// 体力制
@@ -910,8 +912,6 @@ void CPlayer::HitKillY(const int nDmg)
 			// 死亡モーションを設定
 			SetMotion(MOTION_DEATH);
 
-			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_SMALL_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
 		}
 		else
 		{ // 死亡していない場合
@@ -922,8 +922,7 @@ void CPlayer::HitKillY(const int nDmg)
 			// 溺れモーションを設定
 			SetMotion(MOTION_DROWN);
 
-			// 爆発パーティクルを生成
-			CParticle3D::Create(CParticle3D::TYPE_BIG_EXPLOSION, D3DXVECTOR3(posPlayer.x, posPlayer.y + HEIGHT * 0.5f, posPlayer.z));
+		
 		}
 
 		// サウンドの再生
@@ -1362,7 +1361,7 @@ void CPlayer::UpdateDeath(void)
 	// 変数を宣言
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
-
+	m_pGuide->SetEnableDraw(false);
 	// ポインタを宣言
 	CStage *pStage = CScene::GetStage();	// ステージ情報
 	if (pStage == NULL)

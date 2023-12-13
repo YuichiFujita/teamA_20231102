@@ -33,7 +33,7 @@ namespace
 	namespace fade
 	{
 		const D3DXCOLOR INIT_COL	= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);	// 初期化色
-		const D3DXCOLOR SET_COL		= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.6f);	// 設定色
+		const D3DXCOLOR SET_COL		= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.84f);	// 設定色
 
 		const float	ADD_ALPHA	= 0.025f;	// 透明度の加算量
 		const float	SUB_ALPHA	= 0.025f;	// 透明度の減算量
@@ -43,23 +43,23 @@ namespace
 	namespace rule
 	{
 		const POSGRID2		PART	= POSGRID2(1, CEntryRuleManager::RULE_MAX);	// テクスチャ分割数
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(400.0f, 120.0f, 0.0f);		// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(320.0f, 150.0f, 0.0f);		// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(588.0f, 130.0f, 0.0f);		// 大きさ
 		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(0.0f, 140.0f, 0.0f);			// 空白
 	}
 
 	// 開始ボタン情報
 	namespace start
 	{
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 580.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(440.0f, 140.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 595.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(484.0f, 112.5f, 0.0f);		// 大きさ
 	}
 
 	// 勝利ポイント数情報
 	namespace winpoint
 	{
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(830.0f, 120.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(100.0f, 100.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(880.0f, 150.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(90.0f, 110.0f, 0.0f);		// 大きさ
 		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(100.0f, 0.0f, 0.0f);		// 行間
 
 		const int	DIGIT	= 2;	// 桁数
@@ -68,32 +68,32 @@ namespace
 	// 撃破条件情報
 	namespace kill
 	{
-		const POSGRID2		PART	= POSGRID2(1, CRetentionManager::KILL_MAX);						// テクスチャ分割数
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(880.0f, winpoint::POS.y + rule::SPACE.y, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);							// 大きさ
+		const POSGRID2		PART	= POSGRID2(CRetentionManager::KILL_MAX, 1);						// テクスチャ分割数
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(930.0f, winpoint::POS.y + rule::SPACE.y, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(444.0f, 96.0f, 0.0f);								// 大きさ
 	}
 
 	// 勝利条件情報
 	namespace win
 	{
-		const POSGRID2		PART	= POSGRID2(1, CRetentionManager::WIN_MAX);								// テクスチャ分割数
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(880.0f, winpoint::POS.y + (rule::SPACE.y * 2.0f), 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);									// 大きさ
+		const POSGRID2		PART	= POSGRID2(CRetentionManager::WIN_MAX, 1);								// テクスチャ分割数
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(930.0f, winpoint::POS.y + (rule::SPACE.y * 2.0f), 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(444.0f, 96.0f, 0.0f);										// 大きさ
 	}
 
 	// 選択情報
 	namespace select
 	{
-		const float	ADD_SIZE = 15.0f;	// 大きさ加算量
+		const float	ADD_SIZE = 17.5f;	// 大きさ加算量
 
-		const D3DXVECTOR3	POS	= D3DXVECTOR3(880.0f, rule::POS.y, 0.0f);	// 位置
+		const D3DXVECTOR3	POS	= D3DXVECTOR3(930.0f, rule::POS.y, 0.0f);	// 位置
 		const D3DXCOLOR		COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f);		// 色
 
 		const D3DXVECTOR3	SIZE_RULE	= D3DXVECTOR3(kill::SIZE.x + ADD_SIZE, kill::SIZE.y + ADD_SIZE, 0.0f);		// ルール選択時の大きさ
 		const D3DXVECTOR3	SIZE_START	= D3DXVECTOR3(start::SIZE.x + ADD_SIZE, start::SIZE.y + ADD_SIZE, 0.0f);	// 開始選択時の大きさ
 
 		const D3DXCOLOR CHOICE_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 選択中カラー
-		const D3DXCOLOR DEFAULT_COL	= D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f);	// 非選択中カラー
+		const D3DXCOLOR DEFAULT_COL	= D3DXCOLOR(0.65f, 0.65f, 0.65f, 1.0f);	// 非選択中カラー
 	}
 
 	// 矢印情報
@@ -103,10 +103,10 @@ namespace
 		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 		const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
-		const float	SPACE_EDGE		= 50.0f;	// 縁の空白
+		const float	SPACE_EDGE		= 40.0f;	// 縁の空白
 
-		const POSGRID2		PART	= POSGRID2(1, MAX_ARROW);			// テクスチャ分割数
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(90.0f, 90.0f, 9.0f);	// 大きさ
+		const POSGRID2		PART	= POSGRID2(MAX_ARROW, 1);			// テクスチャ分割数
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(select::POS.x - (select::SIZE_RULE.x * 0.5f) - SPACE_EDGE, select::POS.y, 0.0f);	// 位置
 		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(select::SIZE_RULE.x + (SPACE_EDGE * 2.0f), 0.0f, 0.0f);	// 空白
@@ -122,7 +122,7 @@ namespace
 		const float	BASIC_ALPHA		= 0.85f;	// 基準の透明度
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(1080.0f, 660.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(370.0f, 90.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(302.0f, 73.0f, 0.0f);		// 大きさ
 		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);	// 色
 	}
 }
@@ -132,12 +132,13 @@ namespace
 //************************************************************
 const char *CEntryRuleManager::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\ruleTitle000.png",	// ルールタイトルテクスチャ
-	"data\\TEXTURE\\rule000.png",		// 撃破条件テクスチャ
-	"data\\TEXTURE\\rule001.png",		// 勝利条件テクスチャ
-	NULL,								// 開始ボタンテクスチャ
-	NULL,								// 操作表示テクスチャ
-	NULL,								// 矢印テクスチャ
+	"data\\TEXTURE\\Choices.png",			// ルールタイトルテクスチャ
+	"data\\TEXTURE\\battlerule.png",		// 撃破条件テクスチャ
+	"data\\TEXTURE\\win_conditions.png",	// 勝利条件テクスチャ
+	"data\\TEXTURE\\Battle_Start.png",		// 開始ボタンテクスチャ
+	"data\\TEXTURE\\B_Back.png",			// 操作表示テクスチャ
+	"data\\TEXTURE\\Arrow_Twin.png",		// 矢印テクスチャ
+	"data\\TEXTURE\\flame_choice.png",		// 選択テクスチャ
 };
 
 //************************************************************
@@ -298,6 +299,9 @@ HRESULT CEntryRuleManager::Init(void)
 			return E_FAIL;
 		}
 
+		// テクスチャを登録・割当
+		m_pSelect->BindTexture(mc_apTextureFile[TEXTURE_SELECT]);
+
 		// 優先順位を設定
 		m_pSelect->SetPriority(PRIORITY);
 	}
@@ -344,7 +348,7 @@ HRESULT CEntryRuleManager::Init(void)
 		}
 
 		// テクスチャを登録・割当
-		m_pStart->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
+		m_pControl->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
 
 		// 優先順位を設定
 		m_pControl->SetPriority(PRIORITY);
@@ -354,7 +358,7 @@ HRESULT CEntryRuleManager::Init(void)
 	{
 		m_pWinPoint = CMultiValue::Create
 		( // 引数
-			CValue::TEXTURE_NORMAL,	// テクスチャ
+			CValue::TEXTURE_ZERO,	// テクスチャ
 			0,						// 数字
 			winpoint::DIGIT,		// 桁数
 			winpoint::POS,			// 位置
@@ -960,9 +964,7 @@ void CEntryRuleManager::Decide(void)
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	if (pKeyboard->IsTrigger(DIK_RETURN)
-	||  pPad->IsTrigger(CInputPad::KEY_A) || pPad->IsTrigger(CInputPad::KEY_B)
-	||  pPad->IsTrigger(CInputPad::KEY_X) || pPad->IsTrigger(CInputPad::KEY_Y))
+	if (pKeyboard->IsTrigger(DIK_RETURN) || pPad->IsTrigger(CInputPad::KEY_A))
 	{ // 決定の操作が行われた場合
 
 		switch (m_nSelect)
@@ -988,7 +990,7 @@ void CEntryRuleManager::Decide(void)
 		}
 	}
 
-	if (pKeyboard->IsTrigger(DIK_SPACE))
+	if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTrigger(CInputPad::KEY_B))
 	{ // 戻る操作が行われた場合
 
 		// フェードアウト状態にする
