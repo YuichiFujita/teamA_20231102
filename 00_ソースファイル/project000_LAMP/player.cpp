@@ -958,6 +958,14 @@ void CPlayer::SetCounterFlail(const int nCounterFlail)
 }
 
 //============================================================
+//	フレイル取得処理
+//============================================================
+CFlail *CPlayer::GetFlail(void) const
+{
+	return m_pFlail;
+}
+
+//============================================================
 //	自身のメインカラーマテリアル設定処理
 //============================================================
 void CPlayer::SetMainMaterial(void)
@@ -1161,6 +1169,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 			m_dashRot,
 			m_destRot,
 			m_fPlusMove,
+			m_nCounterFlail,
 			m_bDash
 		);
 	}
@@ -1638,7 +1647,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 3.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 6.0f)
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 4.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 7.0f)
 		{
 			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
@@ -1646,54 +1655,74 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		}
 		else
 		{
+			// カウンターアップ開始
+			if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
+			{
+				m_nCounterFlail--;
+			}
+
 			// 引き戻す
 			if (CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE)
 			{
-				m_nCounterFlail -= 1;
-
-				if (m_nCounterFlail < -60)
+				if (m_nCounterFlail < flail::FLAIL_DROP)
 				{
-					m_nCounterFlail = -60;
-				}
+					m_nCounterFlail -= 1;
 
-				if (m_nCounterFlail == -2)
-				{
-					float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
-					float rot2 = m_destRot.y;
-					float rot3 = rot2 - rot1;
+					if (m_nCounterFlail < -60)
+					{
+						m_nCounterFlail = -60;
+					}
 
-					useful::NormalizeRot(rot3);
+					if (m_nCounterFlail == -2)
+					{
+						float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID) + 1.57f;
+						float rot2 = m_destRot.y;
+						float rot3 = rot2 - rot1;
 
-					if (DEAD_ZONE < fStick)
-					{ // デッドゾーン以上の場合
+						useful::NormalizeRot(rot3);
 
-						if (rot3 > 0.0f)
-						{
-							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(0.03f);
+						if (DEAD_ZONE < fStick)
+						{ // デッドゾーン以上の場合
+
+							if (rot3 > 0.0f)
+							{
+								// 溜めてる間鉄球を振り回す
+								m_pFlail->SetChainRotMove(0.03f);
+							}
+							else
+							{
+								// 溜めてる間鉄球を振り回す
+								m_pFlail->SetChainRotMove(-0.03f);
+							}
 						}
 						else
 						{
 							// 溜めてる間鉄球を振り回す
-							m_pFlail->SetChainRotMove(-0.03f);
+							m_pFlail->SetChainRotMove(0.0f);
 						}
 					}
-					else
-					{
-						// 溜めてる間鉄球を振り回す
-						m_pFlail->SetChainRotMove(0.0f);
-					}
+
+					// 移動量を更新
+					m_move.x = 0.0f;
+					m_move.z = 0.0f;
 				}
+			}
 
-				// 溜めた時間に応じて飛距離増加
-				D3DXVECTOR3 move = VEC3_ZERO;
-				move.x = (sinf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-				move.z = (cosf(m_pFlail->GetChainRotTarget()) * (m_nCounterFlail * -m_nCounterFlail));
-				m_pFlail->SetMove(move);
+			// 引き戻す
+			if (CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_L1, m_nPadID) == TRUE)
+			{
+				if (m_nCounterFlail == flail::FLAIL_DROP)
+				{
+					D3DXVECTOR3 vecFlail = GetVec3Position() - m_pFlail->GetVec3Position();
+					float rotFlail;
 
-				// 移動量を更新
-				m_move.x = 0.0f;
-				m_move.z = 0.0f;
+					rotFlail = atan2f(vecFlail.x, vecFlail.z);
+
+					// 移動量を更新
+					m_move.x += sinf(rotFlail + D3DX_PI) * 10.0f;
+					m_move.y = 1.0f;
+					m_move.z += cosf(rotFlail + D3DX_PI) * 10.0f;
+				}
 			}
 
 			// 投擲
@@ -1767,6 +1796,11 @@ void CPlayer::UpdateDash(void)
 
 				// ダッシュしている状態にする
 				m_bDash = true;
+
+				if (m_nCounterFlail > flail::FLAIL_DEF && m_nCounterFlail <= flail::FLAIL_CHARGE)
+				{
+					m_nCounterFlail = flail::FLAIL_DEF;
+				}
 
 				// サウンドの再生
 				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// ジャンプ音

@@ -93,6 +93,7 @@ public:
 		D3DXVECTOR3& rDashRot,
 		D3DXVECTOR3& rDestRot,
 		float& rPlusMove,
+		int& rCounterFlail,
 		bool& rDash
 	);
 
