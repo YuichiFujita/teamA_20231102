@@ -11,7 +11,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-
+#include "sound.h"
 #include "ModelParticle.h"
 
 //************************************************************
@@ -216,7 +216,7 @@ void CBlock::Hit(void)
 		// WATANABE：ビルドすると未解決の外部参照って言われたからコメントアウトしておきました
 		CModParticle::Create(D3DXVECTOR3(CObjectMeshCube::GetVec3Position().x, CObjectMeshCube::GetVec3Position().y + 50.0f,
 			CObjectMeshCube::GetVec3Position().z));
-
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// ヒット音
 		//終了処理を行う
 		Uninit();
 	}
