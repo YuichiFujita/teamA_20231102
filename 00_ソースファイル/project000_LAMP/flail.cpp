@@ -30,7 +30,7 @@ namespace
 	const int	PRIORITY	= 3;		// フレイルの優先順位
 
 	const float	RADIUS		= 50.0f;	// 半径
-	const int	HIT_DAMAGE	= 10;		// ダメージ量
+	const int	HIT_DAMAGE	= 30;		// ダメージ量
 }
 
 //************************************************************
