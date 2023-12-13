@@ -715,9 +715,9 @@ CFlail *CFlail::Create
 //============================================================
 void CFlail::Collision(D3DXVECTOR3& rPos)
 {
-	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+	CPlayer *playerthis = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	if (playerthis->GetCounterFlail() < flail::FLAIL_DEF || playerthis->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		for (int nCntPlayer = 0; nCntPlayer < 4; nCntPlayer++)
 		{
@@ -741,7 +741,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				if (length < 40.0f + (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
 				{
 					// ダメージヒット処理
-					player->HitKnockBack(m_nDamage, vec);
+					player->HitKnockBack(m_nDamage, vec, playerthis);
 				}
 
 				D3DXVECTOR3 posFlail;
@@ -768,7 +768,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 		}
 	}
 
-	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	if (playerthis->GetCounterFlail() < flail::FLAIL_DEF || playerthis->GetCounterFlail() == flail::FLAIL_THROW)
 	{
 		// 障害物との当たり判定
 		if (CollisionObstacle(rPos) ||

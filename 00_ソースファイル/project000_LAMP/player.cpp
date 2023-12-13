@@ -114,21 +114,23 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPadID(nPad)
 {
 	// メンバ変数をクリア
-	m_pStatus		= NULL;			// ステータスの情報
-	m_pFlail		= NULL;			// フレイルの情報
-	m_oldPos		= VEC3_ZERO;	// 過去位置
-	m_move			= VEC3_ZERO;	// 移動量
-	m_destRot		= VEC3_ZERO;	// 目標向き
-	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
-	m_state			= STATE_NONE;	// 状態
-	m_motionOld		= 0;			// 過去モーション
-	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nCounterFlail	= 0;			// フレイル管理カウンター
-	m_fPlusMove		= 0.0f;			// プラス移動量
-	m_fSinAlpha		= 0.0f;			// 透明向き
-	m_bDash			= false;		// ダッシュ状況
-	m_bJump			= false;		// ジャンプ状況
-	m_bAI			= false;
+	m_pStatus			= NULL;			// ステータスの情報
+	m_pFlail			= NULL;			// フレイルの情報
+	m_pFinalAttack		= NULL;			// 攻撃者の情報
+	m_oldPos			= VEC3_ZERO;	// 過去位置
+	m_move				= VEC3_ZERO;	// 移動量
+	m_destRot			= VEC3_ZERO;	// 目標向き
+	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
+	m_state				= STATE_NONE;	// 状態
+	m_motionOld			= 0;			// 過去モーション
+	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail		= 0;			// フレイル管理カウンター
+	m_nCounterAttack	= 0;			// 最終攻撃カウンター
+	m_fPlusMove			= 0.0f;			// プラス移動量
+	m_fSinAlpha			= 0.0f;			// 透明向き
+	m_bDash				= false;		// ダッシュ状況
+	m_bJump				= false;		// ジャンプ状況
+	m_bAI				= false;
 }
 
 //============================================================
@@ -145,22 +147,26 @@ CPlayer::~CPlayer()
 HRESULT CPlayer::Init(void)
 {
 	// メンバ変数を初期化
-	m_pStatus		= NULL;			// ステータスの情報
-	m_pFlail		= NULL;			// フレイルの情報
-	m_oldPos		= VEC3_ZERO;	// 過去位置
-	m_move			= VEC3_ZERO;	// 移動量
-	m_destRot		= VEC3_ZERO;	// 目標向き
-	m_dashRot		= VEC3_ZERO;	// ダッシュ向き
-	m_state			= STATE_NONE;	// 状態
-	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nCounterFlail	= 0;			// フレイル管理カウンター
-	m_fPlusMove		= 0.0f;			// プラス移動量
-	m_fSinAlpha		= 0.0f;			// 透明向き
-	m_bDash			= false;		// ダッシュ状況
-	m_bJump			= true;			// ジャンプ状況
+	m_pStatus			= NULL;			// ステータスの情報
+	m_pFlail			= NULL;			// フレイルの情報
+	m_pFinalAttack		= NULL;			// 攻撃者の情報
+	m_oldPos			= VEC3_ZERO;	// 過去位置
+	m_move				= VEC3_ZERO;	// 移動量
+	m_destRot			= VEC3_ZERO;	// 目標向き
+	m_dashRot			= VEC3_ZERO;	// ダッシュ向き
+	m_state				= STATE_NONE;	// 状態
+	m_nCounterState		= 0;			// 状態管理カウンター
+	m_nCounterFlail		= 0;			// フレイル管理カウンター
+	m_nCounterAttack	= 0;			// 最終攻撃カウンター
+	m_fPlusMove			= 0.0f;			// プラス移動量
+	m_fSinAlpha			= 0.0f;			// 透明向き
+	m_bDash				= false;		// ダッシュ状況
+	m_bJump				= true;			// ジャンプ状況
+
 	m_SItemPermanent[0] = {};
 	m_SItemPermanent[1] = {};
 	m_SItemTemporary = {};
+
 	// オブジェクトキャラクターの初期化
 	if (FAILED(CObjectChara::Init()))
 	{ // 初期化に失敗した場合
@@ -449,125 +455,6 @@ void CPlayer::SetItemPermanent(EItem Item)
 	m_SItemPermanent[0].type = m_SItemPermanent[1].type;
 	m_SItemPermanent[1].type = Item;
 }
-//============================================================
-//	ノックバックヒット処理
-//============================================================
-void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock)
-{
-	
-	if (IsDeath())
-	{ // 死亡フラグが立っている場合
-
-		return;
-	}
-
-	if (m_state != STATE_NORMAL)
-	{ // 通常状態ではない場合
-
-		return;
-	}
-
-	// 変数を宣言
-	bool bDeath = false;	// 死亡状況
-
-	// 死亡状況の設定
-	{
-		// ポインタを宣言
-		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-
-		switch (pRetention->GetKillState())
-		{ // 討伐条件ごとの処理
-		case CRetentionManager::KILL_LIFE:	// 体力制
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がすでにない場合
-
-				return;
-			}
-
-			// 体力にダメージを与える
-			m_pStatus->AddNumLife(-nDmg);
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がなくなった場合
-
-				// 死亡状態にする
-				bDeath = true;
-			}
-
-			break;
-
-		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
-			break;
-
-		default:
-			assert(false);
-			break;
-		}
-	}
-
-	// 状態の設定
-	{
-		// 変数を宣言
-		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
-		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
-
-		// カウンターを初期化
-		m_nCounterState = 0;
-
-		if (bDeath)
-		{ // 死亡している場合
-
-			// 死亡状態を設定
-			SetState(STATE_DEATH);
-
-			// 死亡モーションを設定
-			SetMotion(MOTION_DEATH);
-
-			// 爆発パーティクルを生成
-		
-
-		}
-		else
-		{ // 死亡していない場合
-
-			// NAKAMURA：ふっとび量の決め方きもければ変えて
-			// 変数を宣言
-			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
-
-			// ノックバック移動量を設定
-			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
-			m_move.y = KNOCK_UP;
-			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
-
-			// ノックバック方向に向きを設定
-			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
-			m_destRot.y = rotPlayer.y;	// 目標向きを設定
-			SetVec3Rotation(rotPlayer);	// 向きを設定
-
-			// 空中状態にする
-			m_bJump = true;
-
-			// ノック状態を設定
-			SetState(STATE_KNOCK);
-
-			// 吹っ飛びモーションを設定
-			SetMotion(MOTION_KNOCK);
-
-			// 爆発パーティクルを生成
-
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f,0.99f);
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
-		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
-	}
-
-	// NAKAMURA：吹っ飛び率の決め方は任せます
-	// 吹っ飛び率を加算
-	m_pStatus->AddNumRate(100);
-}
 
 //============================================================
 //	状態の設定処理
@@ -729,6 +616,227 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 }
 
 //============================================================
+//	ノックバックヒット処理
+//============================================================
+void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer *pAttack)
+{
+	if (IsDeath())
+	{ // 死亡フラグが立っている場合
+
+		return;
+	}
+
+	if (m_state != STATE_NORMAL)
+	{ // 通常状態ではない場合
+
+		return;
+	}
+
+	// 変数を宣言
+	bool bDeath = false;	// 死亡状況
+
+	// 死亡状況の設定
+	{
+		// ポインタを宣言
+		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+
+		switch (pRetention->GetKillState())
+		{ // 討伐条件ごとの処理
+		case CRetentionManager::KILL_LIFE:	// 体力制
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がすでにない場合
+
+				return;
+			}
+
+			// 体力にダメージを与える
+			m_pStatus->AddNumLife(-nDmg);
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がなくなった場合
+
+				// 死亡状態にする
+				bDeath = true;
+			}
+
+			break;
+
+		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	// 状態の設定
+	{
+		// 変数を宣言
+		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
+
+		// 攻撃者の情報を保存
+		m_pFinalAttack = pAttack;
+		m_nCounterAttack = 0;	// 最終攻撃カウンター
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
+		if (bDeath)
+		{ // 死亡している場合
+
+			// 死亡状態を設定
+			SetState(STATE_DEATH);
+
+			// 死亡モーションを設定
+			SetMotion(MOTION_DEATH);
+		}
+		else
+		{ // 死亡していない場合
+
+			// NAKAMURA：ふっとび量の決め方きもければ変えて
+			// 変数を宣言
+			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
+
+			// ノックバック移動量を設定
+			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
+			m_move.y = KNOCK_UP;
+			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
+
+			// ノックバック方向に向きを設定
+			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
+			m_destRot.y = rotPlayer.y;	// 目標向きを設定
+			SetVec3Rotation(rotPlayer);	// 向きを設定
+
+			// 空中状態にする
+			m_bJump = true;
+
+			// ノック状態を設定
+			SetState(STATE_KNOCK);
+
+			// 吹っ飛びモーションを設定
+			SetMotion(MOTION_KNOCK);
+
+			// 爆発パーティクルを生成
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f,0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
+		}
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
+	}
+
+	// NAKAMURA：吹っ飛び率の決め方は任せます
+	// 吹っ飛び率を加算
+	m_pStatus->AddNumRate(100);
+}
+
+//============================================================
+//	キルY座標ヒット処理
+//============================================================
+void CPlayer::HitKillY(const int nDmg)
+{
+	if (IsDeath())
+	{ // 死亡フラグが立っている場合
+
+		return;
+	}
+
+	if (m_state != STATE_NORMAL
+	&&  m_state != STATE_KNOCK
+	&&  m_state != STATE_INVULN)
+	{ // 通常・ノック・無敵状態ではない場合
+
+		return;
+	}
+
+	// 変数を宣言
+	bool bDeath = false;	// 死亡状況
+
+	// 死亡状況の設定
+	{
+		// ポインタを宣言
+		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+		CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 600, 0.2f, 0.99f);
+		switch (pRetention->GetKillState())
+		{ // 討伐条件ごとの処理
+		case CRetentionManager::KILL_LIFE:	// 体力制
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がすでにない場合
+
+				return;
+			}
+
+			// 体力にダメージを与える
+			m_pStatus->AddNumLife(-nDmg);
+
+			if (m_pStatus->GetNumLife() <= 0)
+			{ // 体力がなくなった場合
+
+				// 死亡状態にする
+				bDeath = true;
+			}
+
+			break;
+
+		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
+
+			// 死亡状態にする
+			bDeath = true;
+
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	// 状態の設定
+	{
+		// 変数を宣言
+		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
+
+		// カウンターを初期化
+		m_nCounterState = 0;
+
+		// フレイルを強制的に所持
+		m_pFlail->CatchFlail();
+
+		if (bDeath)
+		{ // 死亡している場合
+
+			// 死亡状態を設定
+			SetState(STATE_DEATH);
+
+			// 死亡モーションを設定
+			SetMotion(MOTION_DEATH);
+
+		}
+		else
+		{ // 死亡していない場合
+
+			// 溺れ状態を設定
+			SetState(STATE_DROWN);
+
+			// 溺れモーションを設定
+			SetMotion(MOTION_DROWN);
+
+		
+		}
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
+	}
+}
+
+//============================================================
 //	出現の設定処理
 //============================================================
 void CPlayer::SetSpawn(void)
@@ -834,109 +942,20 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 }
 
 //============================================================
-//	キルY座標ヒット処理
-//============================================================
-void CPlayer::HitKillY(const int nDmg)
-{
-	if (IsDeath())
-	{ // 死亡フラグが立っている場合
-
-		return;
-	}
-
-	if (m_state != STATE_NORMAL
-	&&  m_state != STATE_KNOCK
-	&&  m_state != STATE_INVULN)
-	{ // 通常・ノック・無敵状態ではない場合
-
-		return;
-	}
-
-	// 変数を宣言
-	bool bDeath = false;	// 死亡状況
-
-	// 死亡状況の設定
-	{
-		// ポインタを宣言
-		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-		CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 600, 0.2f, 0.99f);
-		switch (pRetention->GetKillState())
-		{ // 討伐条件ごとの処理
-		case CRetentionManager::KILL_LIFE:	// 体力制
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がすでにない場合
-
-				return;
-			}
-
-			// 体力にダメージを与える
-			m_pStatus->AddNumLife(-nDmg);
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がなくなった場合
-
-				// 死亡状態にする
-				bDeath = true;
-			}
-
-			break;
-
-		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
-
-			// 死亡状態にする
-			bDeath = true;
-
-			break;
-
-		default:
-			assert(false);
-			break;
-		}
-	}
-
-	// 状態の設定
-	{
-		// 変数を宣言
-		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
-
-		// カウンターを初期化
-		m_nCounterState = 0;
-
-		if (bDeath)
-		{ // 死亡している場合
-
-			// 死亡状態を設定
-			SetState(STATE_DEATH);
-
-			// 死亡モーションを設定
-			SetMotion(MOTION_DEATH);
-
-		}
-		else
-		{ // 死亡していない場合
-
-			// 溺れ状態を設定
-			SetState(STATE_DROWN);
-
-			// 溺れモーションを設定
-			SetMotion(MOTION_DROWN);
-
-		
-		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
-	}
-}
-
-//============================================================
 //	パッドインデックス取得処理
 //============================================================
 int CPlayer::GetPadID(void) const
 {
 	// パッドインデックスを返す
 	return m_nPadID;
+}
+
+//============================================================
+//	最後に攻撃してきたプレイヤーの取得処理
+//============================================================
+CPlayer *CPlayer::GetLastAttackPlayer(void) const
+{
+	return m_pFinalAttack;
 }
 
 //============================================================
