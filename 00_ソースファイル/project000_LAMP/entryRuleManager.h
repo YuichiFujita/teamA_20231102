@@ -18,7 +18,7 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define MAX_ARROW	(2)	// 矢印の総数
+#define MAX_RULE_ARROW	(2)	// 矢印の総数
 
 //************************************************************
 //	前方宣言
@@ -101,7 +101,7 @@ private:
 
 	// メンバ変数
 	CAnim2D *m_apRuleTitle[RULE_MAX];	// ルールタイトルの情報
-	CAnim2D *m_apArrow[MAX_ARROW];		// 矢印の情報
+	CAnim2D *m_apArrow[MAX_RULE_ARROW];	// 矢印の情報
 	CMultiValue	*m_pWinPoint;	// 勝利ポイント数の情報
 	CAnim2D		*m_pKill;		// 撃破条件の情報
 	CAnim2D		*m_pWin;		// 勝利条件の情報
