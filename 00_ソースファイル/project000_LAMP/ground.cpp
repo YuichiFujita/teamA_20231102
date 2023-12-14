@@ -41,12 +41,12 @@ const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 	},
 
 	{ // 氷テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 左テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 右テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 下テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 上テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 前テクスチャ
-		"data\\TEXTURE\\iceblock.png",	// 後テクスチャ
+		"data\\TEXTURE\\snow.png",	// 左テクスチャ
+		"data\\TEXTURE\\snow.png",	// 右テクスチャ
+		"data\\TEXTURE\\snow.png",	// 下テクスチャ
+		"data\\TEXTURE\\snow.png",	// 上テクスチャ
+		"data\\TEXTURE\\snow.png",	// 前テクスチャ
+		"data\\TEXTURE\\snow.png",	// 後テクスチャ
 	},
 
 	{ // 火山灰(黒)テクスチャ
