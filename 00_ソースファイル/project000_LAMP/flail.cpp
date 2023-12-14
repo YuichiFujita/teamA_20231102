@@ -62,6 +62,7 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	m_nNumChain = 0;
 	m_nfulChainF = 0;
 	m_nfulChainP = 0;
+	m_nHitCount = 0;
 	m_fChainRot = 0.0f;
 	m_fLengthChain = 0.0f;
 	m_fLengthTarget = 0.0f;
@@ -174,7 +175,7 @@ void CFlail::Update(void)
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[カウンター]：%d\n", player->GetCounterFlail());*/
 		//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[角速度]：%f\n", m_fChainRotMove);
 		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル位置]：%f %f %f\n", GetVec3Position().x, GetVec3Position().y, GetVec3Position().z);
-		CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル角度]：%f\n", m_fChainRot);
+		//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[フレイル角度]：%f\n", m_fChainRot);
 	}
 
 	// オブジェクトモデルの更新
@@ -182,6 +183,20 @@ void CFlail::Update(void)
 
 	// 鎖の更新
 	UpdateChain();
+
+	if (m_bHit)
+	{
+		m_nHitCount++;
+
+		if (m_nHitCount > 60)
+		{
+			m_bHit = false;
+		}
+	}
+	else
+	{
+		m_nHitCount = 0;
+	}
 
 	if (player->GetCounterFlail() == flail::FLAIL_DROP)
 	{
@@ -770,9 +785,9 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				flailLength = D3DXVec3Length(&posFlail);
 
 				//フレイル同士の当たり判定
-				if (flailLength < RADIUS * 3.0f && (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW))
+				if (flailLength < RADIUS * 3.0f && (player->GetCounterFlail() < flail::FLAIL_DROP || player->GetCounterFlail() == flail::FLAIL_THROW))
 				{
-					if (!m_bHit)
+					if (m_bHit == false)
 					{
 						CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 60, 60, 300, 1.0f, 0.99f);
 					}
@@ -781,17 +796,11 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					rotMove1 = GetChainRotMove();
 					rotMove2 = player->GetFlail()->GetChainRotMove();
 
-					SetChainRotMove(rotMove1 * -0.8f);
-					m_fLengthTarget = m_fLengthChain;
+					SetChainRotMove(rotMove2 * 0.8f);
 
-					player->GetFlail()->SetChainRotMove(rotMove2 * -0.8f);
-					player->GetFlail()->SetLengthTarget(player->GetFlail()->GetLengthChain());
+					player->GetFlail()->SetChainRotMove(rotMove1 * 0.8f);
 
 					m_bHit = true;
-				}
-				else
-				{
-					m_bHit = false;
 				}
 			}
 		}
@@ -1432,6 +1441,24 @@ float CFlail::GetLengthTarget(void)
 {
 	// 長さを返す
 	return m_fLengthTarget;
+}
+
+//============================================================
+//	当たり判定状況の設定処理
+//============================================================
+void CFlail::SetHit(const bool& Hit)
+{
+	// 引数の状況を設定
+	m_bHit = Hit;
+}
+
+//============================================================
+//	当たり判定状況の取得処理
+//============================================================
+bool CFlail::GetHit(void)
+{
+	// 状況を返す
+	return m_bHit;
 }
 
 //============================================================

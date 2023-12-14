@@ -104,6 +104,9 @@ public:
 	void SetLengthTarget(const float& rLengthTarget);		// 目標長さ設定
 	float GetLengthTarget(void);							// 目標長さ取得
 
+	void SetHit(const bool& Hit);						// 目標長さ設定
+	bool GetHit(void);									// 目標長さ取得
+
 	void CatchFlail(void);
 	void ShotFlail(const float rot);
 
@@ -144,6 +147,7 @@ private:
 	int			m_nPlayerID;					// プレイヤーID
 	int			m_nNumChain;					// 鎖の数
 	int			m_nDamage;						// ダメージ
+	int			m_nHitCount;					// ダメージ
 	int			m_nfulChainF;					// 鎖の数
 	int			m_nfulChainP;					// 鎖の数
 	float		m_fChainRot;					// 角度
