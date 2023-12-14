@@ -358,7 +358,7 @@ CPlayer::EMotion CPlayerAI::AIselect
 		break;
 	}
 
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[ãﬂÇ≠ÇÃìG]ÅF%d\n", nApproach);
+	//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[ãﬂÇ≠ÇÃìG]ÅF%d\n", nApproach);
 
 	m_currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
 	m_currentMotion = AIattack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);

@@ -1588,6 +1588,10 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				m_nCounterFlail = flail::FLAIL_CHARGE;
 
+				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_FULL, m_nPadID);
+			}
+			else
+			{
 				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_CHAGE, m_nPadID);
 			}
 
@@ -1657,15 +1661,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			m_pFlail->SetLengthTarget(lengthTarget);
-
-			if (m_nCounterFlail == flail::FLAIL_CHARGE)
-			{
-				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_FULL, m_nPadID);
-			}
-			else
-			{
-				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_SHOT, m_nPadID);
-			}
 
 			// カウンターの設定
 			m_nCounterFlail = flail::FLAIL_THROW;

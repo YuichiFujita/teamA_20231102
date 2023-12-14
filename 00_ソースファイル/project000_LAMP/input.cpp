@@ -811,7 +811,7 @@ void CInputPad::SetVibration(EType type, int nPlayer)
 		m_aVibration[nPlayer].vibration.wRightMotorSpeed = VIB_FLAILSHOT;	// ‰E
 
 		// U“®ŠÔ‚Ìİ’è
-		m_aVibration[nPlayer].nTime = 60;
+		m_aVibration[nPlayer].nTime = 5;
 
 		// ˆ—‚ğ”²‚¯‚é
 		break;
