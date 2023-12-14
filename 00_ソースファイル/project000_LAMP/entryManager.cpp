@@ -50,6 +50,7 @@ namespace
 
 	namespace join
 	{
+		const POSGRID2	  PART	= POSGRID2(2, 1);	// テクスチャ分割数
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 480.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 70.0f, 0.0f);		// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
@@ -57,14 +58,47 @@ namespace
 
 	namespace control
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 630.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 620.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(505.0f, 84.0f, 0.0f);			// 大きさ
 	}
 
 	namespace start
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(1100.0f, 600.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(300.0f, 180.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 370.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(380.0f, 80.0f, 0.0f);			// 大きさ
+	}
+
+	namespace numcpu
+	{
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x, 500.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);			// 数字大きさ
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);			// タイトル空白
+		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;								// 数字空白
+		const int			DIGIT		= 1;										// 桁数
+	}
+
+	namespace arrow
+	{
+		const float	ADD_ALPHA		= 0.02f;	// 透明度の加算量
+		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+		const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
+		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
+		const float	SPACE_EDGE		= 170.0f;	// 縁の空白
+
+		const POSGRID2		PART	= POSGRID2(MAX_ENTRY_ARROW, 1);		// テクスチャ分割数
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
+
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x - SPACE_EDGE, numcpu::POS.y, 0.0f);	// 位置
+		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.0f, 0.0f, 0.0f);					// 空白
+		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);		// 色
+	}
+
+	namespace bg
+	{
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 440.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(SCREEN_SIZE.x, 280.0f, 0.0f);	// 大きさ
+		const D3DXCOLOR		COL		= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.625f);		// 色
 	}
 }
 
@@ -75,8 +109,11 @@ const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\entry_player.png",	// PLAYERテクスチャ
 	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
-	"data\\TEXTURE\\entry002.png",	// 操作表示テクスチャ
-	"data\\TEXTURE\\entry003.png",	// 開始表示テクスチャ
+	"data\\TEXTURE\\entry002.png",		// 操作表示テクスチャ
+	"data\\TEXTURE\\entry003.png",		// 開始表示テクスチャ
+	"data\\TEXTURE\\entry004.png",		// 参加状況テクスチャ
+	"data\\TEXTURE\\Arrow_Twin.png",	// 矢印テクスチャ
+	"data\\TEXTURE\\entry_player.png",	// CPUテクスチャ
 };
 
 //************************************************************
@@ -91,10 +128,14 @@ CEntryManager::CEntryManager()
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
+	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
 	m_pRuleManager	= NULL;		// エントリールールの情報
 	m_pControl	= NULL;			// 操作表示の情報
+	m_pBG		= NULL;			// 背景の情報
 	m_pStart	= NULL;			// 開始表示の情報
+	m_pNumCpu	= NULL;			// CPU数表示の情報
 	m_state		= STATE_ENTRY;	// 状態
+	m_fSinAlpha	= 0.0f;			// 透明向き
 }
 
 //============================================================
@@ -114,10 +155,14 @@ HRESULT CEntryManager::Init(void)
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
+	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
 	m_pRuleManager	= NULL;		// エントリールールの情報
 	m_pControl	= NULL;			// 操作表示の情報
+	m_pBG		= NULL;			// 背景の情報
 	m_pStart	= NULL;			// 開始表示の情報
+	m_pNumCpu	= NULL;			// CPU数表示の情報
 	m_state		= STATE_ENTRY;	// 状態
+	m_fSinAlpha	= -HALF_PI;		// 透明向き
 
 	// ゲーム情報を初期化
 	CManager::GetInstance()->GetRetentionManager()->InitGame();
@@ -178,10 +223,12 @@ HRESULT CEntryManager::Init(void)
 		m_apFrame[nCntEntry]->SetPriority(PRIORITY);
 
 		// プレイヤー参加の生成
-		m_apJoin[nCntEntry] = CObject2D::Create
+		m_apJoin[nCntEntry] = CAnim2D::Create
 		( // 引数
+			join::PART.x,	// テクスチャ横分割数
+			join::PART.y,	// テクスチャ縦分割数
 			join::POS + (join::SPACE * (float)nCntEntry),	// 位置
-			join::SIZE	// 大きさ
+			join::SIZE		// 大きさ
 		);
 		if (m_apJoin[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -190,6 +237,9 @@ HRESULT CEntryManager::Init(void)
 			assert(false);
 			return E_FAIL;
 		}
+
+		// テクスチャを登録・割当
+		m_apJoin[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_JOIN]);
 
 		// 優先順位を設定
 		m_apJoin[nCntEntry]->SetPriority(PRIORITY);
@@ -215,6 +265,28 @@ HRESULT CEntryManager::Init(void)
 	// 優先順位を設定
 	m_pControl->SetPriority(PRIORITY);
 
+	// 背景の生成
+	m_pBG = CObject2D::Create
+	( // 引数
+		bg::POS,	// 位置
+		bg::SIZE,	// 大きさ
+		VEC3_ZERO,	// 向き
+		bg::COL		// 色
+	);
+	if (m_pBG == NULL)
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 優先順位を設定
+	m_pBG->SetPriority(PRIORITY);
+
+	// 自動描画をOFFにする
+	m_pBG->SetEnableDraw(false);
+
 	// 開始表示の生成
 	m_pStart = CObject2D::Create
 	( // 引数
@@ -234,6 +306,75 @@ HRESULT CEntryManager::Init(void)
 
 	// 優先順位を設定
 	m_pStart->SetPriority(PRIORITY);
+
+	// 自動描画をOFFにする
+	m_pStart->SetEnableDraw(false);
+
+	// CPU数表示の生成
+	m_pNumCpu = CValueUI::Create
+	( // 引数
+		mc_apTextureFile[TEXTURE_CPU],	// タイトルテクスチャパス
+		CValue::TEXTURE_NORMAL,	// 数字テクスチャ
+		numcpu::DIGIT,			// 桁数
+		numcpu::POS,			// 位置
+		numcpu::SPACE_TITLE,	// 行間
+		numcpu::SPACE_VALUE,	// 数字行間
+		numcpu::SIZE_TITLE,		// タイトル大きさ
+		numcpu::SIZE_VALUE		// 数字大きさ
+	);
+	if (m_pNumCpu == NULL)
+	{ // 生成に失敗した場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 優先順位を設定
+	m_pNumCpu->SetPriority(PRIORITY);
+
+	// 最小数を設定
+	m_pNumCpu->GetMultiValue()->SetMin(0);
+
+	// 最大数を設定
+	m_pNumCpu->GetMultiValue()->SetMax(MAX_PLAYER - 1);
+
+	// 自動描画をOFFにする
+	m_pNumCpu->SetEnableDraw(false);
+
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の生成
+		m_apArrow[i] = CAnim2D::Create
+		( // 引数
+			arrow::PART.x,	// テクスチャ横分割数
+			arrow::PART.y,	// テクスチャ縦分割数
+			arrow::POS + ((float)i * arrow::SPACE),	// 位置
+			arrow::SIZE,	// 大きさ
+			VEC3_ZERO,		// 向き
+			XCOL_AWHITE		// 色
+		);
+		if (m_apArrow[i] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// テクスチャを登録・割当
+		m_apArrow[i]->BindTexture(mc_apTextureFile[TEXTURE_ARROW]);
+
+		// 優先順位を設定
+		m_apArrow[i]->SetPriority(PRIORITY);
+
+		// パターンを設定
+		m_apArrow[i]->SetPattern(i);
+
+		// 自動描画をOFFにする
+		m_apArrow[i]->SetEnableDraw(false);
+	}
 
 	// プレイ人数を初期化
 	CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(0);
@@ -274,11 +415,24 @@ HRESULT CEntryManager::Uninit(void)
 		m_apJoin[nCntEntry]->Uninit();
 	}
 
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の終了
+		m_apArrow[i]->Uninit();
+	}
+
 	// 操作表示の終了
 	m_pControl->Uninit();
 
+	// 背景の終了
+	m_pBG->Uninit();
+
 	// 開始表示の終了
 	m_pStart->Uninit();
+
+	// CPU数表示の終了
+	m_pNumCpu->Uninit();
 
 	// 成功を返す
 	return S_OK;
@@ -303,6 +457,9 @@ void CEntryManager::Update(void)
 		// エントリーの更新
 		UpdateEntry();
 
+		// CPUの更新
+		UpdateCpu();
+
 		// 開始の更新
 		UpdateStart();
 
@@ -319,11 +476,24 @@ void CEntryManager::Update(void)
 			m_apJoin[nCntEntry]->Update();
 		}
 
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 矢印の更新
+			m_apArrow[i]->Update();
+		}
+
 		// 操作表示の更新
 		m_pControl->Update();
 
+		// 背景の更新
+		m_pBG->Update();
+
 		// 開始表示の更新
 		m_pStart->Update();
+
+		// CPU数表示の更新
+		m_pNumCpu->Update();
 
 		break;
 
@@ -486,11 +656,11 @@ void CEntryManager::UpdateEntry(void)
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
-		if (pPad->IsTrigger(CInputPad::KEY_A, nCntEntry))
-		{
-			if (!pRetention->IsEntry(nCntEntry))
-			{ // エントリーしていない場合
+		if (!pRetention->IsEntry(nCntEntry))
+		{ // エントリーしていない場合
 
+			if (pPad->IsTrigger(CInputPad::KEY_A, nCntEntry))
+			{
 				// エントリーを登録
 				pRetention->SetEnableEntry(nCntEntry, true);
 				nNumPlayer++;	// エントリー数加算
@@ -501,19 +671,45 @@ void CEntryManager::UpdateEntry(void)
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
 			}
 		}
-		else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
-		{
-			if (pRetention->IsEntry(nCntEntry))
-			{ // エントリーしている場合
+		else if (pRetention->IsEntry(nCntEntry))
+		{ // エントリーしている場合
 
-				// エントリーを解除
-				pRetention->SetEnableEntry(nCntEntry, false);
-				nNumPlayer--;	// エントリー数減算
+			switch (m_apJoin[nCntEntry]->GetPattern())
+			{ // 準備状況ごとの処理
+			case JOIN_OFF:
 
-				// 色を非参加時のものに設定
-				m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
-				m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
-				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
+				if (pPad->IsTrigger(CInputPad::KEY_A, nCntEntry))
+				{
+					// 準備完了状態にする
+					m_apJoin[nCntEntry]->SetPattern(JOIN_ON);
+				}
+				else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
+				{
+					// エントリーを解除
+					pRetention->SetEnableEntry(nCntEntry, false);
+					nNumPlayer--;	// エントリー数減算
+
+					// 色を非参加時のものに設定
+					m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
+					m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
+					m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
+				}
+
+				break;
+
+			case JOIN_ON:
+
+				if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
+				{
+					// 準備未完了状態にする
+					m_apJoin[nCntEntry]->SetPattern(JOIN_OFF);
+				}
+
+				break;
+
+			default:
+				assert(false);
+				break;
 			}
 		}
 	}
@@ -530,6 +726,49 @@ void CEntryManager::UpdateEntry(void)
 }
 
 //============================================================
+//	CPUの更新処理
+//============================================================
+void CEntryManager::UpdateCpu(void)
+{
+	if (IsReadyOK(1))
+	{ // 全員が準備済みの場合
+
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 矢印の自動描画をONにする
+			m_apArrow[i]->SetEnableDraw(true);
+		}
+
+		// 自動描画をONにする
+		m_pBG->SetEnableDraw(true);			// 背景
+		m_pStart->SetEnableDraw(true);		// 開始表示
+		m_pNumCpu->SetEnableDraw(true);		// CPU数
+
+		// 矢印の更新
+		UpdateArrow();
+
+		// CPUの加減算の更新
+		UpdateAddCpu();
+	}
+	else
+	{ // 全員が準備済みではない場合
+
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 矢印の自動描画をOFFにする
+			m_apArrow[i]->SetEnableDraw(false);
+		}
+
+		// 自動描画をOFFにする
+		m_pBG->SetEnableDraw(false);		// 背景
+		m_pStart->SetEnableDraw(false);		// 開始表示
+		m_pNumCpu->SetEnableDraw(false);	// CPU数
+	}
+}
+
+//============================================================
 //	開始の更新処理
 //============================================================
 void CEntryManager::UpdateStart(void)
@@ -538,15 +777,156 @@ void CEntryManager::UpdateStart(void)
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	if (pKeyboard->IsTrigger(DIK_RETURN)
-	||  pKeyboard->IsTrigger(DIK_SPACE)
-	||  pPad->IsTriggerAll(CInputPad::KEY_START))
-	{
-		if (CManager::GetInstance()->GetRetentionManager()->GetNumPlayer() >= 2)
-		{ // エントリー数が二人以上の場合
+	if (IsReadyOK(2))
+	{ // 遷移可能の場合
 
+		if (pKeyboard->IsTrigger(DIK_RETURN)
+		||  pKeyboard->IsTrigger(DIK_SPACE)
+		||  pPad->IsTriggerAll(CInputPad::KEY_START))
+		{
 			// ルール設定状態にする
 			SetState(STATE_RULE);
 		}
+
+		// 開始表示の色を明るくする
+		m_pStart->SetColor(COL_ENTRY);
 	}
+	else
+	{ // 遷移可能ではない場合
+
+		// 開始表示の色を暗くする
+		m_pStart->SetColor(COL_UNENTRY);
+	}
+}
+
+//============================================================
+//	矢印の更新処理
+//============================================================
+void CEntryManager::UpdateArrow(void)
+{
+	for (int i = 0; i < MAX_ENTRY_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 変数を宣言
+		D3DXCOLOR colArrow = m_apArrow[i]->GetColor();	// 矢印色
+
+		if (colArrow.a < arrow::MIN_COL.a)
+		{ // 透明度が最低限より低い場合
+
+			// 透明度を加算
+			colArrow.a += arrow::ADD_ALPHA;
+
+			if (colArrow.a > arrow::MIN_COL.a)
+			{ // 透明度が超過した場合
+
+				// 透明度を補正
+				colArrow.a = arrow::MIN_COL.a;
+			}
+
+			// 矢印色を設定
+			m_apArrow[i]->SetColor(colArrow);
+		}
+		else
+		{ // 透明度が最低限以上の場合
+
+			// 変数を宣言
+			float fAddAlpha = 0.0f;	// 透明度の加算量
+
+			// 透明度を上げる
+			m_fSinAlpha += arrow::ADD_SINROT;
+			useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
+
+			// 透明度加算量を求める
+			fAddAlpha = (arrow::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
+
+			// 矢印色を設定
+			m_apArrow[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, arrow::BASIC_ALPHA + fAddAlpha));
+		}
+	}
+}
+
+//============================================================
+//	CPUの加減算の更新処理
+//============================================================
+void CEntryManager::UpdateAddCpu(void)
+{
+	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
+	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
+
+	// 現在のCPU数を保存
+	int nOldCpu = m_pNumCpu->GetMultiValue()->GetNum();
+
+	// TODO：ここに現在のCPU数に応じてCPU数の表示を変更する処理
+
+	if (pKeyboard->IsTrigger(DIK_D)
+	||  pKeyboard->IsTrigger(DIK_RIGHT)
+	||  pPad->IsTriggerAll(CInputPad::KEY_RIGHT))
+	{ // 加算の操作が行われた場合
+
+		// CPU数を加算
+		m_pNumCpu->GetMultiValue()->AddNum(1);
+
+		if (nOldCpu != m_pNumCpu->GetMultiValue()->GetNum())
+		{ // 減算できた場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+	}
+	if (pKeyboard->IsTrigger(DIK_A)
+	||  pKeyboard->IsTrigger(DIK_LEFT)
+	||  pPad->IsTriggerAll(CInputPad::KEY_LEFT))
+	{ // 減算の操作が行われた場合
+
+		// CPU数を減算
+		m_pNumCpu->GetMultiValue()->AddNum(-1);
+
+		if (nOldCpu != m_pNumCpu->GetMultiValue()->GetNum())
+		{ // 減算できた場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+	}
+}
+
+//============================================================
+//	準備済みかの判定取得処理
+//============================================================
+bool CEntryManager::IsReadyOK(const int nNumEntry) const
+{
+	// ポインタを宣言
+	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+
+	if (pRetention->GetNumPlayer() < nNumEntry)
+	{ // 参加人数不足
+
+		return false;
+	}
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (pRetention->IsEntry(nCntEntry))
+		{ // エントリーしている場合
+
+			switch (m_apJoin[nCntEntry]->GetPattern())
+			{ // 準備状況ごとの処理
+			case JOIN_OFF:
+
+				// 非準備状態
+				return false;
+
+			case JOIN_ON:
+				break;
+
+			default:
+				assert(false);
+				break;
+			}
+		}
+	}
+
+	// 遷移可能を返す
+	return true;
 }

@@ -165,7 +165,7 @@ HRESULT CPlayer::Init(void)
 	m_fPlusMove = 0.0f;			// プラス移動量
 	m_fSinAlpha = 0.0f;			// 透明向き
 	m_bDash = false;		// ダッシュ状況
-	m_bJump = true;			// ジャンプ状況
+	m_bJump = false;			// ジャンプ状況
 
 	m_SItemPermanent[0] = {};
 	m_SItemPermanent[1] = {};
