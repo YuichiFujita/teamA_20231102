@@ -441,97 +441,50 @@ HRESULT CResultManager::Init(void)
 			assert(false);
 			return E_FAIL;
 		}
-		////“|‚µ‚½”ƒ‚[ƒh‚¾‚Á‚½‚ç
-		//if (CManager::GetInstance()->GetRetentionManager()->GetWinState() == CRetentionManager::WIN_KILL)
-		//{
-		//	for (int nCntRank = 0; nCntRank < RANK_MAX; nCntRank++)
-		//	{
-		//		//ˆê‰ñ‚¾‚¯‚µ‚©’Ê‚ç‚È‚­‚·‚é
-		//		if (m_anSaveRank[nCnt] == NULL)
-		//		{
-		//			m_anSaveRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCntRank);
-		//		}
-		//	}
-		//	switch (nCnt)
-		//	{
-		//	case 0:
-
-		//		//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-		//		m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetWinRank1st();
-
-		//		break;
-
-		//	case 1:
-
-		//		//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-		//		m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCnt);;
-
-		//		break;
-
-		//	case 2:
-
-		//		//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-		//		m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCnt);;
-
-		//		break;
-
-		//	case 3:
-
-
-		//		//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-		//		m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCnt);;
-
-		//		break;
-		//	}
-		//}
-
-		////ƒTƒoƒCƒoƒ‹ƒXƒ^ƒCƒ‹‚¾‚Á‚½‚ç
-		//else if (CManager::GetInstance()->GetRetentionManager()->GetWinState() == CRetentionManager::WIN_SURVIVE)
-		//{
-			for (int nCntRank = 0; nCntRank < RANK_MAX; nCntRank++)
+		for (int nCntRank = 0; nCntRank < RANK_MAX; nCntRank++)
+		{
+			//ˆê‰ñ‚¾‚¯‚µ‚©’Ê‚ç‚È‚­‚·‚é
+			if (m_anSaveRank[nCntRank] == NULL)
 			{
-				//ˆê‰ñ‚¾‚¯‚µ‚©’Ê‚ç‚È‚­‚·‚é
-				if (m_anSaveRank[nCnt] == NULL)
-				{
-					m_anSaveRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCntRank);
-				}
-				else
-				{
-					break;
-				}
+				m_anSaveRank[nCntRank] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCntRank);
 			}
-
-			switch (nCnt)
+			else
 			{
-			case 0:
-
-				//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-				m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetWinRank1st();
-
-				break;
-
-			case 1:
-
-				//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-				m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
-				break;
-
-			case 2:
-
-				//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-				m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
-				break;
-
-			case 3:
-
-
-				//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
-				m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
 				break;
 			}
+		}
+
+		switch (nCnt)
+		{
+		case 0:
+
+			//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
+			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetWinRank1st();
+
+			break;
+
+		case 1:
+
+			//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
+			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
+
+			break;
+
+		case 2:
+
+			//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
+			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
+
+			break;
+
+		case 3:
+
+
+			//‚PˆÊ‚©‚ç‡‚ÉŽæ“¾‚µ‚Ä‚¢‚­
+			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
+
+			break;
+		}
 
 		// —Dæ‡ˆÊ‚ðÝ’è
 		m_apIcon[nCnt]->SetPriority(RESULT_PRIO);
