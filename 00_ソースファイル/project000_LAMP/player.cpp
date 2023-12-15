@@ -707,6 +707,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		if (bDeath)
 		{ // 死亡している場合
 
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 60, 150, 0.5f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 120, 300, 1.0f, 0.8f);
 		  // 死亡状態を設定
 			SetState(STATE_DEATH);
 
@@ -740,8 +742,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 			SetMotion(MOTION_KNOCK);
 
 			// 爆発パーティクルを生成
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 120, 300, 0.5f, 0.99f);
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 60, 600, 1.0f, 0.8f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 60, 150, 0.5f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 120, 300, 1.0f, 0.8f);
 		}
 
 		// サウンドの再生
@@ -781,7 +783,7 @@ void CPlayer::HitKillY(const int nDmg)
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 		if (CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetType() == CLiquid::TYPE_SEA)
 		{
-			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 120, 300, 0.2f, 0.99f);
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 60, 150, 0.2f, 0.99f);
 		}
 		else
 		{
