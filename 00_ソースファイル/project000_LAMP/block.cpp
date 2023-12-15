@@ -20,7 +20,16 @@
 namespace
 {
 	const char* SETUP_TXT = "data\\TXT\\block.txt";	// ブロックセットアップテキスト
+
+#ifdef ON_STENCIL_PLAYER
+
 	const int	PRIORITY = 4;	// ブロックの優先順位
+
+#else	// OFF_STENCIL_PLAYER
+
+	const int	PRIORITY = 1;	// ブロックの優先順位
+
+#endif	// ON_STENCIL_PLAYER
 }
 
 //************************************************************
@@ -164,14 +173,15 @@ void CBlock::Update(void)
 //============================================================
 void CBlock::Draw(void)
 {
-	// ポインタを宣言
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
-
 	/*
 		バックバッファ書き込み用の描画
 	*/
 	// オブジェクトメッシュキューブの描画
 	CObjectMeshCube::Draw();
+
+#ifdef ON_STENCIL_PLAYER
+
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 
 	/*
 		ステンシルバッファ書き込み用の描画
@@ -198,6 +208,8 @@ void CBlock::Draw(void)
 
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+#endif	// ON_STENCIL_PLAYER
 }
 //============================================================
 //	当たり判定処理
