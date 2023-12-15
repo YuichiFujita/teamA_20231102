@@ -57,7 +57,7 @@ namespace
 
 	namespace join
 	{
-		const POSGRID2	  PART	= POSGRID2(2, 1);	// テクスチャ分割数
+		const POSGRID2	  PART	= POSGRID2(1, 2);	// テクスチャ分割数
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 480.0f, 0.0f);	// 位置
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 70.0f, 0.0f);		// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
@@ -77,10 +77,10 @@ namespace
 
 	namespace numcpu
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x, 500.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x + 0.0f, 500.0f, 0.0f);	// 位置
 		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
 		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);			// 数字大きさ
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);			// タイトル空白
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(150.0f, 5.0f, 0.0f);			// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;								// 数字空白
 		const int			DIGIT		= 1;										// 桁数
 	}
@@ -97,7 +97,7 @@ namespace
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x - SPACE_EDGE, numcpu::POS.y, 0.0f);	// 位置
-		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.0f, 0.0f, 0.0f);					// 空白
+		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.4f, 0.0f, 0.0f);					// 空白
 		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);		// 色
 	}
 
@@ -118,9 +118,10 @@ const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
 	"data\\TEXTURE\\entry002.png",		// 操作表示テクスチャ
 	"data\\TEXTURE\\entry003.png",		// 開始表示テクスチャ
-	"data\\TEXTURE\\entry004.png",		// 参加状況テクスチャ
+	"data\\TEXTURE\\Readycheck.png",		// 参加状況テクスチャ
 	"data\\TEXTURE\\Arrow_Twin.png",	// 矢印テクスチャ
-	"data\\TEXTURE\\entry_player.png",	// CPUテクスチャ
+	"data\\TEXTURE\\cpu.png",	// CPUテクスチャ
+	"data\\TEXTURE\\mum_cpu.png",		// CPU数テクスチャ
 };
 
 //************************************************************
@@ -222,6 +223,9 @@ HRESULT CEntryManager::Init(void)
 			assert(false);
 			return E_FAIL;
 		}
+
+		// テクスチャを登録・割当
+		m_apCpu[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_CPU]);
 
 		// 優先順位を設定
 		m_apCpu[nCntEntry]->SetPriority(PRIORITY);
@@ -343,7 +347,7 @@ HRESULT CEntryManager::Init(void)
 	m_pNumCpu = CValueUI::Create
 	( // 引数
 		mc_apTextureFile[TEXTURE_NUMCPU],	// タイトルテクスチャパス
-		CValue::TEXTURE_NORMAL,	// 数字テクスチャ
+		CValue::TEXTURE_ZERO,	// 数字テクスチャ
 		numcpu::DIGIT,			// 桁数
 		numcpu::POS,			// 位置
 		numcpu::SPACE_TITLE,	// 行間
