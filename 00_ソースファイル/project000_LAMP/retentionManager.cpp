@@ -29,6 +29,7 @@ CRetentionManager::CRetentionManager()
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
+	memset(&m_aAI[0], 0, sizeof(m_aAI));						// AI状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
@@ -54,6 +55,7 @@ HRESULT CRetentionManager::Init(void)
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
+	memset(&m_aAI[0], 0, sizeof(m_aAI));						// AI状況
 	m_stateKill		= KILL_LIFE;		// 討伐条件
 	m_stateWin		= WIN_SURVIVE;		// 勝利条件
 	m_nNumPlayer	= 0;				// プレイヤー数
@@ -259,23 +261,29 @@ void CRetentionManager::InitGame(void)
 //============================================================
 //	全エントリー状況の設定処理
 //============================================================
-void CRetentionManager::AllSetEnableEntry(const bool bEntry)
+void CRetentionManager::AllSetEnableEntry(const bool bEntry, const bool bAI)
 {
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
 		// エントリー状況を設定
 		m_aEntry[nCntEntry] = bEntry;
+
+		// AI状況を設定
+		m_aAI[nCntEntry] = bAI;
 	}
 }
 
 //============================================================
 //	エントリーの設定処理
 //============================================================
-void CRetentionManager::SetEnableEntry(const int nID, const bool bEntry)
+void CRetentionManager::SetEnableEntry(const int nID, const bool bEntry, const bool bAI)
 {
 	// 引数インデックスのエントリー状況を設定
 	m_aEntry[nID] = bEntry;
+
+	// 引数インデックスのAI状況を設定
+	m_aAI[nID] = bAI;
 }
 
 //============================================================
@@ -285,6 +293,15 @@ bool CRetentionManager::IsEntry(const int nID) const
 {
 	// 引数インデックスのエントリー状況を返す
 	return m_aEntry[nID];
+}
+
+//============================================================
+//	AI取得処理
+//============================================================
+bool CRetentionManager::IsAI(const int nID) const
+{
+	// 引数インデックスのAI状況を返す
+	return m_aAI[nID];
 }
 
 //============================================================
@@ -451,6 +468,11 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 				{ // プレイヤーの最大数分繰り返す
 
 					CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+					if (pPlayer == NULL)
+					{ // プレイヤーが存在しない場合
+
+						break;
+					}
 
 					if (pPlayer->GetPadID() == nPlayerID)
 					{ // 今回死亡したプレイヤーの場合

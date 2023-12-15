@@ -564,7 +564,7 @@ D3DXMATRIX CPlayer::GetMtxWorld(void) const
 	D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 	D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-												// ワールドマトリックスの初期化
+	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&mtxWorld);
 
 	// 向きを反映
@@ -582,7 +582,7 @@ D3DXMATRIX CPlayer::GetMtxWorld(void) const
 //============================================================
 //	生成処理
 //============================================================
-CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
+CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad, const bool bAI)
 {
 	// ポインタを宣言
 	CPlayer *pPlayer = NULL;	// プレイヤー生成用
@@ -615,17 +615,20 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad)
 	if (pPlayer != NULL)
 	{ // 使用されている場合
 
-	  // プレイヤーの初期化
+		// プレイヤーの初期化
 		if (FAILED(pPlayer->Init()))
 		{ // 初期化に失敗した場合
 
-		  // メモリ開放
+			// メモリ開放
 			delete pPlayer;
 			pPlayer = NULL;
 
 			// 失敗を返す
 			return NULL;
 		}
+
+		// AI状況を設定
+		pPlayer->m_bAI = bAI;
 	}
 
 	// 確保したアドレスを返す

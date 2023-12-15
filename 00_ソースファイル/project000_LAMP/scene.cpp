@@ -84,7 +84,7 @@ HRESULT CScene::Init(void)
 			{ // エントリーされている場合
 
 				// プレイヤーオブジェクトの生成
-				m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
+				m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer, CManager::GetInstance()->GetRetentionManager()->IsAI(nCntPlayer));
 			}
 		}
 	}

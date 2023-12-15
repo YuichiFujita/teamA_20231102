@@ -66,7 +66,7 @@ namespace
 		const D3DXVECTOR3 SIZE_TITLE	= D3DXVECTOR3(300.0f, 100.0f, 0.0f);	// タイトル大きさ
 		const D3DXVECTOR3 SIZE_VALUE	= D3DXVECTOR3(100.0f, 100.0f, 0.0f);	// 数字大きさ
 
-		const float	DIGIT = 2;	// 桁数
+		const int	DIGIT = 2;	// 桁数
 	}
 
 	// 勝利ポイント背景基本情報

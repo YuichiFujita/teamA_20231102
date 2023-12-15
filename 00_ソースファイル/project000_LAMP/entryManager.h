@@ -84,11 +84,12 @@ public:
 
 private:
 	// メンバ関数
-	void UpdateEntry(void);		// エントリーの更新
-	void UpdateCpu(void);		// CPUの更新
-	void UpdateStart(void);		// 開始の更新
-	void UpdateArrow(void);		// 矢印の更新
-	void UpdateAddCpu(void);	// CPUの加減算の更新
+	void UpdateEntry(void);			// エントリーの更新
+	void UpdateCpu(void);			// CPUの更新
+	void UpdateAddCpu(void);		// CPUの加減算の更新
+	void UpdatePlayerName(void);	// プレイヤー名の更新
+	void UpdateStart(void);			// 開始の更新
+	void UpdateArrow(void);			// 矢印の更新
 	bool IsReadyOK(const int nNumEntry) const;	// 準備済みかの判定取得
 
 	// 静的メンバ変数

@@ -142,7 +142,7 @@ public:
 	D3DXMATRIX GetMtxWorld(void) const override;		// マトリックス取得
 
 	// 静的メンバ関数
-	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
+	static CPlayer *Create(CScene::EMode mode, const int nPad, const bool bAI = false);	// 生成
 
 	// メンバ関数
 	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer *pAttack);	// ノックバックヒット

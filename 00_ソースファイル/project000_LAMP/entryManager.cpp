@@ -380,7 +380,7 @@ HRESULT CEntryManager::Init(void)
 	CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(0);
 
 	// エントリーを初期化
-	CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(false);
+	CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(false, false);
 
 	// 成功を返す
 	return S_OK;
@@ -662,7 +662,7 @@ void CEntryManager::UpdateEntry(void)
 			if (pPad->IsTrigger(CInputPad::KEY_A, nCntEntry))
 			{
 				// エントリーを登録
-				pRetention->SetEnableEntry(nCntEntry, true);
+				pRetention->SetEnableEntry(nCntEntry, true, false);
 				nNumPlayer++;	// エントリー数加算
 
 				// 色を参加時のものに設定
@@ -686,7 +686,7 @@ void CEntryManager::UpdateEntry(void)
 				else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
 				{
 					// エントリーを解除
-					pRetention->SetEnableEntry(nCntEntry, false);
+					pRetention->SetEnableEntry(nCntEntry, false, false);
 					nNumPlayer--;	// エントリー数減算
 
 					// 色を非参加時のものに設定
@@ -766,6 +766,100 @@ void CEntryManager::UpdateCpu(void)
 		m_pStart->SetEnableDraw(false);		// 開始表示
 		m_pNumCpu->SetEnableDraw(false);	// CPU数
 	}
+
+	// プレイヤー名の更新
+	UpdatePlayerName();
+}
+
+//============================================================
+//	CPUの加減算の更新処理
+//============================================================
+void CEntryManager::UpdateAddCpu(void)
+{
+	CInputKeyboard		*pKeyboard	= CManager::GetInstance()->GetKeyboard();			// キーボード
+	CInputPad			*pPad		= CManager::GetInstance()->GetPad();				// パッド
+	CRetentionManager	*pRetention	= CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+
+	int nNumPlayer = pRetention->GetNumPlayer();	// プレイ人数
+	bool bAdd = false;	// 加算操作
+	bool bSub = false;	// 減算操作
+
+	// 加算の操作を保存
+	bAdd = pKeyboard->IsTrigger(DIK_D) || pKeyboard->IsTrigger(DIK_RIGHT) || pPad->IsTriggerAll(CInputPad::KEY_RIGHT);
+	
+	// 減算の操作を保存
+	bSub = pKeyboard->IsTrigger(DIK_A) || pKeyboard->IsTrigger(DIK_LEFT) || pPad->IsTriggerAll(CInputPad::KEY_LEFT);
+
+	if (bAdd && !bSub)
+	{ // 加算操作の場合
+
+		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+		{ // プレイヤーの最大数分繰り返す
+
+			if (!pRetention->IsEntry(nCntEntry))
+			{ // エントリーしていない場合
+
+				// エントリーを登録
+				pRetention->SetEnableEntry(nCntEntry, true, true);
+				nNumPlayer++;	// エントリー数加算
+
+				// 準備完了状態にする
+				m_apJoin[nCntEntry]->SetPattern(JOIN_ON);
+
+				// 色を参加時のものに設定
+				m_apFrame[nCntEntry]->SetColor(COL_ENTRY);
+				m_apNumber[nCntEntry]->SetColorTitle(COL_ENTRY);
+				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
+
+				// CPU数を加算
+				m_pNumCpu->GetMultiValue()->AddNum(1);
+
+				// 処理を抜ける
+				break;
+			}
+		}
+	}
+
+	if (bSub && !bAdd)
+	{ // 減算操作の場合
+
+		for (int nCntEntry = MAX_PLAYER - 1; nCntEntry >= 0; nCntEntry--)
+		{ // プレイヤーの最大数分繰り返す
+
+			if (pRetention->IsEntry(nCntEntry) && pRetention->IsAI(nCntEntry))
+			{ // エントリーしている且つ、CPUの場合
+
+				// エントリーを解除
+				pRetention->SetEnableEntry(nCntEntry, false, false);
+				nNumPlayer--;	// エントリー数減算
+
+				// 準備未完了状態にする
+				m_apJoin[nCntEntry]->SetPattern(JOIN_OFF);
+
+				// 色を非参加時のものに設定
+				m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
+				m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
+				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
+
+				// CPU数を減算
+				m_pNumCpu->GetMultiValue()->AddNum(-1);
+
+				// 処理を抜ける
+				break;
+			}
+		}
+	}
+
+	// プレイ人数を設定
+	pRetention->SetNumPlayer(nNumPlayer);
+}
+
+//============================================================
+//	プレイヤー名の更新処理
+//============================================================
+void CEntryManager::UpdatePlayerName(void)
+{
+	// TODO：ここにCPUかPLAYERどっちを書くのかの変更
 }
 
 //============================================================
@@ -841,51 +935,6 @@ void CEntryManager::UpdateArrow(void)
 
 			// 矢印色を設定
 			m_apArrow[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, arrow::BASIC_ALPHA + fAddAlpha));
-		}
-	}
-}
-
-//============================================================
-//	CPUの加減算の更新処理
-//============================================================
-void CEntryManager::UpdateAddCpu(void)
-{
-	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
-
-	// 現在のCPU数を保存
-	int nOldCpu = m_pNumCpu->GetMultiValue()->GetNum();
-
-	// TODO：ここに現在のCPU数に応じてCPU数の表示を変更する処理
-
-	if (pKeyboard->IsTrigger(DIK_D)
-	||  pKeyboard->IsTrigger(DIK_RIGHT)
-	||  pPad->IsTriggerAll(CInputPad::KEY_RIGHT))
-	{ // 加算の操作が行われた場合
-
-		// CPU数を加算
-		m_pNumCpu->GetMultiValue()->AddNum(1);
-
-		if (nOldCpu != m_pNumCpu->GetMultiValue()->GetNum())
-		{ // 減算できた場合
-
-			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
-		}
-	}
-	if (pKeyboard->IsTrigger(DIK_A)
-	||  pKeyboard->IsTrigger(DIK_LEFT)
-	||  pPad->IsTriggerAll(CInputPad::KEY_LEFT))
-	{ // 減算の操作が行われた場合
-
-		// CPU数を減算
-		m_pNumCpu->GetMultiValue()->AddNum(-1);
-
-		if (nOldCpu != m_pNumCpu->GetMultiValue()->GetNum())
-		{ // 減算できた場合
-
-			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 		}
 	}
 }
