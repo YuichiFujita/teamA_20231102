@@ -57,9 +57,9 @@ namespace
 
 	namespace join
 	{
-		const POSGRID2	  PART	= POSGRID2(2, 1);	// テクスチャ分割数
+		const POSGRID2	  PART	= POSGRID2(1, 2);	// テクスチャ分割数
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 480.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 70.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f*1.3f, 42.0f*1.3f, 0.0f);		// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
 
@@ -71,16 +71,16 @@ namespace
 
 	namespace start
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 370.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(380.0f, 80.0f, 0.0f);			// 大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 380.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(573.0f, 99.0f, 0.0f);			// 大きさ
 	}
 
 	namespace numcpu
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x, 500.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
-		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);			// 数字大きさ
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(100.0f, 5.0f, 0.0f);			// タイトル空白
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x - 40.0f, 500.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(306.0f * 0.9f, 98.0f * 0.9f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 95.0f, 0.0f);			// 数字大きさ
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(190.0f, 0.0f, 0.0f);			// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;								// 数字空白
 		const int			DIGIT		= 1;										// 桁数
 	}
@@ -91,7 +91,7 @@ namespace
 		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 		const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
-		const float	SPACE_EDGE		= 170.0f;	// 縁の空白
+		const float	SPACE_EDGE		= 240.0f;	// 縁の空白
 
 		const POSGRID2		PART	= POSGRID2(MAX_ENTRY_ARROW, 1);		// テクスチャ分割数
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
@@ -118,9 +118,10 @@ const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
 	"data\\TEXTURE\\entry002.png",		// 操作表示テクスチャ
 	"data\\TEXTURE\\entry003.png",		// 開始表示テクスチャ
-	"data\\TEXTURE\\entry004.png",		// 参加状況テクスチャ
+	"data\\TEXTURE\\Readycheck.png",		// 参加状況テクスチャ
 	"data\\TEXTURE\\Arrow_Twin.png",	// 矢印テクスチャ
-	"data\\TEXTURE\\entry_player.png",	// CPUテクスチャ
+	"data\\TEXTURE\\cpu.png",	// CPUテクスチャ
+	"data\\TEXTURE\\mum_cpu.png",		// CPU数テクスチャ
 };
 
 //************************************************************
@@ -223,6 +224,9 @@ HRESULT CEntryManager::Init(void)
 			return E_FAIL;
 		}
 
+		// テクスチャを登録・割当
+		m_apCpu[nCntEntry]->BindTexture(mc_apTextureFile[TEXTURE_CPU]);
+
 		// 優先順位を設定
 		m_apCpu[nCntEntry]->SetPriority(PRIORITY);
 
@@ -272,6 +276,9 @@ HRESULT CEntryManager::Init(void)
 
 		// 優先順位を設定
 		m_apJoin[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apJoin[nCntEntry]->SetEnableDraw(false);
 	}
 
 	// 操作表示の生成
@@ -343,7 +350,7 @@ HRESULT CEntryManager::Init(void)
 	m_pNumCpu = CValueUI::Create
 	( // 引数
 		mc_apTextureFile[TEXTURE_NUMCPU],	// タイトルテクスチャパス
-		CValue::TEXTURE_NORMAL,	// 数字テクスチャ
+		CValue::TEXTURE_ZERO,	// 数字テクスチャ
 		numcpu::DIGIT,			// 桁数
 		numcpu::POS,			// 位置
 		numcpu::SPACE_TITLE,	// 行間
@@ -690,7 +697,7 @@ void CEntryManager::UpdateEntry(void)
 
 		bool bEntry = true;	// エントリーができるか
 		if (pRetention->IsEntry(nCntEntry))
-		{ // エントリーしている場合
+		{ // エントリー者がいる場合
 
 			if (pRetention->IsAI(nCntEntry))
 			{ // AIのエントリーなら上書き可能
@@ -702,6 +709,15 @@ void CEntryManager::UpdateEntry(void)
 
 				bEntry = false;
 			}
+
+			// 準備表示の自動描画をONにする
+			m_apJoin[nCntEntry]->SetEnableDraw(true);
+		}
+		else
+		{ // エントリー者がいない場合
+
+			// 準備表示の自動描画をOFFにする
+			m_apJoin[nCntEntry]->SetEnableDraw(false);
 		}
 
 		if (bEntry)
