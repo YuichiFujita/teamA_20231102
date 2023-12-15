@@ -163,6 +163,7 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\ICON_PLAYER003.png",
 	"data\\TEXTURE\\Black-Frame.png",
 	"data\\TEXTURE\\entry_player.png",
+	"data\\TEXTURE\\number000.png",
 
 };
 
@@ -483,8 +484,8 @@ HRESULT CResultManager::Init(void)
 
 		m_apWinNum[nCnt] = CAnim2D::Create
 		(
+			10,
 			1,
-			MAX_PLAYER,
 			D3DXVECTOR3(m_rPos[3].x, m_rPos[3].y + Winner::DISTANCE * nCnt, m_rPos[3].z),
 			Winner::DESTSIZE
 		);
@@ -552,14 +553,14 @@ HRESULT CResultManager::Init(void)
 		m_apWinNum[nCnt]->SetEnableDraw(false);
 
 		// 現在の選択要素の色を白に設定
-		m_apIcon[nCnt]->SetColor(DEFAULT_COL);
-		m_apWinNum[nCnt]->SetColor(DEFAULT_COL);
+		m_apIcon[nCnt]->SetColor(CHOICE_COL);
+		m_apWinNum[nCnt]->SetColor(CHOICE_COL);
 	
 		//テクスチャ反映
 		m_apIcon[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_ICON_PLAYER1 + nCnt]);
 
 		//テクスチャ反映
-		m_apWinNum[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_WIN]);
+		m_apWinNum[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_WIN2]);
 	}
 
 	//--------------------------------------------------------
@@ -651,12 +652,13 @@ HRESULT CResultManager::Init(void)
 			m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
 		}
 	}
-	//３人以上で
-	if (m_nNumPlay >= 3)
+	
+	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
-		for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
+		if (m_apNumber[nCnt] != nullptr)
 		{
-			if (m_apNumber[nCnt] != nullptr)
+			//３人以上で
+			if (m_nNumPlay >= 3)
 			{
 				if (nCnt < 2)
 				{
@@ -664,7 +666,7 @@ HRESULT CResultManager::Init(void)
 				}
 				else
 				{
-					if (m_anWinPoint[m_anRank[RANK_SECOND]] >
+					if (m_anWinPoint[m_anRank[RANK_FOURTH]] <
 						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nCnt]))
 					{
 						m_apNumber[nCnt]->SetPattern(nCnt + 1);
@@ -677,6 +679,10 @@ HRESULT CResultManager::Init(void)
 
 				//現在のパターンを保存
 				m_nPattern = m_apNumber[nCnt]->GetPattern();
+			}
+			else
+			{
+				m_apNumber[nCnt]->SetPattern(nCnt + 1);
 			}
 		}
 	}
@@ -817,7 +823,7 @@ void CResultManager::Update(void)
 			case 0:
 
 				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]);
+				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]+1);
 
 				//プレイヤー順に並べる
 				m_apWinNum[m_anRank[nCnt]]
@@ -828,7 +834,7 @@ void CResultManager::Update(void)
 			case 1:
 
 				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]);
+				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
 
 				//プレイヤー順に並べる
 				m_apWinNum[m_anRank[nCnt]]
@@ -839,7 +845,7 @@ void CResultManager::Update(void)
 			case 2:
 
 				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]);
+				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
 
 				//プレイヤー順に並べる
 				m_apWinNum[m_anRank[nCnt]]
@@ -850,7 +856,7 @@ void CResultManager::Update(void)
 			case 3:
 
 				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]);
+				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
 
 				//プレイヤー順に並べる
 				m_apWinNum[m_anRank[nCnt]]
