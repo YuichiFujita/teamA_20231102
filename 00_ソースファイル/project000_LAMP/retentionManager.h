@@ -91,6 +91,7 @@ public:
 
 	void InitWinRank(void);						// 勝利ランキング初期化
 	void SetWinRank(void);						// 勝利ランキング設定
+	ERank GetWinRank(const int nID);			// 勝利ランキング取得
 	int GetWinRank1st(void) const;				// 勝利ランキング一位プレイヤー取得
 	void InitSurvivalRank(void);				// 生存ランキング初期化
 	void SetSurvivalRank(const int nPlayerID);	// 生存ランキング設定
