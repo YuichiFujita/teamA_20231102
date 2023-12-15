@@ -572,11 +572,20 @@ HRESULT CResultManager::Init(void)
 	//もし一位の値とセーブしている四位の値が同じなら
 	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
 	{
+		//2人だったら
 		if (m_nNumPlay == 2)
 		{
 			//値の入れ替えを行う
 			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
 		}
+		//3人だったら
+		else if (m_nNumPlay == 3)
+		{
+			//値の入れ替えを行う
+			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
+			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_THIRD];
+		}
+		//それ以外(4人だったら)
 		else
 		{
 			//値の入れ替えを行う
@@ -595,14 +604,25 @@ HRESULT CResultManager::Init(void)
 	//もし一位の値とセーブしている二位の値が同じなら
 	else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_SECOND])
 	{
-		//値の入れ替えを行う
-		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
-		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
+		//3人だったら
+		if (m_nNumPlay == 3)
+		{
+			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_THIRD];
+			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FIRST];
+		}
+		//それ以外(4人だったら)
+		else
+		{
+			//値の入れ替えを行う
+			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
+			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
+			m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
+		}
 	}
 
 	// 成功を返す
 	return S_OK;
+
 }
 
 //============================================================
