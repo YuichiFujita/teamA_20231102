@@ -526,6 +526,47 @@ HRESULT CResultManager::Init(void)
 	// 優先順位を設定
 	m_pCover->SetPriority(RESULT_PRIO);
 
+	////順位通りになっていなければ
+	//if (m_anRank[RANK_SECOND] != RANK_FOURTH ||
+	//	m_anRank[RANK_THIRD] != RANK_SECOND ||
+	//	m_anRank[RANK_FOURTH] != RANK_THIRD)
+	//{
+	//	//値の入れ替えをする
+	//	m_anRank[RANK_SECOND] = RANK_FOURTH;
+	//	m_anRank[RANK_THIRD] = RANK_SECOND;
+	//	m_anRank[RANK_FOURTH] = RANK_THIRD;
+	//}
+	////順位通りになっていなければ
+	//else if (m_anRank[RANK_SECOND] != RANK_THIRD &&
+	//	m_anRank[RANK_THIRD] != RANK_FIRST &&
+	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
+	//{
+	//	//順位通りになっていなければ
+	//	m_anRank[RANK_SECOND] = RANK_THIRD;
+	//	m_anRank[RANK_THIRD] = RANK_FIRST;
+	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
+	//}
+	////順位通りになっていなければ
+	//else if (m_anRank[RANK_SECOND] != RANK_THIRD &&
+	//	m_anRank[RANK_THIRD] != RANK_FIRST &&
+	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
+	//{
+	//	//順位通りになっていなければ
+	//	m_anRank[RANK_SECOND] = RANK_THIRD;
+	//	m_anRank[RANK_THIRD] = RANK_FIRST;
+	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
+	//}
+	////順位通りになっていなければ
+	//else if (m_anRank[RANK_SECOND] != RANK_FIRST &&
+	//	m_anRank[RANK_THIRD] != RANK_THIRD &&
+	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
+	//{
+	//	//順位通りになっていなければ
+	//	m_anRank[RANK_SECOND] = RANK_FIRST;
+	//	m_anRank[RANK_THIRD] = RANK_THIRD;
+	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
+	//}
+
 	//もし一位の値とセーブしている四位の値が同じなら
 	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
 	{
@@ -534,6 +575,7 @@ HRESULT CResultManager::Init(void)
 		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_SECOND];
 	}
 	//もし一位の値とセーブしている三位の値が同じなら
+
 	else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_THIRD])
 	{
 		//値の入れ替えを行う
@@ -1218,10 +1260,10 @@ void CResultManager::UpdateNumber(void)
 				&&m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
 			{
 				//
-				if (m_apIcon[m_anNum[EObj::OBJ_NUMBER]] != nullptr&&
+				if (m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
 				{
-					m_apIcon[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
+					m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]]->SetEnableDraw(true);
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
 				}
 
