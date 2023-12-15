@@ -28,6 +28,8 @@ public:
 	{
 		TYPE_GRASS = 0,	// 草原テクスチャ
 		TYPE_STONE,		// 石テクスチャ
+		TYPE_ICE,		// 氷テクうちゃ
+		TYPE_ASH,		// 火山灰(黒)テクスチャ
 		TYPE_MAX		// この列挙型の総数
 	};
 
