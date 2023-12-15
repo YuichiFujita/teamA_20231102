@@ -53,7 +53,16 @@ namespace
 {
 	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
 
+#ifdef ON_STENCIL_PLAYER
+
 	const int	PRIORITY = 3;		// プレイヤーの優先順位
+
+#else	// OFF_STENCIL_PLAYER
+
+	const int	PRIORITY = 3;		// プレイヤーの優先順位
+
+#endif	// ON_STENCIL_PLAYER
+
 	const float	GRAVITY = 1.0f;		// 重力
 	const float	RADIUS = 50.0f;	// 半径
 	const float	HEIGHT = 100.0f;	// 縦幅
@@ -248,7 +257,9 @@ HRESULT CPlayer::Init(void)
 	default:
 		break;
 	}
-
+	m_pClown = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+	m_pClown->BindTexture("data\\TEXTURE\\clown.png");
+	m_pClown->SetEnableDraw(false);
 	// 成功を返す
 	return S_OK;
 }
@@ -285,6 +296,12 @@ void CPlayer::Uninit(void)
 		m_pPlayerGuide->Uninit();
 		m_pPlayerGuide = NULL;
 	}
+	if (m_pClown != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pClown->Uninit();
+		m_pClown = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -295,6 +312,7 @@ void CPlayer::Uninit(void)
 void CPlayer::Update(void)
 {
 	m_pPlayerGuide->SetVec3Position(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 400.0f, GetVec3Position().z));
+	m_pClown->SetVec3Position(D3DXVECTOR3(GetVec3Position().x , GetVec3Position().y + 550.0f, GetVec3Position().z));
 	// 変数を宣言
 	EMotion currentMotion = MOTION_DEATH;	// 現在のモーション
 
@@ -311,6 +329,15 @@ void CPlayer::Update(void)
 			CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 		}
 	}
+	if (CManager::GetInstance()->GetRetentionManager()->GetWinRank(m_nPadID) == CRetentionManager::RANK_1ST)
+	{ // プレイヤーが一位の場合
+		m_pClown->SetEnableDraw(true);
+	}
+	else
+	{
+		m_pClown->SetEnableDraw(false);
+	}
+	
 
 	switch (m_state)
 	{ // 状態ごとの処理
@@ -329,7 +356,7 @@ void CPlayer::Update(void)
 		break;
 
 	case STATE_NORMAL:	// 通常状態
-
+	
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
@@ -404,7 +431,8 @@ void CPlayer::Update(void)
 //============================================================
 void CPlayer::Draw(void)
 {
-	// ポインタを宣言
+#ifdef ON_STENCIL_PLAYER
+
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 
 	// ステンシルテストを有効にする
@@ -429,6 +457,13 @@ void CPlayer::Draw(void)
 
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+#else	// OFF_STENCIL_PLAYER
+
+	// オブジェクトキャラクターの描画
+	CObjectChara::Draw();
+
+#endif	// ON_STENCIL_PLAYER
 }
 
 //============================================================
@@ -569,7 +604,6 @@ void CPlayer::SetEnableUpdate(const bool bUpdate)
 	// 引数の更新状況を設定
 	CObject::SetEnableUpdate(bUpdate);			// 自身
 	m_pFlail->SetEnableUpdate(bUpdate);			// フレイル
-	m_pGuide->SetEnableUpdate(bUpdate);			// 投擲方向
 	m_pPlayerGuide->SetEnableUpdate(bUpdate);	// ID表示
 }
 
@@ -581,7 +615,6 @@ void CPlayer::SetEnableDraw(const bool bDraw)
 	// 引数の描画状況を設定
 	CObject::SetEnableDraw(bDraw);			// 自身
 	m_pFlail->SetEnableDraw(bDraw);			// フレイル
-	m_pGuide->SetEnableDraw(bDraw);			// 投擲方向
 	m_pPlayerGuide->SetEnableDraw(bDraw);	// ID表示
 }
 

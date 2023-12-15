@@ -52,6 +52,10 @@ HRESULT CMask::Init(void)
 		return E_FAIL;
 	}
 
+	// ‰e‚Ì•\¦‚ğOFF‚É‚·‚é
+	SetEnableDepthShadow(false);
+	SetEnableZTex(false);
+
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }
