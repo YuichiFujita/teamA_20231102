@@ -59,7 +59,7 @@ namespace
 	{
 		const POSGRID2	  PART	= POSGRID2(1, 2);	// テクスチャ分割数
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 480.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f, 70.0f, 0.0f);		// 大きさ
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(250.0f*1.3f, 42.0f*1.3f, 0.0f);		// 大きさ
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
 
@@ -71,16 +71,16 @@ namespace
 
 	namespace start
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 370.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(380.0f, 80.0f, 0.0f);			// 大きさ
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 380.0f, 0.0f);	// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(573.0f, 99.0f, 0.0f);			// 大きさ
 	}
 
 	namespace numcpu
 	{
-		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x + 0.0f, 500.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);		// タイトル大きさ
-		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 90.0f, 0.0f);			// 数字大きさ
-		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(150.0f, 5.0f, 0.0f);			// タイトル空白
+		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x - 40.0f, 500.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(306.0f * 0.9f, 98.0f * 0.9f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 95.0f, 0.0f);			// 数字大きさ
+		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(190.0f, 0.0f, 0.0f);			// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;								// 数字空白
 		const int			DIGIT		= 1;										// 桁数
 	}
@@ -91,13 +91,13 @@ namespace
 		const float	ADD_SINROT		= 0.04f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
 		const float	MAX_ADD_ALPHA	= 0.25f;	// 透明度の最大加算量
 		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
-		const float	SPACE_EDGE		= 170.0f;	// 縁の空白
+		const float	SPACE_EDGE		= 240.0f;	// 縁の空白
 
 		const POSGRID2		PART	= POSGRID2(MAX_ENTRY_ARROW, 1);		// テクスチャ分割数
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x - SPACE_EDGE, numcpu::POS.y, 0.0f);	// 位置
-		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.4f, 0.0f, 0.0f);					// 空白
+		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.0f, 0.0f, 0.0f);					// 空白
 		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);		// 色
 	}
 
