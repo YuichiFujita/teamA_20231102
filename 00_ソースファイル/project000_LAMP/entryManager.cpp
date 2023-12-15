@@ -276,6 +276,9 @@ HRESULT CEntryManager::Init(void)
 
 		// 優先順位を設定
 		m_apJoin[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apJoin[nCntEntry]->SetEnableDraw(false);
 	}
 
 	// 操作表示の生成
@@ -694,7 +697,7 @@ void CEntryManager::UpdateEntry(void)
 
 		bool bEntry = true;	// エントリーができるか
 		if (pRetention->IsEntry(nCntEntry))
-		{ // エントリーしている場合
+		{ // エントリー者がいる場合
 
 			if (pRetention->IsAI(nCntEntry))
 			{ // AIのエントリーなら上書き可能
@@ -706,6 +709,15 @@ void CEntryManager::UpdateEntry(void)
 
 				bEntry = false;
 			}
+
+			// 準備表示の自動描画をONにする
+			m_apJoin[nCntEntry]->SetEnableDraw(true);
+		}
+		else
+		{ // エントリー者がいない場合
+
+			// 準備表示の自動描画をOFFにする
+			m_apJoin[nCntEntry]->SetEnableDraw(false);
 		}
 
 		if (bEntry)
