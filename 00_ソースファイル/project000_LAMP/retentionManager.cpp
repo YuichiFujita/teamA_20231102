@@ -277,13 +277,40 @@ void CRetentionManager::AllSetEnableEntry(const bool bEntry, const bool bAI)
 //============================================================
 //	エントリーの設定処理
 //============================================================
-void CRetentionManager::SetEnableEntry(const int nID, const bool bEntry, const bool bAI)
+void CRetentionManager::SetEntry(const int nID, const bool bEntry, const bool bAI)
 {
-	// 引数インデックスのエントリー状況を設定
-	m_aEntry[nID] = bEntry;
+	if (bEntry)
+	{ // エントリーする場合
 
-	// 引数インデックスのAI状況を設定
-	m_aAI[nID] = bAI;
+		if (!m_aEntry[nID])
+		{ // エントリー情報が無い場合
+
+			// プレイヤー数を加算
+			m_nNumPlayer++;
+		}
+
+		// 引数インデックスのエントリー状況を設定
+		m_aEntry[nID] = bEntry;
+
+		// 引数インデックスのAI状況を設定
+		m_aAI[nID] = bAI;
+	}
+	else
+	{ // エントリーを取り消す場合
+
+		if (m_aEntry[nID])
+		{ // エントリー情報がある場合
+
+			// プレイヤー数を減算
+			m_nNumPlayer--;
+		}
+
+		// 引数インデックスのエントリー状況を設定
+		m_aEntry[nID] = bEntry;
+
+		// 引数インデックスのAI状況を設定
+		m_aAI[nID] = bAI;
+	}
 }
 
 //============================================================

@@ -114,9 +114,8 @@ void CSceneEntry::Update(void)
 		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(4);
 #else
 		// 一部プレイヤーを参加させる
-		CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(2, true, false);
-		CManager::GetInstance()->GetRetentionManager()->SetEnableEntry(3, true, false);
-		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(2);
+		CManager::GetInstance()->GetRetentionManager()->SetEntry(2, true, false);
+		CManager::GetInstance()->GetRetentionManager()->SetEntry(3, true, false);
 #endif
 		// シーンの設定
 		CManager::GetInstance()->SetScene(CScene::MODE_GAME);	// ゲーム画面

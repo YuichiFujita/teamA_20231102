@@ -41,6 +41,13 @@ namespace
 		const int			DIGIT		= 1;									// 桁数
 	}
 
+	namespace cpu
+	{
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(165.0f, 60.0f, 0.0f);		// 位置
+		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(242.0f, 107.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
+	}
+
 	namespace frame
 	{
 		const D3DXVECTOR3 POS	= D3DXVECTOR3(160.0f, 280.0f, 0.0f);	// 位置
@@ -126,6 +133,7 @@ CEntryManager::CEntryManager()
 {
 	// メンバ変数をクリア
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
+	memset(&m_apCpu[0],		0, sizeof(m_apCpu));	// プレイヤーCPUの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
@@ -153,6 +161,7 @@ HRESULT CEntryManager::Init(void)
 {
 	// メンバ変数を初期化
 	memset(&m_apNumber[0],	0, sizeof(m_apNumber));	// プレイヤーナンバーの情報
+	memset(&m_apCpu[0],		0, sizeof(m_apCpu));	// プレイヤーCPUの情報
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
@@ -199,6 +208,26 @@ HRESULT CEntryManager::Init(void)
 
 		// 数字を設定
 		m_apNumber[nCntEntry]->GetMultiValue()->SetNum(nCntEntry + 1);
+
+		// プレイヤーCPUの生成
+		m_apCpu[nCntEntry] = CObject2D::Create
+		( // 引数
+			cpu::POS + (cpu::SPACE * (float)nCntEntry),	// 位置
+			cpu::SIZE	// 大きさ
+		);
+		if (m_apCpu[nCntEntry] == NULL)
+		{ // 生成に失敗した場合
+
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// 優先順位を設定
+		m_apCpu[nCntEntry]->SetPriority(PRIORITY);
+
+		// 自動描画をOFFにする
+		m_apCpu[nCntEntry]->SetEnableDraw(false);
 
 		// プレイヤーフレームの生成
 		m_apFrame[nCntEntry] = CObject2D::Create
@@ -313,7 +342,7 @@ HRESULT CEntryManager::Init(void)
 	// CPU数表示の生成
 	m_pNumCpu = CValueUI::Create
 	( // 引数
-		mc_apTextureFile[TEXTURE_CPU],	// タイトルテクスチャパス
+		mc_apTextureFile[TEXTURE_NUMCPU],	// タイトルテクスチャパス
 		CValue::TEXTURE_NORMAL,	// 数字テクスチャ
 		numcpu::DIGIT,			// 桁数
 		numcpu::POS,			// 位置
@@ -408,6 +437,9 @@ HRESULT CEntryManager::Uninit(void)
 		// プレイヤーナンバーの終了
 		m_apNumber[nCntEntry]->Uninit();
 
+		// プレイヤーCPUの終了
+		m_apCpu[nCntEntry]->Uninit();
+
 		// プレイヤーフレームの終了
 		m_apFrame[nCntEntry]->Uninit();
 
@@ -468,6 +500,9 @@ void CEntryManager::Update(void)
 
 			// プレイヤーナンバーの更新
 			m_apNumber[nCntEntry]->Update();
+
+			// プレイヤーCPUの更新
+			m_apCpu[nCntEntry]->Update();
 
 			// プレイヤーフレームの更新
 			m_apFrame[nCntEntry]->Update();
@@ -650,20 +685,35 @@ void CEntryManager::UpdateEntry(void)
 	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
 	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
-	// 変数を宣言
-	int nNumPlayer = pRetention->GetNumPlayer();	// プレイ人数
-
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
-		if (!pRetention->IsEntry(nCntEntry))
-		{ // エントリーしていない場合
+		bool bEntry = true;	// エントリーができるか
+		if (pRetention->IsEntry(nCntEntry))
+		{ // エントリーしている場合
+
+			if (pRetention->IsAI(nCntEntry))
+			{ // AIのエントリーなら上書き可能
+
+				bEntry = true;
+			}
+			else
+			{ // 人間のエントリーなら上書き不可
+
+				bEntry = false;
+			}
+		}
+
+		if (bEntry)
+		{ // エントリー出来る場合
 
 			if (pPad->IsTrigger(CInputPad::KEY_A, nCntEntry))
 			{
 				// エントリーを登録
-				pRetention->SetEnableEntry(nCntEntry, true, false);
-				nNumPlayer++;	// エントリー数加算
+				pRetention->SetEntry(nCntEntry, true, false);
+
+				// 準備未完了状態にする
+				m_apJoin[nCntEntry]->SetPattern(JOIN_OFF);
 
 				// 色を参加時のものに設定
 				m_apFrame[nCntEntry]->SetColor(COL_ENTRY);
@@ -671,8 +721,8 @@ void CEntryManager::UpdateEntry(void)
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
 			}
 		}
-		else if (pRetention->IsEntry(nCntEntry))
-		{ // エントリーしている場合
+		else
+		{ // エントリー出来ない場合
 
 			switch (m_apJoin[nCntEntry]->GetPattern())
 			{ // 準備状況ごとの処理
@@ -686,8 +736,7 @@ void CEntryManager::UpdateEntry(void)
 				else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
 				{
 					// エントリーを解除
-					pRetention->SetEnableEntry(nCntEntry, false, false);
-					nNumPlayer--;	// エントリー数減算
+					pRetention->SetEntry(nCntEntry, false, false);
 
 					// 色を非参加時のものに設定
 					m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
@@ -715,14 +764,15 @@ void CEntryManager::UpdateEntry(void)
 	}
 
 	// デバッグ表示
-	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー数]：%d\n", nNumPlayer);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー数]：%d\n", pRetention->GetNumPlayer());
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー1]：%s\n", pRetention->IsEntry(0) ? "true" : "false");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー2]：%s\n", pRetention->IsEntry(1) ? "true" : "false");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー3]：%s\n", pRetention->IsEntry(2) ? "true" : "false");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー4]：%s\n", pRetention->IsEntry(3) ? "true" : "false");
-
-	// プレイ人数を設定
-	pRetention->SetNumPlayer(nNumPlayer);
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー1AI]：%s\n", pRetention->IsAI(0) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー2AI]：%s\n", pRetention->IsAI(1) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー3AI]：%s\n", pRetention->IsAI(2) ? "true" : "false");
+	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー4AI]：%s\n", pRetention->IsAI(3) ? "true" : "false");
 }
 
 //============================================================
@@ -779,8 +829,7 @@ void CEntryManager::UpdateAddCpu(void)
 	CInputKeyboard		*pKeyboard	= CManager::GetInstance()->GetKeyboard();			// キーボード
 	CInputPad			*pPad		= CManager::GetInstance()->GetPad();				// パッド
 	CRetentionManager	*pRetention	= CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-
-	int nNumPlayer = pRetention->GetNumPlayer();	// プレイ人数
+	int nNumCpu = 0;	// CPU数
 	bool bAdd = false;	// 加算操作
 	bool bSub = false;	// 減算操作
 
@@ -800,8 +849,7 @@ void CEntryManager::UpdateAddCpu(void)
 			{ // エントリーしていない場合
 
 				// エントリーを登録
-				pRetention->SetEnableEntry(nCntEntry, true, true);
-				nNumPlayer++;	// エントリー数加算
+				pRetention->SetEntry(nCntEntry, true, true);
 
 				// 準備完了状態にする
 				m_apJoin[nCntEntry]->SetPattern(JOIN_ON);
@@ -810,9 +858,6 @@ void CEntryManager::UpdateAddCpu(void)
 				m_apFrame[nCntEntry]->SetColor(COL_ENTRY);
 				m_apNumber[nCntEntry]->SetColorTitle(COL_ENTRY);
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
-
-				// CPU数を加算
-				m_pNumCpu->GetMultiValue()->AddNum(1);
 
 				// 処理を抜ける
 				break;
@@ -830,8 +875,7 @@ void CEntryManager::UpdateAddCpu(void)
 			{ // エントリーしている且つ、CPUの場合
 
 				// エントリーを解除
-				pRetention->SetEnableEntry(nCntEntry, false, false);
-				nNumPlayer--;	// エントリー数減算
+				pRetention->SetEntry(nCntEntry, false, false);
 
 				// 準備未完了状態にする
 				m_apJoin[nCntEntry]->SetPattern(JOIN_OFF);
@@ -841,17 +885,25 @@ void CEntryManager::UpdateAddCpu(void)
 				m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
 
-				// CPU数を減算
-				m_pNumCpu->GetMultiValue()->AddNum(-1);
-
 				// 処理を抜ける
 				break;
 			}
 		}
 	}
 
-	// プレイ人数を設定
-	pRetention->SetNumPlayer(nNumPlayer);
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (pRetention->IsAI(nCntEntry))
+		{ // AIの場合
+
+			// AI数加算
+			nNumCpu++;
+		}
+	}
+
+	// CPU数を設定
+	m_pNumCpu->GetMultiValue()->SetNum(nNumCpu);
 }
 
 //============================================================
@@ -859,7 +911,37 @@ void CEntryManager::UpdateAddCpu(void)
 //============================================================
 void CEntryManager::UpdatePlayerName(void)
 {
-	// TODO：ここにCPUかPLAYERどっちを書くのかの変更
+	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (pRetention->IsEntry(nCntEntry))
+		{ // エントリーしている場合
+
+			if (pRetention->IsAI(nCntEntry))
+			{ // AIの場合
+
+				// 参加者名をCPUにする
+				m_apNumber[nCntEntry]->SetEnableDraw(false);
+				m_apCpu[nCntEntry]->SetEnableDraw(true);
+			}
+			else
+			{ // AIではない場合
+
+				// 参加者名をPLAYERにする
+				m_apCpu[nCntEntry]->SetEnableDraw(false);
+				m_apNumber[nCntEntry]->SetEnableDraw(true);
+			}
+		}
+		else
+		{ // エントリーしていない場合
+
+			// 参加者名をPLAYERにする
+			m_apCpu[nCntEntry]->SetEnableDraw(false);
+			m_apNumber[nCntEntry]->SetEnableDraw(true);
+		}
+	}
 }
 
 //============================================================
@@ -944,12 +1026,13 @@ void CEntryManager::UpdateArrow(void)
 //============================================================
 bool CEntryManager::IsReadyOK(const int nNumEntry) const
 {
-	// ポインタを宣言
 	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+	bool bAllAI = true;	// 全参加者のAI状況
 
 	if (pRetention->GetNumPlayer() < nNumEntry)
 	{ // 参加人数不足
 
+		// 非準備状態
 		return false;
 	}
 
@@ -973,7 +1056,25 @@ bool CEntryManager::IsReadyOK(const int nNumEntry) const
 				assert(false);
 				break;
 			}
+
+			if (bAllAI)
+			{ // AIではないプレイヤーが発見されていない場合
+
+				if (!pRetention->IsAI(nCntEntry))
+				{ // AIではないプレイヤーの場合
+
+					// 全員がAIではない状態にする
+					bAllAI = false;
+				}
+			}
 		}
+	}
+
+	if (bAllAI)
+	{ // 全員がAIの場合
+
+		// 非準備状態
+		return false;
 	}
 
 	// 遷移可能を返す

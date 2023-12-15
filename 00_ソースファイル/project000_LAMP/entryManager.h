@@ -46,6 +46,7 @@ public:
 		TEXTURE_JOIN,		// 参加状況テクスチャ
 		TEXTURE_ARROW,		// 矢印テクスチャ
 		TEXTURE_CPU,		// CPUテクスチャ
+		TEXTURE_NUMCPU,		// CPU数テクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
@@ -96,17 +97,19 @@ private:
 	static const char *mc_apTextureFile[];	// テクスチャ定数
 
 	// メンバ変数
-	CEntryRuleManager *m_pRuleManager;		// エントリールールの情報
-	CValueUI *m_apNumber[MAX_PLAYER];		// プレイヤーナンバーの情報
-	CAnim2D *m_apJoin[MAX_PLAYER];			// プレイヤー参加の情報
-	CObject2D *m_apFrame[MAX_PLAYER];		// プレイヤーフレームの情報
-	CAnim2D *m_apArrow[MAX_ENTRY_ARROW];	// 矢印の情報
-	CObject2D *m_pControl;	// 操作表示の情報
-	CObject2D *m_pBG;		// 背景の情報
-	CObject2D *m_pStart;	// 開始表示の情報
-	CValueUI *m_pNumCpu;	// CPU数表示の情報
-	EState m_state;			// 状態
-	float m_fSinAlpha;		// 透明向き
+	CEntryRuleManager *m_pRuleManager;			// エントリールールの情報
+	CValueUI	*m_apNumber[MAX_PLAYER];		// プレイヤーナンバーの情報
+	CObject2D	*m_apCpu[MAX_PLAYER];			// プレイヤーCPUの情報
+	CAnim2D		*m_apJoin[MAX_PLAYER];			// プレイヤー参加の情報
+	CObject2D	*m_apFrame[MAX_PLAYER];			// プレイヤーフレームの情報
+	CAnim2D		*m_apArrow[MAX_ENTRY_ARROW];	// 矢印の情報
+
+	CObject2D	*m_pControl;	// 操作表示の情報
+	CObject2D	*m_pBG;			// 背景の情報
+	CObject2D	*m_pStart;		// 開始表示の情報
+	CValueUI	*m_pNumCpu;		// CPU数表示の情報
+	EState	m_state;			// 状態
+	float	m_fSinAlpha;		// 透明向き
 };
 
 #endif	// _ENTRY_MANAGER_H_

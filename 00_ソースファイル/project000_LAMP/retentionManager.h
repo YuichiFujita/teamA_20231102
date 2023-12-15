@@ -84,8 +84,8 @@ public:
 	int GetWinPoint(void) const;			// 勝利ポイント取得
 	void InitGame(void);					// ゲーム開始時の初期化
 
-	void AllSetEnableEntry(const bool bEntry, const bool bAI);				// 全エントリー状況設定
-	void SetEnableEntry(const int nID, const bool bEntry, const bool bAI);	// エントリー状況設定
+	void AllSetEnableEntry(const bool bEntry, const bool bAI);			// 全エントリー状況設定
+	void SetEntry(const int nID, const bool bEntry, const bool bAI);	// エントリー設定
 	bool IsEntry(const int nID) const;	// エントリー状況取得
 	bool IsAI(const int nID) const;		// AI状況取得
 
