@@ -576,7 +576,7 @@ HRESULT CResultManager::Init(void)
 
 		m_apPlayerEntry[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_PLAYER_ENTRY]);
 		m_apPlayerEntry[nCnt]->SetPriority(RESULT_PRIO);
-		m_apPlayerEntry[nCnt]->SetEnableDraw(true);
+		m_apPlayerEntry[nCnt]->SetEnableDraw(false);
 
 	}
 
