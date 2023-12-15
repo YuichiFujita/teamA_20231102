@@ -42,4 +42,9 @@
 #endif	// _DEBUG
 #endif
 
+// ステンシルバッファのプレイヤー表示 ON/OFF
+#if 0
+#define ON_STENCIL_PLAYER
+#endif
+
 #endif	// _PRECOMPILE_H_

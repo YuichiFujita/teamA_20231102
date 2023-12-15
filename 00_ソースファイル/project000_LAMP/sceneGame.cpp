@@ -102,8 +102,12 @@ HRESULT CSceneGame::Init(void)
 		return E_FAIL;
 	}
 
+#ifdef ON_STENCIL_PLAYER
+
 	// マスクの生成 (プレイヤーの壁裏表示用ポリゴン)
 	CMask::Create(SCREEN_CENT, SCREEN_SIZE, COL);
+
+#endif	// ON_STENCIL_PLAYER
 
 	//--------------------------------------------------------
 	//	初期設定

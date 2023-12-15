@@ -53,7 +53,16 @@ namespace
 {
 	const char* SETUP_TXT = "data\\TXT\\player.txt";	// プレイヤーセットアップテキスト
 
+#ifdef ON_STENCIL_PLAYER
+
 	const int	PRIORITY = 3;		// プレイヤーの優先順位
+
+#else	// OFF_STENCIL_PLAYER
+
+	const int	PRIORITY = 3;		// プレイヤーの優先順位
+
+#endif	// ON_STENCIL_PLAYER
+
 	const float	GRAVITY = 1.0f;		// 重力
 	const float	RADIUS = 50.0f;	// 半径
 	const float	HEIGHT = 100.0f;	// 縦幅
@@ -404,7 +413,8 @@ void CPlayer::Update(void)
 //============================================================
 void CPlayer::Draw(void)
 {
-	// ポインタを宣言
+#ifdef ON_STENCIL_PLAYER
+
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 
 	// ステンシルテストを有効にする
@@ -429,6 +439,13 @@ void CPlayer::Draw(void)
 
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+#else	// OFF_STENCIL_PLAYER
+
+	// オブジェクトキャラクターの描画
+	CObjectChara::Draw();
+
+#endif	// ON_STENCIL_PLAYER
 }
 
 //============================================================
@@ -569,7 +586,6 @@ void CPlayer::SetEnableUpdate(const bool bUpdate)
 	// 引数の更新状況を設定
 	CObject::SetEnableUpdate(bUpdate);			// 自身
 	m_pFlail->SetEnableUpdate(bUpdate);			// フレイル
-	m_pGuide->SetEnableUpdate(bUpdate);			// 投擲方向
 	m_pPlayerGuide->SetEnableUpdate(bUpdate);	// ID表示
 }
 
@@ -581,7 +597,6 @@ void CPlayer::SetEnableDraw(const bool bDraw)
 	// 引数の描画状況を設定
 	CObject::SetEnableDraw(bDraw);			// 自身
 	m_pFlail->SetEnableDraw(bDraw);			// フレイル
-	m_pGuide->SetEnableDraw(bDraw);			// 投擲方向
 	m_pPlayerGuide->SetEnableDraw(bDraw);	// ID表示
 }
 
