@@ -50,6 +50,7 @@ CPlayerAI::CPlayerAI()
 	m_bDash = false;
 	m_bAttack = false;
 	m_bMove = false;
+	m_bEmote = false;
 }
 
 //============================================================
@@ -247,6 +248,10 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 			break;
 
+		case CPlayerAI::STATEAI_EMOTE:
+
+			m_stateAI = STATEAI_EMOTE;
+
 		case CPlayerAI::STATEAI_MAX:
 
 			m_stateAI = STATEAI_NONE;
@@ -257,6 +262,13 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 			break;
 		}
+	}
+
+	if (CManager::GetInstance()->GetRetentionManager()->GetNumSurvival() == 0 && m_stateAI != STATEAI_EMOTE)
+	{ // 残り人数が1人の場合
+
+		m_stateAI = STATEAI_EMOTE;
+		m_bEmote = true;
 	}
 	
 	switch (m_stateAI)
@@ -350,6 +362,13 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 		break;
 
+	case CPlayerAI::STATEAI_EMOTE:
+
+		m_bAttack = false;
+		m_bMove = false;
+
+		break;
+
 	case CPlayerAI::STATEAI_MAX:
 
 		break;
@@ -362,6 +381,7 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 	m_currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
 	m_currentMotion = AIattack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+	m_currentMotion = AIemote(rDestRot);
 
 	return m_currentMotion;
 }
@@ -552,6 +572,10 @@ CPlayer::EMotion CPlayerAI::AIattack
 				// 移動量を更新
 				rMove.x = 0.0f;
 				rMove.z = 0.0f;
+			}
+			else
+			{
+				m_nCounterFlail = flail::FLAIL_DROP;
 			}
 		}
 	}
@@ -773,17 +797,14 @@ void CPlayerAI::AIDash
 		if (Collision(dashPos))
 		{
 			int nProb = rand() % 10000;
-			if (m_nCounterFlail > 60 && m_nCounterFlail <= flail::FLAIL_CHARGE)
-			{
-				bJumpSelect = true;
-			}
+			
 			if (nProb > 9920)
 			{
 				bJumpSelect = true;
 			}
 			else
 			{
-				//bJumpSelect = false;
+				bJumpSelect = false;
 			}
 		}
 		else
@@ -798,6 +819,11 @@ void CPlayerAI::AIDash
 			{
 				bJumpSelect = false;
 			}
+		}
+
+		if (m_stateAI != STATEAI_EMOTE)
+		{
+			bJumpSelect = false;
 		}
 
 		if (bJumpSelect)
@@ -821,6 +847,7 @@ void CPlayerAI::AIDash
 				if (rCounterFlail > flail::FLAIL_DEF && rCounterFlail <= flail::FLAIL_CHARGE)
 				{
 					rCounterFlail = flail::FLAIL_DEF;
+					m_stateAI = STATEAI_MOVE;
 				}
 
 				// サウンドの再生
@@ -852,6 +879,40 @@ void CPlayerAI::AIDash
 			m_stateAI = STATEAI_MOVE;
 		}
 	}
+}
+
+//============================================================
+//	エモートに関するAI
+//============================================================
+CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
+{
+	if (m_bEmote)
+	{
+		int nProb = rand() % 4;
+
+		if (nProb == 0)
+		{
+			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+		}
+		else if (nProb == 1)
+		{
+			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+		}
+		else if (nProb == 2)
+		{
+			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+		}
+		else if (nProb == 3)
+		{
+			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+		}
+
+		rDestRot.y = 0.0f;
+
+		m_bEmote = false;
+	}
+
+	return m_currentMotion;
 }
 
 //============================================================

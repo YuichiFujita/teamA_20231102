@@ -1148,6 +1148,7 @@ void CPlayer::UpdateMotion(int nMotion)
 				break;
 
 			case MOTION_LAND:	// 着地モーション：ループOFF
+			case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
 
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
@@ -1180,6 +1181,7 @@ void CPlayer::UpdateMotion(int nMotion)
 
 	case MOTION_DASH:	// ダッシュモーション：ループOFF
 	case MOTION_LAND:	// 着地モーション：ループOFF
+	case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
 
 		if (IsMotionFinish())
 		{ // モーションが終了していた場合
@@ -1757,6 +1759,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			m_nCounterFlail++;
 		}
+
+		PlayEmote(currentMotion);
 	}
 	else
 	{
@@ -1767,9 +1771,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_pFlail->SetMove(VEC3_ZERO);
 			m_pFlail->CatchFlail();
 		}
-		else
 		{
-			// カウンターアップ開始
+			// カウンターダウン開始
 			if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
 			{
 				m_nCounterFlail--;
@@ -1822,7 +1825,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				}
 			}
 
-			// 引き戻す
+			// フックショット
 			if (CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_L1, m_nPadID) == TRUE)
 			{
 				if (m_nCounterFlail == flail::FLAIL_DROP)
@@ -1834,13 +1837,13 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 					{
 						float rotFlail;
 						rotFlail = atan2f(vecFlail.x, vecFlail.z);
-
+						rotFlail = m_pFlail->GetChainRot();
 						// 移動量を更新
-						m_move.x += sinf(rotFlail + D3DX_PI) * 10.0f;
+						m_move.x += sinf(rotFlail + (D3DX_PI * 0.5f)) * 10.0f;
 						m_move.y = 1.0f;
-						m_move.z += cosf(rotFlail + D3DX_PI) * 10.0f;
+						m_move.z += cosf(rotFlail + (D3DX_PI * 0.5f)) * 10.0f;
 
-						m_destRot.y = rotFlail;
+						m_destRot.y = rotFlail - (D3DX_PI * 0.5f);
 
 						m_bHook = true;
 					}
@@ -1863,6 +1866,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 				m_pFlail->SetLengthTarget(lengthPtoFTarget);
 			}
+
+			PlayEmote(currentMotion);
 		}
 	}
 
@@ -1947,6 +1952,29 @@ void CPlayer::UpdateDash(void)
 			m_fPlusMove = 0.0f;
 			m_bDash = false;
 		}
+	}
+}
+
+//============================================================
+//	エモート操作処理
+//============================================================
+void CPlayer::PlayEmote(EMotion& rAnim)
+{
+	if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_UP, m_nPadID) == TRUE)
+	{
+		rAnim = MOTION_EMOTE_PROUD;
+	}
+	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_DOWN, m_nPadID) == TRUE)
+	{
+		rAnim = MOTION_EMOTE_PROUD;
+	}
+	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT, m_nPadID) == TRUE)
+	{
+		rAnim = MOTION_EMOTE_PROUD;
+	}
+	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT, m_nPadID) == TRUE)
+	{
+		rAnim = MOTION_EMOTE_PROUD;
 	}
 }
 

@@ -64,6 +64,7 @@ public:
 		MOTION_LAND,		// 着地モーション
 		MOTION_DROWN,		// 溺れモーション
 		MOTION_DEATH,		// 死亡モーション
+		MOTION_EMOTE_PROUD,	// 胸を張るエモートモーション
 		MOTION_MAX			// この列挙型の総数
 	};
 
@@ -175,6 +176,8 @@ private:
 	EMotion UpdateInvuln(void);	// 無敵状態時の更新
 	EMotion UpdateDrown(void);	// 溺れ状態時の更新
 	void UpdateDeath(void);		// 死亡状態時の更新
+
+	void PlayEmote(EMotion& rAnim);		// エモート操作
 
 	void UpdateOldPosition(void);			// 過去位置の更新
 	EMotion UpdateMove(D3DXVECTOR3& rPos);	// 移動量・目標向きの更新
