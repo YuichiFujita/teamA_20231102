@@ -54,6 +54,7 @@ namespace
 		"data\\TXT\\Stages\\stage21.txt",
 		"data\\TXT\\Stages\\stage22.txt",
 		"data\\TXT\\Stages\\stage23.txt",
+		"data\\TXT\\Stages\\stage24.txt",
 	};
 }
 

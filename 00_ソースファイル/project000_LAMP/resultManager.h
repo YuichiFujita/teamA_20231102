@@ -151,6 +151,7 @@ private:
 	int m_nSelect;						// 現在の選択
 	int m_nOldSelect;					// 前回の選択
 	int m_anNum[OBJ_MAX];				//　数
+	int m_nNumPlay;
 	int m_anWaitTime[OBJ_MAX];			//　待機時間
 	int m_anRank[RANK::RANK_MAX];		//順位順に並べるための変数
 	int m_anSaveRank[RANK::RANK_MAX];	//順位順の値を保存
