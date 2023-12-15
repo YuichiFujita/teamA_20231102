@@ -33,6 +33,7 @@ public:
 	{
 		TYPE_SEA = 0,	// ‰t‘Ì
 		TYPE_LAVA,
+		TYPE_ICESEA,
 		TYPE_MAX		// ‚±‚Ì—ñ‹“Œ^‚Ì‘”
 	};
 

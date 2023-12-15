@@ -34,6 +34,11 @@ const char *CLiquid::mc_apTextureFile[][LIQUID_MAX] =	// ƒeƒNƒXƒ`ƒƒ’è”
 		"data\\TEXTURE\\Lava002.png",	// ŠC(‰º)
 		"data\\TEXTURE\\Lava003.png",	// ŠC(ã)
 	},
+
+	{ // •XŠCƒeƒNƒXƒ`ƒƒ
+		"data\\TEXTURE\\sea000.jpg",	// •XŠC(‰º)
+		"data\\TEXTURE\\sea01.png",		// •XŠC(ã)
+	},
 };
 
 //************************************************************

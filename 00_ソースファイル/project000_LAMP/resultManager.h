@@ -47,6 +47,11 @@ public:
 		TEXTURE_FRAME,
 		TEXTURE_RESTART,
 		TEXTURE_BACK,
+		TEXTURE_ICON_PLAYER1,
+		TEXTURE_ICON_PLAYER2,
+		TEXTURE_ICON_PLAYER3,
+		TEXTURE_ICON_PLAYER4,
+		TEXTURE_BLACKOUT,
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -71,6 +76,8 @@ public:
 		OBJ_WIN_NUM,
 		OBJ_BIGFRAME,
 		OBJ_FRAME,		//フレーム
+		OBJ_ICON,
+		OBJ_PLAYER,
 		OBJ_NUMBER,
 		OBJ_COVER,
 		OBJ_SELECT,		//セレクト
@@ -83,6 +90,17 @@ public:
 		SELECT_YES = 0,	// YES
 		SELECT_NO,		// NO
 		SELECT_MAX		// この列挙型の総数
+	};
+	//<******************************
+	//ランクの列挙型
+	//<******************************
+	enum RANK
+	{
+		RANK_FIRST = 0,	//一位
+		RANK_SECOND,	//二位
+		RANK_THIRD,		//三位
+		RANK_FOURTH,	//四位
+		RANK_MAX
 	};
 
 	// コンストラクタ
@@ -101,6 +119,7 @@ public:
 	static HRESULT Release(CResultManager *&prResultManager);	// 破棄
 
 private:
+
 	// メンバ関数
 	void UpdateFade(void);			// フェードイン
 	void UpdateSelect(void);		// 選択更新
@@ -123,16 +142,23 @@ private:
 	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
 	CObject2D *m_pFade;					// フェードの情報
 	CObject2D *m_pCover;
+	CObject2D *m_apIcon[NUM_FRAME];	//プレイヤーのアイコン
+	CAnim2D *m_apWinNum[NUM_FRAME];
 	EState m_state;						// 状態
 	D3DXVECTOR3 m_arPos[OBJ_MAX];		// サイズ
+	D3DXVECTOR3 m_rPos[NUM_FRAME];
+	D3DXVECTOR3 m_arOriginPos[OBJ_MAX][NUM_FRAME];
 	D3DXVECTOR3 m_arSize[OBJ_MAX];		// 位置
 	int m_nCounterState;				// 状態管理カウンター
 	int m_nSelect;						// 現在の選択
 	int m_nOldSelect;					// 前回の選択
 	int m_anNum[OBJ_MAX];				//　数
+	int m_nNumPlay;
 	int m_anWaitTime[OBJ_MAX];			//　待機時間
-	bool m_bSkiped;
-	bool m_abSizeFinish[OBJ_MAX];
+	int m_anRank[RANK::RANK_MAX];		//順位順に並べるための変数
+	int m_anSaveRank[RANK::RANK_MAX];	//順位順の値を保存
+	bool m_bSkiped;						//スキップされているかどうか
+	bool m_abSizeFinish[OBJ_MAX];		//サイズ拡大・縮小が終了しているか
 	bool m_abool[OBJ_MAX];				// 判定用
 };
 

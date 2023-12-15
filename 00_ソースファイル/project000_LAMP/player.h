@@ -23,7 +23,7 @@
 class CStatusManager;	// ステータスマネージャークラス
 class CFlail;			// フレイルクラス
 class CPlayerAI;		// フレイルクラス
-
+class CObjectBillboard;
 //************************************************************
 //	クラス定義
 //************************************************************
@@ -143,7 +143,7 @@ public:
 	D3DXMATRIX GetMtxWorld(void) const override;		// マトリックス取得
 
 	// 静的メンバ関数
-	static CPlayer *Create(CScene::EMode mode, const int nPad);	// 生成
+	static CPlayer *Create(CScene::EMode mode, const int nPad, const bool bAI = false);	// 生成
 
 	// メンバ関数
 	void HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer *pAttack);	// ノックバックヒット
@@ -210,6 +210,8 @@ private:
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
 	CObject3D * m_pGuide;			// 投擲方向
+	CObjectBillboard * m_pPlayerGuide;
+
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

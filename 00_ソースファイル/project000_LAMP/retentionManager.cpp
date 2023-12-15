@@ -14,7 +14,7 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define INIT_WINPOINT	(3)		// 初期勝利ポイント
+#define INIT_WINPOINT	(1)		// 初期勝利ポイント
 
 //************************************************************
 //	親クラス [CRetentionManager] のメンバ関数
@@ -259,23 +259,56 @@ void CRetentionManager::InitGame(void)
 //============================================================
 //	全エントリー状況の設定処理
 //============================================================
-void CRetentionManager::AllSetEnableEntry(const bool bEntry)
+void CRetentionManager::AllSetEnableEntry(const bool bEntry, const bool bAI)
 {
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
 
 		// エントリー状況を設定
 		m_aEntry[nCntEntry] = bEntry;
+
+		// AI状況を設定
+		m_aAI[nCntEntry] = bAI;
 	}
 }
 
 //============================================================
 //	エントリーの設定処理
 //============================================================
-void CRetentionManager::SetEnableEntry(const int nID, const bool bEntry)
+void CRetentionManager::SetEntry(const int nID, const bool bEntry, const bool bAI)
 {
-	// 引数インデックスのエントリー状況を設定
-	m_aEntry[nID] = bEntry;
+	if (bEntry)
+	{ // エントリーする場合
+
+		if (!m_aEntry[nID])
+		{ // エントリー情報が無い場合
+
+			// プレイヤー数を加算
+			m_nNumPlayer++;
+		}
+
+		// 引数インデックスのエントリー状況を設定
+		m_aEntry[nID] = bEntry;
+
+		// 引数インデックスのAI状況を設定
+		m_aAI[nID] = bAI;
+	}
+	else
+	{ // エントリーを取り消す場合
+
+		if (m_aEntry[nID])
+		{ // エントリー情報がある場合
+
+			// プレイヤー数を減算
+			m_nNumPlayer--;
+		}
+
+		// 引数インデックスのエントリー状況を設定
+		m_aEntry[nID] = bEntry;
+
+		// 引数インデックスのAI状況を設定
+		m_aAI[nID] = bAI;
+	}
 }
 
 //============================================================
@@ -285,6 +318,15 @@ bool CRetentionManager::IsEntry(const int nID) const
 {
 	// 引数インデックスのエントリー状況を返す
 	return m_aEntry[nID];
+}
+
+//============================================================
+//	AI取得処理
+//============================================================
+bool CRetentionManager::IsAI(const int nID) const
+{
+	// 引数インデックスのAI状況を返す
+	return m_aAI[nID];
 }
 
 //============================================================

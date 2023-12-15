@@ -105,7 +105,7 @@ namespace
 		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
 		const float	SPACE_EDGE		= 40.0f;	// 縁の空白
 
-		const POSGRID2		PART	= POSGRID2(MAX_ARROW, 1);			// テクスチャ分割数
+		const POSGRID2		PART	= POSGRID2(MAX_RULE_ARROW, 1);		// テクスチャ分割数
 		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(80.0f, 80.0f, 0.0f);	// 大きさ
 
 		const D3DXVECTOR3	POS		= D3DXVECTOR3(select::POS.x - (select::SIZE_RULE.x * 0.5f) - SPACE_EDGE, select::POS.y, 0.0f);	// 位置
@@ -250,7 +250,7 @@ HRESULT CEntryRuleManager::Init(void)
 
 	// 矢印の生成
 	{
-		for (int i = 0; i < MAX_ARROW; i++)
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
 		{ // 矢印の総数分繰り返す
 
 			// 矢印の生成
@@ -465,7 +465,7 @@ HRESULT CEntryRuleManager::Uninit(void)
 		m_apRuleTitle[i]->Uninit();
 	}
 
-	for (int i = 0; i < MAX_ARROW; i++)
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
 	{ // 矢印の総数分繰り返す
 
 		// 矢印の終了
@@ -577,7 +577,7 @@ void CEntryRuleManager::Update(void)
 		m_apRuleTitle[i]->Update();
 	}
 
-	for (int i = 0; i < MAX_ARROW; i++)
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
 	{ // 矢印の総数分繰り返す
 
 		// 矢印の更新
@@ -777,7 +777,7 @@ void CEntryRuleManager::UpdateControl(void)
 //============================================================
 void CEntryRuleManager::UpdateArrow(void)
 {
-	for (int i = 0; i < MAX_ARROW; i++)
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
 	{ // 矢印の総数分繰り返す
 
 		// 変数を宣言
@@ -857,7 +857,7 @@ void CEntryRuleManager::Select(void)
 			// 大きさを変更
 			sizeSelect = select::SIZE_RULE;
 
-			for (int i = 0; i < MAX_ARROW; i++)
+			for (int i = 0; i < MAX_RULE_ARROW; i++)
 			{ // 矢印の総数分繰り返す
 
 				// 矢印の位置を変更
@@ -876,7 +876,7 @@ void CEntryRuleManager::Select(void)
 			// 大きさを変更
 			sizeSelect = select::SIZE_START;
 
-			for (int i = 0; i < MAX_ARROW; i++)
+			for (int i = 0; i < MAX_RULE_ARROW; i++)
 			{ // 矢印の総数分繰り返す
 
 				// 自動描画をOFFにする
@@ -905,7 +905,7 @@ void CEntryRuleManager::Select(void)
 			// 大きさを変更
 			sizeSelect = select::SIZE_RULE;
 
-			for (int i = 0; i < MAX_ARROW; i++)
+			for (int i = 0; i < MAX_RULE_ARROW; i++)
 			{ // 矢印の総数分繰り返す
 
 				// 矢印の位置を変更
@@ -924,7 +924,7 @@ void CEntryRuleManager::Select(void)
 			// 大きさを変更
 			sizeSelect = select::SIZE_START;
 
-			for (int i = 0; i < MAX_ARROW; i++)
+			for (int i = 0; i < MAX_RULE_ARROW; i++)
 			{ // 矢印の総数分繰り返す
 
 				// 自動描画をOFFにする
@@ -1127,7 +1127,7 @@ void CEntryRuleManager::SetEnableUI(const bool bDraw)
 		m_apRuleTitle[i]->SetEnableDraw(bDraw);
 	}
 
-	for (int i = 0; i < MAX_ARROW; i++)
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
 	{ // 矢印の総数分繰り返す
 
 		// 矢印の描画を設定
@@ -1192,7 +1192,7 @@ void CEntryRuleManager::SetAlphaUI(const float fAlpha, const bool bFadeOut)
 		float fSetAlpha = 0.0f;	// 設定透明度
 		float fMaxAlpha = 0.0f;	// 最大透明度
 
-		for (int i = 0; i < MAX_ARROW; i++)
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
 		{ // 矢印の総数分繰り返す
 
 			// 色情報を設定

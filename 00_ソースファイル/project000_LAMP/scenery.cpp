@@ -22,9 +22,9 @@
 //************************************************************
 const char *CScenery::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\scenery000.png",	// ビル街テクスチャ (白色)
-	"data\\TEXTURE\\scenery001.png",	// ビル街テクスチャ (水色)
-	"data\\TEXTURE\\scenery002.png",	// ビル街テクスチャ (青色)
+	"data\\TEXTURE\\Mountain0.png",	// ビル街テクスチャ (白色)
+	"data\\TEXTURE\\Mountain1.png",	// ビル街テクスチャ (水色)
+	"data\\TEXTURE\\Mountain2.png",	// ビル街テクスチャ (青色)
 };
 
 //************************************************************
