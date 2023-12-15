@@ -51,6 +51,7 @@ public:
 		TEXTURE_ICON_PLAYER2,
 		TEXTURE_ICON_PLAYER3,
 		TEXTURE_ICON_PLAYER4,
+		TEXTURE_BLACKOUT,
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -145,6 +146,7 @@ private:
 	CAnim2D *m_apWinNum[NUM_FRAME];
 	EState m_state;						// 状態
 	D3DXVECTOR3 m_arPos[OBJ_MAX];		// サイズ
+	D3DXVECTOR3 m_rPos[NUM_FRAME];
 	D3DXVECTOR3 m_arOriginPos[OBJ_MAX][NUM_FRAME];
 	D3DXVECTOR3 m_arSize[OBJ_MAX];		// 位置
 	int m_nCounterState;				// 状態管理カウンター

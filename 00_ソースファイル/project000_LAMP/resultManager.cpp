@@ -154,7 +154,7 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\ICON_PLAYER001.png",
 	"data\\TEXTURE\\ICON_PLAYER002.png",
 	"data\\TEXTURE\\ICON_PLAYER003.png",
-	"data\\TEXTURE\\entry_player.png",
+	"data\\TEXTURE\\Black-Frame.png",
 
 };
 
@@ -183,23 +183,10 @@ CResultManager::CResultManager()
 		}
 	}
 
-	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
-	{
-		m_apFrame[nCnt] = nullptr;
-		m_apIcon[nCnt] = nullptr;
-		m_apWinNum[nCnt] = nullptr;
-		m_anRank[nCnt] = NULL;
-	}
-
-
-	m_pBigFrame		= nullptr;		// 巨大フレーム
-	m_pFade			= NULL;			// フェードの情報
-	m_state			= STATE_NONE;	// 状態
-	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nSelect		= SELECT_YES;	// 現在の選択
-	m_nOldSelect	= SELECT_YES;	// 前回の選択
-	m_nNumPlay = NULL;
-	m_bSkiped = false;
+	m_rPos[0] = Frame::POS;
+	m_rPos[1] = Number::POS;
+	m_rPos[2] = Icon::POS;
+	m_rPos[3] = Winner::POS;
 }
 
 //============================================================
@@ -253,6 +240,38 @@ HRESULT CResultManager::Init(void)
 	m_nOldSelect	= SELECT_YES;	// 前回の選択
 	m_bSkiped = false;
 	m_nNumPlay = CManager::GetInstance()->GetInstance()->GetRetentionManager()->GetNumPlayer();
+
+	switch (m_nNumPlay)
+	{
+	case 2:
+
+		m_rPos[0].y = 330.0f;
+		m_rPos[1].y = 330.0f;
+		m_rPos[2].y = 330.0f;
+		m_rPos[3].y = 330.0f;
+
+		break;
+
+	case 3:
+
+		m_rPos[0].y = 220.0f;
+		m_rPos[1].y = 220.0f;
+		m_rPos[2].y = 220.0f;
+		m_rPos[3].y = 220.0f;
+
+		break;
+
+	case 4:
+
+		m_rPos[0].y = m_rPos[0].y;
+		m_rPos[1].y = m_rPos[1].y;
+		m_rPos[2].y = m_rPos[2].y;
+		m_rPos[3].y = m_rPos[3].y;
+
+		break;
+
+
+	}
 
 	//--------------------------------------------------------
 	//	フェードの生成・設定
@@ -353,20 +372,23 @@ HRESULT CResultManager::Init(void)
 		m_apNumber[nCnt] = CAnim2D::Create
 		(	10, 
 			1, 
-			D3DXVECTOR3(Number::POS.x, Number::POS.y + Number::DISTANCE * nCnt, Number::POS.z),
+			D3DXVECTOR3(m_rPos[1].x, m_rPos[1].y + Number::DISTANCE * nCnt, m_rPos[1].z),
 			Number::INIT_SIZE);
 
 		m_apNumber[nCnt]->BindTexture("data\\TEXTURE\\number002.png");
 		m_apNumber[nCnt]->SetPattern(nCnt + 1);
 		m_apNumber[nCnt]->SetPriority(RESULT_PRIO);
 
+	}
+	for (int nCnt = 0; nCnt < NUM_FRAME;nCnt++)
+	{
 		m_apFrame[nCnt] = CObject2D::Create
 		(
-			D3DXVECTOR3(Frame::POS.x, Frame::POS.y + Frame::DISTANCE * nCnt, Frame::POS.z),
+			D3DXVECTOR3(m_rPos[0].x, m_rPos[0].y + Frame::DISTANCE * nCnt, m_rPos[0].z),
 			Frame::INIT_SIZE
 		);
 
-		if (m_apWinLog[nCnt] == NULL)
+		if (m_apFrame[nCnt] == NULL)
 		{ // 生成に失敗した場合
 
 		  // 失敗を返す
@@ -374,8 +396,18 @@ HRESULT CResultManager::Init(void)
 			return E_FAIL;
 		}
 
-		// テクスチャを設定
-		m_apFrame[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+		//プレイ人数の上限に達していなければ
+		if (nCnt < m_nNumPlay)
+		{
+			// テクスチャを設定
+			m_apFrame[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
+		}
+		//達していなければ
+		else
+		{
+			// テクスチャを設定
+			m_apFrame[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_BLACKOUT]);
+		}
 
 		// 優先順位を設定
 		m_apFrame[nCnt]->SetPriority(RESULT_PRIO);
@@ -419,7 +451,7 @@ HRESULT CResultManager::Init(void)
 	{
 		m_apIcon[nCnt] = CObject2D::Create
 		(
-			D3DXVECTOR3(Icon::POS.x, Icon::POS.y + Icon::DISTANCE * nCnt, Icon::POS.z),
+			D3DXVECTOR3(m_rPos[2].x, m_rPos[2].y + Icon::DISTANCE * nCnt, m_rPos[2].z),
 			Icon::DESTSIZE
 		);
 
@@ -429,7 +461,7 @@ HRESULT CResultManager::Init(void)
 		(
 			1,
 			MAX_PLAYER,
-			D3DXVECTOR3(Winner::POS.x, Winner::POS.y + Winner::DISTANCE * nCnt, Winner::POS.z),
+			D3DXVECTOR3(m_rPos[3].x, m_rPos[3].y + Winner::DISTANCE * nCnt, m_rPos[3].z),
 			Winner::DESTSIZE
 		);
 
@@ -622,9 +654,7 @@ HRESULT CResultManager::Init(void)
 
 	// 成功を返す
 	return S_OK;
-
 }
-
 //============================================================
 //	終了処理
 //============================================================
@@ -646,8 +676,16 @@ HRESULT CResultManager::Uninit(void)
 			m_apWinLog[nCnt] = nullptr;
 		}
 	}
+	//フレーム終了処理
+	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
+	{
+		if (m_apFrame[nCnt] != nullptr)
+		{
+			m_apFrame[nCnt]->Uninit();
+			m_apFrame[nCnt] = nullptr;
+		}
+	}
 
-	//フレームの終了処理
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
 		if (m_apNumber[nCnt] != nullptr)
@@ -656,11 +694,6 @@ HRESULT CResultManager::Uninit(void)
 			m_apNumber[nCnt] = nullptr;
 		}
 		
-		if (m_apFrame[nCnt] != nullptr)
-		{
-			m_apFrame[nCnt]->Uninit();
-			m_apFrame[nCnt] = nullptr;
-		}
 		if (m_apIcon[nCnt] != nullptr)
 		{
 			m_apIcon[nCnt]->Uninit();
@@ -1209,7 +1242,7 @@ void CResultManager::UpdateFrame(void)
 				&&m_apFrame[m_anNum[EObj::OBJ_FRAME]]->GetVec3Sizing().y == Frame::DESTSIZE.y)
 			{
 				//範囲外にいかないようにする
-				if (m_anNum[EObj::OBJ_FRAME] >= m_nNumPlay - 1)
+				if (m_anNum[EObj::OBJ_FRAME] >= m_nNumPlay-1)
 				{
 					//フレーム
 					m_anNum[EObj::OBJ_FRAME] = m_nNumPlay - 1;
@@ -1576,7 +1609,7 @@ void CResultManager::SkipStaging(void)
 	}
 
 	//フレーム数分回す
-	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
+	for (int nCnt = 0; nCnt < m_nNumPlay - 1; nCnt++)
 	{
 		//描画をするようにする
 		m_apFrame[nCnt]->SetEnableDraw(true);
