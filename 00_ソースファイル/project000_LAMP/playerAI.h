@@ -32,9 +32,10 @@ public:
 	// 行動パターン列挙
 	enum EStateAI
 	{
-		STATEAI_NONE = 0,	// X軸
-		STATEAI_MOVE,		// Y軸
-		STATEAI_ATTACK,		// Z軸
+		STATEAI_NONE = 0,	// 静止状態
+		STATEAI_MOVE,		// 移動状態
+		STATEAI_ATTACK,		// 攻撃状態
+		STATEAI_EMOTE,		// エモート状態
 		STATEAI_MAX			// この列挙型の総数
 	};
 
@@ -86,6 +87,8 @@ public:
 		const int nMotionOld
 	);
 
+	CPlayer::EMotion AIemote(D3DXVECTOR3& rDestRot);
+
 	void AIDash
 	(
 		D3DXVECTOR3& rPos,
@@ -128,6 +131,7 @@ private:
 
 	bool m_bAttack;
 	bool m_bMove;
+	bool m_bEmote;
 };
 
 #endif	// _PLAYERAI_H_
