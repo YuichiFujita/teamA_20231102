@@ -39,6 +39,12 @@ const char *CLiquid::mc_apTextureFile[][LIQUID_MAX] =	// テクスチャ定数
 		"data\\TEXTURE\\sea000.jpg",	// 氷海(下)
 		"data\\TEXTURE\\sea01.png",		// 氷海(上)
 	},
+
+	{ // 泥水テクスチャ
+		"data\\TEXTURE\\sea000.jpg",		// 泥水(下)
+		"data\\TEXTURE\\muddywater.png",	// 泥水(上)
+	},
+
 };
 
 //************************************************************
