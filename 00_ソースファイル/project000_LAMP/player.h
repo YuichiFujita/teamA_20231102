@@ -23,7 +23,7 @@
 class CStatusManager;	// ステータスマネージャークラス
 class CFlail;			// フレイルクラス
 class CPlayerAI;		// フレイルクラス
-
+class CObjectBillboard;
 //************************************************************
 //	クラス定義
 //************************************************************
@@ -207,6 +207,8 @@ private:
 	D3DXVECTOR3	m_dashRot;			// ダッシュ向き
 	EState		m_state;			// 状態
 	CObject3D * m_pGuide;			// 投擲方向
+	CObjectBillboard * m_pPlayerGuide;
+
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

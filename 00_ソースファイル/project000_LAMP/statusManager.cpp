@@ -11,6 +11,7 @@
 #include "manager.h"
 #include "multiValue.h"
 #include "retentionManager.h"
+#include "objectBillboard.h"
 #include "object2D.h"
 
 //************************************************************
@@ -24,7 +25,7 @@ namespace
 	{
 		const int MAX_LIFE	= 100;	// ”Žš
 		const int MAX_DIG	= 3;	// Œ…”
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(150.0f, 600.0f, 0.0f);	// ˆÊ’u
+		const D3DXVECTOR3 POS	= D3DXVECTOR3(200.0f, 75.0f, 0.0f);	// ˆÊ’u
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(D3DXVECTOR3(64.0f, 144.0f, 0.0f) * 0.75f);	// ‘å‚«‚³
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(40.0f, 0.0f, 0.0f);		// sŠÔ
 	}
@@ -111,14 +112,31 @@ HRESULT CStatusManager::Init(void)
 	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
 	{
 		m_pKnockRate->SetEnableDraw(false);
-		 m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		 m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) , life::POS.y + 10.0f, life::POS.x), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 		 m_pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
 	}
 	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
 	{
 		m_pLife->SetEnableDraw(false);
-		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 50.0f, life::POS.y, life::POS.x), D3DXVECTOR3(300.0f, 150.0f, 0.0f));
+		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) , life::POS.y + 10.0f, life::POS.x), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 		m_pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
+	}
+	switch (m_nPadID)
+	{
+	case 0:
+		m_pUI->SetColor(D3DXCOLOR(1.0f, 0.5f, 0.5f, 1.0f));
+		break;
+	case 1:
+		m_pUI->SetColor(D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f));
+		break;
+	case 2:
+		m_pUI->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.5f, 1.0f));
+		break;
+	case 3:
+		m_pUI->SetColor(D3DXCOLOR(0.5f, 1.0f, 0.5f, 1.0f));
+		break;
+	default:
+		break;
 	}
 	// —Dæ‡ˆÊ‚ðÝ’è
 	m_pUI->SetPriority(PRIORITY);

@@ -43,6 +43,7 @@
 #include "playerAI.h"
 
 #include "orbitalEffect.h"
+#include "objectBillboard.h"
 #include "orbitalParticle.h"
 
 //************************************************************
@@ -229,6 +230,25 @@ HRESULT CPlayer::Init(void)
 	m_pGuide->SetLabel(ELabel::LABEL_UI);
 	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
 
+	m_pPlayerGuide = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
+	switch (m_nPadID)
+	{
+	case 0:
+		m_pPlayerGuide->BindTexture("data\\TEXTURE\\Player_1.png");
+		break;
+	case 1:
+		m_pPlayerGuide->BindTexture("data\\TEXTURE\\Player_2.png");
+		break;
+	case 2:
+		m_pPlayerGuide->BindTexture("data\\TEXTURE\\Player_3.png");
+		break;
+	case 3:
+		m_pPlayerGuide->BindTexture("data\\TEXTURE\\Player_4.png");
+		break;
+	default:
+		break;
+	}
+
 	// 成功を返す
 	return S_OK;
 }
@@ -259,6 +279,12 @@ void CPlayer::Uninit(void)
 		m_pGuide->Uninit();
 		m_pGuide = NULL;
 	}
+	if (m_pPlayerGuide != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pPlayerGuide->Uninit();
+		m_pPlayerGuide = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -268,6 +294,7 @@ void CPlayer::Uninit(void)
 //============================================================
 void CPlayer::Update(void)
 {
+	m_pPlayerGuide->SetVec3Position(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 400.0f, GetVec3Position().z));
 	// 変数を宣言
 	EMotion currentMotion = MOTION_DEATH;	// 現在のモーション
 
@@ -784,14 +811,21 @@ void CPlayer::HitKillY(const int nDmg)
 	{
 		// ポインタを宣言
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
-		if (CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetType() == CLiquid::TYPE_SEA)
+		switch (CManager::GetInstance()->GetScene()->GetStage()->GetLiquid()->GetType())
 		{
+		case CLiquid::TYPE_SEA:
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 60, 150, 0.2f, 0.99f);
-		}
-		else
-		{
+			break;
+		case CLiquid::TYPE_LAVA:
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(15.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.1f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -2.5f, 0.0f), 12, 600, 60, 120, 150, 0.2f, 0.99f);
+			break;
+		case CLiquid::TYPE_ICESEA:
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.8f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 60, 150, 0.2f, 0.99f);
+			break;
+		default:
+			break;
 		}
+	
 
 		switch (pRetention->GetKillState())
 		{ // 討伐条件ごとの処理
