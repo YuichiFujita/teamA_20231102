@@ -269,6 +269,11 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 		m_stateAI = STATEAI_EMOTE;
 		m_bEmote = true;
+
+		if (m_nCounterFlail < flail::FLAIL_DROP)
+		{
+			m_nCounterFlail = flail::FLAIL_DROP;
+		}
 	}
 	
 	switch (m_stateAI)
@@ -379,9 +384,16 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 	//CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[近くの敵]：%d\n", nApproach);
 
-	m_currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
-	m_currentMotion = AIattack(pFlail,rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
-	m_currentMotion = AIemote(rDestRot);
+	if (m_stateAI != STATEAI_EMOTE)
+	{ // 残り人数が1人の場合
+
+		m_currentMotion = AImove(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+		m_currentMotion = AIattack(pFlail, rPos, rMove, rDestRot, pCounterFlail, nMotionOld);
+	}
+	else
+	{
+		m_currentMotion = AIemote(rDestRot);
+	}
 
 	return m_currentMotion;
 }
@@ -896,15 +908,15 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 		}
 		else if (nProb == 1)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
 		}
 		else if (nProb == 2)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
 		}
 		else if (nProb == 3)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
 		}
 
 		rDestRot.y = 0.0f;

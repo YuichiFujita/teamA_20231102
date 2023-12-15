@@ -65,6 +65,7 @@ public:
 		MOTION_DROWN,		// 溺れモーション
 		MOTION_DEATH,		// 死亡モーション
 		MOTION_EMOTE_PROUD,	// 胸を張るエモートモーション
+		MOTION_EMOTE_SLEEP,	// 寝るエモートモーション
 		MOTION_MAX			// この列挙型の総数
 	};
 
