@@ -52,6 +52,7 @@ public:
 		TEXTURE_ICON_PLAYER3,
 		TEXTURE_ICON_PLAYER4,
 		TEXTURE_BLACKOUT,
+		TEXTURE_PLAYER_ENTRY,
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
@@ -144,9 +145,10 @@ private:
 	CObject2D *m_pCover;
 	CObject2D *m_apIcon[NUM_FRAME];	//プレイヤーのアイコン
 	CAnim2D *m_apWinNum[NUM_FRAME];
+	CObject2D *m_apPlayerEntry[NUM_FRAME];
 	EState m_state;						// 状態
 	D3DXVECTOR3 m_arPos[OBJ_MAX];		// サイズ
-	D3DXVECTOR3 m_rPos[NUM_FRAME];
+	D3DXVECTOR3 m_rPos[5];
 	D3DXVECTOR3 m_arOriginPos[OBJ_MAX][NUM_FRAME];
 	D3DXVECTOR3 m_arSize[OBJ_MAX];		// 位置
 	int m_nCounterState;				// 状態管理カウンター
@@ -154,6 +156,8 @@ private:
 	int m_nOldSelect;					// 前回の選択
 	int m_anNum[OBJ_MAX];				//　数
 	int m_nNumPlay;
+	int m_nPattern;
+	int m_anWinPoint[RANK::RANK_MAX];
 	int m_anWaitTime[OBJ_MAX];			//　待機時間
 	int m_anRank[RANK::RANK_MAX];		//順位順に並べるための変数
 	int m_anSaveRank[RANK::RANK_MAX];	//順位順の値を保存

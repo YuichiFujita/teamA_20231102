@@ -134,9 +134,16 @@ namespace Icon
 namespace Winner
 {
 	//定数の定義
-	const D3DXVECTOR3	POS = D3DXVECTOR3(900.0f, 110.0f, 0.0f);					// 位置
+	const D3DXVECTOR3	POS = D3DXVECTOR3(1080.0f, 110.0f, 0.0f);					// 位置
 	const float			DISTANCE = 170.0f;											// 間隔
 	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(125.0f, 125.0f, 0.0f);				// 目的の位置
+}
+namespace Player
+{
+	//定数の定義
+	const D3DXVECTOR3	POS = D3DXVECTOR3(950.0f, 110.0f, 0.0f);					// 位置
+	const float			DISTANCE = 170.0f;											// 間隔
+	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(300.0f, 125.0f, 0.0f);				// 目的の位置
 }
 
 //************************************************************
@@ -155,6 +162,7 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\ICON_PLAYER002.png",
 	"data\\TEXTURE\\ICON_PLAYER003.png",
 	"data\\TEXTURE\\Black-Frame.png",
+	"data\\TEXTURE\\entry_player.png",
 
 };
 
@@ -187,6 +195,7 @@ CResultManager::CResultManager()
 	m_rPos[1] = Number::POS;
 	m_rPos[2] = Icon::POS;
 	m_rPos[3] = Winner::POS;
+	m_rPos[4] = Player::POS;
 }
 
 //============================================================
@@ -225,6 +234,7 @@ HRESULT CResultManager::Init(void)
 		m_apWinNum[nCnt] = nullptr;
 		m_anRank[nCnt] = NULL;
 		m_anSaveRank[nCnt] = NULL;
+		m_anWinPoint[nCnt] = NULL;
 	}
 
 	// メンバ変数を初期化
@@ -236,37 +246,48 @@ HRESULT CResultManager::Init(void)
 	m_pCover		= NULL;			// フェードの情報
 	m_state			= STATE_FADEIN;	// 状態
 	m_nCounterState	= 0;			// 状態管理カウンター
+	m_nPattern = 0;
 	m_nSelect		= SELECT_YES;	// 現在の選択
 	m_nOldSelect	= SELECT_YES;	// 前回の選択
 	m_bSkiped = false;
 	m_nNumPlay = CManager::GetInstance()->GetInstance()->GetRetentionManager()->GetNumPlayer();
 
+	//プレイしている人数によって変える
 	switch (m_nNumPlay)
 	{
+		//二人だった場合
 	case 2:
 
+		//中央に寄せる
 		m_rPos[0].y = 330.0f;
 		m_rPos[1].y = 330.0f;
 		m_rPos[2].y = 330.0f;
 		m_rPos[3].y = 330.0f;
+		m_rPos[4].y = 330.0f;
 
 		break;
 
+		//三人だった場合
 	case 3:
 
+		//
 		m_rPos[0].y = 220.0f;
 		m_rPos[1].y = 220.0f;
 		m_rPos[2].y = 220.0f;
 		m_rPos[3].y = 220.0f;
+		m_rPos[4].y = 220.0f;
 
 		break;
 
+		//四人だった場合
 	case 4:
 
+		//従来の並び方にする
 		m_rPos[0].y = m_rPos[0].y;
 		m_rPos[1].y = m_rPos[1].y;
 		m_rPos[2].y = m_rPos[2].y;
 		m_rPos[3].y = m_rPos[3].y;
+		m_rPos[4].y = m_rPos[4].y;
 
 		break;
 
@@ -376,8 +397,10 @@ HRESULT CResultManager::Init(void)
 			Number::INIT_SIZE);
 
 		m_apNumber[nCnt]->BindTexture("data\\TEXTURE\\number002.png");
-		m_apNumber[nCnt]->SetPattern(nCnt + 1);
+
 		m_apNumber[nCnt]->SetPriority(RESULT_PRIO);
+
+		m_anWinPoint[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCnt);
 
 	}
 	for (int nCnt = 0; nCnt < NUM_FRAME;nCnt++)
@@ -447,6 +470,7 @@ HRESULT CResultManager::Init(void)
 	m_apSelect[SELECT_YES]->BindTexture(mc_apTextureFile[TEXTURE_RESTART]);
 	m_apSelect[SELECT_NO]->BindTexture(mc_apTextureFile[TEXTURE_BACK]);
 
+	//
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
 		m_apIcon[nCnt] = CObject2D::Create
@@ -539,6 +563,23 @@ HRESULT CResultManager::Init(void)
 	}
 
 	//--------------------------------------------------------
+	//	フレーム生成・設定
+	//--------------------------------------------------------
+	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
+	{
+		m_apPlayerEntry[nCnt] = CObject2D::Create
+		(
+			D3DXVECTOR3(m_rPos[4].x, m_rPos[4].y + Player::DISTANCE * nCnt, m_rPos[4].z),
+			Player::DESTSIZE
+		);
+
+		m_apPlayerEntry[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_PLAYER_ENTRY]);
+		m_apPlayerEntry[nCnt]->SetPriority(RESULT_PRIO);
+		m_apPlayerEntry[nCnt]->SetEnableDraw(true);
+
+	}
+
+	//--------------------------------------------------------
 	//	フェードの生成・設定
 	//--------------------------------------------------------
 	// フェードの生成
@@ -559,47 +600,6 @@ HRESULT CResultManager::Init(void)
 	m_pCover->BindTexture("data\\TEXTURE\\Remach_flame.png");
 	// 優先順位を設定
 	m_pCover->SetPriority(RESULT_PRIO);
-
-	////順位通りになっていなければ
-	//if (m_anRank[RANK_SECOND] != RANK_FOURTH ||
-	//	m_anRank[RANK_THIRD] != RANK_SECOND ||
-	//	m_anRank[RANK_FOURTH] != RANK_THIRD)
-	//{
-	//	//値の入れ替えをする
-	//	m_anRank[RANK_SECOND] = RANK_FOURTH;
-	//	m_anRank[RANK_THIRD] = RANK_SECOND;
-	//	m_anRank[RANK_FOURTH] = RANK_THIRD;
-	//}
-	////順位通りになっていなければ
-	//else if (m_anRank[RANK_SECOND] != RANK_THIRD &&
-	//	m_anRank[RANK_THIRD] != RANK_FIRST &&
-	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
-	//{
-	//	//順位通りになっていなければ
-	//	m_anRank[RANK_SECOND] = RANK_THIRD;
-	//	m_anRank[RANK_THIRD] = RANK_FIRST;
-	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
-	//}
-	////順位通りになっていなければ
-	//else if (m_anRank[RANK_SECOND] != RANK_THIRD &&
-	//	m_anRank[RANK_THIRD] != RANK_FIRST &&
-	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
-	//{
-	//	//順位通りになっていなければ
-	//	m_anRank[RANK_SECOND] = RANK_THIRD;
-	//	m_anRank[RANK_THIRD] = RANK_FIRST;
-	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
-	//}
-	////順位通りになっていなければ
-	//else if (m_anRank[RANK_SECOND] != RANK_FIRST &&
-	//	m_anRank[RANK_THIRD] != RANK_THIRD &&
-	//	m_anRank[RANK_FOURTH] != RANK_SECOND)
-	//{
-	//	//順位通りになっていなければ
-	//	m_anRank[RANK_SECOND] = RANK_FIRST;
-	//	m_anRank[RANK_THIRD] = RANK_THIRD;
-	//	m_anRank[RANK_FOURTH] = RANK_SECOND;
-	//}
 
 	//もし一位の値とセーブしている四位の値が同じなら
 	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
@@ -649,6 +649,35 @@ HRESULT CResultManager::Init(void)
 			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
 			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
 			m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
+		}
+	}
+	//３人以上で
+	if (m_nNumPlay >= 3)
+	{
+		for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
+		{
+			if (m_apNumber[nCnt] != nullptr)
+			{
+				if (nCnt < 2)
+				{
+					m_apNumber[nCnt]->SetPattern(nCnt + 1);
+				}
+				else
+				{
+					if (m_anWinPoint[m_anRank[RANK_SECOND]] >
+						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nCnt]))
+					{
+						m_apNumber[nCnt]->SetPattern(nCnt + 1);
+					}
+					else
+					{
+						m_apNumber[nCnt]->SetPattern(m_nPattern);
+					}
+				}
+
+				//現在のパターンを保存
+				m_nPattern = m_apNumber[nCnt]->GetPattern();
+			}
 		}
 	}
 
@@ -704,6 +733,11 @@ HRESULT CResultManager::Uninit(void)
 			m_apWinNum[nCnt]->Uninit();
 			m_apWinNum[nCnt] = nullptr;
 		}
+		if (m_apPlayerEntry[nCnt] != nullptr)
+		{
+			m_apPlayerEntry[nCnt]->Uninit();
+			m_apPlayerEntry[nCnt] = nullptr;
+		}
 	}
 
 	//選択肢の終了処理
@@ -730,6 +764,7 @@ HRESULT CResultManager::Uninit(void)
 //============================================================
 void CResultManager::Update(void)
 {
+
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
 		//中身チェック
@@ -824,7 +859,12 @@ void CResultManager::Update(void)
 				break;
 			}
 		}
+		if (m_apPlayerEntry[nCnt] != nullptr)
+		{
+			m_apPlayerEntry[nCnt]->Update();
+		}
 	}
+
 	// 遷移決定の更新
 	UpdateTransition();
 
@@ -1325,10 +1365,12 @@ void CResultManager::UpdateNumber(void)
 			{
 				//
 				if (m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
-					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
+					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr&&
+					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
 				{
 					m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]]->SetEnableDraw(true);
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
+					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
 				}
 
 				//範囲外にいかないようにする
@@ -1636,6 +1678,7 @@ void CResultManager::SkipStaging(void)
 
 		m_apIcon[nCnt]->SetEnableDraw(true);
 		m_apWinNum[nCnt]->SetEnableDraw(true);
+		m_apPlayerEntry[nCnt]->SetEnableDraw(true);
 	}
 	m_state = STATE_FRAME;
 
