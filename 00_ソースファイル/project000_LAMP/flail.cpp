@@ -367,10 +367,10 @@ void CFlail::UpdateChain(void)
 		{
 			if (nCntChain == m_nfulChainF)
 			{
-				if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
+				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
 				{
 					UpdateDropFlailPos(m_fChainRot);
-				}
+				}*/
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -661,6 +661,11 @@ void CFlail::Draw(void)
 		}
 
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rotOld);
+	}
+
+	if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
+	{
+		UpdateDropFlailPos(m_fChainRot);
 	}
 
 	UpdateFlailPos();
@@ -1147,6 +1152,12 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 					else
 					{
 						m_fChainRotMove *= 0.0f;
+						m_fLengthTarget = m_fLengthChain;
+
+						if (m_fLengthChain <= flail::FLAIL_RADIUS * 4.0f)
+						{
+							CatchFlail();
+						}
 					}
 
 					bHitCheck = true;
@@ -1231,6 +1242,12 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 					else
 					{
 						m_fChainRotMove *= 0.0f;
+						m_fLengthTarget = m_fLengthChain;
+
+						if (m_fLengthChain <= flail::FLAIL_RADIUS * 4.0f)
+						{
+							CatchFlail();
+						}
 					}
 
 					bHitBoxCheck = true;
@@ -1466,6 +1483,8 @@ bool CFlail::GetHit(void)
 //============================================================
 void CFlail::CatchFlail()
 {
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
@@ -1506,6 +1525,8 @@ void CFlail::CatchFlail()
 	m_fLengthTarget = 0.0f;
 	//m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
+
+	player->SetCounterFlail(flail::FLAIL_DEF);
 }
 
 //============================================================
