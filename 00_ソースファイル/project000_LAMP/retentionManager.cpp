@@ -423,6 +423,14 @@ void CRetentionManager::SetWinRank(void)
 }
 
 //============================================================
+//	勝利ランキング取得処理
+//============================================================
+CRetentionManager::ERank CRetentionManager::GetWinRank(const int nID)
+{
+	return (ERank)m_aWinRank[nID];
+}
+
+//============================================================
 //	勝利ランキング一位プレイヤーのインデックス取得処理
 //============================================================
 int CRetentionManager::GetWinRank1st(void) const

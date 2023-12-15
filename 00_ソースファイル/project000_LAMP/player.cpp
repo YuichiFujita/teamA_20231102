@@ -257,7 +257,9 @@ HRESULT CPlayer::Init(void)
 	default:
 		break;
 	}
-
+	m_pClown = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
+	m_pClown->BindTexture("data\\TEXTURE\\clown.png");
+	m_pClown->SetEnableDraw(false);
 	// 成功を返す
 	return S_OK;
 }
@@ -294,6 +296,12 @@ void CPlayer::Uninit(void)
 		m_pPlayerGuide->Uninit();
 		m_pPlayerGuide = NULL;
 	}
+	if (m_pClown != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pClown->Uninit();
+		m_pClown = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -304,6 +312,7 @@ void CPlayer::Uninit(void)
 void CPlayer::Update(void)
 {
 	m_pPlayerGuide->SetVec3Position(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 400.0f, GetVec3Position().z));
+	m_pClown->SetVec3Position(D3DXVECTOR3(GetVec3Position().x , GetVec3Position().y + 550.0f, GetVec3Position().z));
 	// 変数を宣言
 	EMotion currentMotion = MOTION_DEATH;	// 現在のモーション
 
@@ -320,6 +329,15 @@ void CPlayer::Update(void)
 			CManager::GetInstance()->GetRetentionManager()->SetSurvivalRank(m_nPadID);
 		}
 	}
+	if (CManager::GetInstance()->GetRetentionManager()->GetWinRank(m_nPadID) == CRetentionManager::RANK_1ST)
+	{ // プレイヤーが一位の場合
+		m_pClown->SetEnableDraw(true);
+	}
+	else
+	{
+		m_pClown->SetEnableDraw(false);
+	}
+	
 
 	switch (m_state)
 	{ // 状態ごとの処理
@@ -338,7 +356,7 @@ void CPlayer::Update(void)
 		break;
 
 	case STATE_NORMAL:	// 通常状態
-
+	
 		// 通常状態の更新
 		currentMotion = UpdateNormal();
 
