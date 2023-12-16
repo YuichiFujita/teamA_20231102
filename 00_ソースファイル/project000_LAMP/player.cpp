@@ -1166,7 +1166,8 @@ void CPlayer::UpdateMotion(int nMotion)
 				break;
 
 			case MOTION_LAND:	// 着地モーション：ループOFF
-			case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
+			case MOTION_EMOTE_PROUD:	// 胸張りエモートモーション：ループOFF
+			case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
 
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
@@ -1213,6 +1214,7 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_ATTACK:	// 攻撃モーション：ループOFF
 	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 	case MOTION_DEATH:	// 死亡モーション：ループOFF
+	case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
 
 		break;
 
@@ -1984,7 +1986,7 @@ void CPlayer::PlayEmote(EMotion& rAnim)
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_DOWN, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_PROUD;
+		rAnim = MOTION_EMOTE_SLEEP;
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT, m_nPadID) == TRUE)
 	{
