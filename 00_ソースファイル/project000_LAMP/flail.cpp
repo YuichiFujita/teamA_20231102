@@ -336,6 +336,8 @@ void CFlail::UpdateChain(void)
 
 	D3DXVECTOR3 posCol = VEC3_ZERO;
 	
+	//CollisionChain(posCol);
+
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
@@ -397,10 +399,10 @@ void CFlail::UpdateChain(void)
 			{
 				rot.y += m_fChainRotMove;
 
-				if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
+				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
 				{
 					UpdateDropFlailPos(rot.y);
-				}
+				}*/
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -606,7 +608,18 @@ void CFlail::Draw(void)
 		{
 			if (m_fLengthChain != 0)
 			{
-				rotNow.z = -(D3DX_PI * 0.5f) + acosf((m_chain[nCntChain].multiModel->GetMtxWorld()._42 - GetVec3Position().y) / m_fLengthChain);
+				float cosRot1, cosRot2, acosRot;
+
+				cosRot1 = m_chain[nCntChain].multiModel->GetMtxWorld()._42 - GetVec3Position().y;
+				rotNow.z = 0.0f;
+
+				if (cosRot1 < m_fLengthChain)
+				{
+					cosRot2 = cosRot1 / m_fLengthChain;
+					acosRot = acosf(cosRot2);
+
+					rotNow.z = -(D3DX_PI * 0.5f) + acosRot;
+				}
 			}
 
 			m_chain[nCntChain].multiModel->SetVec3Rotation(rotNow);
@@ -748,7 +761,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 			if (player != NULL && nCntPlayer != m_nPlayerID && player->GetState() != CPlayer::STATE_DEATH)
 			{
 				D3DXVECTOR3 vec;
-				float length;
+				float length, colLength;
 
 				// プレイヤーとフレイルのベクトルを求める
 				vec = player->GetVec3Position() - GetVec3Position();
@@ -757,10 +770,20 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				// 距離を求める
 				length = D3DXVec3Length(&vec);
 
+				//フレイルの当たり判定用半径
+				if (playerthis->GetCounterFlail() == flail::FLAIL_DROP)
+				{
+					colLength = 40.0f + RADIUS + player->GetRadius();
+				}
+				else
+				{
+					colLength = 40.0f + (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain;
+				}
+
 				// 吹っ飛びベクトルを正規化
 				D3DXVec3Normalize(&vec, &vec);
 
-				if (length < 40.0f + (RADIUS + player->GetRadius()) * 0.0015f * m_fLengthChain)
+				if (length < colLength)
 				{
 					float length = D3DXVec3Length(&(rPos - m_oldPos)) + 1.0f;
 					int nAddDamage;
@@ -795,7 +818,6 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					if (m_bHit == false)
 					{
 						CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, 300, 1.0f, 0.99f);
-				
 					}
 
 					float rotMove1, rotMove2;
@@ -803,8 +825,13 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					rotMove2 = player->GetFlail()->GetChainRotMove();
 
 					SetChainRotMove(rotMove2 * 0.8f);
-					m_fLengthTarget = m_fLengthChain;
 					player->GetFlail()->SetChainRotMove(rotMove1 * 0.8f);
+
+					if (player->GetCounterFlail() == flail::FLAIL_THROW)
+					{
+						player->SetCounterFlail(flail::FLAIL_DROP);
+						player->SetMotion(CPlayer::MOTION_IDOL);
+					}
 
 					m_bHit = true;
 				}
@@ -891,16 +918,104 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	if (player->GetCounterFlail() < flail::FLAIL_DEF || player->GetCounterFlail() == flail::FLAIL_THROW)
+	while (1)
 	{
-		// 障害物との当たり判定
-		if (CollisionObstacle(rPos) ||
-		CollisionBlock(CPlayer::AXIS_X, rPos) || 
-		CollisionBlock(CPlayer::AXIS_Z, rPos)
-		)
-		{
-			return true;
+		for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
+		{ // 優先順位の総数分繰り返す
+
+		  // ポインタを宣言
+			CObject *pObjectTop = CObject::GetTop(nCntPri);	// 先頭オブジェクト
+
+			if (pObjectTop != NULL)
+			{ // 先頭が存在する場合
+
+			  // ポインタを宣言
+				CObject *pObjCheck = pObjectTop;	// オブジェクト確認用
+
+				while (pObjCheck != NULL)
+				{ // オブジェクトが使用されている場合繰り返す
+
+				  // 変数を宣言
+					D3DXVECTOR3 pos = VEC3_ZERO;		// 地盤位置
+					D3DXVECTOR3 rot = VEC3_ZERO;		// 地盤向き
+					D3DXVECTOR3 sizeMin = VEC3_ZERO;	// 地盤最小大きさ
+					D3DXVECTOR3 sizeMax = VEC3_ZERO;	// 地盤最大大きさ
+
+					// ポインタを宣言
+					CObject *pObjectNext = pObjCheck->GetNext();	// 次オブジェクト
+
+					if (pObjCheck->GetLabel() == CObject::LABEL_BLOCK)
+					{
+						// 変数を宣言
+						pos = pObjCheck->GetVec3Position();
+
+						// 地盤の向きを設定
+						rot = pObjCheck->GetVec3Rotation();
+
+						// 地盤の最小の大きさを設定
+						sizeMin = pObjCheck->GetVec3Sizing();
+						sizeMin.y *= 2.0f;	// 縦の大きさを倍にする
+
+											// 地盤の最大の大きさを設定
+						sizeMax = pObjCheck->GetVec3Sizing();
+						sizeMax.y = 0.0f;		// 縦の大きさを初期化
+					}
+					else if (pObjCheck->GetLabel() == CObject::LABEL_OBSTACLE)
+					{
+						// 変数を宣言
+						CObstacle::SStatusInfo status;		// 障害物ステータス
+
+															// 障害物のステータスを設定
+						status = CObstacle::GetStatusInfo(pObjCheck->GetType());
+
+						// 障害物の向きを設定
+						rot = pObjCheck->GetVec3Rotation();
+
+						// 障害物の位置を設定
+						pos = pObjCheck->GetVec3Position();
+						pos.x += sinf(rot.y + status.fAngleCenter) * status.fLengthCenter;
+						pos.y = 0.0f;
+						pos.z += cosf(rot.y + status.fAngleCenter) * status.fLengthCenter;
+
+						// 障害物の大きさを設定
+						sizeMax = status.sizeColl;
+						sizeMin = sizeMax * -1.0f;
+					}
+					else
+					{
+						// 次のオブジェクトへのポインタを代入
+						pObjCheck = pObjectNext;
+
+						continue;
+					}
+
+					D3DXVECTOR3 posCorner[4] = {};									//箱の角
+					D3DXVECTOR3 posStick = VEC3_ZERO;
+
+					posCorner[0] = collision::PosRelativeMtx(pos, rot, D3DXVECTOR3(sizeMax.x, 0.0f, sizeMax.z));
+					posCorner[1] = collision::PosRelativeMtx(pos, rot, D3DXVECTOR3(sizeMin.x, 0.0f, sizeMax.z));
+					posCorner[2] = collision::PosRelativeMtx(pos, rot, D3DXVECTOR3(sizeMax.x, 0.0f, sizeMin.z));
+					posCorner[3] = collision::PosRelativeMtx(pos, rot, D3DXVECTOR3(sizeMin.x, 0.0f, sizeMin.z));
+
+					posStick.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41;
+					posStick.y = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_42;
+					posStick.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_43;
+
+					for (int nCntCorner = 0; nCntCorner < 4; nCntCorner++)
+					{
+						if (D3DXVec3Length(&(posCorner[0] - posStick)) < m_fLengthChain)
+						{
+
+						}
+					}
+
+					// 次のオブジェクトへのポインタを代入
+					pObjCheck = pObjectNext;
+				}
+			}
 		}
+
+		break;
 	}
 
 	return false;
@@ -1152,12 +1267,14 @@ bool CFlail::CollisionBlock(const CPlayer::EAxis axis, D3DXVECTOR3& rPos)
 					}
 					else
 					{
-						m_fChainRotMove *= 0.0f;
-						m_fLengthTarget = m_fLengthChain;
+						CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-						if (m_fLengthChain <= flail::FLAIL_RADIUS * 4.0f)
+						m_fChainRotMove *= 0.0f;
+
+						if (player->GetCounterFlail() == flail::FLAIL_THROW)
 						{
-							CatchFlail();
+							player->SetCounterFlail(flail::FLAIL_DROP);
+							player->SetMotion(CPlayer::MOTION_IDOL);
 						}
 					}
 
@@ -1242,12 +1359,14 @@ bool CFlail::CollisionObstacle(D3DXVECTOR3& rPos)
 					}
 					else
 					{
-						m_fChainRotMove *= 0.0f;
-						m_fLengthTarget = m_fLengthChain;
+						CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-						if (m_fLengthChain <= flail::FLAIL_RADIUS * 4.0f)
+						m_fChainRotMove *= 0.0f;
+
+						if (player->GetCounterFlail() == flail::FLAIL_THROW)
 						{
-							CatchFlail();
+							player->SetCounterFlail(flail::FLAIL_DROP);
+							player->SetMotion(CPlayer::MOTION_IDOL);
 						}
 					}
 
@@ -1522,12 +1641,12 @@ void CFlail::CatchFlail()
 	}
 
 	m_fChainRot = 0.0f;
-	m_fLengthChain = 0.0f;
-	m_fLengthTarget = 0.0f;
+	//m_fLengthChain = 0.0f;
+	//m_fLengthTarget = 0.0f;
 	//m_fChainRotTarget = 0.0f;
 	m_fChainRotMove = 0.0f;
 
-	player->SetCounterFlail(flail::FLAIL_DEF);
+	//player->SetCounterFlail(flail::FLAIL_DEF);
 }
 
 //============================================================

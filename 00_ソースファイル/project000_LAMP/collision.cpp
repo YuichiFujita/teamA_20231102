@@ -1082,7 +1082,7 @@ bool collision::Square
 				}
 
 				//à íuèCê≥
-				*posTarget = vecIntersect - vecNorPlaneCenter;
+				*posTarget = vecIntersect - (vecNorPlaneCenter * 7.0f);
 
 				return true;
 			}
