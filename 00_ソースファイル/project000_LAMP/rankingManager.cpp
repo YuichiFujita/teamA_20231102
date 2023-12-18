@@ -716,11 +716,11 @@ void CRankingManager::UpdateTransition(void)
 
 	if (pKeyboard->IsTrigger(DIK_RETURN)
 	||  pKeyboard->IsTrigger(DIK_SPACE)
-	||  pPad->IsTrigger(CInputPad::KEY_A)
-	||  pPad->IsTrigger(CInputPad::KEY_B)
-	||  pPad->IsTrigger(CInputPad::KEY_X)
-	||  pPad->IsTrigger(CInputPad::KEY_Y)
-	||  pPad->IsTrigger(CInputPad::KEY_START))
+	||  pPad->IsTriggerAll(CInputPad::KEY_A)
+	||  pPad->IsTriggerAll(CInputPad::KEY_B)
+	||  pPad->IsTriggerAll(CInputPad::KEY_X)
+	||  pPad->IsTriggerAll(CInputPad::KEY_Y)
+	||  pPad->IsTriggerAll(CInputPad::KEY_START))
 	{
 		if (m_state != STATE_WAIT)
 		{ // ‘JˆÚ‘Ò‹@ó‘Ô‚Å‚Í‚È‚¢ê‡

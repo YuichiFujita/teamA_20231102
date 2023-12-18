@@ -313,7 +313,7 @@ void CPause::Select(void)
 
 		if (pKeyboard->IsTrigger(DIK_W)
 		||  pKeyboard->IsTrigger(DIK_UP)
-		||  pPad->IsTrigger(CInputPad::KEY_UP))
+		||  pPad->IsTriggerAll(CInputPad::KEY_UP))
 		{ // 上移動の操作が行われた場合
 
 			// 上に選択をずらす
@@ -324,7 +324,7 @@ void CPause::Select(void)
 		}
 		if (pKeyboard->IsTrigger(DIK_S)
 		||  pKeyboard->IsTrigger(DIK_DOWN)
-		||  pPad->IsTrigger(CInputPad::KEY_DOWN))
+		||  pPad->IsTriggerAll(CInputPad::KEY_DOWN))
 		{ // 下移動の操作が行われた場合
 
 			// 下に選択をずらす
@@ -334,9 +334,9 @@ void CPause::Select(void)
 			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 		}
 
-		if (pKeyboard->IsTrigger(DIK_RETURN)  || pKeyboard->IsTrigger(DIK_SPACE)
-		||  pPad->IsTrigger(CInputPad::KEY_A) || pPad->IsTrigger(CInputPad::KEY_B)
-		||  pPad->IsTrigger(CInputPad::KEY_X) || pPad->IsTrigger(CInputPad::KEY_Y))
+		if (pKeyboard->IsTrigger(DIK_RETURN)	 || pKeyboard->IsTrigger(DIK_SPACE)
+		||  pPad->IsTriggerAll(CInputPad::KEY_A) || pPad->IsTriggerAll(CInputPad::KEY_B)
+		||  pPad->IsTriggerAll(CInputPad::KEY_X) || pPad->IsTriggerAll(CInputPad::KEY_Y))
 		{ // 決定の操作が行われた場合
 
 			// サウンドの再生

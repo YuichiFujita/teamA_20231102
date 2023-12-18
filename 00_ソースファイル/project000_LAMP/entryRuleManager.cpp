@@ -841,7 +841,7 @@ void CEntryRuleManager::Select(void)
 
 	if (pKeyboard->IsTrigger(DIK_W)
 	||  pKeyboard->IsTrigger(DIK_UP)
-	||  pPad->IsTrigger(CInputPad::KEY_UP))
+	||  pPad->IsTriggerAll(CInputPad::KEY_UP))
 	{ // 上移動の操作が行われた場合
 
 		// 上に選択をずらす
@@ -889,7 +889,7 @@ void CEntryRuleManager::Select(void)
 	}
 	if (pKeyboard->IsTrigger(DIK_S)
 	||  pKeyboard->IsTrigger(DIK_DOWN)
-	||  pPad->IsTrigger(CInputPad::KEY_DOWN))
+	||  pPad->IsTriggerAll(CInputPad::KEY_DOWN))
 	{ // 下移動の操作が行われた場合
 
 		// 下に選択をずらす
@@ -964,7 +964,7 @@ void CEntryRuleManager::Decide(void)
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	if (pKeyboard->IsTrigger(DIK_RETURN) || pPad->IsTrigger(CInputPad::KEY_A))
+	if (pKeyboard->IsTrigger(DIK_RETURN) || pPad->IsTriggerAll(CInputPad::KEY_A))
 	{ // 決定の操作が行われた場合
 
 		switch (m_nSelect)
@@ -976,7 +976,7 @@ void CEntryRuleManager::Decide(void)
 
 		case SELECT_GAME:
 
-			// ツール変更反映
+			// ルール変更反映
 			SetRule();
 
 			// 終了状態にする
@@ -990,7 +990,7 @@ void CEntryRuleManager::Decide(void)
 		}
 	}
 
-	if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTrigger(CInputPad::KEY_B))
+	if (pKeyboard->IsTrigger(DIK_SPACE) || pPad->IsTriggerAll(CInputPad::KEY_B))
 	{ // 戻る操作が行われた場合
 
 		// フェードアウト状態にする
@@ -1013,7 +1013,7 @@ void CEntryRuleManager::ChangeRule(void)
 
 	if (pKeyboard->IsTrigger(DIK_A)
 	||  pKeyboard->IsTrigger(DIK_LEFT)
-	||  pPad->IsTrigger(CInputPad::KEY_LEFT))
+	||  pPad->IsTriggerAll(CInputPad::KEY_LEFT))
 	{ // 左移動の操作が行われた場合
 
 		switch (m_nSelect)
@@ -1052,7 +1052,7 @@ void CEntryRuleManager::ChangeRule(void)
 	}
 	if (pKeyboard->IsTrigger(DIK_D)
 	||  pKeyboard->IsTrigger(DIK_RIGHT)
-	||  pPad->IsTrigger(CInputPad::KEY_RIGHT))
+	||  pPad->IsTriggerAll(CInputPad::KEY_RIGHT))
 	{ // 右移動の操作が行われた場合
 
 		switch (m_nSelect)

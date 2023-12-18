@@ -72,7 +72,6 @@ private:
 	void UpdateFade(void);	// フェードアウト
 	void UpdateMove(void);	// タイトル移動
 	void UpdateStart(void);	// 遷移決定
-	void ActSelect(void);	// 選択操作
 	void SkipStaging(void);	// 演出スキップ
 
 	// 静的メンバ変数
