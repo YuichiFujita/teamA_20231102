@@ -51,7 +51,7 @@ public:
 	void Draw(void) override;		// •`‰æ
 
 	//ƒƒ“ƒoŠÖ”
-	void Collision();
+	bool Collision();
 
 	static CItem *Create(D3DXVECTOR3 pos);
 
