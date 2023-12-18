@@ -45,6 +45,7 @@
 #include "orbitalEffect.h"
 #include "objectBillboard.h"
 #include "orbitalParticle.h"
+#include "item.h"
 
 //************************************************************
 //	定数宣言
@@ -260,6 +261,7 @@ HRESULT CPlayer::Init(void)
 	m_pClown = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 	m_pClown->BindTexture("data\\TEXTURE\\clown.png");
 	m_pClown->SetEnableDraw(false);
+
 	// 成功を返す
 	return S_OK;
 }
@@ -819,7 +821,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 
 	// NAKAMURA：吹っ飛び率の決め方は任せます
 	// 吹っ飛び率を加算
-	m_pStatus->AddNumRate(100);
+	m_pStatus->AddNumRate(nDmg * 7);
 }
 
 //============================================================
@@ -1656,7 +1658,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	if (m_nCounterFlail > flail::FLAIL_DEF)
 	{// 0より大きい時
 
-		if ((CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail <= flail::FLAIL_CHARGE)
+		if ((CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) == TRUE && m_nCounterFlail <= flail::FLAIL_CHARGE))
 		{// 投げるボタンが押されている時
 		 // カウンターアップ
 			m_nCounterFlail++;
@@ -1693,7 +1695,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		}
 
 		// 投擲
-		if ((CManager::GetInstance()->GetPad()->IsRelease(CInputPad::KEY_R1, m_nPadID) == TRUE) && m_nCounterFlail != flail::FLAIL_THROW)
+		if ((CManager::GetInstance()->GetPad()->IsPress(CInputPad::KEY_R1, m_nPadID) != TRUE) && m_nCounterFlail != flail::FLAIL_THROW)
 		{
 			// 溜めた時間に応じて飛距離増加
 			D3DXVECTOR3 move = VEC3_ZERO;
@@ -1701,18 +1703,12 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			move.x = (sinf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			move.z = (cosf(m_pFlail->GetChainRotTarget()) * 5.0f * m_nCounterFlail);
 			m_pFlail->SetMove(move);
-			m_pFlail->SetChainRotMove(m_pFlail->GetChainRotMove());
 
 			D3DXVECTOR3 posFlail = m_pFlail->GetVec3Position();
 			if (posFlail.y < 0.0f)
 			{
 				posFlail.y = 0.0f;
 				m_pFlail->SetVec3Position(posFlail);
-
-				if (m_pFlail->GetVec3Position() == VEC3_ZERO)
-				{
-					assert(false);
-				}
 			}
 
 			if (DEAD_ZONE < fStickR)
@@ -1785,7 +1781,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	else
 	{
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
-		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 4.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 7.0f)
+		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 2.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 5.0f)
 		{
 			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
@@ -1858,6 +1854,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						float rotFlail;
 						rotFlail = atan2f(vecFlail.x, vecFlail.z);
 						rotFlail = m_pFlail->GetChainRot();
+
 						// 移動量を更新
 						m_move.x += sinf(rotFlail + (D3DX_PI * 0.5f)) * 10.0f;
 						m_move.y = 1.0f;
@@ -2491,6 +2488,11 @@ bool CPlayer::CollisionObstacle(D3DXVECTOR3& rPos)
 
 				// 障害物の大きさを設定
 				sizeObsMax = status.sizeColl;
+
+				sizeObsMax.x += (RADIUS * 0.8f);
+				sizeObsMax.y += (RADIUS * 0.8f);
+				sizeObsMax.z += (RADIUS * 0.8f);
+
 				sizeObsMin = sizeObsMax * -1.0f;
 
 				// 障害物との判定を実行

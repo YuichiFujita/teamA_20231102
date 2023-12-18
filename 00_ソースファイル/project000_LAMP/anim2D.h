@@ -61,7 +61,7 @@ public:
 	void SetEnablePlayBack(const bool bPlayBack);	// 逆再生状況の設定
 	int  GetPattern(void) const;					// パターンの取得
 	int  GetLoopAnimation(void) const;				// パターン繰り返し数の取得
-
+	void SetAdd(bool add) { m_bAdd = add; }
 private:
 	// メンバ変数
 	int m_nCounter;		// アニメーションカウンター
@@ -73,6 +73,7 @@ private:
 	int m_nNumLoop;		// パターン繰り返し数
 	bool m_bStop;		// 停止状況
 	bool m_bPlayBack;	// 逆再生状況
+	bool m_bAdd;
 };
 
 #endif	// _ANIM2D_H_

@@ -58,8 +58,13 @@ HRESULT CReady::Init(void)
 	m_pTexFight->BindTexture("data\\TEXTURE\\Fight.png");
 	m_pTexFight->SetEnableDraw(false);
 	m_nStateCount = 120;
-	
-	
+	m_pFlare = CAnim2D::Create(23, 2, SCREEN_CENT, SCREEN_SIZE);
+	m_pFlare->BindTexture("data\\TEXTURE\\lensFlare.jpg");
+	m_pFlare->SetCounter(1);
+	m_pFlare->SetAdd(true);
+	m_pFlare->SetEnableStop(true);
+	m_pFlare->SetLabel(LABEL_EFFECT);
+
 	// ¬Œ÷‚ð•Ô‚·
 	return S_OK;
 }
@@ -80,6 +85,11 @@ void CReady::Uninit(void)
 		m_pTexFight->Uninit();
 		m_pTexFight = NULL;
 	}
+	if (m_pFlare != NULL)
+	{
+		m_pFlare->Uninit();
+		m_pFlare = NULL;
+	}
 	Release();
 }
 
@@ -97,11 +107,12 @@ void CReady::Update(void)
 		{
 			if (m_nStateCount == 0)
 			{
-				CParticle2D::Create(CParticle2D::TYPE_DAMAGE, D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0.0f));
+				m_pFlare->SetEnableStop(false);
+			
 			}
 			m_pTexReady->SetEnableDraw(false);
 			m_pTexFight->SetEnableDraw(true);
-			if (m_nStateCount <= -60)
+			if (m_pFlare->GetLoopAnimation() > 0)
 			{
 				
 				CSceneGame::GetGameManager()->SetState(CGameManager::STATE_NORMAL);

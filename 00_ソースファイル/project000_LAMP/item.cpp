@@ -12,7 +12,7 @@
 #include "input.h"
 #include "scene.h"
 #include "collision.h"
-
+#include "orbitalParticle.h"
 //============================================================
 // 静的メンバ変数
 //============================================================
@@ -43,6 +43,7 @@ CItem::CItem()
 {
 	//値の初期化
 	m_nType = TYPE::TYPE_HEAL;
+	SetLabel(LABEL_EFFECT);
 }
 
 //============================================================
@@ -80,7 +81,7 @@ void CItem::Uninit(void)
 //============================================================
 void CItem::Update(void)
 {
-
+	Collision();
 }
 //============================================================
 // 描画
@@ -117,6 +118,9 @@ void CItem::Collision()
 			if (collision::Circle2D(playerPos, itemPos, fPlayerRadius, fItemRadisu) == true)
 			{
 				pPlayer->Hit();
+				Uninit();
+				CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 800, 60, 60, 150, 1.0f, 0.85f);
+				return;
 			}
 		}
 	}
@@ -150,7 +154,7 @@ CItem *CItem::Create(D3DXVECTOR3 pos)
 		pItem->SetVec3Position(pos);
 
 		//ランダムでアイテムを生成する
-		pItem->BindModel(mc_apModelFile[pItem->m_nType]);
+		pItem->BindModel("data\\MODEL\\OBSTACLE\\present.x");
 	}
 
 	// ポインタを返す
