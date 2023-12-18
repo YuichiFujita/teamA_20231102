@@ -501,6 +501,11 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 				{ // プレイヤーの最大数分繰り返す
 
 					CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+					if (pPlayer == NULL)
+					{ // 存在しない場合
+
+						break;
+					}
 
 					if (pPlayer->GetPadID() == nPlayerID)
 					{ // 今回死亡したプレイヤーの場合

@@ -45,6 +45,7 @@
 #include "orbitalEffect.h"
 #include "objectBillboard.h"
 #include "orbitalParticle.h"
+#include "item.h"
 
 //************************************************************
 //	’è”éŒ¾
@@ -260,6 +261,7 @@ HRESULT CPlayer::Init(void)
 	m_pClown = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(100.0f, 100.0f, 0.0f));
 	m_pClown->BindTexture("data\\TEXTURE\\clown.png");
 	m_pClown->SetEnableDraw(false);
+
 	// ¬Œ÷‚ğ•Ô‚·
 	return S_OK;
 }

@@ -34,7 +34,6 @@ public:
 	{
 		TEXTURE_FADE = 0,		// フェードテクスチャ
 		TEXTURE_TITLE,			// ランキングタイトルテクスチャ
-		TEXTURE_WIN_BG,			// 勝利ポイント背景テクスチャ
 		TEXTURE_WIN,			// 勝利ポイントタイトルテクスチャ
 		TEXTURE_PLAYER,			// プレイヤーテクスチャ
 		TEXTURE_PLAYER_POINT,	// 勝利ポイントテクスチャ
@@ -49,10 +48,10 @@ public:
 		STATE_FADEIN = 0,		// フェードイン状態
 		STATE_FADEIN_WAIT,		// フェードイン待機状態
 		STATE_FADEIN_ACCEL,		// フェードイン加速状態
+		STATE_SCALELINE_WAIT,	// 下線の拡大待機状態
+		STATE_SCALELINE,		// 下線の拡大表示状態
 		STATE_RANK_TITLE_WAIT,	// ランキングタイトル待機状態
 		STATE_RANK_TITLE,		// ランキングタイトル表示状態
-		STATE_WINPOINT_WAIT,	// 勝利ポイント待機状態
-		STATE_WINPOINT,			// 勝利ポイント表示状態
 		STATE_FRAME_WAIT,		// プレイヤーフレーム待機状態
 		STATE_FRAME,			// プレイヤーフレーム表示状態
 		STATE_PLAYERPOINT_WAIT,	// プレイヤー勝利ポイント待機状態
@@ -86,10 +85,12 @@ private:
 	void UpdateFadeIn(void);			// フェードイン更新
 	void UpdateFadeInWait(void);		// フェードイン待機更新
 	void UpdateFadeInAccel(void);		// フェードイン加速更新
+
+	void UpdateScaleLineWait(void);		// 下線の拡大待機更新
+	void UpdateScaleLine(void);			// 下線の拡大表示更新
 	void UpdateRankTitleWait(void);		// ランキングタイトル待機更新
 	void UpdateRankTitle(void);			// ランキングタイトル表示更新
-	void UpdateWinPointWait(void);		// 勝利ポイント待機更新
-	void UpdateWinPoint(void);			// 勝利ポイント表示更新
+
 	void UpdateFrameWait(void);			// プレイヤーフレーム待機更新
 	void UpdateFrame(void);				// プレイヤーフレーム表示更新
 	void UpdatePlayerPointWait(void);	// プレイヤー勝利ポイント待機更新

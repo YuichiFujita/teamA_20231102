@@ -32,12 +32,12 @@ const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 	},
 
 	{ // 石テクスチャ
-		"data\\TEXTURE\\mud.png",	// 左テクスチャ
-		"data\\TEXTURE\\mud.png",	// 右テクスチャ
-		"data\\TEXTURE\\mud.png",	// 下テクスチャ
-		"data\\TEXTURE\\mud.png",	// 上テクスチャ
-		"data\\TEXTURE\\mud.png",	// 前テクスチャ
-		"data\\TEXTURE\\mud.png",	// 後テクスチャ
+		"data\\TEXTURE\\block000.png",	// 左テクスチャ
+		"data\\TEXTURE\\block000.png",	// 右テクスチャ
+		"data\\TEXTURE\\block000.png",	// 下テクスチャ
+		"data\\TEXTURE\\block000.png",	// 上テクスチャ
+		"data\\TEXTURE\\block000.png",	// 前テクスチャ
+		"data\\TEXTURE\\block000.png",	// 後テクスチャ
 	},
 
 	{ // 氷テクスチャ
