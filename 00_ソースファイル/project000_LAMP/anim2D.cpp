@@ -8,7 +8,8 @@
 //	インクルードファイル
 //************************************************************
 #include "anim2D.h"
-
+#include "manager.h"
+#include "renderer.h"
 //************************************************************
 //	子クラス [CAnim2D] のメンバ関数
 //************************************************************
@@ -69,7 +70,7 @@ HRESULT CAnim2D::Init(void)
 	m_nNumLoop		= 0;	// パターン繰り返し数
 	m_bStop		= false;	// 停止状況
 	m_bPlayBack	= false;	// 逆再生状況
-
+	m_bAdd = false;
 	// オブジェクト2Dの初期化
 	if (FAILED(CObject2D::Init()))
 	{ // 初期化に失敗した場合
@@ -150,8 +151,22 @@ void CAnim2D::Update(void)
 //============================================================
 void CAnim2D::Draw(void)
 {
+	// ポインタを宣言
+	LPDIRECT3DDEVICE9	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
+	if (m_bAdd)
+	{
+
+		// αブレンディングを加算合成に設定
+		pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+		pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	}
 	// オブジェクト2Dの描画
 	CObject2D::Draw();
+	// αブレンディングを元に戻す
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 }
 
 //============================================================

@@ -15,7 +15,7 @@
 //************************************************************
 #include "main.h"
 #include "object2D.h"
-
+#include "anim2D.h"
 //************************************************************
 //	ƒNƒ‰ƒX’è‹`
 //************************************************************
@@ -49,6 +49,7 @@ private:
 	int m_nStateCount;
 	CObject2D * m_pTexReady;
 	CObject2D * m_pTexFight;
+	CAnim2D * m_pFlare;
 };
 
 #endif	// _Ready_H_
