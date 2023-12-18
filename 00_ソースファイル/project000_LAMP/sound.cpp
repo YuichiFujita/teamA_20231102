@@ -23,7 +23,7 @@ const CSound::SSoundInfo CSound::mc_aSoundInfo[LABEL_MAX] =	// サウンド情報
 	{ "data\\BGM\\Result.wav", -1 },		// BGM (リザルト)
 
 
-	{ "data\\SE\\select000.wav",  0 },		// 選択操作音00
+	{ "data\\SE\\typewriter.wav",  0 },		// 選択操作音00
 	{ "data\\SE\\select001.wav",  0 },		// 選択操作音01
 	{ "data\\SE\\decision000.wav",  0 },	// 決定音00
 	{ "data\\SE\\decision001.wav",  0 },	// 決定音01
