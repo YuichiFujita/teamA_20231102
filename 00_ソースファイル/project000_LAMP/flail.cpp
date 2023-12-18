@@ -105,6 +105,7 @@ HRESULT CFlail::Init(void)
 		// ÉÇÉfÉãÇäÑìñ
 		m_chain[nCntChain].multiModel->BindModel(mc_apModelFileChain[CFlail::CHAIN_NORMAL]);
 	}
+
 	m_pOrbit = CObjectOrbit::Create(GetPtrMtxWorld(), CObjectOrbit::SOffset(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, -50.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), 60,60);
 	m_pOrbit->BindTexture("data\\TEXTURE\\orbitLine.png");
 	// ê¨å˜Çï‘Ç∑
@@ -336,7 +337,7 @@ void CFlail::UpdateChain(void)
 
 	D3DXVECTOR3 posCol = VEC3_ZERO;
 	
-	//CollisionChain(posCol);
+	CollisionChain(posCol);
 
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
@@ -1003,7 +1004,11 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 
 					for (int nCntCorner = 0; nCntCorner < 4; nCntCorner++)
 					{
-						if (D3DXVec3Length(&(posCorner[0] - posStick)) < m_fLengthChain)
+						D3DXVECTOR3 posDef;
+						posDef = posCorner[nCntCorner] - posStick;
+						posDef.y = 0.0f;
+
+						if (D3DXVec3Length(&posDef) < m_fLengthChain)
 						{
 
 						}

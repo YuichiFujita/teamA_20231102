@@ -1,5 +1,7 @@
 #include "ModelParticle.h"
 #include "ModelEffect.h"
+#include "texture.h"
+#include "manager.h"
 
 //<**************************************************************
 //名前宣言
@@ -24,7 +26,7 @@ CModParticle::CModParticle() : CObject(CObject::LABEL_PARTICLE, 1)
 //<=============================================================
 //モデルパーティクルの生成処理
 //<=============================================================
-CModParticle *CModParticle::Create(const D3DXVECTOR3 rPos)
+CModParticle *CModParticle::Create(const D3DXVECTOR3 rPos, const D3DXCOLOR col, int texID)
 {
 	//最初に生成する
 	CModParticle *pModParticle = new CModParticle;
@@ -37,6 +39,8 @@ CModParticle *CModParticle::Create(const D3DXVECTOR3 rPos)
 
 		//値の代入
 		pModParticle->m_pos = rPos;
+		pModParticle->m_col = col;
+		pModParticle->m_pTexID = texID;
 
 		//ポインタを返す
 		return pModParticle;
@@ -116,7 +120,6 @@ void CModParticle::Set(void)
 		m_move.z *= MOVE_VALUE.z;
 
 		//モデルエフェクトを生成する
-		CModEffect::Create(m_pos, m_rot, m_move, NUM_LIFE,true);
-
+		CModEffect::Create(m_pos, m_rot, m_move, NUM_LIFE,true, m_col, &m_pTexID);
 	}
 }

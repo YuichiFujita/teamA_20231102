@@ -46,7 +46,7 @@ public:
 	void Draw(void) override { CObjectModel::Draw(); }		
 
 	//ê∂ê¨èàóù
-	static CModEffect *Create(const D3DXVECTOR3 rPos, const D3DXVECTOR3 rRot, const D3DXVECTOR3 rMove,const int nLife,const bool bGravity);
+	static CModEffect *Create(const D3DXVECTOR3 rPos, const D3DXVECTOR3 rRot, const D3DXVECTOR3 rMove,const int nLife,const bool bGravity, const D3DXCOLOR col, int *texID);
 
 private:
 

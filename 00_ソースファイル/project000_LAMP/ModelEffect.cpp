@@ -50,7 +50,7 @@ CModEffect::CModEffect() : CObjectModel(CObject::LABEL_EFFECT,1)
 //モデルエフェクトの生成処理
 //<=============================================================
 CModEffect *CModEffect::Create(const D3DXVECTOR3 rPos, const D3DXVECTOR3 rRot, 
-	const D3DXVECTOR3 rMove, const int nLife, const bool bGravity)
+	const D3DXVECTOR3 rMove, const int nLife, const bool bGravity, const D3DXCOLOR col, int *texID)
 {
 	//生成するためのオブジェクト
 	CModEffect *pModelEffect = new CModEffect;
@@ -69,9 +69,14 @@ CModEffect *CModEffect::Create(const D3DXVECTOR3 rPos, const D3DXVECTOR3 rRot,
 		pModelEffect->m_rMove = rMove;			//移動値
 		pModelEffect->m_nLife = nLife;			//寿命
 		pModelEffect->m_bGravity = bGravity;	//重力を加えるかどうか
+		pModelEffect->m_Col = col;				//重力を加えるかどうか
 
 		//ランダムで出すかけらを設定
 		pModelEffect->BindModel(mc_apTextureFile[rand() % MAX_PIECE]);
+
+		CModel::SModel modelData = pModelEffect->GetModelData();
+		modelData.pTextureID[0] = *texID;
+		pModelEffect->SetModelData(modelData);
 
 		//ポインタを返す
 		return pModelEffect;

@@ -32,7 +32,7 @@ public:
 	void Update(void) override;						// XV
 	void Draw(void) override {};					// •`‰æ
 
-	static CModParticle *Create(const D3DXVECTOR3 rPos);
+	static CModParticle *Create(const D3DXVECTOR3 rPos, const D3DXCOLOR col, int texID);
 
 private:
 
@@ -47,6 +47,7 @@ private:
 	D3DXVECTOR3 m_rot;	// Œü‚«
 	D3DXCOLOR m_col;	// F
 	int  m_nLife;		// õ–½
+	int m_pTexID;
 
 };
 
