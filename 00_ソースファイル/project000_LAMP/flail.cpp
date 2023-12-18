@@ -8,6 +8,7 @@
 //	インクルードファイル
 //************************************************************
 #include "flail.h"
+#include "flailEntry.h"
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
@@ -564,6 +565,8 @@ void CFlail::Draw(void)
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
 
+#ifdef ON_STENCIL_PLAYER
+
 	// ステンシルテストを有効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
 	
@@ -580,6 +583,8 @@ void CFlail::Draw(void)
 	pDevice->SetRenderState(D3DRS_STENCILPASS,	D3DSTENCILOP_REPLACE);	// Zテスト・ステンシルテスト成功
 	pDevice->SetRenderState(D3DRS_STENCILFAIL,	D3DSTENCILOP_KEEP);		// Zテスト・ステンシルテスト失敗
 	pDevice->SetRenderState(D3DRS_STENCILZFAIL,	D3DSTENCILOP_KEEP);		// Zテスト失敗・ステンシルテスト成功
+
+#endif	// ON_STENCIL_PLAYER
 
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
@@ -651,13 +656,13 @@ void CFlail::Draw(void)
 			if (nCntChain == 0)
 			{ // 親が存在しない場合
 
-			  // 現在のマトリックスを取得
+				// 現在のマトリックスを取得
 				pDevice->GetTransform(D3DTS_WORLD, &mtxParent);	// 設定された最新のマトリックス (実体のマトリックス)
 			}
 			else
 			{ // 親が存在する場合
 
-			  // 親のマトリックスを設定
+				// 親のマトリックスを設定
 				mtxParent = m_chain[IDParent].multiModel->GetMtxWorld();
 			}
 
@@ -686,8 +691,12 @@ void CFlail::Draw(void)
 	// オブジェクトモデルの描画
 	CObjectModel::Draw();
 
+#ifdef ON_STENCIL_PLAYER
+
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+#endif	// ON_STENCIL_PLAYER
 }
 
 //============================================================
@@ -695,6 +704,7 @@ void CFlail::Draw(void)
 //============================================================
 CFlail *CFlail::Create
 ( // 引数
+	CScene::EMode mode,			// モード
 	const CPlayer& rPlayer,		// プレイヤー
 	const D3DXVECTOR3& rPos,	// 位置
 	const D3DXVECTOR3& rRot,	// 向き
@@ -707,8 +717,25 @@ CFlail *CFlail::Create
 	if (pModelUI == NULL)
 	{ // 使用されていない場合
 
-		// メモリ確保
-		pModelUI = new CFlail;	// モデルUI
+		// モードオーバー
+		assert(mode > NONE_IDX && mode < CScene::MODE_MAX);
+
+		switch (mode)
+		{ // モードごとの処理
+		case CScene::MODE_ENTRY:
+
+			// メモリ確保
+			pModelUI = new CFlailEntry;	// フレイルエントリー
+
+			break;
+
+		case CScene::MODE_GAME:
+
+			// メモリ確保
+			pModelUI = new CFlail;	// フレイル
+
+			break;
+		}
 	}
 	else { assert(false); return NULL; }	// 使用中
 

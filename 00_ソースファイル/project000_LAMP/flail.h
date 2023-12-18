@@ -116,6 +116,7 @@ public:
 	// 静的メンバ関数
 	static CFlail *Create	// 生成
 	( // 引数
+		CScene::EMode mode,						// モード
 		const CPlayer& rPlayer,					// プレイヤー
 		const D3DXVECTOR3& rPos,				// 位置
 		const D3DXVECTOR3& rRot = VEC3_ZERO,	// 向き
@@ -139,7 +140,7 @@ private:
 	static const char *mc_apModelFileChain[];	// モデル定数
 
 	// メンバ変数
-	SChain		m_chain[flail::FLAIL_NUM_MAX];		// 鎖
+	SChain		m_chain[flail::FLAIL_NUM_MAX];	// 鎖
 	CObjectOrbit * m_pOrbit;
 	D3DXVECTOR3 m_posOrg;						// 回転原点
 	D3DXVECTOR3 m_oldPos;						// 過去の位置

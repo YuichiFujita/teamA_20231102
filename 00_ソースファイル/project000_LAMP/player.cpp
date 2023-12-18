@@ -125,7 +125,7 @@ const char *CPlayer::mc_apModelFile[] =	// モデル定数
 //============================================================
 //	コンストラクタ
 //============================================================
-CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_nPadID(nPad)
+CPlayer::CPlayer(const CScene::EMode mode, const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY), m_mode(mode), m_nPadID(nPad)
 {
 	// メンバ変数をクリア
 	m_pStatus = NULL;			// ステータスの情報
@@ -208,11 +208,11 @@ HRESULT CPlayer::Init(void)
 	}
 
 	// フレイルの生成
-	m_pFlail = CFlail::Create(*this, VEC3_ZERO);
+	m_pFlail = CFlail::Create(m_mode, *this, VEC3_ZERO);
 	if (m_pFlail == NULL)
 	{ // 非使用中の場合
 
-	  // 失敗を返す
+		// 失敗を返す
 		assert(false);
 		return E_FAIL;
 	}
@@ -656,7 +656,7 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad, const bool bAI)
 	if (pPlayer == NULL)
 	{ // 使用されていない場合
 
-	  // モードオーバー
+		// モードオーバー
 		assert(mode > NONE_IDX && mode < CScene::MODE_MAX);
 
 		switch (mode)
@@ -664,14 +664,14 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad, const bool bAI)
 		case CScene::MODE_ENTRY:
 
 			// メモリ確保
-			pPlayer = new CPlayerEntry(nPad);	// プレイヤーエントリー
+			pPlayer = new CPlayerEntry(mode, nPad);	// プレイヤーエントリー
 
 			break;
 
 		case CScene::MODE_GAME:
 
 			// メモリ確保
-			pPlayer = new CPlayer(nPad);	// プレイヤー
+			pPlayer = new CPlayer(mode, nPad);	// プレイヤー
 
 			break;
 		}

@@ -122,7 +122,7 @@ public:
 		int nLife;	//効果時間
 	};
 	// コンストラクタ
-	explicit CPlayer(const int nPad);
+	CPlayer(const CScene::EMode mode, int nPad);
 
 	// デストラクタ
 	~CPlayer();
@@ -223,6 +223,7 @@ private:
 	bool		m_bJump;			// ジャンプ状況
 	bool		m_bAI;				// AI状況
 	bool		m_bHook;			// AI状況
+	const CScene::EMode m_mode;		// モード
 	const int	m_nPadID;			// パッドインデックス
 };
 
