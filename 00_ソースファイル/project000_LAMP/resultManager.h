@@ -18,9 +18,9 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define	RESULT_PRIO	(14)		// リザルトの優先順位
-#define	NUM_WIN		(2)			//勝利ロゴの数
-#define	NUM_FRAME	(4)			//フレームの数
+#define	RESULT_PRIO	(14)	// リザルトの優先順位
+#define	NUM_WIN		(2)		// 勝利ロゴの数
+#define	NUM_FRAME	(4)		// フレームの数
 
 //************************************************************
 //	前方宣言
@@ -54,6 +54,7 @@ public:
 		TEXTURE_BLACKOUT,
 		TEXTURE_PLAYER_ENTRY,
 		TEXTURE_WIN2,
+		TEXTURE_RANK,
 		TEXTURE_MAX				// この列挙型の総数
 	};
 
