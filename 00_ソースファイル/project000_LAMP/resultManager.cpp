@@ -27,21 +27,22 @@
 #define DEFAULT_COL	(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f))	// 非選択中カラー
 
 //***********************************************************
-//ネームスペースの定義
+//	ネームスペースの定義
 //***********************************************************
-//フェード関連
+// フェード関連
 namespace Fade
 {
-	const D3DXCOLOR SETCOL_FADE		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f));					// α値の停止値
-	const D3DXVECTOR3 SIZE_FADE		(SCREEN_SIZE);											// フェードの大きさ
-	const D3DXCOLOR INITCOL_FADE	(XCOL_AWHITE);											// α値の初期値
-	const float ADD_ALPHA			(0.008f);												// α値の加算量
+	const D3DXCOLOR SETCOL_FADE		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.6f);	// α値の停止値
 
+	const D3DXVECTOR3 SIZE_FADE		= SCREEN_SIZE;	// フェードの大きさ
+	const D3DXCOLOR INITCOL_FADE	= XCOL_AWHITE;	// α値の初期値
+	const float ADD_ALPHA			= 0.008f;		// α値の加算量
 }
-//勝利ロゴ関連
+
+// 勝利ロゴ関連
 namespace Win
 {
-	//番号の列挙型
+	// 番号の列挙型
 	enum Number
 	{
 		NUMBER_ZERO = 0,	//０番目
@@ -49,63 +50,69 @@ namespace Win
 		NUMBER_MAX
 	};
 
-	//定数の定義
-	const D3DXVECTOR3	POS							= D3DXVECTOR3(625.0f, 350.0f, 0.0f);	// 位置
-	const D3DXVECTOR3	DESTPOS						= D3DXVECTOR3(265.0f, 60.0f, 0.0f);		// 位置
+	// 定数の定義
+	const D3DXVECTOR3	POS		= D3DXVECTOR3(625.0f, 350.0f, 0.0f);	// 位置
+	const D3DXVECTOR3	DESTPOS	= D3DXVECTOR3(265.0f, 60.0f, 0.0f);		// 目標位置
+	const D3DXVECTOR3	INIT_SIZE = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
 
-	const D3DXVECTOR3	DISTANCE[NUMBER_MAX]		= { D3DXVECTOR3(195.0f, -5.0f, 0.0f),
-														D3DXVECTOR3(155.0f, -5.0f, 0.0f) };	// 目的の位置
-		
-	const D3DXVECTOR3	INIT_SIZE					= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
+	const D3DXVECTOR3	DISTANCE[NUMBER_MAX]	= { D3DXVECTOR3(195.0f, -5.0f, 0.0f),
+													D3DXVECTOR3(155.0f, -5.0f, 0.0f) };	// 目的の位置
 
 	const D3DXVECTOR3	DESTSIZE_WIN[NUMBER_MAX]	= { D3DXVECTOR3(390.0f*1.5f, 85.0f*1.5f, 0.0f),
-														D3DXVECTOR3(390.0f*1.2f, 85.0f*1.2f, 0.0f) };	// 目的の位置
+														D3DXVECTOR3(390.0f*1.2f, 85.0f*1.2f, 0.0f) };	// 目的の大きさ
 
 	const D3DXVECTOR3	DESTSIZE_NUMBER[NUMBER_MAX] = { D3DXVECTOR3(120.0f*1.6f, 75.0f*1.6f, 0.0f),
-														D3DXVECTOR3(120.0f*1.3f, 75.0f*1.3f, 0.0f) };		// 目的の位置
+														D3DXVECTOR3(120.0f*1.3f, 75.0f*1.3f, 0.0f) };	// 目的の大きさ
 
-	const int			MAX_WAIT					= 300;									// 待機時間の最大値
-	const float			VALUE_INERTIA[NUMBER_MAX]	= {0.015f,0.05f};						// 慣性の値
+	const int	MAX_WAIT					= 300;				// 待機時間の最大値
+	const float	VALUE_INERTIA[NUMBER_MAX]	= {0.015f,0.05f};	// 慣性の値
 }
-//巨大フレーム関連
+
+// 巨大フレーム関連
 namespace BigFrame
 {
 	//定数の定義
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(270.0f, 410.0f, 0.0f);				// 位置
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(530.0f, 610.0f, 0.0f);				// 目的の位置
-	const int			MAX_WAIT		= 10;												// 待機時間の最大値
-	const float			VALUE_INERTIA	= 0.015f;											// 慣性の値
-
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(270.0f, 410.0f, 0.0f);	// 位置
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(530.0f, 610.0f, 0.0f);	// 目的の位置
+	const int			MAX_WAIT		= 10;									// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.015f;								// 慣性の値
 }
+
+// 順位
 namespace Number
 {
-	const POSGRID2		PART = POSGRID2(4,1);	// テクスチャ分割数
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(660.0f, 110.0f, 0.0f);					// 位置
-	const float			DISTANCE		= 170.0f;											// 間隔
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);					// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(128.0f, 140.0f, 0.0f);				// 目的の位置
-	const int			NUM = 3;															// 表示させる数
-	const int			MAX_WAIT = 5;														// 待機時間の最大値
-	const float			VALUE_INERTIA = 0.09f;												// 慣性の値
+	const POSGRID2		PART		= POSGRID2(4, 1);						// テクスチャ分割数
+	const D3DXVECTOR3	POS			= D3DXVECTOR3(690.0f, 110.0f, 0.0f);	// 位置
+	const float			DISTANCE	= 170.0f;								// 間隔
+	const D3DXVECTOR3	INIT_SIZE	= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE	= D3DXVECTOR3(406.0f*0.5f, 240.0f*0.5f, 0.0f);	// 目的の位置
+
+	const int			NUM = 3;				// 表示させる数
+	const int			MAX_WAIT = 5;			// 待機時間の最大値
+	const float			VALUE_INERTIA = 0.09f;	// 慣性の値
 
 }
-//フレーム関連
+
+// フレーム関連
 namespace Frame
 {
-	//定数の定義
-	const D3DXVECTOR3	POS				= D3DXVECTOR3(920.0f, 110.0f, 0.0f);					// 位置
-	const float			DISTANCE		= 170.0f;											// 間隔
-	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f,0.0f, 0.0f);						// サイズの初期化
-	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 160.0f, 0.0f);				// 目的の位置
-	const int			NUM				= 3;												// 表示させる数
-	const int			MAX_WAIT		= 5;												// 待機時間の最大値
-	const float			VALUE_INERTIA	= 0.025f;											// 慣性の値
+	// 定数の定義
+	const D3DXVECTOR3	POS				= D3DXVECTOR3(920.0f, 110.0f, 0.0f);	// 位置
+	const float			CENT_POSY		= 445.0f;								// 中心位置Y
+	const float			DISTANCE		= 170.0f;								// 間隔
+	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f,0.0f, 0.0f);			// サイズの初期化
+	const D3DXVECTOR3	DESTSIZE		= D3DXVECTOR3(700.0f, 160.0f, 0.0f);	// 目的の位置
+
+	const int			NUM				= 3;		// 表示させる数
+	const int			MAX_WAIT		= 5;		// 待機時間の最大値
+	const float			VALUE_INERTIA	= 0.025f;	// 慣性の値
 }
-//カバー関連
+
+// リマッチ背景関連
 namespace Cover
 {
-	//定数の定義
+	// 定数の定義
 	const D3DXVECTOR3	POS				= SCREEN_CENT;							// 位置
 	const D3DXVECTOR3	INIT_SIZE		= D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
 	const D3DXCOLOR		INIT_COL		= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 色の初期化
@@ -113,41 +120,50 @@ namespace Cover
 	const float			VALUE_INERTIA	= 0.06f;								// 慣性の値
 
 }
-//選択肢関連
+
+// 選択肢関連
 namespace Select
 {
-	const D3DXVECTOR3	POS			= D3DXVECTOR3(535.0f, 400.0f, 0.0f);					// 位置
-	const float			DISTANCE	= 230.0f;												// 間隔
+	const D3DXVECTOR3	POS			= D3DXVECTOR3(535.0f, 400.0f, 0.0f);	// 位置
+	const float			DISTANCE	= 230.0f;								// 間隔
+
 	const D3DXVECTOR3	INIT_SIZE[CResultManager::SELECT_MAX] = { D3DXVECTOR3(125.0f*1.3f, 54.0f*1.3f, 0.0f),
 																  D3DXVECTOR3(97.0f *1.3f, 54.0f*1.3f, 0.0f) };	// 大きさ
 }
-//
+
+// プレイヤーアイコン
 namespace Icon
 {
 
-	//定数の定義
-	const D3DXVECTOR3	POS = D3DXVECTOR3(790.0f, 110.0f, 0.0f);		// 位置
+	// 定数の定義
+	const D3DXVECTOR3	POS = D3DXVECTOR3(850.0f, 110.0f, 0.0f);		// 位置
 	const float			DISTANCE = 170.0f;								// 間隔
 	const D3DXVECTOR3	INIT_SIZE = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// サイズの初期化
 	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(125.0f, 125.0f, 0.0f);	// 目的の位置
-	const int			NUM = 3;										// 表示させる数
-	const int			MAX_WAIT = 5;									// 待機時間の最大値
-	const float			VALUE_INERTIA = 0.025f;
+
+	const int	NUM = 3;				// 表示させる数
+	const int	MAX_WAIT = 5;			// 待機時間の最大値
+	const float	VALUE_INERTIA = 0.025f;
 
 }
+
+// プレイヤー番号
 namespace Winner
 {
-	//定数の定義
-	const D3DXVECTOR3	POS = D3DXVECTOR3(1180.0f, 110.0f, 0.0f);					// 位置
-	const float			DISTANCE = 170.0f;											// 間隔
-	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(125.0f, 125.0f, 0.0f);				// 目的の位置
+	// 定数の定義
+	const POSGRID2		PART = POSGRID2(10, 1);							// テクスチャ分割数
+	const D3DXVECTOR3	POS = D3DXVECTOR3(1200.0f, 110.0f, 0.0f);		// 位置
+	const float			DISTANCE = 170.0f;								// 間隔
+	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(125.0f, 125.0f, 0.0f);	// 目的の位置
 }
+
+// プレイヤータイトル
 namespace Player
 {
-	//定数の定義
-	const D3DXVECTOR3	POS = D3DXVECTOR3(1050.0f, 110.0f, 0.0f);					// 位置
-	const float			DISTANCE = 170.0f;											// 間隔
-	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(300.0f, 125.0f, 0.0f);				// 目的の位置
+	// 定数の定義
+	const D3DXVECTOR3	POS = D3DXVECTOR3(1070.0f, 110.0f, 0.0f);		// 位置
+	const float			DISTANCE = 170.0f;								// 間隔
+	const D3DXVECTOR3	DESTSIZE = D3DXVECTOR3(300.0f, 125.0f, 0.0f);	// 目的の位置
 }
 
 //************************************************************
@@ -169,6 +185,7 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\entry_player.png",
 	"data\\TEXTURE\\number000.png",
 	"data\\TEXTURE\\ranking001.png",
+	"data\\TEXTURE\\Remach_flame.png",
 };
 
 //************************************************************
@@ -195,12 +212,6 @@ CResultManager::CResultManager()
 			m_arOriginPos[nCnt][nCntFrame] = VEC3_ZERO;
 		}
 	}
-
-	m_rPos[0] = Frame::POS;
-	m_rPos[1] = Number::POS;
-	m_rPos[2] = Icon::POS;
-	m_rPos[3] = Winner::POS;
-	m_rPos[4] = Player::POS;
 }
 
 //============================================================
@@ -216,15 +227,15 @@ CResultManager::~CResultManager()
 //============================================================
 HRESULT CResultManager::Init(void)
 {
-	//オブジェクトの数分初期化を行う
+	// オブジェクトの数分初期化を行う
 	for (int nCnt = 0; nCnt < OBJ_MAX; nCnt++)
 	{
-		m_arPos[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	// 位置
-		m_arSize[nCnt]	= (D3DXVECTOR3(0.0f, 0.0f, 0.0f));	// サイズ
-		m_anNum[nCnt] = 0;									// 現在の番号
-		m_anWaitTime[nCnt] = 0;								// 待機時間
-		m_abool[nCnt] = false;								// 判定用
-		m_abSizeFinish[nCnt] = false;						// サイズ変更判定用
+		m_arPos[nCnt]	= VEC3_ZERO;	// 位置
+		m_arSize[nCnt]	= VEC3_ZERO;	// サイズ
+		m_anNum[nCnt] = 0;				// 現在の番号
+		m_anWaitTime[nCnt] = 0;			// 待機時間
+		m_abool[nCnt] = false;			// 判定用
+		m_abSizeFinish[nCnt] = false;	// サイズ変更判定用
 
 		for (int nCntFrame = 0; nCntFrame < NUM_FRAME; nCntFrame++)
 		{
@@ -234,106 +245,80 @@ HRESULT CResultManager::Init(void)
 
 	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
 	{
-		m_apFrame[nCnt] = nullptr;
-		m_apIcon[nCnt] = nullptr;
-		m_apWinNum[nCnt] = nullptr;
-		m_anRank[nCnt] = NULL;
-		m_anSaveRank[nCnt] = NULL;
-		m_anWinPoint[nCnt] = NULL;
+		m_apFrame[nCnt]		= nullptr;
+		m_apIcon[nCnt]		= nullptr;
+		m_apWinNum[nCnt]	= nullptr;
+		m_anRank[nCnt]		= 0;
+		m_anSaveRank[nCnt]	= 0;
+		m_anWinPoint[nCnt]	= 0;
 	}
 
 	// メンバ変数を初期化
 	memset(&m_apWinLog[0], 0, sizeof(&m_apWinLog));
 	memset(&m_apSelect[0], 0, sizeof(&m_apSelect));
 
-	m_pBigFrame		= nullptr;		//巨大フレーム		
-	m_pFade			= NULL;			// フェードの情報
-	m_pCover		= NULL;			// フェードの情報
+	m_pBigFrame		= nullptr;		// 巨大フレーム		
+	m_pFade			= nullptr;		// フェードの情報
+	m_pCover		= nullptr;		// フェードの情報
 	m_state			= STATE_FADEIN;	// 状態
 	m_nCounterState	= 0;			// 状態管理カウンター
-	m_nPattern = 0;
+	m_nPattern		= 0;
 	m_nSelect		= SELECT_YES;	// 現在の選択
 	m_nOldSelect	= SELECT_YES;	// 前回の選択
-	m_bSkiped = false;
-	m_nNumPlay = CManager::GetInstance()->GetInstance()->GetRetentionManager()->GetNumPlayer();
+	m_bSkiped		= false;
+	m_nNumPlay		= CManager::GetInstance()->GetInstance()->GetRetentionManager()->GetNumPlayer();
 
-	//プレイしている人数によって変える
-	switch (m_nNumPlay)
-	{
-		//二人だった場合
-	case 2:
+	// 変数を宣言
+	float fDis = (Frame::DISTANCE * 0.5f) * m_nNumPlay;	// 中心からの距離
 
-		//中央に寄せる
-		m_rPos[0].y = 330.0f;
-		m_rPos[1].y = 330.0f;
-		m_rPos[2].y = 330.0f;
-		m_rPos[3].y = 330.0f;
-		m_rPos[4].y = 330.0f;
-
-		break;
-
-		//三人だった場合
-	case 3:
-
-		//
-		m_rPos[0].y = 220.0f;
-		m_rPos[1].y = 220.0f;
-		m_rPos[2].y = 220.0f;
-		m_rPos[3].y = 220.0f;
-		m_rPos[4].y = 220.0f;
-
-		break;
-
-		//四人だった場合
-	case 4:
-
-		//従来の並び方にする
-		m_rPos[0].y = m_rPos[0].y;
-		m_rPos[1].y = m_rPos[1].y;
-		m_rPos[2].y = m_rPos[2].y;
-		m_rPos[3].y = m_rPos[3].y;
-		m_rPos[4].y = m_rPos[4].y;
-
-		break;
-
-
-	}
+	// 従来の並び方にする
+	m_rPos[0] = D3DXVECTOR3(Frame::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
+	m_rPos[1] = D3DXVECTOR3(Number::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
+	m_rPos[2] = D3DXVECTOR3(Icon::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
+	m_rPos[3] = D3DXVECTOR3(Winner::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
+	m_rPos[4] = D3DXVECTOR3(Player::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
 
 	//--------------------------------------------------------
 	//	フェードの生成・設定
 	//--------------------------------------------------------
-	// フェードの生成
-	m_pFade = CObject2D::Create
-	( // 引数
-		SCREEN_CENT,	// 位置
-		Fade::SIZE_FADE,		// 大きさ
-		VEC3_ZERO,		// 向き
-		Fade::INITCOL_FADE	// 色
-	);
-	if (m_pFade == NULL)
-	{ // 生成に失敗した場合
+	{
+		// フェードの生成
+		m_pFade = CObject2D::Create
+		( // 引数
+			SCREEN_CENT,		// 位置
+			Fade::SIZE_FADE,	// 大きさ
+			VEC3_ZERO,			// 向き
+			Fade::INITCOL_FADE	// 色
+		);
+		if (m_pFade == NULL)
+		{ // 生成に失敗した場合
 
-		// 失敗を返す
-		assert(false);
-		return E_FAIL;
+			// 失敗を返す
+			assert(false);
+			return E_FAIL;
+		}
+
+		// 優先順位を設定
+		m_pFade->SetPriority(RESULT_PRIO);
 	}
-	// 優先順位を設定
-	m_pFade->SetPriority(RESULT_PRIO);
 
 	//--------------------------------------------------------
 	//	巨大フレーム生成・設定
 	//--------------------------------------------------------
-	m_pBigFrame = CObject2D::Create
-	(
-		D3DXVECTOR3(BigFrame::POS.x, BigFrame::POS.y, BigFrame::POS.z),
-		Win::INIT_SIZE
-	);
+	{
+		// 巨大フレームの生成
+		m_pBigFrame = CObject2D::Create
+		(
+			D3DXVECTOR3(BigFrame::POS.x, BigFrame::POS.y, BigFrame::POS.z),
+			Win::INIT_SIZE
+		);
 
-	// テクスチャを設定
-	m_pBigFrame->BindTexture(mc_apTextureFile[TEXTURE_WINNERFRAME]);
+		// テクスチャを設定
+		m_pBigFrame->BindTexture(mc_apTextureFile[TEXTURE_WINNERFRAME]);
 
-	// 優先順位を設定
-	m_pBigFrame->SetPriority(RESULT_PRIO);
+		// 優先順位を設定
+		m_pBigFrame->SetPriority(RESULT_PRIO);
+	}
 
 	//--------------------------------------------------------
 	//	勝利ロゴ生成・設定
@@ -378,7 +363,7 @@ HRESULT CResultManager::Init(void)
 		if (m_apWinLog[nCnt] == NULL)
 		{ // 生成に失敗した場合
 
-		  // 失敗を返す
+			// 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
@@ -401,18 +386,18 @@ HRESULT CResultManager::Init(void)
 		if (m_apFrame[nCnt] == NULL)
 		{ // 生成に失敗した場合
 
-		  // 失敗を返す
+			// 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
 
-		//プレイ人数の上限に達していなければ
+		// プレイ人数の上限に達していなければ
 		if (nCnt < m_nNumPlay)
 		{
 			// テクスチャを設定
 			m_apFrame[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_FRAME]);
 		}
-		//達していなければ
+		// 達していなければ
 		else
 		{
 			// テクスチャを設定
@@ -446,33 +431,39 @@ HRESULT CResultManager::Init(void)
 
 	//
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
-	{
+	{ // 参加プレイヤー数分繰り返す
+
+		// プレイヤーキャラアイコンの生成
 		m_apIcon[nCnt] = CObject2D::Create
 		(
 			D3DXVECTOR3(m_rPos[2].x, m_rPos[2].y + Icon::DISTANCE * nCnt, m_rPos[2].z),
 			Icon::DESTSIZE
 		);
 
+		// プレイヤーキャラアイコンの位置を保存
 		m_arOriginPos[EObj::OBJ_ICON][nCnt] = m_apIcon[nCnt]->GetVec3Position();
 
+		// プレイヤー番号の生成
 		m_apWinNum[nCnt] = CAnim2D::Create
 		(
-			10,
-			1,
+			Winner::PART.x,
+			Winner::PART.y,
 			D3DXVECTOR3(m_rPos[3].x, m_rPos[3].y + Winner::DISTANCE * nCnt, m_rPos[3].z),
 			Winner::DESTSIZE
 		);
 
+		// プレイヤー番号の位置を保存
 		m_arOriginPos[EObj::OBJ_PLAYER][nCnt] = m_apWinNum[nCnt]->GetVec3Position();
 
 		if (m_apIcon[nCnt] == nullptr
-			|| m_apWinNum[nCnt] == nullptr)
+		|| m_apWinNum[nCnt] == nullptr)
 		{ // 生成に失敗した場合
 
-		  // 失敗を返す
+			// 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
+
 		for (int nCntRank = 0; nCntRank < m_nNumPlay; nCntRank++)
 		{
 			//一回だけしか通らなくする
@@ -522,6 +513,7 @@ HRESULT CResultManager::Init(void)
 		m_apIcon[nCnt]->SetPriority(RESULT_PRIO);
 		m_apWinNum[nCnt]->SetPriority(RESULT_PRIO);
 
+		// 自動描画をOFFにする
 		m_apIcon[nCnt]->SetEnableDraw(false);
 		m_apWinNum[nCnt]->SetEnableDraw(false);
 
@@ -529,87 +521,101 @@ HRESULT CResultManager::Init(void)
 		m_apIcon[nCnt]->SetColor(CHOICE_COL);
 		m_apWinNum[nCnt]->SetColor(CHOICE_COL);
 	
-		//テクスチャ反映
+		// テクスチャ反映
 		m_apIcon[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_ICON_PLAYER1 + nCnt]);
-
-		//テクスチャ反映
 		m_apWinNum[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_WIN2]);
 	}
 
 	//--------------------------------------------------------
-	//	フレーム生成・設定
+	//	プレイヤータイトル生成・設定
 	//--------------------------------------------------------
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
-	{
+	{ // 参加プレイヤー数分繰り返す
+
+		// プレイヤータイトルの生成
 		m_apPlayerEntry[nCnt] = CObject2D::Create
 		(
 			D3DXVECTOR3(m_rPos[4].x, m_rPos[4].y + Player::DISTANCE * nCnt, m_rPos[4].z),
 			Player::DESTSIZE
 		);
 
+		// テクスチャを登録・割当
 		m_apPlayerEntry[nCnt]->BindTexture(mc_apTextureFile[TEXTURE_PLAYER_ENTRY]);
+
+		// 優先順位を設定
 		m_apPlayerEntry[nCnt]->SetPriority(RESULT_PRIO);
+
+		// 自動描画をOFFにする
 		m_apPlayerEntry[nCnt]->SetEnableDraw(false);
-
 	}
 
 	//--------------------------------------------------------
-	//	フェードの生成・設定
+	//	リマッチ選択背景の生成・設定
 	//--------------------------------------------------------
-	// フェードの生成
-	m_pCover = CObject2D::Create
-	( // 引数
-		Cover::POS,			// 位置
-		Cover::INIT_SIZE,	// 大きさ
-		VEC3_ZERO,			// 向き
-		Cover::INIT_COL		// 色
-	);
-	if (m_pCover == NULL)
-	{ // 生成に失敗した場合
-
-	  // 失敗を返す
-		assert(false);
-		return E_FAIL;
-	}
-	m_pCover->BindTexture("data\\TEXTURE\\Remach_flame.png");
-	// 優先順位を設定
-	m_pCover->SetPriority(RESULT_PRIO);
-
-	//--------------------------------------------------------
-	//	選択肢生成・設定
-	//--------------------------------------------------------
-	for (int nCnt = 0; nCnt < SELECT_MAX; nCnt++)
 	{
-		m_apSelect[nCnt] = CObject2D::Create
-		(
-			D3DXVECTOR3(Select::POS.x + Select::DISTANCE * nCnt, Select::POS.y, Select::POS.z),
-			Select::INIT_SIZE[nCnt]
+		// リマッチ選択背景の生成
+		m_pCover = CObject2D::Create
+		( // 引数
+			Cover::POS,			// 位置
+			Cover::INIT_SIZE,	// 大きさ
+			VEC3_ZERO,			// 向き
+			Cover::INIT_COL		// 色
 		);
-
-		if (m_apSelect[nCnt] == NULL)
+		if (m_pCover == NULL)
 		{ // 生成に失敗した場合
 
-		  // 失敗を返す
+			// 失敗を返す
 			assert(false);
 			return E_FAIL;
 		}
 
+		// テクスチャを登録・割当
+		m_pCover->BindTexture(mc_apTextureFile[TEXTURE_REMACH_BG]);
+
 		// 優先順位を設定
-		m_apSelect[nCnt]->SetPriority(RESULT_PRIO);
-
-		// 自動描画をOFFにする
-		m_apSelect[nCnt]->SetEnableDraw(false);
-
-		// 現在の選択要素の色を白に設定
-		m_apSelect[nCnt]->SetColor(DEFAULT_COL);
-
+		m_pCover->SetPriority(RESULT_PRIO);
 	}
 
+	//--------------------------------------------------------
+	//	選択肢生成・設定
+	//--------------------------------------------------------
+	{
+		for (int nCnt = 0; nCnt < SELECT_MAX; nCnt++)
+		{ // 選択肢分繰り返す
 
-	// テクスチャを設定
-	m_apSelect[SELECT_YES]->BindTexture(mc_apTextureFile[TEXTURE_RESTART]);
-	m_apSelect[SELECT_NO]->BindTexture(mc_apTextureFile[TEXTURE_BACK]);
+			// 選択肢の生成
+			m_apSelect[nCnt] = CObject2D::Create
+			(
+				D3DXVECTOR3(Select::POS.x + Select::DISTANCE * nCnt, Select::POS.y, Select::POS.z),
+				Select::INIT_SIZE[nCnt]
+			);
+			if (m_apSelect[nCnt] == NULL)
+			{ // 生成に失敗した場合
 
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// 優先順位を設定
+			m_apSelect[nCnt]->SetPriority(RESULT_PRIO);
+
+			// 自動描画をOFFにする
+			m_apSelect[nCnt]->SetEnableDraw(false);
+
+			// 現在の選択要素の色を白に設定
+			m_apSelect[nCnt]->SetColor(DEFAULT_COL);
+		}
+
+		// テクスチャを設定
+		m_apSelect[SELECT_YES]->BindTexture(mc_apTextureFile[TEXTURE_RESTART]);
+		m_apSelect[SELECT_NO]->BindTexture(mc_apTextureFile[TEXTURE_BACK]);
+	}
+
+	//--------------------------------------------------------
+	//	ランキングの順位表示設定
+	//--------------------------------------------------------
+#if 1
 	//もし一位の値とセーブしている四位の値が同じなら
 	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
 	{
@@ -635,7 +641,6 @@ HRESULT CResultManager::Init(void)
 		}
 	}
 	//もし一位の値とセーブしている三位の値が同じなら
-
 	else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_THIRD])
 	{
 		//値の入れ替えを行う
@@ -670,14 +675,14 @@ HRESULT CResultManager::Init(void)
 			{
 				if (nCnt < 2)
 				{
-					m_apNumber[nCnt]->SetPattern(nCnt);
+					m_apNumber[nCnt]->SetPattern(nCnt + 1);
 				}
 				else
 				{
 					if (m_anWinPoint[m_anRank[RANK_FOURTH]] <
 						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nCnt]))
 					{
-						m_apNumber[nCnt]->SetPattern(nCnt);
+						m_apNumber[nCnt]->SetPattern(nCnt + 1);
 					}
 					else
 					{
@@ -690,10 +695,13 @@ HRESULT CResultManager::Init(void)
 			}
 			else
 			{
-				m_apNumber[nCnt]->SetPattern(nCnt);
+				m_apNumber[nCnt]->SetPattern(nCnt + 1);
 			}
 		}
 	}
+#else
+	// TODO：順位表示のテクスチャ割り当て
+#endif
 
 	// 成功を返す
 	return S_OK;
