@@ -391,6 +391,14 @@ void CObjectMeshCube::Draw(void)
 }
 
 //============================================================
+//	メッシュキューブ取得処理
+//============================================================
+CObjectMeshCube::SMeshCube CObjectMeshCube::GetMeshCube(void)
+{
+	return m_meshCube;
+}
+
+//============================================================
 //	位置の設定処理
 //============================================================
 void CObjectMeshCube::SetVec3Position(const D3DXVECTOR3& rPos)

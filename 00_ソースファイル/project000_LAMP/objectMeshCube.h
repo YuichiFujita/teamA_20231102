@@ -171,6 +171,7 @@ public:
 	float GetBorderThick(void) const;					// 縁取り太さ取得
 	void SetTextureState(const ETexState texState);		// テクスチャ状態設定
 	ETexState GetTextureState(void) const;				// テクスチャ状態取得
+	SMeshCube GetMeshCube(void);						// マトリックスポインタ取得
 
 	void SetOrigin(const EOrigin origin);	// 原点設定
 	EOrigin GetOrigin(void) const;			// 原点取得

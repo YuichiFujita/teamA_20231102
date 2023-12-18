@@ -77,7 +77,7 @@ namespace
 	const float	KNOCK_SIDE = 35.0f;	// ノック横移動量
 	const int	DMG_KILLY = 50;		// キルY座標のダメージ量
 
-	const float MAX_KNOCK_RATE	= 4.0f;		// 最大吹っ飛び倍率
+	const float MAX_KNOCK_RATE	= 2.0f;		// 最大吹っ飛び倍率
 	const float	INVULN_ALPHA	= 0.5f;		// 無敵状態の透明度
 	const int	INVULN_CNT		= 60;		// 無敵時間のフレーム数
 	const int	DROWN_CNT		= 120;		// 溺れ時間のフレーム数
@@ -145,7 +145,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_bDash = false;		// ダッシュ状況
 	m_bJump = false;		// ジャンプ状況
 	m_bHook = false;
-	m_bAI = false;
+	m_bAI = true;
 }
 
 //============================================================
@@ -791,7 +791,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		  // 変数を宣言
 			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
 
-																																// ノックバック移動量を設定
+			// ノックバック移動量を設定
 			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
 			m_move.y = KNOCK_UP;
 			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
