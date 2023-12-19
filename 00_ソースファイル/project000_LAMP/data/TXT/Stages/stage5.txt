@@ -154,7 +154,7 @@ STAGE_GROUNDSET
 		TYPE = 1
 		POS = 0.00 0.00 0.00
 		ROT = 0.00 0.00 0.00
-		SIZE = 1200.00 50.00 1150.00
+		SIZE = 1200.00 100.00 1150.00
 		PARTX = 23.00 1.00 
 		PARTY = 24.00 23.00 
 		PARTZ = 24.00 1.00 
@@ -438,4 +438,29 @@ STAGE_SPAWNPOINTSET
 	END_SPAWNPOINTSET
 
 END_STAGE_SPAWNPOINTSET
+
+#------------------------------------------------------------------------------
+#	アイテム生成位置の配置情報
+#------------------------------------------------------------------------------
+STAGE_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = 490.00 0.00 -460.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -50.00 0.00 -360.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -910.00 0.00 40.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -140.00 0.00 890.00
+	END_ITEMPOINTSET
+
+END_STAGE_ITEMPOINTSET
+
+
 
