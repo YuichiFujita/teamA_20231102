@@ -62,7 +62,8 @@ private:
 	D3DXVECTOR3 m_pos;
 	static D3DXVECTOR3 m_rPos[MAX_SPAWNPOINT];		//ˆÊ’u
 	static CItem *m_pItem;
-	int m_nCnt;
+	static int m_nCnt;
+	int m_nRand;
 };
 
 #endif
