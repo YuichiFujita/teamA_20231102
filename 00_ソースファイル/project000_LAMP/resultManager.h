@@ -145,8 +145,8 @@ private:
 	CAnim2D *m_apNumber[NUM_FRAME];		// フレーム
 	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
 	CObject2D *m_pFade;					// フェードの情報
-	CObject2D *m_pCover;
-	CObject2D *m_apIcon[NUM_FRAME];	//プレイヤーのアイコン
+	CObject2D *m_pCover;				//カバー
+	CObject2D *m_apIcon[NUM_FRAME];		//プレイヤーのアイコン
 	CAnim2D *m_apWinNum[NUM_FRAME];
 	CObject2D *m_apPlayerEntry[NUM_FRAME];
 	EState m_state;						// 状態
@@ -158,10 +158,10 @@ private:
 	int m_nSelect;						// 現在の選択
 	int m_nOldSelect;					// 前回の選択
 	int m_anNum[OBJ_MAX];				//　数
-	int m_nNumPlay;
-	int m_nPattern;
-	int m_anWinPoint[RANK::RANK_MAX];
-	int m_anWaitTime[OBJ_MAX];			//　待機時間
+	int m_nNumPlay;						//何人遊んでいるか
+	int m_nPattern;						//番号パターン
+	int m_anWinPoint[RANK::RANK_MAX];	//勝利数
+	int m_anWaitTime[OBJ_MAX];			//待機時間
 	int m_anRank[RANK::RANK_MAX];		//順位順に並べるための変数
 	int m_anSaveRank[RANK::RANK_MAX];	//順位順の値を保存
 	bool m_bSkiped;						//スキップされているかどうか
