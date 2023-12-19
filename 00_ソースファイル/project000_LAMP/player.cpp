@@ -1706,7 +1706,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 
 	float fStickR = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y) * 0.5f;	// スティックの倒し量
-	m_bHook = false;
+	
 
 																				// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
@@ -1916,9 +1916,27 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 						m_destRot.y = rotFlail - (D3DX_PI * 0.5f);
 
+						if (!m_bHook)
+						{
+							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SWING);
+							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);
+
+						}
 						m_bHook = true;
 					}
+					else
+					{
+						m_bHook = false;
+					}
 				}
+				else
+				{
+					m_bHook = false;
+				}
+			}
+			else
+			{
+				m_bHook = false;
 			}
 
 			// 投擲
