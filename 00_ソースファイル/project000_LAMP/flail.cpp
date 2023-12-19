@@ -157,10 +157,7 @@ void CFlail::Update(void)
 		m_move.x = 0.0f;
 		m_move.z = 0.0f;
 	}
-	if (player->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
-	{
-		m_nDamage = 20;
-	}
+
 	else
 	{
 		m_nDamage = HIT_DAMAGE;
@@ -815,7 +812,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				{
 					float length = D3DXVec3Length(&(rPos - m_oldPos)) + 1.0f;
 					int nAddDamage;
-
+					float bonus = 1.0f;
 					if (length > 80.0f)
 					{
 						nAddDamage = 30;
@@ -828,9 +825,28 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					{
 						nAddDamage = 0;
 					}
+					if (playerthis->GetTemporaryItem().type == CPlayer::ITEM_BOOST_KNOCKBACK)
+					{
+						vec *= 2.0f;
+						// ポインタを宣言
+						CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
+						if (pRetention->GetKillState() == CRetentionManager::KILL_LIFE)
+						{
+							vec *= 3.0f;
+						}
+						else
+						{
+							vec *= 2.0f;
+						}
+						
+					}
+					if (playerthis->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
+					{
+						bonus = 2.0f;
+					}
 					// ダメージヒット処理
-					player->HitKnockBack(m_nDamage + nAddDamage, vec, playerthis);
+					player->HitKnockBack((m_nDamage + nAddDamage) * bonus, vec, playerthis);
 				}
 
 				D3DXVECTOR3 posFlail;

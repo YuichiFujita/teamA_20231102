@@ -22,10 +22,10 @@
 
 // ‰ñ•œ
 #define HEAL_POSGAP		(24.0f)	// ‰ñ•œ‚ÌˆÊ’u‚¸‚ê—Ê
-#define HEAL_MOVE		(1.2f)	// ‰ñ•œ‚ÌˆÚ“®—Ê
+#define HEAL_MOVE		(3.2f)	// ‰ñ•œ‚ÌˆÚ“®—Ê
 #define HEAL_SPAWN		(6)		// ‰ñ•œ‚Ì¶¬”
 #define HEAL_EFF_LIFE	(50)	// ‰ñ•œ‚ÌŽõ–½
-#define HEAL_SIZE		(55.0f)	// ‰ñ•œ‚Ì‘å‚«‚³
+#define HEAL_SIZE		(155.0f)	// ‰ñ•œ‚Ì‘å‚«‚³
 #define HEAL_SUB_SIZE	(0.5f)	// ‰ñ•œ‚Ì”¼Œa‚ÌŒ¸ŽZ—Ê
 
 // A•¨“¥‚Ý‚Â‚Ô‚µ
