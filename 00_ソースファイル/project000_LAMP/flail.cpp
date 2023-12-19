@@ -833,11 +833,11 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 
 						if (pRetention->GetKillState() == CRetentionManager::KILL_LIFE)
 						{
-							vec *= 3.0f;
+							vec *= 2.0f;
 						}
 						else
 						{
-							vec *= 2.0f;
+							vec *= 1.5f;
 						}
 						
 					}
