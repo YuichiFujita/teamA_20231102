@@ -145,7 +145,7 @@ CPlayer::CPlayer(const int nPad) : CObjectChara(CObject::LABEL_PLAYER, PRIORITY)
 	m_bDash = false;		// ダッシュ状況
 	m_bJump = false;		// ジャンプ状況
 	m_bHook = false;
-	m_bAI = true;
+	m_bAI = false;
 }
 
 //============================================================
@@ -1202,7 +1202,6 @@ void CPlayer::UpdateMotion(int nMotion)
 
 	case MOTION_DASH:	// ダッシュモーション：ループOFF
 	case MOTION_LAND:	// 着地モーション：ループOFF
-	case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
 
 		if (IsMotionFinish())
 		{ // モーションが終了していた場合
@@ -1217,6 +1216,7 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 	case MOTION_DEATH:	// 死亡モーション：ループOFF
 	case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
+	case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
 
 		break;
 

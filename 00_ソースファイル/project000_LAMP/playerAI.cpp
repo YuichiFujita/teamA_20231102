@@ -252,6 +252,8 @@ CPlayer::EMotion CPlayerAI::AIselect
 
 			m_stateAI = STATEAI_EMOTE;
 
+			break;
+
 		case CPlayerAI::STATEAI_MAX:
 
 			m_stateAI = STATEAI_NONE;
@@ -273,6 +275,13 @@ CPlayer::EMotion CPlayerAI::AIselect
 		if (m_nCounterFlail < flail::FLAIL_DROP)
 		{
 			m_nCounterFlail = flail::FLAIL_DROP;
+		}
+
+		if (m_nCounterFlail == flail::FLAIL_THROW)
+		{
+			CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPadID);
+
+			player->SetMotion(CPlayer::MOTION_IDOL);
 		}
 	}
 	
@@ -833,9 +842,10 @@ void CPlayerAI::AIDash
 			}
 		}
 
-		if (m_stateAI != STATEAI_EMOTE)
+		if (m_stateAI == STATEAI_EMOTE)
 		{
 			bJumpSelect = false;
+			m_bDash = false;
 		}
 
 		if (bJumpSelect)
@@ -908,7 +918,7 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 		}
 		else if (nProb == 1)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
+			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
 		}
 		else if (nProb == 2)
 		{

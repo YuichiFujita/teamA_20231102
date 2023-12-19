@@ -335,10 +335,6 @@ void CFlail::UpdateChain(void)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	D3DXVECTOR3 posCol = VEC3_ZERO;
-	
-	CollisionChain(posCol);
-
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
@@ -370,10 +366,7 @@ void CFlail::UpdateChain(void)
 		{
 			if (nCntChain == m_nfulChainF)
 			{
-				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
-				{
-					UpdateDropFlailPos(m_fChainRot);
-				}*/
+			
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -399,11 +392,6 @@ void CFlail::UpdateChain(void)
 			if (nCntChain == m_nfulChainF)
 			{
 				rot.y += m_fChainRotMove;
-
-				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
-				{
-					UpdateDropFlailPos(rot.y);
-				}*/
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -536,6 +524,10 @@ void CFlail::UpdateChain(void)
 		// ƒ‚ƒfƒ‹‚ÌXV
 		m_chain[nCntChain].multiModel->Update();
 	}
+
+	D3DXVECTOR3 posCol = VEC3_ZERO;
+
+	CollisionChain(posCol);
 }
 
 //============================================================
@@ -918,8 +910,9 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+	bool bCol = false;
 
-	while (1)
+	while (bCol)
 	{
 		for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 		{ // —Dæ‡ˆÊ‚Ì‘”•ªŒJ‚è•Ô‚·
@@ -1010,7 +1003,32 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 
 						if (D3DXVec3Length(&posDef) < m_fLengthChain)
 						{
+							D3DXVECTOR3 vecFlail, vecFlailOld;
+							float rotPoint, rotFlail, rotFlailOld, rotFlailDef;
 
+							vecFlail = GetVec3Position() - posStick;
+							vecFlailOld = m_oldPos - posStick;
+
+							rotPoint = atan2f(posDef.x, posDef.z);
+							rotFlail = atan2f(vecFlail.x, vecFlail.z);
+							rotFlailOld = atan2f(vecFlailOld.x, vecFlailOld.z);
+
+							if (rotFlail > rotFlailOld)
+							{
+								if (rotFlail < rotPoint && rotFlail >rotFlailOld)
+								{
+
+								}
+							}
+							else
+							{
+								if (rotFlail < rotPoint && rotFlail >rotFlailOld)
+								{
+
+								}
+							}
+
+							bCol = true;
 						}
 					}
 
@@ -1019,8 +1037,6 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 				}
 			}
 		}
-
-		break;
 	}
 
 	return false;

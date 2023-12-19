@@ -148,10 +148,10 @@ private:
 	int			m_nNumChain;					// 鎖の数
 	int			m_nDamage;						// ダメージ
 	int			m_nHitCount;					// ダメージ
-	int			m_nfulChainF;					// 鎖の数
-	int			m_nfulChainP;					// 鎖の数
+	int			m_nfulChainF;					// フレイルにもっとも近い支点鎖
+	int			m_nfulChainP;					// プレイヤーにもっとも近い支点鎖
 	float		m_fChainRot;					// 角度
-	float		m_fChainRotOld;					// 角度
+	float		m_fChainRotOld;					// 過去角度
 	float		m_fChainRotTarget;				// 目標角度
 	float		m_fChainRotMove;				// 角速度
 	float		m_fLengthChain;					// 鎖の長さ
