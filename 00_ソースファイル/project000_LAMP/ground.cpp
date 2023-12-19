@@ -32,12 +32,12 @@ const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 	},
 
 	{ // 石テクスチャ
-		"data\\TEXTURE\\stone.png",	// 左テクスチャ
-		"data\\TEXTURE\\stone.png",	// 右テクスチャ
-		"data\\TEXTURE\\stone.png",	// 下テクスチャ
-		"data\\TEXTURE\\stone.png",	// 上テクスチャ
-		"data\\TEXTURE\\stone.png",	// 前テクスチャ
-		"data\\TEXTURE\\stone.png",	// 後テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 左テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 右テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 下テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 上テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 前テクスチャ
+		"data\\TEXTURE\\stone_001.png",	// 後テクスチャ
 	},
 
 	{ // 氷テクスチャ
@@ -66,7 +66,6 @@ const char *CGround::mc_apTextureFile[][6] =	// テクスチャ定数
 		"data\\TEXTURE\\mud.png",	// 前テクスチャ
 		"data\\TEXTURE\\mud.png",	// 後テクスチャ
 	},
-
 };
 
 //************************************************************
