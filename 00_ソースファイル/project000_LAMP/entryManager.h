@@ -119,6 +119,7 @@ private:
 	CAnim2D		*m_apJoin[MAX_PLAYER];			// プレイヤー参加の情報
 	CObject2D	*m_apFrame[MAX_PLAYER];			// プレイヤーフレームの情報
 	CAnim2D		*m_apArrow[MAX_ENTRY_ARROW];	// 矢印の情報
+	CAnim2D		*m_apFlailArrow[MAX_ENTRY_ARROW][MAX_PLAYER];	// フレイル矢印の情報
 
 	CObject2D	*m_pControl;	// 操作表示の情報
 	CObject2D	*m_pBG;			// 背景の情報
