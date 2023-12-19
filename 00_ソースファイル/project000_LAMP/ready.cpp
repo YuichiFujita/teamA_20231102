@@ -60,7 +60,7 @@ HRESULT CReady::Init(void)
 	m_nStateCount = 120;
 	m_pFlare = CAnim2D::Create(23, 2, SCREEN_CENT, SCREEN_SIZE);
 	m_pFlare->BindTexture("data\\TEXTURE\\lensFlare.jpg");
-	m_pFlare->SetCounter(1);
+	m_pFlare->SetCounter(2);
 	m_pFlare->SetAdd(true);
 	m_pFlare->SetEnableStop(true);
 	m_pFlare->SetLabel(LABEL_EFFECT);

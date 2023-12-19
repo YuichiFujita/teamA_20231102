@@ -7,11 +7,23 @@
 #include "ItemSpawnPoint.h"
 #include "manager.h"
 #include "renderer.h"
+#include "scene.h"
 
 //<********************************
 //静的メンバ関数の設定
 //<********************************
 int CItemSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
+CItem *CItemSpawnPoint::m_pItem = nullptr;
+D3DXVECTOR3 CItemSpawnPoint::m_rPos[MAX_SPAWNPOINT] = {};
+int CItemSpawnPoint::m_nCnt = 0;
+
+//<**************************************
+//名前定義
+//<**************************************
+namespace ItemSpawn
+{
+	const int MAX_TIME = 250;	//クールタイムの最大値
+}
 
 //<==================================
 //コンストラクタ
@@ -19,27 +31,40 @@ int CItemSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
 CItemSpawnPoint::CItemSpawnPoint() : CObject(CObject::LABEL_ITEMPOINT, 0), m_nIdx(m_nNumIdx)
 {
 	//値の初期化
-	m_pos = VEC3_ZERO;
+	m_nRand = 0;
 
 	//番号を加算
 	m_nNumIdx++;
 }
 //<==================================
-//デストラクタ
+//デストラクタ(主に静的メンバ変数を終了させるのに使う)
 //<==================================
 CItemSpawnPoint::~CItemSpawnPoint()
 {
 	//番号を減算
 	m_nNumIdx--;
+
+	//中身があったら
+	if (m_nCnt != 0)
+	{
+		m_nCnt = 0;
+	}
+	
+	//もし初期化されていなければ
+	if (m_rPos[m_nNumIdx] != VEC3_ZERO)
+	{
+		//位置の初期化
+		m_rPos[m_nNumIdx] = VEC3_ZERO;
+	}
 }
 //<==================================
 //初期化
 //<==================================
 HRESULT CItemSpawnPoint::Init(void) 
 {
-	//値の初期化
-	m_pos = VEC3_ZERO;
-
+	//初期化をする
+	m_nRand = 0;
+	
 	return S_OK;
 }		
 //<==================================
@@ -48,14 +73,23 @@ HRESULT CItemSpawnPoint::Init(void)
 void CItemSpawnPoint::Uninit(void) 
 {
 	Release();
+
+	//中身チェック
+	if (m_pItem != nullptr)
+	{
+		m_pItem->Uninit();
+		m_pItem = nullptr;
+	}
 }			
 //<=======================================
 //アイテムスポーンポイントの生成処理
 //<=======================================
 CItemSpawnPoint *CItemSpawnPoint::Create(const D3DXVECTOR3& rPos)
 {
+	//インスタンス生成用のオブジェクト
 	CItemSpawnPoint *pItemSpawnPoint = new CItemSpawnPoint;
 
+	//nullptrになっていないことを確認する
 	assert(pItemSpawnPoint != nullptr);
 
 	//成功したら
@@ -64,6 +98,10 @@ CItemSpawnPoint *CItemSpawnPoint::Create(const D3DXVECTOR3& rPos)
 		// 位置を設定
 		pItemSpawnPoint->SetVec3Position(rPos);
 
+		//位置を取得してくる
+		m_rPos[pItemSpawnPoint->m_nIdx] = pItemSpawnPoint->GetVec3Position();
+
+		//そのポインタを返す
 		return pItemSpawnPoint;
 	}
 	//失敗したら
@@ -73,6 +111,49 @@ CItemSpawnPoint *CItemSpawnPoint::Create(const D3DXVECTOR3& rPos)
 	}
 
 	return nullptr;
+}
+//<=======================================
+//更新処理
+//<=======================================
+void CItemSpawnPoint::Update(void)
+{
+	//もしゲームモードだったら
+	if (CManager::GetInstance()->GetScene()->GetMode() == CScene::EMode::MODE_GAME)
+	{
+		//もしこのアイテムがnullptrではない+コリジョンが当たっていた場合
+		if (m_pItem != nullptr
+			&&m_pItem->Collision() == true)
+		{
+			m_pItem->Uninit();
+			m_pItem =nullptr;
+		}
+
+		//アイテムがなければ
+		if (m_pItem == nullptr)
+		{
+			//加算していく
+			m_nCnt++;
+
+			//もし規定値を超えていれば
+			if (m_nCnt >= ItemSpawn::MAX_TIME)
+			{
+				//決定する
+				m_nRand = rand() % m_nNumIdx + 0;
+
+				//生成処理を行う(番号から位置を取得してくる)
+				m_pItem = CItem::Create(m_rPos[m_nRand]);
+
+				//初期化する
+				m_nCnt = 0;
+			}
+		}
+		//あったら
+		else if (m_pItem != nullptr)
+		{
+			//何もしない
+		}
+	}
+	
 }
 //<=======================================
 //番号の設定

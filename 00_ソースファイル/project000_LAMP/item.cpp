@@ -13,6 +13,7 @@
 #include "scene.h"
 #include "collision.h"
 #include "orbitalParticle.h"
+#include "ItemSpawnPoint.h"
 //============================================================
 // 静的メンバ変数
 //============================================================
@@ -95,8 +96,10 @@ void CItem::Draw(void)
 //============================================================
 // 当たり判定
 //============================================================
-void CItem::Collision()
+bool CItem::Collision()
 {
+	bool bHit = false;
+
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{
 		// CSceneのプレイヤー取得
@@ -111,6 +114,7 @@ void CItem::Collision()
 
 			//アイテムの位置取得
 			D3DXVECTOR3 itemPos = GetVec3Position();
+
 			//アイテムの半径取得
 			float fItemRadisu = GetRadius();
 
@@ -118,12 +122,13 @@ void CItem::Collision()
 			if (collision::Circle2D(playerPos, itemPos, fPlayerRadius, fItemRadisu) == true)
 			{
 				pPlayer->Hit();
-				Uninit();
 				CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 800, 60, 60, 150, 1.0f, 0.85f);
-				return;
+				bHit = true;
+				break;
 			}
 		}
 	}
+	return bHit;
 }
 
 //============================================================

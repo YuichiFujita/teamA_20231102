@@ -209,6 +209,7 @@ CResultManager::CResultManager()
 
 		for (int nCntFrame = 0; nCntFrame < NUM_FRAME; nCntFrame++)
 		{
+			//最初の位置
 			m_arOriginPos[nCnt][nCntFrame] = VEC3_ZERO;
 		}
 	}
@@ -227,7 +228,9 @@ CResultManager::~CResultManager()
 //============================================================
 HRESULT CResultManager::Init(void)
 {
+	//<************************************************
 	// オブジェクトの数分初期化を行う
+	//<************************************************
 	for (int nCnt = 0; nCnt < OBJ_MAX; nCnt++)
 	{
 		m_arPos[nCnt]	= VEC3_ZERO;	// 位置
@@ -237,26 +240,34 @@ HRESULT CResultManager::Init(void)
 		m_abool[nCnt] = false;			// 判定用
 		m_abSizeFinish[nCnt] = false;	// サイズ変更判定用
 
+		//二次元配列の初期化
 		for (int nCntFrame = 0; nCntFrame < NUM_FRAME; nCntFrame++)
 		{
+			//過去位置の保存
 			m_arOriginPos[nCnt][nCntFrame] = VEC3_ZERO;
 		}
 	}
 
+	//<************************************************
+	//初期化
+	//<************************************************
 	for (int nCnt = 0; nCnt < NUM_FRAME; nCnt++)
 	{
-		m_apFrame[nCnt]		= nullptr;
-		m_apIcon[nCnt]		= nullptr;
-		m_apWinNum[nCnt]	= nullptr;
-		m_anRank[nCnt]		= 0;
-		m_anSaveRank[nCnt]	= 0;
-		m_anWinPoint[nCnt]	= 0;
+		m_apFrame[nCnt]		= nullptr;	//フレーム
+		m_apIcon[nCnt]		= nullptr;	//プレイヤーアイコン
+		m_apWinNum[nCnt]	= nullptr;	//勝利者番号
+		m_anRank[nCnt]		= 0;		//ランク
+		m_anSaveRank[nCnt]	= 0;		//保存用ランク
+		m_anWinPoint[nCnt]	= 0;		//得点
 	}
 
 	// メンバ変数を初期化
 	memset(&m_apWinLog[0], 0, sizeof(&m_apWinLog));
 	memset(&m_apSelect[0], 0, sizeof(&m_apSelect));
 
+	//<************************************************
+	//単体の初期化
+	//<************************************************
 	m_pBigFrame		= nullptr;		// 巨大フレーム		
 	m_pFade			= nullptr;		// フェードの情報
 	m_pCover		= nullptr;		// フェードの情報
@@ -270,6 +281,7 @@ HRESULT CResultManager::Init(void)
 
 	// 変数を宣言
 	float fDis = (Frame::DISTANCE * 0.5f) * m_nNumPlay;	// 中心からの距離
+	int nPattarn = 0;									//番号パターン
 
 	// 従来の並び方にする
 	m_rPos[0] = D3DXVECTOR3(Frame::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
@@ -328,7 +340,7 @@ HRESULT CResultManager::Init(void)
 		//現在のカウントで処理を分ける
 		switch (nCnt)
 		{
-			//
+			//誰がの部分
 			case 0:
 
 				m_apWinLog[nCnt] = CAnim2D::Create
@@ -342,7 +354,7 @@ HRESULT CResultManager::Init(void)
 
 			break;
 
-			//
+			//プレイヤー番号
 			case 1:
 
 				m_apWinLog[nCnt] = CAnim2D::Create
@@ -375,6 +387,9 @@ HRESULT CResultManager::Init(void)
 		m_apWinLog[nCnt]->SetPriority(RESULT_PRIO);
 	}
 
+	//<*****************************************************
+	//フレーム生成
+	//<*****************************************************
 	for (int nCnt = 0; nCnt < NUM_FRAME;nCnt++)
 	{
 		m_apFrame[nCnt] = CObject2D::Create
@@ -409,7 +424,7 @@ HRESULT CResultManager::Init(void)
 	}
 
 	//--------------------------------------------------------
-	//	フレーム生成・設定
+	//	順位生成・設定
 	//--------------------------------------------------------
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
@@ -464,6 +479,9 @@ HRESULT CResultManager::Init(void)
 			return E_FAIL;
 		}
 
+		//<******************************************************
+		//ソートをするための順位保存処理
+		//<******************************************************
 		for (int nCntRank = 0; nCntRank < m_nNumPlay; nCntRank++)
 		{
 			//一回だけしか通らなくする
@@ -612,10 +630,12 @@ HRESULT CResultManager::Init(void)
 		m_apSelect[SELECT_NO]->BindTexture(mc_apTextureFile[TEXTURE_BACK]);
 	}
 
-	//--------------------------------------------------------
-	//	ランキングの順位表示設定
-	//--------------------------------------------------------
 #if 1
+	//--------------------------------------------------------
+	//<*******************************************************
+	//ランキングのソート処理
+	//<*******************************************************
+	//--------------------------------------------------------
 	//もし一位の値とセーブしている四位の値が同じなら
 	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
 	{
@@ -666,26 +686,37 @@ HRESULT CResultManager::Init(void)
 		}
 	}
 	
+	//<******************************************
+	//同点がいる場合の順位並び変え処理
+	//<******************************************
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
+		//中身チェック
 		if (m_apNumber[nCnt] != nullptr)
 		{
 			//３人以上で
 			if (m_nNumPlay >= 3)
 			{
-				if (nCnt < 2)
+				//進める
+				if (nCnt < 1)
 				{
 					m_apNumber[nCnt]->SetPattern(nCnt + 1);
 				}
+				//それ以外のカウントだったら
 				else
 				{
-					if (m_anWinPoint[m_anRank[RANK_FOURTH]] <
-						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nCnt]))
+					//勝利ポイントが同じでなければ
+					if (m_anWinPoint[m_anRank[nCnt]] !=
+						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nPattarn]))
 					{
+						//パターンを進める
 						m_apNumber[nCnt]->SetPattern(nCnt + 1);
+						nPattarn += 1;
 					}
+					//同じだったら
 					else
 					{
+						//とどめる
 						m_apNumber[nCnt]->SetPattern(m_nPattern);
 					}
 				}
@@ -693,6 +724,7 @@ HRESULT CResultManager::Init(void)
 				//現在のパターンを保存
 				m_nPattern = m_apNumber[nCnt]->GetPattern();
 			}
+			//3人以下だったら
 			else
 			{
 				m_apNumber[nCnt]->SetPattern(nCnt + 1);
@@ -737,24 +769,30 @@ HRESULT CResultManager::Uninit(void)
 		}
 	}
 
+	//<******************************************
+	//プレイヤー数に関係しているオブジェクトの終了処理
+	//<******************************************
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
+		//順位
 		if (m_apNumber[nCnt] != nullptr)
 		{
 			m_apNumber[nCnt]->Uninit();
 			m_apNumber[nCnt] = nullptr;
 		}
-		
+		//プレイヤーアイコン
 		if (m_apIcon[nCnt] != nullptr)
 		{
 			m_apIcon[nCnt]->Uninit();
 			m_apIcon[nCnt] = nullptr;
 		}
+		//勝利者番号
 		if (m_apWinNum[nCnt] != nullptr)
 		{
 			m_apWinNum[nCnt]->Uninit();
 			m_apWinNum[nCnt] = nullptr;
 		}
+		//プレイヤー番号
 		if (m_apPlayerEntry[nCnt] != nullptr)
 		{
 			m_apPlayerEntry[nCnt]->Uninit();
@@ -787,6 +825,9 @@ HRESULT CResultManager::Uninit(void)
 void CResultManager::Update(void)
 {
 
+	//<******************************************
+	//プレイヤーアイコンの位置設定
+	//<******************************************
 	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
 	{
 		//中身チェック
@@ -796,7 +837,8 @@ void CResultManager::Update(void)
 
 			switch (nCnt)
 			{
-			case 0:
+				//一位
+			case RANK_FIRST:
 
 				//プレイヤー順に並べる
 				m_apIcon[m_anRank[nCnt]]
@@ -804,7 +846,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 1:
+				//二位
+			case RANK_SECOND:
 
 				//プレイヤー順に並べる
 				m_apIcon[m_anRank[nCnt]]
@@ -812,7 +855,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 2:
+				//三位
+			case RANK_THIRD:
 
 				//プレイヤー順に並べる
 				m_apIcon[m_anRank[nCnt]]
@@ -820,7 +864,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 3:
+				//四位
+			case RANK_FOURTH:
 
 				//プレイヤー順に並べる
 				m_apIcon[m_anRank[nCnt]]
@@ -829,14 +874,17 @@ void CResultManager::Update(void)
 				break;
 			}
 		}
-		//中身チェック
+		//<******************************************
+		//プレイヤー順位の位置設定
+		//<******************************************
 		if (m_apWinNum[nCnt] != nullptr)
 		{
 			m_apWinNum[nCnt]->Update();
 
 			switch (nCnt)
 			{
-			case 0:
+				//一位
+			case RANK_FIRST:
 
 				//その順位のプレイヤーのテクスチャパターンにする
 				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]+1);
@@ -847,7 +895,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 1:
+				//二位
+			case RANK_SECOND:
 
 				//その順位のプレイヤーのテクスチャパターンにする
 				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
@@ -858,7 +907,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 2:
+				//三位
+			case RANK_THIRD:
 
 				//その順位のプレイヤーのテクスチャパターンにする
 				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
@@ -869,7 +919,8 @@ void CResultManager::Update(void)
 
 				break;
 
-			case 3:
+				//四位
+			case RANK_FOURTH:
 
 				//その順位のプレイヤーのテクスチャパターンにする
 				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
@@ -881,8 +932,10 @@ void CResultManager::Update(void)
 				break;
 			}
 		}
+		//中身チェック
 		if (m_apPlayerEntry[nCnt] != nullptr)
 		{
+			//更新処理
 			m_apPlayerEntry[nCnt]->Update();
 		}
 	}
@@ -1385,11 +1438,12 @@ void CResultManager::UpdateNumber(void)
 			if (m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().x == Number::DESTSIZE.x
 				&&m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
 			{
-				//
+				//もしアイコン・勝利者番号・プレイヤー番号の中身があれば
 				if (m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr&&
 					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
 				{
+					//描画をする
 					m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]]->SetEnableDraw(true);
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
 					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);

@@ -130,9 +130,7 @@ HRESULT CTitleManager::Init(void)
 		m_apSelect[nCntTitle] = CObject2D::Create
 		( // 引数
 			POS_SELECT + (SPACE_SELECT * (float)nCntTitle),	// 位置
-			SIZE_SELECT,	// 大きさ
-			VEC3_ZERO,		// 向き
-			DEFAULT_COL		// 色
+			SIZE_SELECT	// 大きさ
 		);
 		if (m_apSelect[nCntTitle] == NULL)
 		{ // 生成に失敗した場合
@@ -155,7 +153,6 @@ HRESULT CTitleManager::Init(void)
 	//--------------------------------------------------------
 	//	タイトルロゴの生成・設定
 	//--------------------------------------------------------
-
 	for (int nCntTitle = 0; nCntTitle < LOGO_MAX; nCntTitle++)
 	{ // タイトルロゴの総数分繰り返す
 		m_apLogo[nCntTitle] = CObject2D::Create
@@ -242,9 +239,6 @@ void CTitleManager::Update(void)
 	switch (m_state)
 	{ // 状態ごとの処理
 	case STATE_NONE:	// 何もしない状態
-
-		// 無し
-
 		break;
 
 	case STATE_FADEOUT:	// フェードアウト状態
@@ -262,10 +256,6 @@ void CTitleManager::Update(void)
 		break;
 
 	case STATE_WAIT:	// 遷移待機状態
-
-		// 選択操作
-		ActSelect();
-
 		break;
 
 	default:	// 例外処理
@@ -289,8 +279,6 @@ void CTitleManager::Update(void)
 
 	// フェードの更新
 	m_pFade->Update();
-
-	
 }
 
 //============================================================
@@ -448,11 +436,11 @@ void CTitleManager::UpdateStart(void)
 
 	if (pKeyboard->IsTrigger(DIK_RETURN)
 	||  pKeyboard->IsTrigger(DIK_SPACE)
-	||  pPad->IsTrigger(CInputPad::KEY_A)
-	||  pPad->IsTrigger(CInputPad::KEY_B)
-	||  pPad->IsTrigger(CInputPad::KEY_X)
-	||  pPad->IsTrigger(CInputPad::KEY_Y)
-	||  pPad->IsTrigger(CInputPad::KEY_START))
+	||  pPad->IsTriggerAll(CInputPad::KEY_A)
+	||  pPad->IsTriggerAll(CInputPad::KEY_B)
+	||  pPad->IsTriggerAll(CInputPad::KEY_X)
+	||  pPad->IsTriggerAll(CInputPad::KEY_Y)
+	||  pPad->IsTriggerAll(CInputPad::KEY_START))
 	{
 		if (m_state != STATE_WAIT)
 		{ // 遷移待機状態ではない場合
@@ -494,52 +482,6 @@ void CTitleManager::UpdateStart(void)
 				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// 決定音00
 			}
 		}
-	}
-}
-
-//============================================================
-//	選択操作処理
-//============================================================
-void CTitleManager::ActSelect(void)
-{
-	// ポインタを宣言
-	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
-
-	if (CManager::GetInstance()->GetFade()->GetState() == CFade::FADE_NONE)
-	{ // フェード中ではない場合
-
-		if (pKeyboard->IsTrigger(DIK_A)
-		||  pKeyboard->IsTrigger(DIK_LEFT)
-		||  pPad->IsTrigger(CInputPad::KEY_LEFT))
-		{ // 左移動の操作が行われた場合
-
-			// 左に選択をずらす
-			m_nSelect = (m_nSelect + (SELECT_MAX - 1)) % SELECT_MAX;
-
-			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
-		}
-		if (pKeyboard->IsTrigger(DIK_D)
-		||  pKeyboard->IsTrigger(DIK_RIGHT)
-		||  pPad->IsTrigger(CInputPad::KEY_RIGHT))
-		{ // 右移動の操作が行われた場合
-
-			// 右に選択をずらす
-			m_nSelect = (m_nSelect + 1) % SELECT_MAX;
-
-			// サウンドの再生
-			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
-		}
-
-		// 前回の選択要素の色を黒に設定
-		m_apSelect[m_nOldSelect]->SetColor(DEFAULT_COL);
-
-		// 現在の選択要素の色を白に設定
-		m_apSelect[m_nSelect]->SetColor(CHOICE_COL);
-
-		// 現在の選択要素を代入
-		m_nOldSelect = m_nSelect;
 	}
 }
 

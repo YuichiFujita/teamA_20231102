@@ -1,17 +1,16 @@
 //============================================================
 //
-//	プレイヤーエントリー処理 [playerEntry.cpp]
+//	フレイルエントリー処理 [flailEntry.cpp]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	インクルードファイル
 //************************************************************
-#include "playerEntry.h"
+#include "flailEntry.h"
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
-#include "flail.h"
 #include "retentionManager.h"
 
 //************************************************************
@@ -23,12 +22,12 @@ namespace
 }
 
 //************************************************************
-//	子クラス [CPlayerEntry] のメンバ関数
+//	子クラス [CFlailEntry] のメンバ関数
 //************************************************************
 //============================================================
 //	コンストラクタ
 //============================================================
-CPlayerEntry::CPlayerEntry(const CScene::EMode mode, const int nPad) : CPlayer(mode, nPad)
+CFlailEntry::CFlailEntry()
 {
 
 }
@@ -36,7 +35,7 @@ CPlayerEntry::CPlayerEntry(const CScene::EMode mode, const int nPad) : CPlayer(m
 //============================================================
 //	デストラクタ
 //============================================================
-CPlayerEntry::~CPlayerEntry()
+CFlailEntry::~CFlailEntry()
 {
 
 }
@@ -44,19 +43,16 @@ CPlayerEntry::~CPlayerEntry()
 //============================================================
 //	初期化処理
 //============================================================
-HRESULT CPlayerEntry::Init(void)
+HRESULT CFlailEntry::Init(void)
 {
-	// プレイヤーの初期化
-	if (FAILED(CPlayer::Init()))
+	// フレイルの初期化
+	if (FAILED(CFlail::Init()))
 	{ // 初期化に失敗した場合
 
 		// 失敗を返す
 		assert(false);
 		return E_FAIL;
 	}
-
-	// エントリーの設定
-	SetEntry();
 
 	// 影の表示をOFFにする
 	SetEnableDepthShadow(false);
@@ -69,30 +65,29 @@ HRESULT CPlayerEntry::Init(void)
 //============================================================
 //	終了処理
 //============================================================
-void CPlayerEntry::Uninit(void)
+void CFlailEntry::Uninit(void)
 {
-	// プレイヤーの終了
-	CPlayer::Uninit();
+	// フレイルの終了
+	CFlail::Uninit();
 }
 
 //============================================================
 //	更新処理
 //============================================================
-void CPlayerEntry::Update(void)
+void CFlailEntry::Update(void)
 {
-	// モーション・オブジェクトキャラクターの更新
-	UpdateMotion(CPlayer::MOTION_IDOL);
+
 }
 
 //============================================================
 //	描画処理
 //============================================================
-void CPlayerEntry::Draw(void)
+void CFlailEntry::Draw(void)
 {
 	// 変数を宣言
 	D3DVIEWPORT9 defViewport;		// カメラのビューポート保存用
 	D3DVIEWPORT9 currentViewport;	// 現在のビューポート保存用
-	int nPadID = GetPadID();		// パッドインデックス
+	int nPlayerID = GetPlayerID();	// プレイヤーインデックス
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
@@ -100,11 +95,11 @@ void CPlayerEntry::Draw(void)
 
 	// カメラのビューポートの位置を設定
 	currentViewport = pCamera->GetViewport(CCamera::TYPE_ENTRY);	// ビューポート取得
-	currentViewport.X = (nPadID * SPACE_WIDTH);						// 左上位置を設定
+	currentViewport.X = (nPlayerID * SPACE_WIDTH);					// 左上位置を設定
 	pCamera->SetViewport(CCamera::TYPE_ENTRY, currentViewport);		// ビューポート設定
 
-	if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nPadID))
-	{ // 現在のプレイヤーがエントリーしている場合
+	if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nPlayerID))
+	{ // 現在のフレイルがエントリーしている場合
 
 		// 現在のビューポートを取得
 		pDevice->GetViewport(&defViewport);
@@ -112,8 +107,14 @@ void CPlayerEntry::Draw(void)
 		// カメラの設定
 		CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_ENTRY);
 
+		// 親の棒モデルのマトリックスを取得
+		D3DXMATRIX mtxStick = CScene::GetPlayer(nPlayerID)->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld();
+
+		// フレイル位置を設定
+		SetVec3Position(D3DXVECTOR3(mtxStick._41, mtxStick._42, mtxStick._43));
+
 		// オブジェクトキャラクターの描画
-		CObjectChara::Draw();
+		CObjectModel::Draw();
 
 		// カメラの設定を元に戻す
 		CManager::GetInstance()->GetCamera()->SetCamera(CCamera::TYPE_MAIN);
@@ -121,38 +122,4 @@ void CPlayerEntry::Draw(void)
 		// ビューポートを元に戻す
 		pDevice->SetViewport(&defViewport);
 	}
-}
-
-//============================================================
-//	エントリーの設定処理
-//============================================================
-void CPlayerEntry::SetEntry(void)
-{
-	// 変数を宣言
-	D3DXVECTOR3 set = VEC3_ZERO;	// 引数設定用
-
-	// 情報を初期化
-	SetState(STATE_NONE);	// 何もしない状態の設定
-	SetMotion(MOTION_IDOL);	// 待機モーションを設定
-
-	// 位置を設定
-	SetVec3Position(set);
-
-	// 向きを設定
-	SetVec3Rotation(set);
-
-	// マテリアルを再設定
-	ResetMaterial();
-
-	// メインカラーを設定
-	SetMainMaterial();
-
-	// 透明度を不透明に設定
-	SetAlpha(1.0f);
-
-	// プレイヤーの付属品の自動描画を停止
-	CPlayer::SetEnableDrawUI(false);
-	CPlayer::SetEnableDraw(false);
-	CObject::SetEnableDraw(true);		// プレイヤーは描画ON
-	GetFlail()->SetEnableDraw(true);	// フレイルも描画ON
 }

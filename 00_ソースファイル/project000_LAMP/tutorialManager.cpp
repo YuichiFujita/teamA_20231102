@@ -145,7 +145,7 @@ void CTutorialManager::Update(void)
 	CInputKeyboard	*pKeyboard	= CManager::GetInstance()->GetKeyboard();	// キーボード
 	CInputPad		*pPad		= CManager::GetInstance()->GetPad();		// パッド
 
-	if (pKeyboard->IsTrigger(DIK_RETURN) || pPad->IsTrigger(CInputPad::KEY_START))
+	if (pKeyboard->IsTrigger(DIK_RETURN) || pPad->IsTriggerAll(CInputPad::KEY_START))
 	{
 		// シーンの設定
 		CManager::GetInstance()->SetScene(CScene::MODE_TITLE);	// タイトル画面
