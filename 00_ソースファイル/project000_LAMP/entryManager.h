@@ -100,9 +100,13 @@ private:
 	void UpdateAddCpu(void);		// CPUの加減算の更新
 	void UpdatePlayerName(void);	// プレイヤー名の更新
 	void UpdateControlUI(void);		// 操作UIの更新
+	void UpdateStartUI(void);		// 開始UIの更新
 	void UpdateStart(void);			// 開始の更新
 	void UpdateArrow(void);			// 矢印の更新
+	void UpdateCpuBG(void);			// CPU数背景の演出の更新
+	void UpdateCpuUI(void);			// CPU数UIの演出の更新
 	void UpdateUIAll(void);			// UIオブジェクトの全更新
+	void SetCpuObject(const bool bStart);		// CPU演出の設定
 	bool IsReadyOK(const int nNumEntry) const;	// 準備済みかの判定取得
 
 	// 静的メンバ変数
@@ -122,6 +126,8 @@ private:
 	CValueUI	*m_pNumCpu;		// CPU数表示の情報
 	EStateEntry	m_stateEntry;	// エントリー状態
 	EState	m_state;			// 状態
+	float	m_fScale;			// 拡大率
+	float	m_fSinStartAlpha;	// 開始表示の透明向き
 	float	m_fSinControlAlpha;	// 操作表示の透明向き
 	float	m_fSinArrowAlpha;	// 矢印表示の透明向き
 };
