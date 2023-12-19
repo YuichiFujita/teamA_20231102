@@ -158,6 +158,7 @@ CEntryManager::CEntryManager()
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
+	memset(&m_apFlailArrow[0][0], 0, sizeof(m_apFlailArrow));	// フレイル矢印の情報
 
 	m_pRuleManager	= NULL;		// エントリールールの情報
 	m_pControl		= NULL;		// 操作表示の情報
@@ -192,6 +193,7 @@ HRESULT CEntryManager::Init(void)
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
+	memset(&m_apFlailArrow[0][0], 0, sizeof(m_apFlailArrow));	// フレイル矢印の情報
 
 	m_pRuleManager	= NULL;	// エントリールールの情報
 	m_pControl		= NULL;	// 操作表示の情報
