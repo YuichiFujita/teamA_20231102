@@ -55,6 +55,8 @@ namespace
 		"data\\TXT\\Stages\\stage22.txt",
 		"data\\TXT\\Stages\\stage23.txt",
 		"data\\TXT\\Stages\\stage24.txt",
+		"data\\TXT\\Stage_morikawa\\stage001.txt",
+		"data\\TXT\\Stage_morikawa\\stage002.txt",
 	};
 }
 

@@ -65,24 +65,40 @@ namespace
 
 	namespace control
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 620.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(505.0f, 84.0f, 0.0f);			// 大きさ
+		const float	ADD_ALPHA		= 0.008f;	// 透明度の加算量
+		const float	ADD_SINROT		= 0.06f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+		const float	MAX_ADD_ALPHA	= 0.5f;		// 透明度の最大加算量
+		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
+
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 620.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(505.0f, 84.0f, 0.0f);			// 大きさ
+		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);	// 色
 	}
 
 	namespace start
 	{
-		const D3DXVECTOR3 POS	= D3DXVECTOR3(SCREEN_CENT.x, 380.0f, 0.0f);	// 位置
-		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(573.0f, 99.0f, 0.0f);			// 大きさ
+		const float	ADD_ALPHA		= 0.008f;	// 透明度の加算量
+		const float	ADD_SINROT		= 0.06f;	// 透明度ふわふわさせる際のサインカーブ向き加算量
+		const float	MAX_ADD_ALPHA	= 0.5f;		// 透明度の最大加算量
+		const float	BASIC_ALPHA		= 0.95f;	// 基準の透明度
+
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 380.0f, 0.0f);	// 位置
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(573.0f, 99.0f, 0.0f);			// 大きさ
+		const D3DXCOLOR		MIN_COL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, BASIC_ALPHA - MAX_ADD_ALPHA);	// 色
 	}
 
 	namespace numcpu
 	{
 		const D3DXVECTOR3	POS			= D3DXVECTOR3(SCREEN_CENT.x - 40.0f, 500.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(306.0f * 0.9f, 98.0f * 0.9f, 0.0f);		// タイトル大きさ
+		const D3DXVECTOR3	SIZE_TITLE	= D3DXVECTOR3(306.0f * 0.9f, 98.0f * 0.9f, 0.0f);	// タイトル大きさ
 		const D3DXVECTOR3	SIZE_VALUE	= D3DXVECTOR3(80.0f, 95.0f, 0.0f);			// 数字大きさ
 		const D3DXVECTOR3	SPACE_TITLE	= D3DXVECTOR3(190.0f, 0.0f, 0.0f);			// タイトル空白
 		const D3DXVECTOR3	SPACE_VALUE	= VEC3_ZERO;								// 数字空白
 		const int			DIGIT		= 1;										// 桁数
+
+		const float	INIT_SCALE	= 0.01f;	// タイトル初期拡大率
+		const float	ADD_SCALE	= 0.12f;	// タイトル加算拡大率
+		const float	SET_SCALE	= 1.0f;		// タイトル設定拡大率
 	}
 
 	namespace arrow
@@ -103,9 +119,13 @@ namespace
 
 	namespace bg
 	{
-		const D3DXVECTOR3	POS		= D3DXVECTOR3(SCREEN_CENT.x, 440.0f, 0.0f);	// 位置
-		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(SCREEN_SIZE.x, 280.0f, 0.0f);	// 大きさ
-		const D3DXCOLOR		COL		= D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.625f);		// 色
+		const float	ADD_SIZE_X	= 250.0f;	// 横サイズの加算量
+
+		const D3DXVECTOR3	POS	= D3DXVECTOR3(0.0f, 440.0f, 0.0f);		// 位置
+		const D3DXCOLOR		COL = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.625f);	// 色
+
+		const D3DXVECTOR3	INIT_SIZE	= D3DXVECTOR3(0.0f, 280.0f, 0.0f);	// 初期の大きさ
+		const D3DXVECTOR3	DEST_SIZE	= D3DXVECTOR3(SCREEN_SIZE.x * 2.0f, 280.0f, 0.0f);	// 目標の大きさ
 	}
 }
 
@@ -118,9 +138,9 @@ const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\entry_flame.png",	// フレームテクスチャ
 	"data\\TEXTURE\\entry002.png",		// 操作表示テクスチャ
 	"data\\TEXTURE\\entry003.png",		// 開始表示テクスチャ
-	"data\\TEXTURE\\Readycheck.png",		// 参加状況テクスチャ
+	"data\\TEXTURE\\Readycheck.png",	// 参加状況テクスチャ
 	"data\\TEXTURE\\Arrow_Twin.png",	// 矢印テクスチャ
-	"data\\TEXTURE\\cpu.png",	// CPUテクスチャ
+	"data\\TEXTURE\\cpu.png",			// CPUテクスチャ
 	"data\\TEXTURE\\mum_cpu.png",		// CPU数テクスチャ
 };
 
@@ -138,13 +158,19 @@ CEntryManager::CEntryManager()
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
+
 	m_pRuleManager	= NULL;		// エントリールールの情報
-	m_pControl	= NULL;			// 操作表示の情報
-	m_pBG		= NULL;			// 背景の情報
-	m_pStart	= NULL;			// 開始表示の情報
-	m_pNumCpu	= NULL;			// CPU数表示の情報
-	m_state		= STATE_ENTRY;	// 状態
-	m_fSinAlpha	= 0.0f;			// 透明向き
+	m_pControl		= NULL;		// 操作表示の情報
+	m_pBG			= NULL;		// 背景の情報
+	m_pStart		= NULL;		// 開始表示の情報
+	m_pNumCpu		= NULL;		// CPU数表示の情報
+	m_fScale		= 0.0f;		// 拡大率
+	m_fSinStartAlpha	= 0.0f;	// 開始表示の透明向き
+	m_fSinControlAlpha	= 0.0f;	// 操作表示の透明向き
+	m_fSinArrowAlpha	= 0.0f;	// 矢印表示の透明向き
+
+	m_stateEntry	= STATE_ENTRY_NONE_JOIN;	// エントリー状態
+	m_state			= STATE_ENTRY;				// 状態
 }
 
 //============================================================
@@ -166,13 +192,19 @@ HRESULT CEntryManager::Init(void)
 	memset(&m_apFrame[0],	0, sizeof(m_apFrame));	// プレイヤーフレームの情報
 	memset(&m_apJoin[0],	0, sizeof(m_apJoin));	// プレイヤー参加の情報
 	memset(&m_apArrow[0],	0, sizeof(m_apArrow));	// プレイヤー参加の情報
-	m_pRuleManager	= NULL;		// エントリールールの情報
-	m_pControl	= NULL;			// 操作表示の情報
-	m_pBG		= NULL;			// 背景の情報
-	m_pStart	= NULL;			// 開始表示の情報
-	m_pNumCpu	= NULL;			// CPU数表示の情報
-	m_state		= STATE_ENTRY;	// 状態
-	m_fSinAlpha	= -HALF_PI;		// 透明向き
+
+	m_pRuleManager	= NULL;	// エントリールールの情報
+	m_pControl		= NULL;	// 操作表示の情報
+	m_pBG			= NULL;	// 背景の情報
+	m_pStart		= NULL;	// 開始表示の情報
+	m_pNumCpu		= NULL;	// CPU数表示の情報
+	m_fScale		= 1.0f;	// 拡大率
+
+	m_fSinStartAlpha	= -HALF_PI;	// 開始表示の透明向き
+	m_fSinControlAlpha	= -HALF_PI;	// 操作表示の透明向き
+	m_fSinArrowAlpha	= -HALF_PI;	// 矢印表示の透明向き
+	m_stateEntry	= STATE_ENTRY_NONE_JOIN;	// エントリー状態
+	m_state			= STATE_ENTRY;				// 状態
 
 	// ゲーム情報を初期化
 	CManager::GetInstance()->GetRetentionManager()->InitGame();
@@ -285,7 +317,9 @@ HRESULT CEntryManager::Init(void)
 	m_pControl = CObject2D::Create
 	( // 引数
 		control::POS,	// 位置
-		control::SIZE	// 大きさ
+		control::SIZE,	// 大きさ
+		VEC3_ZERO,		// 向き
+		XCOL_AWHITE		// 色
 	);
 	if (m_pControl == NULL)
 	{ // 生成に失敗した場合
@@ -304,10 +338,10 @@ HRESULT CEntryManager::Init(void)
 	// 背景の生成
 	m_pBG = CObject2D::Create
 	( // 引数
-		bg::POS,	// 位置
-		bg::SIZE,	// 大きさ
-		VEC3_ZERO,	// 向き
-		bg::COL		// 色
+		bg::POS,		// 位置
+		bg::INIT_SIZE,	// 大きさ
+		VEC3_ZERO,		// 向き
+		bg::COL			// 色
 	);
 	if (m_pBG == NULL)
 	{ // 生成に失敗した場合
@@ -327,7 +361,9 @@ HRESULT CEntryManager::Init(void)
 	m_pStart = CObject2D::Create
 	( // 引数
 		start::POS,	// 位置
-		start::SIZE	// 大きさ
+		start::SIZE * numcpu::INIT_SCALE,	// 大きさ
+		VEC3_ZERO,	// 向き
+		XCOL_AWHITE	// 色
 	);
 	if (m_pStart == NULL)
 	{ // 生成に失敗した場合
@@ -355,8 +391,8 @@ HRESULT CEntryManager::Init(void)
 		numcpu::POS,			// 位置
 		numcpu::SPACE_TITLE,	// 行間
 		numcpu::SPACE_VALUE,	// 数字行間
-		numcpu::SIZE_TITLE,		// タイトル大きさ
-		numcpu::SIZE_VALUE		// 数字大きさ
+		numcpu::SIZE_TITLE * numcpu::INIT_SCALE,	// タイトル大きさ
+		numcpu::SIZE_VALUE * numcpu::INIT_SCALE		// 数字大きさ
 	);
 	if (m_pNumCpu == NULL)
 	{ // 生成に失敗した場合
@@ -496,46 +532,65 @@ void CEntryManager::Update(void)
 		// エントリーの更新
 		UpdateEntry();
 
-		// CPUの更新
-		UpdateCpu();
+		switch (m_stateEntry)
+		{ // エントリー状態ごとの処理
+		case STATE_ENTRY_NONE_JOIN:
+
+			if (IsReadyOK(1))
+			{ // 全員が準備済みの場合
+
+				// CPU演出の開始設定
+				SetCpuObject(true);
+
+				// CPU数背景の自動描画をONにする
+				m_pBG->SetEnableDraw(true);
+
+				// CPU数背景の演出状態にする
+				m_stateEntry = STATE_ENTRY_CPU_BG;
+			}
+
+			break;
+
+		case STATE_ENTRY_CPU_BG:
+
+			// CPU数背景の演出の更新
+			UpdateCpuBG();
+
+			break;
+
+		case STATE_ENTRY_CPU_UI:
+
+			// CPU数UIの演出の更新
+			UpdateCpuUI();
+
+			break;
+
+		case STATE_ENTRY_NUMCPU:
+
+			// CPUの更新
+			UpdateCpu();
+
+			// 開始UIの更新
+			UpdateStartUI();
+
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
 
 		// 開始の更新
 		UpdateStart();
 
-		for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
-		{ // プレイヤーの最大数分繰り返す
+		// プレイヤー名の更新
+		UpdatePlayerName();
 
-			// プレイヤーナンバーの更新
-			m_apNumber[nCntEntry]->Update();
+		// 操作UIの更新
+		UpdateControlUI();
 
-			// プレイヤーCPUの更新
-			m_apCpu[nCntEntry]->Update();
-
-			// プレイヤーフレームの更新
-			m_apFrame[nCntEntry]->Update();
-
-			// プレイヤー参加の更新
-			m_apJoin[nCntEntry]->Update();
-		}
-
-		for (int i = 0; i < MAX_RULE_ARROW; i++)
-		{ // 矢印の総数分繰り返す
-
-			// 矢印の更新
-			m_apArrow[i]->Update();
-		}
-
-		// 操作表示の更新
-		m_pControl->Update();
-
-		// 背景の更新
-		m_pBG->Update();
-
-		// 開始表示の更新
-		m_pStart->Update();
-
-		// CPU数表示の更新
-		m_pNumCpu->Update();
+		// UIオブジェクトの全更新
+		UpdateUIAll();
 
 		break;
 
@@ -807,9 +862,9 @@ void CEntryManager::UpdateCpu(void)
 		}
 
 		// 自動描画をONにする
-		m_pBG->SetEnableDraw(true);			// 背景
-		m_pStart->SetEnableDraw(true);		// 開始表示
-		m_pNumCpu->SetEnableDraw(true);		// CPU数
+		m_pBG->SetEnableDraw(true);		// 背景
+		m_pStart->SetEnableDraw(true);	// 開始表示
+		m_pNumCpu->SetEnableDraw(true);	// CPU数
 
 		// 矢印の更新
 		UpdateArrow();
@@ -831,10 +886,10 @@ void CEntryManager::UpdateCpu(void)
 		m_pBG->SetEnableDraw(false);		// 背景
 		m_pStart->SetEnableDraw(false);		// 開始表示
 		m_pNumCpu->SetEnableDraw(false);	// CPU数
-	}
 
-	// プレイヤー名の更新
-	UpdatePlayerName();
+		// 準備の未完了状態にする
+		m_stateEntry = STATE_ENTRY_NONE_JOIN;
+	}
 }
 
 //============================================================
@@ -961,6 +1016,97 @@ void CEntryManager::UpdatePlayerName(void)
 }
 
 //============================================================
+//	操作UIの更新処理
+//============================================================
+void CEntryManager::UpdateControlUI(void)
+{
+	// 変数を宣言
+	D3DXCOLOR colControl = m_pControl->GetColor();	// 操作表示色
+
+	if (colControl.a < control::MIN_COL.a)
+	{ // 透明度が最低限より低い場合
+
+		// 透明度を加算
+		colControl.a += control::ADD_ALPHA;
+
+		if (colControl.a > control::MIN_COL.a)
+		{ // 透明度が超過した場合
+
+			// 透明度を補正
+			colControl.a = control::MIN_COL.a;
+		}
+
+		// 操作表示色を設定
+		m_pControl->SetColor(colControl);
+	}
+	else
+	{ // 透明度が最低限以上の場合
+
+		// 変数を宣言
+		float fAddAlpha = 0.0f;	// 透明度の加算量
+
+		// 透明度を上げる
+		m_fSinControlAlpha += control::ADD_SINROT;
+		useful::NormalizeRot(m_fSinControlAlpha);	// 向き正規化
+
+		// 透明度加算量を求める
+		fAddAlpha = (control::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinControlAlpha) - 1.0f);
+
+		// 操作表示色を設定
+		m_pControl->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, control::BASIC_ALPHA + fAddAlpha));
+	}
+}
+
+//============================================================
+//	開始UIの更新処理
+//============================================================
+void CEntryManager::UpdateStartUI(void)
+{
+	if (!IsReadyOK(2))
+	{ // 二人以上が準備OKしていない場合
+
+		// 関数を抜ける
+		return;
+	}
+
+	// 変数を宣言
+	D3DXCOLOR colStart = m_pStart->GetColor();	// 開始表示色
+
+	if (colStart.a < start::MIN_COL.a)
+	{ // 透明度が最低限より低い場合
+
+		// 透明度を加算
+		colStart.a += start::ADD_ALPHA;
+
+		if (colStart.a > start::MIN_COL.a)
+		{ // 透明度が超過した場合
+
+			// 透明度を補正
+			colStart.a = start::MIN_COL.a;
+		}
+
+		// 操作表示色を設定
+		m_pStart->SetColor(colStart);
+	}
+	else
+	{ // 透明度が最低限以上の場合
+
+		// 変数を宣言
+		float fAddAlpha = 0.0f;	// 透明度の加算量
+
+		// 透明度を上げる
+		m_fSinStartAlpha += start::ADD_SINROT;
+		useful::NormalizeRot(m_fSinStartAlpha);	// 向き正規化
+
+		// 透明度加算量を求める
+		fAddAlpha = (start::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinStartAlpha) - 1.0f);
+
+		// 操作表示色を設定
+		m_pStart->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, start::BASIC_ALPHA + fAddAlpha));
+	}
+}
+
+//============================================================
 //	開始の更新処理
 //============================================================
 void CEntryManager::UpdateStart(void)
@@ -972,16 +1118,21 @@ void CEntryManager::UpdateStart(void)
 	if (IsReadyOK(2))
 	{ // 遷移可能の場合
 
-		if (pKeyboard->IsTrigger(DIK_RETURN)
-		||  pKeyboard->IsTrigger(DIK_SPACE)
-		||  pPad->IsTriggerAll(CInputPad::KEY_START))
-		{
-			// ルール設定状態にする
-			SetState(STATE_RULE);
+		if (m_stateEntry == STATE_ENTRY_NUMCPU)
+		{ // CPU数の設定状態の場合
+
+			if (pKeyboard->IsTrigger(DIK_RETURN)
+			||  pKeyboard->IsTrigger(DIK_SPACE)
+			||  pPad->IsTriggerAll(CInputPad::KEY_START))
+			{
+				// ルール設定状態にする
+				SetState(STATE_RULE);
+			}
 		}
 
 		// 開始表示の色を明るくする
-		m_pStart->SetColor(COL_ENTRY);
+		D3DXCOLOR col = m_pStart->GetColor();
+		m_pStart->SetColor(D3DXCOLOR(COL_ENTRY.r, COL_ENTRY.g, COL_ENTRY.b, col.a));
 	}
 	else
 	{ // 遷移可能ではない場合
@@ -1025,15 +1176,178 @@ void CEntryManager::UpdateArrow(void)
 			float fAddAlpha = 0.0f;	// 透明度の加算量
 
 			// 透明度を上げる
-			m_fSinAlpha += arrow::ADD_SINROT;
-			useful::NormalizeRot(m_fSinAlpha);	// 向き正規化
+			m_fSinArrowAlpha += arrow::ADD_SINROT;
+			useful::NormalizeRot(m_fSinArrowAlpha);	// 向き正規化
 
 			// 透明度加算量を求める
-			fAddAlpha = (arrow::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinAlpha) - 1.0f);
+			fAddAlpha = (arrow::MAX_ADD_ALPHA / 2.0f) * (sinf(m_fSinArrowAlpha) - 1.0f);
 
 			// 矢印色を設定
 			m_apArrow[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, arrow::BASIC_ALPHA + fAddAlpha));
 		}
+	}
+}
+
+//============================================================
+//	CPU数背景の演出の更新処理
+//============================================================
+void CEntryManager::UpdateCpuBG(void)
+{
+	// 変数を宣言
+	D3DXVECTOR3 sizeBG = m_pBG->GetVec3Sizing();	// 背景の大きさ
+
+	// 大きさを加算
+	sizeBG.x += bg::ADD_SIZE_X;
+
+	if (sizeBG.x >= bg::DEST_SIZE.x)
+	{ // 目標の大きさ以上の場合
+
+		// 大きさを補正
+		sizeBG.x = bg::DEST_SIZE.x;
+
+		// 自動描画をONにする
+		m_pStart->SetEnableDraw(true);	// 開始表示
+		m_pNumCpu->SetEnableDraw(true);	// CPU数
+
+		// UI演出の拡大率を設定
+		m_fScale = numcpu::INIT_SCALE;
+
+		// CPU数UIの演出状態にする
+		m_stateEntry = STATE_ENTRY_CPU_UI;
+	}
+
+	// 背景の大きさを反映
+	m_pBG->SetVec3Sizing(sizeBG);
+}
+
+//============================================================
+//	CPU数UIの演出の更新処理
+//============================================================
+void CEntryManager::UpdateCpuUI(void)
+{
+	// 拡大率を加算
+	m_fScale += numcpu::ADD_SCALE;
+
+	if (m_fScale < numcpu::SET_SCALE)
+	{ // まだ大きくなる場合
+
+		// 大きさを反映
+		m_pStart->SetVec3Sizing(start::SIZE * m_fScale);	// 開始表示
+		m_pNumCpu->SetScalingTitle(numcpu::SIZE_TITLE * m_fScale);	// CPU数タイトル
+		m_pNumCpu->GetMultiValue()->SetVec3Sizing(numcpu::SIZE_VALUE * m_fScale);	// CPU数値
+	}
+	else
+	{ // 大きくなり切った場合
+
+		// 大きさを反映
+		m_pStart->SetVec3Sizing(start::SIZE);	// 開始表示
+		m_pNumCpu->SetScalingTitle(numcpu::SIZE_TITLE);	// CPU数タイトル
+		m_pNumCpu->GetMultiValue()->SetVec3Sizing(numcpu::SIZE_VALUE);	// CPU数値
+
+		// 拡大率を初期化
+		m_fScale = 1.0f;
+
+		// CPU数の変更状態にする
+		m_stateEntry = STATE_ENTRY_NUMCPU;
+	}
+}
+
+//============================================================
+//	UIオブジェクトの全更新処理
+//============================================================
+void CEntryManager::UpdateUIAll(void)
+{
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		// プレイヤーナンバーの更新
+		m_apNumber[nCntEntry]->Update();
+
+		// プレイヤーCPUの更新
+		m_apCpu[nCntEntry]->Update();
+
+		// プレイヤーフレームの更新
+		m_apFrame[nCntEntry]->Update();
+
+		// プレイヤー参加の更新
+		m_apJoin[nCntEntry]->Update();
+	}
+
+	for (int i = 0; i < MAX_RULE_ARROW; i++)
+	{ // 矢印の総数分繰り返す
+
+		// 矢印の更新
+		m_apArrow[i]->Update();
+	}
+
+	// 操作表示の更新
+	m_pControl->Update();
+
+	// 背景の更新
+	m_pBG->Update();
+
+	// 開始表示の更新
+	m_pStart->Update();
+
+	// CPU数表示の更新
+	m_pNumCpu->Update();
+}
+
+//============================================================
+//	CPU演出の設定処理
+//============================================================
+void CEntryManager::SetCpuObject(const bool bStart)
+{
+	if (bStart)
+	{ // 開始時の設定の場合
+
+		// 自動描画をOFFにする
+		m_pBG->SetEnableDraw(false);		// 背景
+		m_pStart->SetEnableDraw(false);		// 開始表示
+		m_pNumCpu->SetEnableDraw(false);	// CPU数
+
+		// 大きさを設定
+		m_pBG->SetVec3Sizing(bg::INIT_SIZE);												// 背景
+		m_pStart->SetVec3Sizing(start::SIZE * numcpu::INIT_SCALE);							// 開始表示
+		m_pNumCpu->SetScalingTitle(numcpu::SIZE_TITLE * numcpu::INIT_SCALE);				// CPU数タイトル
+		m_pNumCpu->GetMultiValue()->SetVec3Sizing(numcpu::SIZE_VALUE * numcpu::INIT_SCALE);	// CPU数値
+
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+	
+			// 矢印の色を設定
+			m_apArrow[i]->SetColor(XCOL_AWHITE);
+		}
+
+		// 開始表示の色を設定
+		m_pStart->SetColor(XCOL_AWHITE);
+	}
+	else
+	{ // スキップ時の設定の場合
+
+		// 拡大率を初期化
+		m_fScale = 1.0f;
+
+		// 自動描画をONにする
+		m_pBG->SetEnableDraw(true);		// 背景
+		m_pStart->SetEnableDraw(true);	// 開始表示
+		m_pNumCpu->SetEnableDraw(true);	// CPU数
+
+		// 大きさを設定
+		m_pBG->SetVec3Sizing(bg::DEST_SIZE);							// 背景
+		m_pStart->SetVec3Sizing(start::SIZE);							// 開始表示
+		m_pNumCpu->SetScalingTitle(numcpu::SIZE_TITLE);					// CPU数タイトル
+		m_pNumCpu->GetMultiValue()->SetVec3Sizing(numcpu::SIZE_VALUE);	// CPU数値
+
+		for (int i = 0; i < MAX_RULE_ARROW; i++)
+		{ // 矢印の総数分繰り返す
+
+			// 矢印の色を設定
+			m_apArrow[i]->SetColor(XCOL_AWHITE);
+		}
+
+		// 開始表示の色を設定
+		m_pStart->SetColor(XCOL_AWHITE);
 	}
 }
 
