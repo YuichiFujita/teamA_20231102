@@ -88,6 +88,26 @@ HRESULT CScene::Init(void)
 			}
 		}
 	}
+	//
+	else if (m_mode == MODE_RESULT)
+	{
+		//一位を取得する
+		int nWin1st = CManager::GetInstance()->GetRetentionManager()->GetWinRank1st();
+
+		for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+		{ // プレイヤー数分繰り返す
+
+			if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nCntPlayer))
+			{ // エントリーされている場合
+
+			  // プレイヤーオブジェクトの生成
+				m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
+
+				m_apPlayer[nCntPlayer]->SetEnableDraw(false);
+			}
+		}
+		m_apPlayer[nWin1st]->SetEnableDraw(true);
+	}
 
 	// 成功を返す
 	return S_OK;

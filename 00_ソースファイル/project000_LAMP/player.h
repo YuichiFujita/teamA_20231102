@@ -17,7 +17,6 @@
 #include "objectChara.h"
 #include "scene.h"
 #include "object3D.h"
-#include "orbitalParticle.h"
 //************************************************************
 //	前方宣言
 //************************************************************
@@ -214,7 +213,6 @@ private:
 	CObject3D * m_pGuide;			// 投擲方向
 	CObjectBillboard * m_pPlayerGuide;
 	CObjectBillboard * m_pClown;
-	CorbitalParticle * m_pEffect;
 	int			m_motionOld;		// 過去モーション
 	int			m_nCounterState;	// 状態管理カウンター
 	int			m_nCounterFlail;	// フレイル管理カウンター

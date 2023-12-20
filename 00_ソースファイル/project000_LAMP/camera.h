@@ -28,6 +28,7 @@ public:
 		TYPE_MAIN = 0,	// メインカメラ
 		TYPE_MODELUI,	// モデルUI表示カメラ
 		TYPE_ENTRY,		// エントリー表示カメラ
+		TYPE_RESULT,
 		TYPE_MAX		// この列挙型の総数
 	};
 

@@ -38,7 +38,6 @@ public:
 	void Draw(void) override;		// 描画
 
 	static CorbitalParticle * Create(D3DXVECTOR3 pos, D3DXVECTOR3 Offset, D3DXCOLOR col, D3DXVECTOR3 range, D3DXVECTOR3 rot, D3DXVECTOR3 forth, int nLife, int nSpeed,int nEffectLife, int nLength, int nNumSpawn, float fAngle = 1.0f, float fAttenuation = 0.9f);
-	void SetVec3Position(const D3DXVECTOR3& rPos) override;	// 位置設定
 
 private:
 	// オーバーライド関数
