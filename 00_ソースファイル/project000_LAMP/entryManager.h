@@ -47,6 +47,7 @@ public:
 		TEXTURE_ARROW,		// 矢印テクスチャ
 		TEXTURE_CPU,		// CPUテクスチャ
 		TEXTURE_NUMCPU,		// CPU数テクスチャ
+		TEXTURE_FLAILARROW,	// フレイル矢印テクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
@@ -96,6 +97,7 @@ public:
 private:
 	// メンバ関数
 	void UpdateEntry(void);			// エントリーの更新
+	void UpdateFlail(void);			// フレイルの更新
 	void UpdateCpu(void);			// CPUの更新
 	void UpdateAddCpu(void);		// CPUの加減算の更新
 	void UpdatePlayerName(void);	// プレイヤー名の更新
@@ -119,7 +121,7 @@ private:
 	CAnim2D		*m_apJoin[MAX_PLAYER];			// プレイヤー参加の情報
 	CObject2D	*m_apFrame[MAX_PLAYER];			// プレイヤーフレームの情報
 	CAnim2D		*m_apArrow[MAX_ENTRY_ARROW];	// 矢印の情報
-	CAnim2D		*m_apFlailArrow[MAX_ENTRY_ARROW][MAX_PLAYER];	// フレイル矢印の情報
+	CAnim2D		*m_apFlailArrow[MAX_PLAYER][MAX_ENTRY_ARROW];	// フレイル矢印の情報
 
 	CObject2D	*m_pControl;	// 操作表示の情報
 	CObject2D	*m_pBG;			// 背景の情報

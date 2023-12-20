@@ -836,8 +836,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 			{
 				m_pStatus->AddNumRate(nDmg);
 			}
-		  // NAKAMURAF‚Ó‚Á‚Æ‚Ñ—Ê‚ÌŒˆ‚ß•û‚«‚à‚¯‚ê‚Î•Ï‚¦‚Ä
-		  // •Ï”‚ğéŒ¾
+			// NAKAMURAF‚Ó‚Á‚Æ‚Ñ—Ê‚ÌŒˆ‚ß•û‚«‚à‚¯‚ê‚Î•Ï‚¦‚Ä
+			// •Ï”‚ğéŒ¾
 			if (m_SItemTemporary.type != ITEM_SUPERARMOR)
 			{
 				float fKnockRate = m_pStatus->GetNumRate();	// ‚Á”ò‚Î‚µ—¦

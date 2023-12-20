@@ -55,6 +55,16 @@ namespace
 		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(320.0f, 0.0f, 0.0f);		// 空白
 	}
 
+	namespace flailArrow
+	{
+		const float	SPACE_EDGE		= 130.0f;	// 縁の空白
+
+		const POSGRID2		PART	= POSGRID2(MAX_ENTRY_ARROW, 1);		// テクスチャ分割数
+		const D3DXVECTOR3	SIZE	= D3DXVECTOR3(40.0f, 40.0f, 0.0f);	// 大きさ
+		const D3DXVECTOR3	POS		= D3DXVECTOR3(frame::POS.x - SPACE_EDGE, frame::POS.y, 0.0f);	// 位置
+		const D3DXVECTOR3	SPACE	= D3DXVECTOR3(SPACE_EDGE * 2.0f, 0.0f, 0.0f);					// 空白
+	}
+
 	namespace join
 	{
 		const POSGRID2	  PART	= POSGRID2(1, 2);	// テクスチャ分割数
@@ -142,6 +152,7 @@ const char *CEntryManager::mc_apTextureFile[] =	// テクスチャ定数
 	"data\\TEXTURE\\Arrow_Twin.png",	// 矢印テクスチャ
 	"data\\TEXTURE\\cpu.png",			// CPUテクスチャ
 	"data\\TEXTURE\\mum_cpu.png",		// CPU数テクスチャ
+	"data\\TEXTURE\\Arrow_Twin.png",	// フレイル矢印テクスチャ
 };
 
 //************************************************************
@@ -313,6 +324,40 @@ HRESULT CEntryManager::Init(void)
 
 		// 自動描画をOFFにする
 		m_apJoin[nCntEntry]->SetEnableDraw(false);
+
+		for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+		{ // 矢印の総数分繰り返す
+
+			// フレイル矢印の生成
+			m_apFlailArrow[nCntEntry][nCntArrow] = CAnim2D::Create
+			( // 引数
+				flailArrow::PART.x,	// テクスチャ横分割数
+				flailArrow::PART.y,	// テクスチャ縦分割数
+				flailArrow::POS + ((float)nCntArrow * flailArrow::SPACE) + ((float)nCntEntry * frame::SPACE),	// 位置
+				flailArrow::SIZE,	// 大きさ
+				VEC3_ZERO,			// 向き
+				XCOL_WHITE			// 色
+			);
+			if (m_apFlailArrow[nCntEntry][nCntArrow] == NULL)
+			{ // 生成に失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// テクスチャを登録・割当
+			m_apFlailArrow[nCntEntry][nCntArrow]->BindTexture(mc_apTextureFile[TEXTURE_FLAILARROW]);
+
+			// 優先順位を設定
+			m_apFlailArrow[nCntEntry][nCntArrow]->SetPriority(PRIORITY);
+
+			// パターンを設定
+			m_apFlailArrow[nCntEntry][nCntArrow]->SetPattern(nCntArrow);
+
+			// 自動描画をOFFにする
+			m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(false);
+		}
 	}
 
 	// 操作表示の生成
@@ -490,6 +535,13 @@ HRESULT CEntryManager::Uninit(void)
 
 		// プレイヤー参加の終了
 		m_apJoin[nCntEntry]->Uninit();
+
+		for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+		{ // 矢印の総数分繰り返す
+
+			// フレイル矢印の終了
+			m_apFlailArrow[nCntEntry][nCntArrow]->Uninit();
+		}
 	}
 
 	for (int i = 0; i < MAX_RULE_ARROW; i++)
@@ -792,6 +844,13 @@ void CEntryManager::UpdateEntry(void)
 				m_apFrame[nCntEntry]->SetColor(COL_ENTRY);
 				m_apNumber[nCntEntry]->SetColorTitle(COL_ENTRY);
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
+
+				for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+				{ // 矢印の総数分繰り返す
+
+					// フレイル矢印の自動描画をONにする
+					m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(true);
+				}
 			}
 		}
 		else
@@ -805,6 +864,13 @@ void CEntryManager::UpdateEntry(void)
 				{
 					// 準備完了状態にする
 					m_apJoin[nCntEntry]->SetPattern(JOIN_ON);
+
+					for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+					{ // 矢印の総数分繰り返す
+
+						// フレイル矢印の自動描画をOFFにする
+						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(false);
+					}
 				}
 				else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
 				{
@@ -815,6 +881,13 @@ void CEntryManager::UpdateEntry(void)
 					m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
 					m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
 					m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
+
+					for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+					{ // 矢印の総数分繰り返す
+
+						// フレイル矢印の自動描画をOFFにする
+						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(false);
+					}
 				}
 
 				break;
@@ -825,6 +898,13 @@ void CEntryManager::UpdateEntry(void)
 				{
 					// 準備未完了状態にする
 					m_apJoin[nCntEntry]->SetPattern(JOIN_OFF);
+
+					for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+					{ // 矢印の総数分繰り返す
+						
+						// フレイル矢印の自動描画をONにする
+						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(true);
+					}
 				}
 
 				break;
@@ -846,6 +926,14 @@ void CEntryManager::UpdateEntry(void)
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー2AI]：%s\n", pRetention->IsAI(1) ? "true" : "false");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー3AI]：%s\n", pRetention->IsAI(2) ? "true" : "false");
 	CManager::GetInstance()->GetDebugProc()->Print(CDebugProc::POINT_LEFT, "[エントリー4AI]：%s\n", pRetention->IsAI(3) ? "true" : "false");
+}
+
+//============================================================
+//	フレイルの更新処理
+//============================================================
+void CEntryManager::UpdateFlail(void)
+{
+
 }
 
 //============================================================
@@ -1273,6 +1361,13 @@ void CEntryManager::UpdateUIAll(void)
 
 		// プレイヤー参加の更新
 		m_apJoin[nCntEntry]->Update();
+
+		for (int nCntArrow = 0; nCntArrow < MAX_ENTRY_ARROW; nCntArrow++)
+		{ // 矢印の総数分繰り返す
+
+			// フレイル矢印の更新
+			m_apFlailArrow[nCntEntry][nCntArrow]->Update();
+		}
 	}
 
 	for (int i = 0; i < MAX_RULE_ARROW; i++)

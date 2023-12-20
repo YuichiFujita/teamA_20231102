@@ -265,7 +265,11 @@ CGround *CGround::Create
 
 		// 大きさを設定
 		pGround->SetVec3Sizing(rSize);
-		int nSprit;
+
+		// 分割数
+		int nSprit = 1;
+
+#if 0
 		// テクスチャの分割数Xを設定
 		if (type == TYPE_GRASS)
 		{
@@ -275,6 +279,8 @@ CGround *CGround::Create
 		{
 			nSprit = 2;
 		}
+#endif
+
 		pGround->SetTexturePatternX(rTexPartX / nSprit);
 
 		// テクスチャの分割数Yを設定
