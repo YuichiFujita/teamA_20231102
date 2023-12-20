@@ -1170,6 +1170,7 @@ void CPlayer::UpdateMotion(int nMotion)
 			case MOTION_LAND:	// 着地モーション：ループOFF
 			case MOTION_EMOTE_PROUD:	// 胸張りエモートモーション：ループOFF
 			case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
+			case MOTION_EMOTE_RORI:	// 粛清ロリ神レクイエムエモートモーション：ループOFF
 
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
@@ -1216,7 +1217,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 	case MOTION_DEATH:	// 死亡モーション：ループOFF
 	case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
-	case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
+	case MOTION_EMOTE_PROUD:	// 胸を張るエモートモーション：ループOFF
+	case MOTION_EMOTE_RORI:	// 粛清ロリ神レクイエムエモートモーション：ループOFF
 
 		break;
 
@@ -1987,7 +1989,7 @@ void CPlayer::PlayEmote(EMotion& rAnim)
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_PROUD;
+		rAnim = MOTION_EMOTE_RORI;
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT, m_nPadID) == TRUE)
 	{

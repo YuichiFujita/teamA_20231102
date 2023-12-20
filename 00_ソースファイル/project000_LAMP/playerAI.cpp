@@ -918,7 +918,7 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 		}
 		else if (nProb == 1)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_PROUD;
+			m_currentMotion = CPlayer::MOTION_EMOTE_RORI;
 		}
 		else if (nProb == 2)
 		{
@@ -926,7 +926,7 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 		}
 		else if (nProb == 3)
 		{
-			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
+			m_currentMotion = CPlayer::MOTION_EMOTE_RORI;
 		}
 
 		rDestRot.y = 0.0f;

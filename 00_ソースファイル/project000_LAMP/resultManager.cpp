@@ -482,50 +482,10 @@ HRESULT CResultManager::Init(void)
 		//<******************************************************
 		//ソートをするための順位保存処理
 		//<******************************************************
-		for (int nCntRank = 0; nCntRank < m_nNumPlay; nCntRank++)
-		{
-			//一回だけしか通らなくする
-			if (m_anSaveRank[nCntRank] == NULL)
-			{
-				m_anSaveRank[nCntRank] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCntRank);
-			}
-			else
-			{
-				break;
-			}
-		}
 
-		switch (nCnt)
-		{
-		case 0:
-
-			//１位から順に取得していく
-			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetWinRank1st();
-
-			break;
-
-		case 1:
-
-			//１位から順に取得していく
-			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
-			break;
-
-		case 2:
-
-			//１位から順に取得していく
-			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
-			break;
-
-		case 3:
-
-
-			//１位から順に取得していく
-			m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(nCnt);
-
-			break;
-		}
+		//１位から順に取得していく
+		m_anSaveRank[nCnt] = nCnt;
+		m_anRank[nCnt] = CManager::GetInstance()->GetRetentionManager()->GetWinRank(nCnt);
 
 		// 優先順位を設定
 		m_apIcon[nCnt]->SetPriority(RESULT_PRIO);
@@ -636,101 +596,131 @@ HRESULT CResultManager::Init(void)
 	//ランキングのソート処理
 	//<*******************************************************
 	//--------------------------------------------------------
-	//もし一位の値とセーブしている四位の値が同じなら
-	if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
-	{
-		//2人だったら
-		if (m_nNumPlay == 2)
-		{
-			//値の入れ替えを行う
-			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
-		}
-		//3人だったら
-		else if (m_nNumPlay == 3)
-		{
-			//値の入れ替えを行う
-			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
-			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_THIRD];
-		}
-		//それ以外(4人だったら)
-		else
-		{
-			//値の入れ替えを行う
-			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-			m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_SECOND];
-		}
-	}
-	//もし一位の値とセーブしている三位の値が同じなら
-	else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_THIRD])
-	{
-		//値の入れ替えを行う
-		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_SECOND];
-	}
-	//もし一位の値とセーブしている二位の値が同じなら
-	else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_SECOND])
-	{
-		//3人だったら
-		if (m_nNumPlay == 3)
-		{
-			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_THIRD];
-			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FIRST];
-		}
-		//それ以外(4人だったら)
-		else
-		{
-			//値の入れ替えを行う
-			m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-			m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
-			m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
+	for (int nCntOrg = 0; nCntOrg < m_nNumPlay - 1; nCntOrg++)
+	{ // 参加プレイヤー数分繰り返す
+
+		for (int nCntTemp = nCntOrg; nCntTemp < m_nNumPlay; nCntTemp++)
+		{ // 参加プレイヤー数分繰り返す
+
+			if (m_anRank[nCntOrg] > m_anRank[nCntTemp])
+			{
+				int temp;
+
+				temp = m_anRank[nCntOrg];
+				m_anRank[nCntOrg] = m_anRank[nCntTemp];
+				m_anRank[nCntTemp] = temp;
+
+				temp = m_anSaveRank[nCntOrg];
+				m_anSaveRank[nCntOrg] = m_anSaveRank[nCntTemp];
+				m_anSaveRank[nCntTemp] = temp;
+			}
+
+			if (m_anSaveRank[nCntOrg] > m_anSaveRank[nCntTemp] && m_anRank[nCntOrg] == m_anRank[nCntTemp])
+			{
+				int temp;
+
+				temp = m_anSaveRank[nCntOrg];
+				m_anSaveRank[nCntOrg] = m_anSaveRank[nCntTemp];
+				m_anSaveRank[nCntTemp] = temp;
+			}
 		}
 	}
+	////もし一位の値とセーブしている四位の値が同じなら
+	//if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
+	//{
+	//	//2人だったら
+	//	if (m_nNumPlay == 2)
+	//	{
+	//		//値の入れ替えを行う
+	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
+	//	}
+	//	//3人だったら
+	//	else if (m_nNumPlay == 3)
+	//	{
+	//		//値の入れ替えを行う
+	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
+	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_THIRD];
+	//	}
+	//	//それ以外(4人だったら)
+	//	else
+	//	{
+	//		//値の入れ替えを行う
+	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
+	//		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_SECOND];
+	//	}
+	//}
+	////もし一位の値とセーブしている三位の値が同じなら
+	//else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_THIRD])
+	//{
+	//	//値の入れ替えを行う
+	//	m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
+	//	m_anRank[RANK_THIRD] = m_anSaveRank[RANK_SECOND];
+	//}
+	////もし一位の値とセーブしている二位の値が同じなら
+	//else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_SECOND])
+	//{
+	//	//3人だったら
+	//	if (m_nNumPlay == 3)
+	//	{
+	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_THIRD];
+	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FIRST];
+	//	}
+	//	//それ以外(4人だったら)
+	//	else
+	//	{
+	//		//値の入れ替えを行う
+	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
+	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
+	//		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
+	//	}
+	//}
 	
 	//<******************************************
 	//同点がいる場合の順位並び変え処理
 	//<******************************************
-	for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
-	{
-		//中身チェック
-		if (m_apNumber[nCnt] != nullptr)
-		{
-			//３人以上で
-			if (m_nNumPlay >= 3)
-			{
-				//進める
-				if (nCnt < 1)
-				{
-					m_apNumber[nCnt]->SetPattern(nCnt + 1);
-				}
-				//それ以外のカウントだったら
-				else
-				{
-					//勝利ポイントが同じでなければ
-					if (m_anWinPoint[m_anRank[nCnt]] !=
-						CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nPattarn]))
-					{
-						//パターンを進める
-						m_apNumber[nCnt]->SetPattern(nCnt + 1);
-						nPattarn += 1;
-					}
-					//同じだったら
-					else
-					{
-						//とどめる
-						m_apNumber[nCnt]->SetPattern(m_nPattern);
-					}
-				}
 
-				//現在のパターンを保存
-				m_nPattern = m_apNumber[nCnt]->GetPattern();
-			}
-			//3人以下だったら
-			else
-			{
-				m_apNumber[nCnt]->SetPattern(nCnt + 1);
-			}
-		}
-	}
+	//for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
+	//{
+	//	//中身チェック
+	//	if (m_apNumber[nCnt] != nullptr)
+	//	{
+	//		//３人以上で
+	//		if (m_nNumPlay >= 3)
+	//		{
+	//			//進める
+	//			if (nCnt < 1)
+	//			{
+	//				m_apNumber[nCnt]->SetPattern(nCnt + 1);
+	//			}
+	//			//それ以外のカウントだったら
+	//			else
+	//			{
+	//				//勝利ポイントが同じでなければ
+	//				if (m_anWinPoint[m_anRank[nCnt]] !=
+	//					CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nPattarn]))
+	//				{
+	//					//パターンを進める
+	//					m_apNumber[nCnt]->SetPattern(nCnt + 1);
+	//					nPattarn += 1;
+	//				}
+	//				//同じだったら
+	//				else
+	//				{
+	//					//とどめる
+	//					m_apNumber[nCnt]->SetPattern(m_nPattern);
+	//				}
+	//			}
+	//			//現在のパターンを保存
+	//			m_nPattern = m_apNumber[nCnt]->GetPattern();
+	//		}
+	//		//3人以下だったら
+	//		else
+	//		{
+	//			m_apNumber[nCnt]->SetPattern(nCnt + 1);
+	//		}
+	//	}
+	//}
+
 #else
 	// TODO：順位表示のテクスチャ割り当て
 #endif
@@ -835,45 +825,11 @@ void CResultManager::Update(void)
 		{
 			m_apIcon[nCnt]->Update();
 
-			switch (nCnt)
-			{
-				//一位
-			case RANK_FIRST:
-
-				//プレイヤー順に並べる
-				m_apIcon[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_ICON][nCnt]);
-
-				break;
-
-				//二位
-			case RANK_SECOND:
-
-				//プレイヤー順に並べる
-				m_apIcon[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_ICON][nCnt]);
-
-				break;
-
-				//三位
-			case RANK_THIRD:
-
-				//プレイヤー順に並べる
-				m_apIcon[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_ICON][nCnt]);
-
-				break;
-
-				//四位
-			case RANK_FOURTH:
-
-				//プレイヤー順に並べる
-				m_apIcon[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_ICON][nCnt]);
-
-				break;
-			}
+			//プレイヤー順に並べる
+			m_apIcon[m_anSaveRank[nCnt]]
+				->SetVec3Position(m_arOriginPos[EObj::OBJ_ICON][nCnt]);
 		}
+
 		//<******************************************
 		//プレイヤー順位の位置設定
 		//<******************************************
@@ -881,56 +837,12 @@ void CResultManager::Update(void)
 		{
 			m_apWinNum[nCnt]->Update();
 
-			switch (nCnt)
-			{
-				//一位
-			case RANK_FIRST:
+			//その順位のプレイヤーのテクスチャパターンにする
+			m_apWinNum[nCnt]->SetPattern(m_anSaveRank[nCnt] + 1);
 
-				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt]+1);
-
-				//プレイヤー順に並べる
-				m_apWinNum[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_PLAYER][m_anRank[nCnt]]);
-
-				break;
-
-				//二位
-			case RANK_SECOND:
-
-				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
-
-				//プレイヤー順に並べる
-				m_apWinNum[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_PLAYER][m_anRank[nCnt]]);
-
-				break;
-
-				//三位
-			case RANK_THIRD:
-
-				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
-
-				//プレイヤー順に並べる
-				m_apWinNum[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_PLAYER][m_anRank[nCnt]]);
-
-				break;
-
-				//四位
-			case RANK_FOURTH:
-
-				//その順位のプレイヤーのテクスチャパターンにする
-				m_apWinNum[nCnt]->SetPattern(m_anRank[nCnt] + 1);
-
-				//プレイヤー順に並べる
-				m_apWinNum[m_anRank[nCnt]]
-					->SetVec3Position(m_arOriginPos[EObj::OBJ_PLAYER][m_anRank[nCnt]]);
-
-				break;
-			}
+			//プレイヤー順に並べる
+			m_apWinNum[nCnt]
+				->SetVec3Position(m_arOriginPos[EObj::OBJ_PLAYER][nCnt]);
 		}
 		//中身チェック
 		if (m_apPlayerEntry[nCnt] != nullptr)
@@ -938,6 +850,8 @@ void CResultManager::Update(void)
 			//更新処理
 			m_apPlayerEntry[nCnt]->Update();
 		}
+
+		m_apNumber[nCnt]->SetPattern(m_anRank[nCnt]);
 	}
 
 	// 遷移決定の更新
