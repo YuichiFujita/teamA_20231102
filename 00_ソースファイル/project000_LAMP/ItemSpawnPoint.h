@@ -13,8 +13,7 @@
 #include "main.h"
 #include "object.h"
 #include "Item.h"
-
-
+#include "gameManager.h"
 
 //<**************************************
 //ƒNƒ‰ƒXéŒ¾
@@ -62,6 +61,7 @@ private:
 	D3DXVECTOR3 m_pos;
 	static D3DXVECTOR3 m_rPos[MAX_SPAWNPOINT];		//ˆÊ’u
 	static CItem *m_pItem;
+	static CGameManager *m_pGameMane;
 	static int m_nCnt;
 	int m_nRand;
 };

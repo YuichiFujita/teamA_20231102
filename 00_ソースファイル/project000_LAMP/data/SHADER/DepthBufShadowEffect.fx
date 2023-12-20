@@ -66,8 +66,8 @@ float4 DepthBufShadow_PS( float4 Col : COLOR, float4 ZCalcTex : TEXCOORD1 , VS_O
    float ZValue = ZCalcTex.z / ZCalcTex.w;
 
 	if ((tex2D(tex0, In.Tex).r + tex2D(tex0, In.Tex).g + tex2D(tex0, In.Tex).b) != 0.0f)
-{
-	Col = (Col * tex2D(tex0, In.Tex));
+	{
+	Col = (In.Col * tex2D(tex0, In.Tex));
 	}
 
 	

@@ -8,6 +8,8 @@
 #include "manager.h"
 #include "renderer.h"
 #include "scene.h"
+#include "gameManager.h"
+#include "sceneGame.h"
 
 //<********************************
 //静的メンバ関数の設定
@@ -16,6 +18,7 @@ int CItemSpawnPoint::m_nNumIdx = 0;		// スポーン番号の個数
 CItem *CItemSpawnPoint::m_pItem = nullptr;
 D3DXVECTOR3 CItemSpawnPoint::m_rPos[MAX_SPAWNPOINT] = {};
 int CItemSpawnPoint::m_nCnt = 0;
+CGameManager *CItemSpawnPoint::m_pGameMane = nullptr;
 
 //<**************************************
 //名前定義
@@ -64,7 +67,7 @@ HRESULT CItemSpawnPoint::Init(void)
 {
 	//初期化をする
 	m_nRand = 0;
-	
+
 	return S_OK;
 }		
 //<==================================
@@ -73,12 +76,18 @@ HRESULT CItemSpawnPoint::Init(void)
 void CItemSpawnPoint::Uninit(void) 
 {
 	Release();
-
+	
 	//中身チェック
 	if (m_pItem != nullptr)
 	{
 		m_pItem->Uninit();
 		m_pItem = nullptr;
+	}
+	//ゲームマネージャの終了処理
+	if (m_pGameMane != nullptr)
+	{
+		m_pGameMane->Uninit();
+		m_pGameMane = nullptr;
 	}
 }			
 //<=======================================
@@ -120,37 +129,44 @@ void CItemSpawnPoint::Update(void)
 	//もしゲームモードだったら
 	if (CManager::GetInstance()->GetScene()->GetMode() == CScene::EMode::MODE_GAME)
 	{
-		//もしこのアイテムがnullptrではない+コリジョンが当たっていた場合
-		if (m_pItem != nullptr
-			&&m_pItem->Collision() == true)
-		{
-			m_pItem->Uninit();
-			m_pItem =nullptr;
-		}
+		//情報取得(必ずそのモードであることを確認してからすること)
+		m_pGameMane = CSceneGame::GetGameManager();
 
-		//アイテムがなければ
-		if (m_pItem == nullptr)
+		//もしステートが通常だったら
+		if (m_pGameMane->GetState() == CGameManager::STATE_NORMAL)
 		{
-			//加算していく
-			m_nCnt++;
-
-			//もし規定値を超えていれば
-			if (m_nCnt >= ItemSpawn::MAX_TIME)
+			//もしこのアイテムがnullptrではない+コリジョンが当たっていた場合
+			if (m_pItem != nullptr
+				&&m_pItem->Collision() == true)
 			{
-				//決定する
-				m_nRand = rand() % m_nNumIdx + 0;
-
-				//生成処理を行う(番号から位置を取得してくる)
-				m_pItem = CItem::Create(m_rPos[m_nRand]);
-
-				//初期化する
-				m_nCnt = 0;
+				m_pItem->Uninit();
+				m_pItem = nullptr;
 			}
-		}
-		//あったら
-		else if (m_pItem != nullptr)
-		{
-			//何もしない
+
+			//アイテムがなければ
+			if (m_pItem == nullptr)
+			{
+				//加算していく
+				m_nCnt++;
+
+				//もし規定値を超えていれば
+				if (m_nCnt >= ItemSpawn::MAX_TIME)
+				{
+					//決定する
+					m_nRand = rand() % m_nNumIdx + 0;
+
+					//生成処理を行う(番号から位置を取得してくる)
+					m_pItem = CItem::Create(m_rPos[m_nRand]);
+
+					//初期化する
+					m_nCnt = 0;
+				}
+			}
+			//あったら
+			else if (m_pItem != nullptr)
+			{
+				//何もしない
+			}
 		}
 	}
 	
