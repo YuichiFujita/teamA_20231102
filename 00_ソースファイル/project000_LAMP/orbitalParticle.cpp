@@ -56,6 +56,7 @@ void CorbitalParticle::Update()
 	while (m_nCount >= 60)
 	{
 		m_nCount -= 60;
+		float fRot, fRot2;//Šp“x
 		float fMove;//ˆÚ“®—Ê
 		D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		D3DXVECTOR3 pos = m_pos;
@@ -102,6 +103,14 @@ void CorbitalParticle::Update()
 void CorbitalParticle::Draw()
 {
 
+}
+//============================================================
+//	ˆÊ’u‚Ìİ’èˆ—
+//============================================================
+void CorbitalParticle::SetVec3Position(const D3DXVECTOR3& rPos)
+{
+	// ˆø”‚ÌˆÊ’u‚ğİ’è
+	m_pos = rPos;
 }
 //=============================================
 //¶¬ŠÖ”

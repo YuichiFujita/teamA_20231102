@@ -9,7 +9,6 @@
 //************************************************************
 #include "flail.h"
 #include "flailEntry.h"
-#include "frailResult.h"
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
@@ -158,10 +157,7 @@ void CFlail::Update(void)
 		m_move.x = 0.0f;
 		m_move.z = 0.0f;
 	}
-	if (player->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
-	{
-		m_nDamage = 20;
-	}
+
 	else
 	{
 		m_nDamage = HIT_DAMAGE;
@@ -337,10 +333,6 @@ void CFlail::UpdateChain(void)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
 
-	D3DXVECTOR3 posCol = VEC3_ZERO;
-	
-	CollisionChain(posCol);
-
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
 	{
 		D3DXVECTOR3 pos, rot;
@@ -372,10 +364,7 @@ void CFlail::UpdateChain(void)
 		{
 			if (nCntChain == m_nfulChainF)
 			{
-				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
-				{
-					UpdateDropFlailPos(m_fChainRot);
-				}*/
+			
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -401,11 +390,6 @@ void CFlail::UpdateChain(void)
 			if (nCntChain == m_nfulChainF)
 			{
 				rot.y += m_fChainRotMove;
-
-				/*if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
-				{
-					UpdateDropFlailPos(rot.y);
-				}*/
 			}
 			else if (nCntChain == m_nfulChainP)
 			{
@@ -538,6 +522,10 @@ void CFlail::UpdateChain(void)
 		// モデルの更新
 		m_chain[nCntChain].multiModel->Update();
 	}
+
+	D3DXVECTOR3 posCol = VEC3_ZERO;
+
+	CollisionChain(posCol);
 }
 
 //============================================================
@@ -737,13 +725,6 @@ CFlail *CFlail::Create
 			pModelUI = new CFlail;	// フレイル
 
 			break;
-
-		case CScene::MODE_RESULT:
-
-			// メモリ確保
-			pModelUI = new CFlailResult;	// フレイル
-
-			break;
 		}
 	}
 	else { assert(false); return NULL; }	// 使用中
@@ -823,7 +804,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				{
 					float length = D3DXVec3Length(&(rPos - m_oldPos)) + 1.0f;
 					int nAddDamage;
-
+					float bonus = 1.0f;
 					if (length > 80.0f)
 					{
 						nAddDamage = 30;
@@ -836,9 +817,28 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					{
 						nAddDamage = 0;
 					}
+					if (playerthis->GetTemporaryItem().type == CPlayer::ITEM_BOOST_KNOCKBACK)
+					{
+						vec *= 2.0f;
+						// ポインタを宣言
+						CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
+						if (pRetention->GetKillState() == CRetentionManager::KILL_LIFE)
+						{
+							vec *= 2.0f;
+						}
+						else
+						{
+							vec *= 1.5f;
+						}
+						
+					}
+					if (playerthis->GetTemporaryItem().type == CPlayer::ITEM_BOOST_ATTACK)
+					{
+						bonus = 2.0f;
+					}
 					// ダメージヒット処理
-					player->HitKnockBack(m_nDamage + nAddDamage, vec, playerthis);
+					player->HitKnockBack((m_nDamage + nAddDamage) * bonus, vec, playerthis);
 				}
 
 				D3DXVECTOR3 posFlail;
@@ -953,8 +953,9 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 {
 	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_nPlayerID);
+	bool bCol = false;
 
-	while (1)
+	while (bCol)
 	{
 		for (int nCntPri = 0; nCntPri < MAX_PRIO; nCntPri++)
 		{ // 優先順位の総数分繰り返す
@@ -1045,7 +1046,32 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 
 						if (D3DXVec3Length(&posDef) < m_fLengthChain)
 						{
+							D3DXVECTOR3 vecFlail, vecFlailOld;
+							float rotPoint, rotFlail, rotFlailOld, rotFlailDef;
 
+							vecFlail = GetVec3Position() - posStick;
+							vecFlailOld = m_oldPos - posStick;
+
+							rotPoint = atan2f(posDef.x, posDef.z);
+							rotFlail = atan2f(vecFlail.x, vecFlail.z);
+							rotFlailOld = atan2f(vecFlailOld.x, vecFlailOld.z);
+
+							if (rotFlail > rotFlailOld)
+							{
+								if (rotFlail < rotPoint && rotFlail >rotFlailOld)
+								{
+
+								}
+							}
+							else
+							{
+								if (rotFlail < rotPoint && rotFlail >rotFlailOld)
+								{
+
+								}
+							}
+
+							bCol = true;
 						}
 					}
 
@@ -1054,8 +1080,6 @@ bool CFlail::CollisionChain(D3DXVECTOR3& rPos)
 				}
 			}
 		}
-
-		break;
 	}
 
 	return false;

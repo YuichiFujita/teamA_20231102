@@ -46,7 +46,6 @@
 #include "objectBillboard.h"
 #include "orbitalParticle.h"
 #include "item.h"
-#include "PlayerResult.h"
 
 //************************************************************
 //	定数宣言
@@ -146,7 +145,7 @@ CPlayer::CPlayer(const CScene::EMode mode, const int nPad) : CObjectChara(CObjec
 	m_bDash = false;		// ダッシュ状況
 	m_bJump = false;		// ジャンプ状況
 	m_bHook = false;
-	m_bAI = true;
+	m_bAI = false;
 }
 
 //============================================================
@@ -170,6 +169,7 @@ HRESULT CPlayer::Init(void)
 	m_move = VEC3_ZERO;	// 移動量
 	m_destRot = VEC3_ZERO;	// 目標向き
 	m_dashRot = VEC3_ZERO;	// ダッシュ向き
+	m_pEffect = NULL;
 	m_state = STATE_NONE;	// 状態
 	m_nCounterState = 0;			// 状態管理カウンター
 	m_nCounterFlail = 0;			// フレイル管理カウンター
@@ -200,6 +200,7 @@ HRESULT CPlayer::Init(void)
 
 	// ステータス情報の生成
 	m_pStatus = CStatusManager::Create(m_nPadID);
+	m_pStatus->SetNumRate(0);
 	if (m_pStatus == NULL)
 	{ // 非使用中の場合
 
@@ -305,6 +306,12 @@ void CPlayer::Uninit(void)
 		m_pClown->Uninit();
 		m_pClown = NULL;
 	}
+	if (m_pEffect != NULL)
+	{ // 使用中の場合
+	  // メモリ開放
+		m_pEffect->Uninit();
+		m_pEffect = NULL;
+	}
 	// オブジェクトキャラクターの終了
 	CObjectChara::Uninit();
 }
@@ -400,11 +407,20 @@ void CPlayer::Update(void)
 
 	if (m_SItemTemporary.type != ITEM_EMPTY)
 	{
+		if (m_pEffect != NULL)
+		{
+			m_pEffect->SetVec3Position(GetVec3Position());
+		}
 		m_SItemTemporary.nLife--;
 		if (m_SItemTemporary.nLife <= 0)
 		{
 			m_SItemTemporary.type = ITEM_EMPTY;
 			m_SItemTemporary.nLife = 0;
+			if (m_pEffect != NULL)
+			{
+				m_pEffect->Uninit();
+				m_pEffect = NULL;
+			}
 		}
 	}
 
@@ -477,7 +493,7 @@ void CPlayer::Hit(void)
 	EItem Item = ITEM_EMPTY;
 	while (Item == ITEM_EMPTY)
 	{
-		Item = (EItem)(rand() % ITEM_MAX);
+		Item = (EItem)(rand() % ITEM_BIGFLAIL);
 	}
 	switch (Item)
 	{
@@ -485,19 +501,38 @@ void CPlayer::Hit(void)
 		break;
 	case CPlayer::ITEM_HEAL:
 		m_pStatus->SetNumLife(m_pStatus->GetNumLife() + 20);
-		m_pStatus->SetNumRate(m_pStatus->GetNumRate() - 20);
+		m_pStatus->SetNumRate(m_pStatus->GetNumRate() - 50);
+		CParticle3D::Create(CParticle3D::TYPE_HEAL, GetVec3Position(),D3DXCOLOR(0.2f,1.0f,0.2f,1.0f));
 		break;
 	case CPlayer::ITEM_BOOST_ATTACK:
 		m_SItemTemporary.type = ITEM_BOOST_ATTACK;
-		m_SItemTemporary.nLife = 600;
+		m_SItemTemporary.nLife = 900;
+		if (m_pEffect != NULL)
+		{
+			m_pEffect->Uninit();
+			m_pEffect = NULL;
+		}
+		m_pEffect = m_pEffect->Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.2f, 1.0f), D3DXVECTOR3(50.0f, 0.0f, 50.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, 0.5f, 0.0f), 1800, 60, 60, 60, 20);
 		break;
 	case CPlayer::ITEM_BOOST_KNOCKBACK:
 		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
-		m_SItemTemporary.nLife = 600;
+		m_SItemTemporary.nLife = 900;
+		if (m_pEffect != NULL)
+		{
+			m_pEffect->Uninit();
+			m_pEffect = NULL;
+		}
+		m_pEffect = m_pEffect->Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.8f, 0.2f, 1.0f), D3DXVECTOR3(50.0f, 0.0f, 50.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, 0.5f, 0.0f), 1800, 60, 60, 60, 20);
 		break;
 	case CPlayer::ITEM_SUPERARMOR:
-		m_SItemTemporary.type = ITEM_BOOST_KNOCKBACK;
+		m_SItemTemporary.type = ITEM_SUPERARMOR;
 		m_SItemTemporary.nLife = 450;
+		if (m_pEffect != NULL)
+		{
+			m_pEffect->Uninit();
+			m_pEffect = NULL;
+		}
+		m_pEffect = m_pEffect->Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 0.5f, 1.0f, 1.0f), D3DXVECTOR3(0.0f, 40.0f, 0.0f), VEC3_ZERO, VEC3_ZERO, 1800, 300, 60, 60, 20);
 		break;
 	case CPlayer::ITEM_BIGFLAIL:
 		SetItemPermanent(ITEM_BIGFLAIL);
@@ -520,6 +555,7 @@ void CPlayer::Hit(void)
 		break;
 	}
 }
+
 //============================================================
 //アイテムの効果設定
 //============================================================
@@ -675,13 +711,6 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad, const bool bAI)
 			pPlayer = new CPlayer(mode, nPad);	// プレイヤー
 
 			break;
-
-		case CScene::MODE_RESULT:
-
-			// メモリ確保
-			pPlayer = new CPlayerResult(mode, nPad);	// プレイヤー
-
-			break;
 		}
 	}
 	else { assert(false); return NULL; }	// 使用中
@@ -795,29 +824,47 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		else
 		{ // 死亡していない場合
 
-			// NAKAMURA：ふっとび量の決め方きもければ変えて
-			// 変数を宣言
-			float fKnockRate = ((MAX_KNOCK_RATE - 1.0f) / (float)m_pStatus->GetNumMaxLife()) * m_pStatus->GetNumRate() + 1.0f;	// 吹っ飛ばし率
+		  // NAKAMURA：吹っ飛び率の決め方は任せます
+		  // 吹っ飛び率を加算
+			CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
-			// ノックバック移動量を設定
-			m_move.x = fKnockRate * vecKnock.x * KNOCK_SIDE;
-			m_move.y = KNOCK_UP;
-			m_move.z = fKnockRate * vecKnock.z * KNOCK_SIDE;
+			if (pRetention->GetKillState() == CRetentionManager::KILL_LIFE)
+			{
+				m_pStatus->SetNumRate(30);
+			}
+			else
+			{
+				m_pStatus->AddNumRate(nDmg);
+			}
+		  // NAKAMURA：ふっとび量の決め方きもければ変えて
+		  // 変数を宣言
+			if (m_SItemTemporary.type != ITEM_SUPERARMOR)
+			{
+				float fKnockRate = m_pStatus->GetNumRate();	// 吹っ飛ばし率
 
-			// ノックバック方向に向きを設定
-			rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
-			m_destRot.y = rotPlayer.y;	// 目標向きを設定
-			SetVec3Rotation(rotPlayer);	// 向きを設定
+				// ノックバック移動量を設定
+				m_move.x = fKnockRate * vecKnock.x;
+				m_move.y = KNOCK_UP;
+				m_move.z = fKnockRate * vecKnock.z;
 
-										// 空中状態にする
-			m_bJump = true;
+				// ノックバック方向に向きを設定
+				rotPlayer.y = atan2f(vecKnock.x, vecKnock.z);	// 吹っ飛び向きを計算
+				m_destRot.y = rotPlayer.y;	// 目標向きを設定
+				SetVec3Rotation(rotPlayer);	// 向きを設定
 
-			// ノック状態を設定
-			SetState(STATE_KNOCK);
+											// 空中状態にする
+				m_bJump = true;
 
-			// 吹っ飛びモーションを設定
-			SetMotion(MOTION_KNOCK);
+				// ノック状態を設定
+				SetState(STATE_KNOCK);
 
+				// 吹っ飛びモーションを設定
+				SetMotion(MOTION_KNOCK);
+			}
+			else
+			{
+				SetState(STATE_INVULN);	// 無敵状態の設定
+			}
 			// 爆発パーティクルを生成
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.2f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 6, 800, 60, 60, 150, 0.5f, 0.99f);
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(10.0f, 0.0f, 0.0f), D3DXCOLOR(1.0f, 0.4f, 0.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 1600, 60, 120, 300, 1.0f, 0.8f);
@@ -827,9 +874,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
 	}
 
-	// NAKAMURA：吹っ飛び率の決め方は任せます
-	// 吹っ飛び率を加算
-	m_pStatus->AddNumRate(nDmg * 7);
+	
+
 }
 
 //============================================================
@@ -1178,6 +1224,7 @@ void CPlayer::UpdateMotion(int nMotion)
 			case MOTION_LAND:	// 着地モーション：ループOFF
 			case MOTION_EMOTE_PROUD:	// 胸張りエモートモーション：ループOFF
 			case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
+			case MOTION_EMOTE_RORI:	// 粛清ロリ神レクイエムエモートモーション：ループOFF
 
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
@@ -1210,7 +1257,6 @@ void CPlayer::UpdateMotion(int nMotion)
 
 	case MOTION_DASH:	// ダッシュモーション：ループOFF
 	case MOTION_LAND:	// 着地モーション：ループOFF
-	case MOTION_EMOTE_PROUD:	// 死亡モーション：ループOFF
 
 		if (IsMotionFinish())
 		{ // モーションが終了していた場合
@@ -1225,6 +1271,8 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_KNOCK:	// 吹っ飛びモーション：ループOFF
 	case MOTION_DEATH:	// 死亡モーション：ループOFF
 	case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
+	case MOTION_EMOTE_PROUD:	// 胸を張るエモートモーション：ループOFF
+	case MOTION_EMOTE_RORI:	// 粛清ロリ神レクイエムエモートモーション：ループOFF
 
 		break;
 
@@ -1660,7 +1708,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	}
 
 	float fStickR = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y) * 0.5f;	// スティックの倒し量
-	m_bHook = false;
+	
 
 																				// カウンターの値によって挙動を変更
 	if (m_nCounterFlail > flail::FLAIL_DEF)
@@ -1870,9 +1918,27 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 						m_destRot.y = rotFlail - (D3DX_PI * 0.5f);
 
+						if (!m_bHook)
+						{
+							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SWING);
+							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);
+
+						}
 						m_bHook = true;
 					}
+					else
+					{
+						m_bHook = false;
+					}
 				}
+				else
+				{
+					m_bHook = false;
+				}
+			}
+			else
+			{
+				m_bHook = false;
 			}
 
 			// 投擲
@@ -1995,7 +2061,7 @@ void CPlayer::PlayEmote(EMotion& rAnim)
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_PROUD;
+		rAnim = MOTION_EMOTE_RORI;
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT, m_nPadID) == TRUE)
 	{

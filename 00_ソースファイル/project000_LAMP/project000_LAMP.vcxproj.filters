@@ -306,17 +306,10 @@
     <ClCompile Include="flailEntry.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="PlayerResult.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="frailResult.cpp">
-=======
     <ClCompile Include="flail.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="gameManager.cpp">
->>>>>>> ec5fdf95314d37b6df3424c6df2636f41b194f22
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -610,12 +603,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="flailEntry.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerResult.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="frailResult.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

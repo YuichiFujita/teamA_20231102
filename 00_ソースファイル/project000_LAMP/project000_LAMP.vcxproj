@@ -165,7 +165,6 @@
     <ClCompile Include="editGround.cpp" />
     <ClCompile Include="editItemPoint.cpp" />
     <ClCompile Include="flailEntry.cpp" />
-    <ClCompile Include="frailResult.cpp" />
     <ClCompile Include="ItemSpawnPoint.cpp" />
     <ClCompile Include="editObstacle.cpp" />
     <ClCompile Include="editSpawnPoint.cpp" />
@@ -219,7 +218,6 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="playerAI.cpp" />
     <ClCompile Include="playerEntry.cpp" />
-    <ClCompile Include="PlayerResult.cpp" />
     <ClCompile Include="precompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -268,7 +266,6 @@
     <ClInclude Include="editGround.h" />
     <ClInclude Include="editItemPoint.h" />
     <ClInclude Include="flailEntry.h" />
-    <ClInclude Include="frailResult.h" />
     <ClInclude Include="ItemSpawnPoint.h" />
     <ClInclude Include="editObstacle.h" />
     <ClInclude Include="editSpawnPoint.h" />
@@ -322,7 +319,6 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="playerAI.h" />
     <ClInclude Include="playerEntry.h" />
-    <ClInclude Include="PlayerResult.h" />
     <ClInclude Include="precompile.h" />
     <ClInclude Include="rankingManager.h" />
     <ClInclude Include="ready.h" />
