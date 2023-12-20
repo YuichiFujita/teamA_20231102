@@ -625,101 +625,6 @@ HRESULT CResultManager::Init(void)
 			}
 		}
 	}
-	////もし一位の値とセーブしている四位の値が同じなら
-	//if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_FOURTH])
-	//{
-	//	//2人だったら
-	//	if (m_nNumPlay == 2)
-	//	{
-	//		//値の入れ替えを行う
-	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
-	//	}
-	//	//3人だったら
-	//	else if (m_nNumPlay == 3)
-	//	{
-	//		//値の入れ替えを行う
-	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_SECOND];
-	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_THIRD];
-	//	}
-	//	//それ以外(4人だったら)
-	//	else
-	//	{
-	//		//値の入れ替えを行う
-	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-	//		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_SECOND];
-	//	}
-	//}
-	////もし一位の値とセーブしている三位の値が同じなら
-	//else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_THIRD])
-	//{
-	//	//値の入れ替えを行う
-	//	m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-	//	m_anRank[RANK_THIRD] = m_anSaveRank[RANK_SECOND];
-	//}
-	////もし一位の値とセーブしている二位の値が同じなら
-	//else if (m_anRank[RANK_FIRST] == m_anSaveRank[RANK_SECOND])
-	//{
-	//	//3人だったら
-	//	if (m_nNumPlay == 3)
-	//	{
-	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_THIRD];
-	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FIRST];
-	//	}
-	//	//それ以外(4人だったら)
-	//	else
-	//	{
-	//		//値の入れ替えを行う
-	//		m_anRank[RANK_SECOND] = m_anSaveRank[RANK_FIRST];
-	//		m_anRank[RANK_THIRD] = m_anSaveRank[RANK_FOURTH];
-	//		m_anRank[RANK_FOURTH] = m_anSaveRank[RANK_THIRD];
-	//	}
-	//}
-	
-	//<******************************************
-	//同点がいる場合の順位並び変え処理
-	//<******************************************
-
-	//for (int nCnt = 0; nCnt < m_nNumPlay; nCnt++)
-	//{
-	//	//中身チェック
-	//	if (m_apNumber[nCnt] != nullptr)
-	//	{
-	//		//３人以上で
-	//		if (m_nNumPlay >= 3)
-	//		{
-	//			//進める
-	//			if (nCnt < 1)
-	//			{
-	//				m_apNumber[nCnt]->SetPattern(nCnt + 1);
-	//			}
-	//			//それ以外のカウントだったら
-	//			else
-	//			{
-	//				//勝利ポイントが同じでなければ
-	//				if (m_anWinPoint[m_anRank[nCnt]] !=
-	//					CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(m_anRank[nPattarn]))
-	//				{
-	//					//パターンを進める
-	//					m_apNumber[nCnt]->SetPattern(nCnt + 1);
-	//					nPattarn += 1;
-	//				}
-	//				//同じだったら
-	//				else
-	//				{
-	//					//とどめる
-	//					m_apNumber[nCnt]->SetPattern(m_nPattern);
-	//				}
-	//			}
-	//			//現在のパターンを保存
-	//			m_nPattern = m_apNumber[nCnt]->GetPattern();
-	//		}
-	//		//3人以下だったら
-	//		else
-	//		{
-	//			m_apNumber[nCnt]->SetPattern(nCnt + 1);
-	//		}
-	//	}
-	//}
 
 #else
 	// TODO：順位表示のテクスチャ割り当て
@@ -1353,12 +1258,12 @@ void CResultManager::UpdateNumber(void)
 				&&m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
 			{
 				//もしアイコン・勝利者番号・プレイヤー番号の中身があれば
-				if (m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
+				if (m_apIcon[m_anSaveRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr&&
 					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]] != nullptr)
 				{
 					//描画をする
-					m_apIcon[m_anRank[m_anNum[EObj::OBJ_NUMBER]]]->SetEnableDraw(true);
+					m_apIcon[m_anSaveRank[m_anNum[EObj::OBJ_NUMBER]]]->SetEnableDraw(true);
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
 					m_apPlayerEntry[m_anNum[EObj::OBJ_NUMBER]]->SetEnableDraw(true);
 				}
