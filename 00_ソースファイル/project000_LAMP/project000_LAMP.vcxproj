@@ -195,6 +195,7 @@
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="multiModel.cpp" />
     <ClCompile Include="multiValue.cpp" />
+    <ClCompile Include="nextPoint.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="motion.h" />
     <ClInclude Include="multiModel.h" />
     <ClInclude Include="multiValue.h" />
+    <ClInclude Include="nextPoint.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />

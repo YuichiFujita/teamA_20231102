@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/00_ソースファイル/project000_LAMP/data/TXT/save_stage.txt

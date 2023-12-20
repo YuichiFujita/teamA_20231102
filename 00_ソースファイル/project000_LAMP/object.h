@@ -70,6 +70,7 @@ public:
 		LABEL_UI,			// UI
 		LABEL_NUMBER,		// 数字
 		LABEL_PLAYER,		// プレイヤー
+		LABEL_NEXT,			// 遷移位置
 		LABEL_SPAWNPOINT,	// 生成位置
 		LABEL_ITEMPOINT,	// アイテム生成位置
 		LABEL_GROUND,		// 地盤
