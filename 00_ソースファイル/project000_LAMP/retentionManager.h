@@ -89,6 +89,9 @@ public:
 	bool IsEntry(const int nID) const;	// エントリー状況取得
 	bool IsAI(const int nID) const;		// AI状況取得
 
+	void SetFlail(const int nID, const int nFlail);	// フレイルの種類設定
+	int GetFlail(const int nID) const;				// フレイルの種類取得
+
 	void InitWinRank(void);						// 勝利ランキング初期化
 	void SetWinRank(void);						// 勝利ランキング設定
 	ERank GetWinRank(const int nID);			// 勝利ランキング取得
@@ -113,6 +116,7 @@ private:
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
 	int		m_aWinRank[MAX_PLAYER];			// 降順の勝利ランキング
 	int		m_aPlayerWin[MAX_PLAYER];		// プレイヤーポイント数
+	int		m_aFlail[MAX_PLAYER];			// フレイルの種類
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 	bool	m_aAI[MAX_PLAYER];				// AI状況
 };

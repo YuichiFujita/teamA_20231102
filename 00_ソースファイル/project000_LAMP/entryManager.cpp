@@ -18,6 +18,8 @@
 #include "multiValue.h"
 #include "entryRuleManager.h"
 #include "retentionManager.h"
+#include "player.h"
+#include "flail.h"
 #include "fade.h"
 
 //************************************************************
@@ -584,6 +586,9 @@ void CEntryManager::Update(void)
 		// エントリーの更新
 		UpdateEntry();
 
+		// フレイルの更新
+		UpdateFlail();
+
 		switch (m_stateEntry)
 		{ // エントリー状態ごとの処理
 		case STATE_ENTRY_NONE_JOIN:
@@ -931,7 +936,59 @@ void CEntryManager::UpdateEntry(void)
 //============================================================
 void CEntryManager::UpdateFlail(void)
 {
+	// ポインタを宣言
+	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
 
+	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
+	{ // プレイヤーの最大数分繰り返す
+
+		if (!pRetention->IsEntry(nCntEntry))
+		{ // エントリーしていない場合
+
+			break;
+		}
+
+		if (m_apJoin[nCntEntry]->GetPattern() != JOIN_OFF)
+		{ // 準備が出来ている場合
+
+			break;
+		}
+
+		// ポインタを宣言
+		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
+		CFlail *pFlail = pPlayer->GetFlail();				// フレイル情報
+
+		// 変数を宣言
+		int nType = pFlail->GetType();	// フレイル種類
+
+		if (pPad->IsTrigger(CInputPad::KEY_RIGHT))
+		{ // 右移動の操作が行われた場合
+
+			// 右に選択をずらす
+			nType = (nType + (CFlail::FLAIL_MAX - 1)) % CFlail::FLAIL_MAX;
+
+			// フレイル種類を反映
+			pFlail->SetType(nType);
+			pRetention->SetFlail(nCntEntry, nType);
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+		if (pPad->IsTrigger(CInputPad::KEY_LEFT))
+		{ // 左移動の操作が行われた場合
+
+			// 左に選択をずらす
+			nType = (nType + 1) % CFlail::FLAIL_MAX;
+
+			// フレイル種類を反映
+			pFlail->SetType(nType);
+			pRetention->SetFlail(nCntEntry, nType);
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+	}
 }
 
 //============================================================

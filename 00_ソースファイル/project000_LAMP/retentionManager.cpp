@@ -10,6 +10,7 @@
 #include "retentionManager.h"
 #include "manager.h"
 #include "player.h"
+#include "flail.h"
 
 //************************************************************
 //	マクロ定義
@@ -27,6 +28,7 @@ CRetentionManager::CRetentionManager()
 	// メンバ変数をクリア
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
+	memset(&m_aFlail[0], 0, sizeof(m_aFlail));					// フレイルの種類
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
@@ -52,6 +54,7 @@ HRESULT CRetentionManager::Init(void)
 	// メンバ変数を初期化
 	memset(&m_aSurvivalRank[0], 0, sizeof(m_aSurvivalRank));	// 降順の生存ランキング
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
+	memset(&m_aFlail[0], 0, sizeof(m_aFlail));					// フレイルの種類
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;		// 討伐条件
@@ -327,6 +330,35 @@ bool CRetentionManager::IsAI(const int nID) const
 {
 	// 引数インデックスのAI状況を返す
 	return m_aAI[nID];
+}
+
+//============================================================
+//	フレイルの種類の設定処理
+//============================================================
+void CRetentionManager::SetFlail(const int nID, const int nFlail)
+{
+	if (nID    > NONE_IDX && nID    < MAX_PLAYER
+	&&  nFlail > NONE_IDX && nFlail < CFlail::FLAIL_MAX)
+	{ // インデックスが正規の場合
+
+		// フレイルの種類を返す
+		m_aFlail[nID] = nFlail;
+	}
+	else { assert(false); }
+}
+
+//============================================================
+//	フレイルの種類取得処理
+//============================================================
+int CRetentionManager::GetFlail(const int nID) const
+{
+	if (nID > NONE_IDX && nID < MAX_PLAYER)
+	{ // インデックスが正規の場合
+
+		// フレイルの種類を返す
+		return m_aFlail[nID];
+	}
+	else { assert(false); return NONE_IDX; }
 }
 
 //============================================================

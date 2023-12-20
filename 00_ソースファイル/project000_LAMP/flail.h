@@ -46,13 +46,14 @@ public:
 	enum EModelFlail
 	{
 		FLAIL_NORMAL = 0,	// 鉄球
-		FLAIL_PREFABHUT,	// プレハブ小屋
+		FLAIL_HEAD,			// 頭
+		FLAIL_ESCAPEKUN,	// エスケープ君
 		FLAIL_MAX			// この列挙型の総数
 	};
 
 	enum EModelChain
 	{
-		CHAIN_NORMAL = 0,	// 鉄球
+		CHAIN_NORMAL = 0,	// 鎖
 		CHAIN_MAX			// この列挙型の総数
 	};
 
@@ -76,7 +77,10 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+	void SetType(const int nType) override;	// 種類設定
+	int GetType(void) const override;		// 種類取得
 
+	// メンバ関数
 	void SetVec3PosOrg(const D3DXVECTOR3& rPosOrg);			// 回転原点設定
 	D3DXVECTOR3 GetVec3PosOrg(void);						// 回転原点取得
 
@@ -145,6 +149,7 @@ private:
 	D3DXVECTOR3 m_posOrg;						// 回転原点
 	D3DXVECTOR3 m_oldPos;						// 過去の位置
 	D3DXVECTOR3	m_move;							// 移動量
+	EModelFlail	m_typeFlail;					// フレイルの種類
 	int			m_nPlayerID;					// プレイヤーID
 	int			m_nNumChain;					// 鎖の数
 	int			m_nDamage;						// ダメージ
