@@ -9,6 +9,7 @@
 //************************************************************
 #include "flail.h"
 #include "flailEntry.h"
+#include "frailResult.h"
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
@@ -734,6 +735,13 @@ CFlail *CFlail::Create
 
 			// メモリ確保
 			pModelUI = new CFlail;	// フレイル
+
+			break;
+
+		case CScene::MODE_RESULT:
+
+			// メモリ確保
+			pModelUI = new CFlailResult;	// フレイル
 
 			break;
 		}

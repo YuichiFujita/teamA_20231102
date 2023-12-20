@@ -46,6 +46,7 @@
 #include "objectBillboard.h"
 #include "orbitalParticle.h"
 #include "item.h"
+#include "PlayerResult.h"
 
 //************************************************************
 //	定数宣言
@@ -672,6 +673,13 @@ CPlayer *CPlayer::Create(CScene::EMode mode, const int nPad, const bool bAI)
 
 			// メモリ確保
 			pPlayer = new CPlayer(mode, nPad);	// プレイヤー
+
+			break;
+
+		case CScene::MODE_RESULT:
+
+			// メモリ確保
+			pPlayer = new CPlayerResult(mode, nPad);	// プレイヤー
 
 			break;
 		}
