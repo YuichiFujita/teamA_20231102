@@ -54,6 +54,8 @@ public:
 	D3DXVECTOR3 GetVec3Sizing(void) const override;			// 大きさ取得
 	void SetColor(const D3DXCOLOR& rCol) override;			// 色設定
 	D3DXCOLOR GetColor(void) const override;				// 色取得
+	D3DXMATRIX *GetPtrMtxWorld(void) override;				// マトリックスポインタ取得
+	D3DXMATRIX GetMtxWorld(void) const override;			// マトリックス取得
 
 	// 静的メンバ関数
 	static CObject3D *Create	// 生成

@@ -9,7 +9,6 @@
 //************************************************************
 #include "flail.h"
 #include "flailEntry.h"
-#include "frailResult.h"
 #include "manager.h"
 #include "renderer.h"
 #include "camera.h"
@@ -41,8 +40,9 @@ namespace
 //************************************************************
 const char *CFlail::mc_apModelFileFlail[] =	// モデル定数(フレイル)
 {
-	"data\\MODEL\\PLAYER\\15_ironBall.x",	// 鉄球
-	"data\\MODEL\\OBSTACLE\\obstacle018.x",	// プレハブ小屋
+	"data\\MODEL\\FLAIL\\ironBall.x",	// 鉄球
+	"data\\MODEL\\FLAIL\\head.x",		// 頭
+	"data\\MODEL\\FLAIL\\escapekun.x",	// エスケープ君
 };
 
 const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
@@ -61,6 +61,7 @@ CFlail::CFlail() : CObjectModel(CObject::LABEL_NONE, PRIORITY)
 	memset(&m_chain[0], 0, sizeof(m_chain));	// モデルの情報
 	m_oldPos = VEC3_ZERO;
 	m_move = VEC3_ZERO;
+	m_typeFlail = FLAIL_NORMAL;
 	m_nNumChain = 0;
 	m_nfulChainF = 0;
 	m_nfulChainP = 0;
@@ -95,8 +96,6 @@ HRESULT CFlail::Init(void)
 		return E_FAIL;
 	}
 
-	BindModel(mc_apModelFileFlail[FLAIL_NORMAL]);
-
 	m_nNumChain = flail::FLAIL_NUM_MAX;
 
 	for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
@@ -110,6 +109,7 @@ HRESULT CFlail::Init(void)
 
 	m_pOrbit = CObjectOrbit::Create(GetPtrMtxWorld(), CObjectOrbit::SOffset(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(0.0f, 0.0f, -50.0f), D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)), 60,60);
 	m_pOrbit->BindTexture("data\\TEXTURE\\orbitLine.png");
+
 	// 成功を返す
 	return S_OK;
 }
@@ -691,6 +691,30 @@ void CFlail::Draw(void)
 }
 
 //============================================================
+//	種類の設定処理
+//============================================================
+void CFlail::SetType(const int nType)
+{
+	if (nType > NONE_IDX && nType < FLAIL_MAX)
+	{
+		// 種類を設定
+		m_typeFlail = (EModelFlail)nType;
+
+		// モデルを割当
+		BindModel(mc_apModelFileFlail[m_typeFlail]);
+	}
+	else { assert(false); }
+}
+
+//============================================================
+//	種類取得処理
+//============================================================
+int CFlail::GetType(void) const
+{
+	return (int)m_typeFlail;
+}
+
+//============================================================
 //	生成処理
 //============================================================
 CFlail *CFlail::Create
@@ -726,14 +750,6 @@ CFlail *CFlail::Create
 			pModelUI = new CFlail;	// フレイル
 
 			break;
-			
-			
-		case CScene::MODE_RESULT:
-
-			// メモリ確保
-			pModelUI = new CFlailResult;	// フレイル
-
-			break;
 		}
 	}
 	else { assert(false); return NULL; }	// 使用中
@@ -764,6 +780,9 @@ CFlail *CFlail::Create
 
 		// 鎖の親を設定
 		pModelUI->BindParent(rPlayer);
+
+		// フレイルの種類を設定
+		pModelUI->SetType(CManager::GetInstance()->GetRetentionManager()->GetFlail(rPlayer.GetPadID()));
 
 		// 確保したアドレスを返す
 		return pModelUI;

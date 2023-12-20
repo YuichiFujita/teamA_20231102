@@ -17,6 +17,14 @@
 #include "particle2D.h"
 
 //************************************************************
+//	定数宣言
+//************************************************************
+namespace
+{
+	const int	PRIORITY = 12;	// 開始の優先順位
+}
+
+//************************************************************
 //	子クラス [CReady] のメンバ関数
 //************************************************************
 //============================================================
@@ -64,6 +72,10 @@ HRESULT CReady::Init(void)
 	m_pFlare->SetAdd(true);
 	m_pFlare->SetEnableStop(true);
 	m_pFlare->SetLabel(LABEL_EFFECT);
+
+	m_pTexReady->SetPriority(PRIORITY);
+	m_pTexFight->SetPriority(PRIORITY);
+	m_pFlare->SetPriority(PRIORITY);
 
 	// 成功を返す
 	return S_OK;

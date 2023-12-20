@@ -23,6 +23,7 @@
 #include "obstacle.h"
 #include "spawnPoint.h"
 #include "ItemSpawnPoint.h"
+#include "nextPoint.h"
 
 //************************************************************
 //	定数宣言
@@ -31,6 +32,9 @@ namespace
 {
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
+#if 0
+		"data\\TXT\\Stages\\stage0.txt",
+#else
 		"data\\TXT\\Stages\\stage1.txt",
 		"data\\TXT\\Stages\\stage2.txt",
 		"data\\TXT\\Stages\\stage3.txt",
@@ -57,6 +61,7 @@ namespace
 		"data\\TXT\\Stages\\stage24.txt",
 		"data\\TXT\\Stage_morikawa\\stage001.txt",
 		"data\\TXT\\Stage_morikawa\\stage002.txt",
+#endif
 	};
 }
 
@@ -580,6 +585,15 @@ HRESULT CStage::LoadSetup(CStage *pStage)
 
 			// アイテム生成位置の読込
 			else if (FAILED(LoadItemPoint(&aString[0], pFile, pStage)))
+			{ // 読み込みに失敗した場合
+
+				// 失敗を返す
+				assert(false);
+				return E_FAIL;
+			}
+
+			// 遷移位置情報の読込
+			else if (FAILED(LoadNextPoint(&aString[0], pFile, pStage)))
 			{ // 読み込みに失敗した場合
 
 				// 失敗を返す
@@ -2019,6 +2033,79 @@ HRESULT CStage::LoadItemPoint(const char * pString, FILE * pFile, CStage * pStag
 				}
 			}
 		} while (strcmp(&aString[0], "END_STAGE_ITEMPOINTSET") != 0);	// 読み込んだ文字列が END_STAGE_ITEMPOINTSET ではない場合ループ
+	}
+
+	// 成功を返す
+	return S_OK;
+}
+
+//============================================================
+//	遷移位置情報の読込処理
+//============================================================
+HRESULT CStage::LoadNextPoint(const char * pString, FILE * pFile, CStage * pStage)
+{
+	// 変数を宣言
+	D3DXVECTOR3 pos = VEC3_ZERO;	// 位置の代入用
+	D3DXVECTOR3 size = VEC3_ZERO;	// 大きさの代入用
+
+	// 変数配列を宣言
+	char aString[MAX_STRING];	// テキストの文字列の代入用
+
+	if (pString == NULL || pFile == NULL || pStage == NULL)
+	{ // 文字列・ファイル・ステージが存在しない場合
+
+		// 失敗を返す
+		assert(false);
+		return E_FAIL;
+	}
+
+	// 遷移位置の設定
+	if (strcmp(pString, "STAGE_NEXTPOINTSET") == 0)
+	{ // 読み込んだ文字列が STAGE_NEXTPOINTSET の場合
+
+		do
+		{ // 読み込んだ文字列が END_STAGE_NEXTPOINTSET ではない場合ループ
+
+			// ファイルから文字列を読み込む
+			fscanf(pFile, "%s", &aString[0]);
+
+			if (strcmp(&aString[0], "NEXTPOINTSET") == 0)
+			{ // 読み込んだ文字列が NEXTPOINTSET の場合
+
+				do
+				{ // 読み込んだ文字列が END_NEXTPOINTSET ではない場合ループ
+
+					// ファイルから文字列を読み込む
+					fscanf(pFile, "%s", &aString[0]);
+
+					if (strcmp(&aString[0], "POS") == 0)
+					{ // 読み込んだ文字列が POS の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &pos.x);		// 位置Xを読み込む
+						fscanf(pFile, "%f", &pos.y);		// 位置Yを読み込む
+						fscanf(pFile, "%f", &pos.z);		// 位置Zを読み込む
+					}
+					else if (strcmp(&aString[0], "SIZE") == 0)
+					{ // 読み込んだ文字列が SIZE の場合
+
+						fscanf(pFile, "%s", &aString[0]);	// = を読み込む (不要)
+						fscanf(pFile, "%f", &size.x);		// 大きさXを読み込む
+						fscanf(pFile, "%f", &size.y);		// 大きさYを読み込む
+						fscanf(pFile, "%f", &size.z);		// 大きさZを読み込む
+					}
+				} while (strcmp(&aString[0], "END_NEXTPOINTSET") != 0);	// 読み込んだ文字列が END_NEXTPOINTSET ではない場合ループ
+
+				// 遷移位置オブジェクトの生成
+				if (CNextPoint::Create(pos, size) == NULL)
+				{ // 確保に失敗した場合
+
+					// 失敗を返す
+					assert(false);
+					return E_FAIL;
+				}
+			}
+		} while (strcmp(&aString[0], "END_STAGE_NEXTPOINTSET") != 0);	// 読み込んだ文字列が END_STAGE_NEXTPOINTSET ではない場合ループ
 	}
 
 	// 成功を返す
