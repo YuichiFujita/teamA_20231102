@@ -16,6 +16,7 @@
 #include "sceneGame.h"
 #include "gameManager.h"
 #include "retentionManager.h"
+#include "sound.h"
 
 //************************************************************
 //	定数宣言
@@ -29,10 +30,14 @@ namespace
 	{
 		const int	PRIORITY	= 9;		// レッスン表示の優先順位
 		const float	MIN_SCALE	= 1.0f;		// 最小の拡大率
-		const float	MAX_SCALE	= 2.0f;		// 最大の拡大率
+		const float	MAX_SCALE	= 1.9f;		// 最大の拡大率
 		const float	REV_SCALE	= 0.45f;	// 拡大率の補正係数
+
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(800.0f, 500.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 500.0f, 0.0f);		// 空白
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 300.0f, 0.0f);		// 空白
+
+		const D3DXCOLOR	COL_NORMAL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 通常カラー
+		const D3DXCOLOR	COL_LAST	= D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);	// 最終カラー
 	}
 }
 
@@ -41,13 +46,18 @@ namespace
 //************************************************************
 const char *CControlPoint::mc_apTextureFile[] =	// テクスチャ定数
 {
-	NULL,	// 地面テクスチャ
-	"data\\TEXTURE\\tutorial_control.png",	// 操作テクスチャ
+	"data\\TEXTURE\\field_font001.png",	// 地面テクスチャ
+	"data\\TEXTURE\\tutorial_next.png",	// 次テクスチャ
+	"data\\TEXTURE\\tutorial_prev.png",	// 前テクスチャ
 };
 
 const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 {
-	"data\\TEXTURE\\lesson000.png",	// 呼び込みテクスチャ
+	"data\\TEXTURE\\lesson000.png",	// 移動テクスチャ
+	"data\\TEXTURE\\lesson001.png",	// ダッシュテクスチャ
+	"data\\TEXTURE\\lesson002.png",	// 攻撃テクスチャ
+	"data\\TEXTURE\\lesson003.png",	// 攻撃種類テクスチャ
+	"data\\TEXTURE\\lesson004.png",	// フックショットテクスチャ
 };
 
 //************************************************************
@@ -60,7 +70,9 @@ CControlPoint::CControlPoint() : CObject3D(CObject::LABEL_NEXT, PRIORITY)
 {
 	// メンバ変数をクリア
 	m_pTutorial = NULL;		// チュートリアル表示情報
-	m_pControl = NULL;		// 操作表示情報
+	m_pNext = NULL;			// 次操作の表示情報
+	m_pPrev = NULL;			// 前操作の表示情報
+	m_nLesson = LESSON_00;	// レッスン
 	m_fScale = 0.0f;		// 拡大率
 	m_fDestScale = 0.0f;	// 目標拡大率
 }
@@ -80,7 +92,9 @@ HRESULT CControlPoint::Init(void)
 {
 	// メンバ変数を初期化
 	m_pTutorial = NULL;		// チュートリアル表示情報
-	m_pControl = NULL;		// 操作表示情報
+	m_pNext = NULL;			// 次操作の表示情報
+	m_pPrev = NULL;			// 前操作の表示情報
+	m_nLesson = LESSON_00;	// レッスン
 	m_fScale = 1.0f;		// 拡大率
 	m_fDestScale = 1.0f;	// 目標拡大率
 
@@ -104,7 +118,7 @@ HRESULT CControlPoint::Init(void)
 	);
 
 	// テクスチャを登録・割当
-	m_pTutorial->BindTexture(mc_apLessonFile[LESSON_YOBIKOMI]);
+	m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
 
 	// ラベルを設定
 	m_pTutorial->SetLabel(LABEL_UI);
@@ -112,21 +126,37 @@ HRESULT CControlPoint::Init(void)
 	// 優先順位を設定
 	m_pTutorial->SetPriority(tutorial::PRIORITY);
 
-	// 操作表示の生成
-	m_pControl = CObjectBillboard::Create
+	// 前操作表示の生成
+	m_pPrev = CObjectBillboard::Create
 	( // 引数
 		VEC3_ZERO,		// 位置
 		tutorial::SIZE	// 大きさ
 	);
 
 	// テクスチャを登録・割当
-	m_pControl->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
+	m_pPrev->BindTexture(mc_apTextureFile[TEXTURE_PREV]);
 
 	// ラベルを設定
-	m_pControl->SetLabel(LABEL_UI);
+	m_pPrev->SetLabel(LABEL_UI);
 
 	// 優先順位を設定
-	m_pControl->SetPriority(tutorial::PRIORITY);
+	m_pPrev->SetPriority(tutorial::PRIORITY);
+
+	// 次操作表示の生成
+	m_pNext = CObjectBillboard::Create
+	( // 引数
+		VEC3_ZERO,		// 位置
+		tutorial::SIZE	// 大きさ
+	);
+
+	// テクスチャを登録・割当
+	m_pNext->BindTexture(mc_apTextureFile[TEXTURE_NEXT]);
+
+	// ラベルを設定
+	m_pNext->SetLabel(LABEL_UI);
+
+	// 優先順位を設定
+	m_pNext->SetPriority(tutorial::PRIORITY);
 
 	// 自身の影の描画をOFF・影の映り込みをONにする
 	SetEnableDepthShadow(true);
@@ -164,7 +194,8 @@ void CControlPoint::Update(void)
 		m_fDestScale = tutorial::MAX_SCALE;
 
 		// 操作の描画をONにする
-		m_pControl->SetEnableDraw(true);
+		m_pPrev->SetEnableDraw(true);	// 前操作表示
+		m_pNext->SetEnableDraw(true);	// 次操作表示
 	}
 	else
 	{ // 誰もいなかった場合
@@ -173,7 +204,8 @@ void CControlPoint::Update(void)
 		m_fDestScale = tutorial::MIN_SCALE;
 
 		// 操作の描画をOFFにする
-		m_pControl->SetEnableDraw(false);
+		m_pPrev->SetEnableDraw(false);	// 前操作表示
+		m_pNext->SetEnableDraw(false);	// 次操作表示
 	}
 
 	// レッスンの更新
@@ -202,7 +234,12 @@ void CControlPoint::SetVec3Position(const D3DXVECTOR3 & rPos)
 
 	// チュートリアル表示の位置を設定
 	m_pTutorial->SetVec3Position(rPos + tutorial::SPACE);
-	m_pControl->SetVec3Position(rPos + tutorial::SPACE);
+
+	// 前操作表示の位置を設定
+	m_pPrev->SetVec3Position(rPos + tutorial::SPACE);
+
+	// 次操作表示の位置を設定
+	m_pNext->SetVec3Position(rPos + tutorial::SPACE);
 }
 
 //============================================================
@@ -306,7 +343,54 @@ bool CControlPoint::Collision(void)
 //============================================================
 void CControlPoint::UpdateTutorial(const int nID)
 {
+	// ポインタを宣言
+	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
 
+	if (pPad->IsTrigger(CInputPad::KEY_A, nID))
+	{ // 右移動の操作が行われた場合
+
+		// レッスンを進める
+		m_nLesson++;
+
+		if (m_nLesson >= LESSON_MAX)
+		{ // レッスンが最大値を超えた場合
+
+			// レッスンを補正 (戻す)
+			m_nLesson--;
+		}
+		else
+		{ // レッスンが超えていない場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+
+		// テクスチャを登録・割当
+		m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
+	}
+	if (pPad->IsTrigger(CInputPad::KEY_B, nID))
+	{ // 左移動の操作が行われた場合
+
+		// レッスンを戻す
+		m_nLesson--;
+
+		if (m_nLesson <= NONE_IDX)
+		{ // レッスンが最小値を下回った場合
+
+			// レッスンを補正 (進める)
+			m_nLesson++;
+		}
+		else
+		{ // レッスンが下回っていない場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+
+		// テクスチャを登録・割当
+		m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
+	}
 }
 
 //============================================================
@@ -325,5 +409,34 @@ void CControlPoint::UpdateLesson(void)
 
 	// チュートリアル表示の大きさを設定
 	m_pTutorial->SetVec3Sizing(tutorial::SIZE * m_fScale);
-	m_pControl->SetVec3Sizing(tutorial::SIZE * m_fScale);
+
+	// 前操作表示の大きさを設定
+	m_pPrev->SetVec3Sizing(tutorial::SIZE * m_fScale);
+
+	// 次操作表示の大きさを設定
+	m_pNext->SetVec3Sizing(tutorial::SIZE * m_fScale);
+
+	// 前操作表示の色を設定
+	if (m_nLesson <= 0)
+	{ // 前がこれ以上ない場合
+
+		m_pPrev->SetColor(tutorial::COL_LAST);
+	}
+	else
+	{ // 前がある場合
+
+		m_pPrev->SetColor(tutorial::COL_NORMAL);
+	}
+
+	// 次操作表示の色を設定
+	if (m_nLesson >= LESSON_MAX - 1)
+	{ // 次がこれ以上ない場合
+
+		m_pNext->SetColor(tutorial::COL_LAST);
+	}
+	else
+	{ // 次がある場合
+
+		m_pNext->SetColor(tutorial::COL_NORMAL);
+	}
 }
