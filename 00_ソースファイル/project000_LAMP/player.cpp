@@ -408,6 +408,8 @@ void CPlayer::Update(void)
 
 	if (m_SItemTemporary.type != ITEM_EMPTY)
 	{
+		m_pStatus->SetEnableDrawItemUI(true);
+
 		if (m_pEffect != NULL)
 		{
 			m_pEffect->SetVec3Position(GetVec3Position());
@@ -423,6 +425,10 @@ void CPlayer::Update(void)
 				m_pEffect = NULL;
 			}
 		}
+	}
+	else
+	{
+		m_pStatus->SetEnableDrawItemUI(false);
 	}
 
 	// UŒ‚‚Ì•ÛŽƒJƒEƒ“ƒ^[‚ÌŠÇ—
@@ -496,6 +502,9 @@ void CPlayer::Hit(void)
 	{
 		Item = (EItem)(rand() % ITEM_BIGFLAIL);
 	}
+
+	m_pStatus->SetTextureItemUI(Item);
+	
 	switch (Item)
 	{
 	case CPlayer::ITEM_EMPTY:
@@ -1100,8 +1109,9 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	m_pStatus->SetEnableDrawLife(bDraw);	// ‘Ì—Í
 	m_pStatus->SetEnableDrawRate(bDraw);	// ‚Á”ò‚Ñ—¦
 
-											// UI‚Ì•`‰æó‹µ‚ðÝ’è
+	// UI‚Ì•`‰æó‹µ‚ðÝ’è
 	m_pStatus->SetEnableDrawUI(bDraw);
+	m_pStatus->SetEnableDrawItemUI(bDraw);
 }
 
 //============================================================

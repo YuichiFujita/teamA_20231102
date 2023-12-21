@@ -82,6 +82,8 @@ public:
 	int GetNumSurvival(void) const;			// 生存人数取得
 	void SetWinPoint(const int nWinPoint);	// 勝利ポイント設定
 	int GetWinPoint(void) const;			// 勝利ポイント取得
+	void SetWinPlayerID(const int nWinID);	// 勝利プレイヤーID設定
+	int GetWinPlayerID(void) const;			// 勝利プレイヤーID取得
 	void InitGame(void);					// ゲーム開始時の初期化
 
 	void AllSetEnableEntry(const bool bEntry, const bool bAI);			// 全エントリー状況設定
@@ -100,6 +102,8 @@ public:
 	void SetSurvivalRank(const int nPlayerID);	// 生存ランキング設定
 	ERank GetSurvivalRank(const int nID) const;	// 生存ランキング取得
 	int GetPlayerWin(const int nID) const;		// プレイヤーポイント数取得
+	int GetPlayerWinOld(const int nID) const;	// 過去プレイヤーポイント数取得
+	void SetPlayerWinOld(const int nID);		// 過去プレイヤーポイント数設定
 
 	// 静的メンバ関数
 	static CRetentionManager *Create(void);	// 生成
@@ -112,10 +116,12 @@ private:
 	int		m_nNumPlayer;	// プレイヤー数
 	int		m_nNumSurvival;	// 生存プレイヤー数
 	int		m_nWinPoint;	// 勝利ポイント数
+	int		m_nWinPlayerID;	// 勝利プレイヤーID
 
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
 	int		m_aWinRank[MAX_PLAYER];			// 降順の勝利ランキング
 	int		m_aPlayerWin[MAX_PLAYER];		// プレイヤーポイント数
+	int		m_aPlayerWinOld[MAX_PLAYER];	// 過去プレイヤーポイント数
 	int		m_aFlail[MAX_PLAYER];			// フレイルの種類
 	bool	m_aEntry[MAX_PLAYER];			// エントリー状況
 	bool	m_aAI[MAX_PLAYER];				// AI状況

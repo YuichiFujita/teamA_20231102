@@ -51,16 +51,22 @@ public:
 	int  GetNumMaxRate(void) const;				// 最大吹っ飛び率取得
 	void SetEnableDrawRate(const bool bDraw);	// 吹っ飛び率の描画設定
 	void SetEnableDrawUI(const bool bDraw);		// UIの描画設定
+	void SetEnableDrawItemUI(const bool bDraw);		// アイテムUIの描画設定
+	void SetTextureItemUI(const int nItemID);		// アイテムUIの描画設定
 
 	// 静的メンバ関数
 	static CStatusManager *Create(const int nPadID);	// 生成
 	static HRESULT Release(CStatusManager *&prStatusManager);	// 破棄
 
 private:
+	// 静的メンバ変数
+	static const char *mc_apTextureFileItem[];	// モデル定数
+
 	// メンバ変数
 	CMultiValue *m_pLife;		// 体力の情報
 	CMultiValue *m_pKnockRate;	// 吹っ飛び率の情報
 	CObject2D * m_pUI;
+	CObject2D * m_pItemUI;
 	const int m_nPadID;	// パッドID定数
 };
 

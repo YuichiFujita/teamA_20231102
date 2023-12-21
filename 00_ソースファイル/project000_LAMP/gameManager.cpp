@@ -154,6 +154,35 @@ void CGameManager::Update(void)
 				if (m_nCounterState >= WAIT_RESULT_FRAME)
 				{ // 余韻が経過した場合
 
+					if (CManager::GetInstance()->GetRetentionManager()->GetWinState() == CRetentionManager::WIN_SURVIVE)
+					{
+						// 勝利者IDを設定
+						CManager::GetInstance()->GetRetentionManager()->SetWinPlayerID(CManager::GetInstance()->GetRetentionManager()->GetSurvivalRank(CRetentionManager::RANK_1ST));
+					}
+					else if (CManager::GetInstance()->GetRetentionManager()->GetWinState() == CRetentionManager::WIN_KILL)
+					{
+						//比較用変数追加
+						int winPlayer = -1;
+						int playerpoint = 0;
+						int MaxPoint = 0;
+
+						for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+						{
+							playerpoint = CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCntPlayer) - CManager::GetInstance()->GetRetentionManager()->GetPlayerWinOld(nCntPlayer);
+
+							if (playerpoint > MaxPoint)
+							{
+								winPlayer = nCntPlayer;
+								MaxPoint = playerpoint;
+							}
+
+							CManager::GetInstance()->GetRetentionManager()->SetPlayerWinOld(nCntPlayer);
+						}
+
+						// 勝利者IDを設定
+						CManager::GetInstance()->GetRetentionManager()->SetWinPlayerID(winPlayer);
+					}
+
 					// リザルト情報を設定
 					m_pMiddleResult->SetResultData();
 
