@@ -1,0 +1,628 @@
+#==============================================================================
+#
+#	ゲームステージのセットアップ [stageGame.txt]
+#	Author : you
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+#	ステージ範囲の情報
+#------------------------------------------------------------------------------
+#	MODE	：制限モード
+#	CENTER	：中心座標
+#	NEAR	：制限位置 (前)
+#	FAR		：制限位置 (後)
+#	RIGHT	：制限位置 (右)
+#	LEFT	：制限位置 (左)
+#	RADIUS	：制限位置 (半径)
+#	FIELD	：制限位置 (地面)
+#------------------------------------------------------------------------------
+LIMITSET
+	CENTER = 0.0 0.0 0.0
+	NEAR = -12000
+	FAR = 12000
+	RIGHT = 12000
+	LEFT = -12000
+	FIELD = -50
+END_LIMITSET
+
+#------------------------------------------------------------------------------
+#	地面の配置情報
+#------------------------------------------------------------------------------
+#	CULL = 1：カリングなし
+#	CULL = 2：表カリング
+#	CULL = 3：裏カリング
+#------------------------------------------------------------------------------
+#	LIGHT = 0：ライティングOFF
+#	LIGHT = 1：ライティングON
+#------------------------------------------------------------------------------
+STAGE_FIELDSET
+
+	# 地面の総数
+	NUM = 0
+
+END_STAGE_FIELDSET
+
+#------------------------------------------------------------------------------
+#	壁の配置情報
+#------------------------------------------------------------------------------
+#	CULL = 1：カリングなし
+#	CULL = 2：表カリング
+#	CULL = 3：裏カリング
+#------------------------------------------------------------------------------
+#	LIGHT = 0：ライティングOFF
+#	LIGHT = 1：ライティングON
+#------------------------------------------------------------------------------
+STAGE_WALLSET
+
+	# 壁の総数
+	NUM = 0
+
+END_STAGE_WALLSET
+
+#------------------------------------------------------------------------------
+#	景色の配置情報
+#------------------------------------------------------------------------------
+STAGE_SCENERYSET
+
+	# 景色の総数
+	NUM = 3
+
+	SCENERYSET
+		TEXTURE_ID = 0
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+		COL = 1.0 1.0 1.0 1.0
+		PART = 14 1
+		RADIUS = 18000.0
+		HEIGHT = 800.0
+	END_SCENERYSET
+	
+	SCENERYSET
+		TEXTURE_ID = 1
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 85.0 0.0
+		COL = 1.0 1.0 1.0 1.0
+		PART = 14 1
+		RADIUS = 20000.0
+		HEIGHT = 1400.0
+	END_SCENERYSET
+	
+	SCENERYSET
+		TEXTURE_ID = 2
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 35.0 0.0
+		COL = 1.0 1.0 1.0 1.0
+		PART = 14 1
+		RADIUS = 22000.0
+		HEIGHT = 2000.0
+	END_SCENERYSET
+
+END_STAGE_SCENERYSET
+
+#------------------------------------------------------------------------------
+#	空の配置情報
+#------------------------------------------------------------------------------
+STAGE_SKYSET
+
+	# 空の総数
+	NUM = 2
+
+	SKYSET
+		TEXTURE_ID = 0
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+		COL = 1.0 1.0 1.0 1.0
+    	PART = 32 6
+		RADIUS = 30000.0
+	END_SKYSET
+	
+	SKYSET
+		TEXTURE_ID = 0
+		POS = 0.0 0.0 0.0
+		ROT = 0.0 0.0 180.0
+		COL = 1.0 1.0 1.0 1.0
+    	PART = 32 6
+		RADIUS = 30000.0
+	END_SKYSET
+
+END_STAGE_SKYSET
+
+#------------------------------------------------------------------------------
+#	液体の配置情報
+#------------------------------------------------------------------------------
+STAGE_LIQUIDSET
+
+	# 液体の総数
+	NUM = 1
+
+	LIQUIDSET
+		TYPE = 1
+		POS = 0.0 -100.0 0.0
+		ROT = 0.0 45.0 0.0
+		SIZE = 60000.0 60000.0
+		COL = 1.0 1.0 1.0 1.0
+		PART = 128 128
+		TEXMOVE_LOW = 0.0 0.002
+		TEXMOVE_HIGH = 0.0 0.0001
+		MAX_UP = 18.0
+		ADD_SINROT = 5.0
+		ADD_VTXROT = 60.0
+	END_LIQUIDSET
+	
+END_STAGE_LIQUIDSET
+
+#------------------------------------------------------------------------------
+#	地盤の配置情報
+#------------------------------------------------------------------------------
+STAGE_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -710.00 0.00 380.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 200.00 50.00 200.00
+		PARTX = 4.00 1.00 
+		PARTY = 4.00 4.00 
+		PARTZ = 4.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = 710.00 0.00 380.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 200.00 50.00 200.00
+		PARTX = 4.00 1.00 
+		PARTY = 4.00 4.00 
+		PARTZ = 4.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 830.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 1100.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 22.00 5.00 
+		PARTZ = 22.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 -70.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 1400.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 28.00 5.00 
+		PARTZ = 28.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 -800.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 650.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 13.00 5.00 
+		PARTZ = 13.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -470.00 0.00 -1550.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 200.00 50.00 500.00
+		PARTX = 10.00 1.00 
+		PARTY = 4.00 10.00 
+		PARTZ = 4.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = 430.00 0.00 -1550.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 200.00 50.00 500.00
+		PARTX = 10.00 1.00 
+		PARTY = 4.00 10.00 
+		PARTZ = 4.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 -1520.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 250.00 50.00 150.00
+		PARTX = 3.00 1.00 
+		PARTY = 5.00 3.00 
+		PARTZ = 5.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 -2300.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 650.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 13.00 5.00 
+		PARTZ = 13.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -20.00 0.00 1430.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 200.00 50.00 350.00
+		PARTX = 7.00 1.00 
+		PARTY = 4.00 7.00 
+		PARTZ = 4.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = 1800.00 0.00 -1580.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 800.00 50.00 800.00
+		PARTX = 16.00 1.00 
+		PARTY = 16.00 16.00 
+		PARTZ = 16.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -2440.00 0.00 460.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 800.00 50.00 800.00
+		PARTX = 16.00 1.00 
+		PARTY = 16.00 16.00 
+		PARTZ = 16.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = 2200.00 0.00 -30.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 400.00 50.00 750.00
+		PARTX = 15.00 1.00 
+		PARTY = 8.00 15.00 
+		PARTZ = 8.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -2840.00 0.00 -1090.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 400.00 50.00 750.00
+		PARTX = 15.00 1.00 
+		PARTY = 8.00 15.00 
+		PARTZ = 8.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = 2850.00 0.00 470.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 250.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 5.00 5.00 
+		PARTZ = 5.00 1.00 
+	END_GROUNDSET
+
+	GROUNDSET
+		TYPE = 3
+		POS = -3490.00 0.00 -1590.00
+		ROT = 0.00 0.00 0.00
+		SIZE = 250.00 50.00 250.00
+		PARTX = 5.00 1.00 
+		PARTY = 5.00 5.00 
+		PARTZ = 5.00 1.00 
+	END_GROUNDSET
+
+END_STAGE_GROUNDSET
+
+#------------------------------------------------------------------------------
+#	ブロックの配置情報
+#------------------------------------------------------------------------------
+STAGE_BLOCKSET
+
+END_STAGE_BLOCKSET
+
+#------------------------------------------------------------------------------
+#	障害物の配置情報
+#------------------------------------------------------------------------------
+STAGE_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		POS = 750.00 0.00 1030.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		POS = -1170.00 0.00 130.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		POS = -1170.00 0.00 -270.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		POS = 1130.00 0.00 -270.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 10
+		POS = 1130.00 0.00 130.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = -470.00 0.00 -40.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 280.00 0.00 70.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 10.00 0.00 -210.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = -810.00 0.00 300.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 670.00 0.00 -130.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 190.00 0.00 930.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = -410.00 0.00 -1240.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = -60.00 0.00 -760.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 20.00 0.00 -2170.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = -530.00 0.00 -2370.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 6
+		POS = 420.00 0.00 -1490.00
+		ROT = 0.00 0.00 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 0
+		POS = 500.00 0.00 -740.00
+		ROT = 0.00 1.10 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 0
+		POS = -550.00 0.00 -1880.00
+		ROT = 0.00 -0.25 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 1
+		POS = -390.00 0.00 810.00
+		ROT = 0.00 -0.25 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 1
+		POS = 840.00 0.00 300.00
+		ROT = 0.00 -1.55 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -1690.00 0.00 -190.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -1690.00 0.00 1110.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -1690.00 0.00 400.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -3190.00 0.00 400.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -3190.00 0.00 -190.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -3190.00 0.00 1110.00
+		ROT = 0.00 -1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -2120.00 0.00 -300.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -2120.00 0.00 1210.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = -2680.00 0.00 1210.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1740.00 0.00 -2330.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1150.00 0.00 -2330.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 2300.00 0.00 -2330.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1650.00 0.00 -830.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1150.00 0.00 -830.00
+		ROT = 0.00 -3.14 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1050.00 0.00 -1260.00
+		ROT = 0.00 1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 1050.00 0.00 -1880.00
+		ROT = 0.00 1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 2550.00 0.00 -1880.00
+		ROT = 0.00 1.57 0.00
+	END_OBSTACLESET
+
+	OBSTACLESET
+		TYPE = 12
+		POS = 2550.00 0.00 -1260.00
+		ROT = 0.00 1.57 0.00
+	END_OBSTACLESET
+
+END_STAGE_OBSTACLESET
+
+#------------------------------------------------------------------------------
+#	生成位置の配置情報
+#------------------------------------------------------------------------------
+STAGE_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = -2490.00 0.00 820.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 1740.00 0.00 -1960.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = -2480.00 0.00 130.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+	SPAWNPOINTSET
+		POS = 1780.00 0.00 -1310.00
+		ROT = 0.00 0.00 0.00
+	END_SPAWNPOINTSET
+
+END_STAGE_SPAWNPOINTSET
+
+#------------------------------------------------------------------------------
+#	アイテム生成位置の配置情報
+#------------------------------------------------------------------------------
+STAGE_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -10.00 0.00 1530.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -10.00 0.00 -1530.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -480.00 0.00 -750.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = 420.00 0.00 -2330.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = 2880.00 0.00 480.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -3460.00 0.00 -1630.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = -750.00 0.00 -20.00
+	END_ITEMPOINTSET
+
+	ITEMPOINTSET
+		POS = 770.00 0.00 760.00
+	END_ITEMPOINTSET
+
+END_STAGE_ITEMPOINTSET
+
