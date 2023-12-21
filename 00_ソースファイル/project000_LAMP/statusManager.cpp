@@ -13,6 +13,7 @@
 #include "retentionManager.h"
 #include "objectBillboard.h"
 #include "object2D.h"
+#include "player.h"
 
 //************************************************************
 //	定数宣言
@@ -47,9 +48,9 @@ const char *CStatusManager::mc_apTextureFileItem[] =	// モデル定数(フレイル)
 {
 	"data\\TEXTURE\\rule000.png",			// 鉄球
 	"data\\TEXTURE\\rule001.png",			// 頭
-	"data\\TEXTURE\\rule000.png",			// エスケープ君
-	"data\\TEXTURE\\rule001.png",			// エスケープ君
-	"data\\TEXTURE\\ruleTitle000.png",		// エスケープ君
+	"data\\TEXTURE\\itemicon002.png",		// エスケープ君
+	"data\\TEXTURE\\itemicon001.png",		// エスケープ君
+	"data\\TEXTURE\\itemicon000.png",		// エスケープ君
 	"data\\TEXTURE\\rule000.png",			// エスケープ君
 	"data\\TEXTURE\\rule000.png",			// エスケープ君
 	"data\\TEXTURE\\rule000.png",			// エスケープ君
@@ -342,7 +343,11 @@ void CStatusManager::SetEnableDrawItemUI(const bool bDraw)
 //============================================================
 void CStatusManager::SetTextureItemUI(const int nItemID)
 {
-	m_pItemUI->BindTexture(mc_apTextureFileItem[nItemID]);
+	if (nItemID != CPlayer::ITEM_HEAL)
+	{ // 回復の場合は表示の変更なし
+
+		m_pItemUI->BindTexture(mc_apTextureFileItem[nItemID]);
+	}
 }
 
 //============================================================

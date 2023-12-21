@@ -101,7 +101,7 @@ public:
 	int GetWinRank1st(void) const;				// 勝利ランキング一位プレイヤー取得
 	void InitSurvivalRank(void);				// 生存ランキング初期化
 	void SetSurvivalRank(const int nPlayerID);	// 生存ランキング設定
-	ERank GetSurvivalRank(const int nID) const;	// 生存ランキング取得
+	int CRetentionManager::GetSurvivalRank(const int nRank) const;	// 生存ランキング取得
 	int GetPlayerWin(const int nID) const;		// プレイヤーポイント数取得
 	int GetPlayerWinOld(const int nID) const;	// 過去プレイヤーポイント数取得
 	void SetPlayerWinOld(const int nID);		// 過去プレイヤーポイント数設定

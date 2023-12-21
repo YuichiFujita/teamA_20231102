@@ -347,7 +347,7 @@ void CControlPoint::UpdateTutorial(const int nID)
 	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
 
-	if (pPad->IsTrigger(CInputPad::KEY_A, nID))
+	if (pPad->IsTrigger(CInputPad::KEY_Y, nID))
 	{ // 右移動の操作が行われた場合
 
 		// レッスンを進める
@@ -369,7 +369,7 @@ void CControlPoint::UpdateTutorial(const int nID)
 		// テクスチャを登録・割当
 		m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
 	}
-	if (pPad->IsTrigger(CInputPad::KEY_B, nID))
+	if (pPad->IsTrigger(CInputPad::KEY_X, nID))
 	{ // 左移動の操作が行われた場合
 
 		// レッスンを戻す
