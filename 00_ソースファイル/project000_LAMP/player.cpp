@@ -408,6 +408,8 @@ void CPlayer::Update(void)
 
 	if (m_SItemTemporary.type != ITEM_EMPTY)
 	{
+		m_pStatus->SetEnableDrawItemUI(true);
+
 		if (m_pEffect != NULL)
 		{
 			m_pEffect->SetVec3Position(GetVec3Position());
@@ -423,6 +425,10 @@ void CPlayer::Update(void)
 				m_pEffect = NULL;
 			}
 		}
+	}
+	else
+	{
+		m_pStatus->SetEnableDrawItemUI(false);
 	}
 
 	// 攻撃の保持カウンターの管理
@@ -496,6 +502,9 @@ void CPlayer::Hit(void)
 	{
 		Item = (EItem)(rand() % ITEM_BIGFLAIL);
 	}
+
+	m_pStatus->SetTextureItemUI(Item);
+	
 	switch (Item)
 	{
 	case CPlayer::ITEM_EMPTY:
@@ -1100,8 +1109,9 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
 	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 
-											// UIの描画状況を設定
+	// UIの描画状況を設定
 	m_pStatus->SetEnableDrawUI(bDraw);
+	m_pStatus->SetEnableDrawItemUI(bDraw);
 }
 
 //============================================================
@@ -1604,14 +1614,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	EMotion currentMotion = MOTION_IDOL;		// 現在のモーション
 
-												// ポインタを宣言
+	// ポインタを宣言
 	CInputKeyboard	*pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad = CManager::GetInstance()->GetPad();		// パッド
+	CInputPad		*pPad = CManager::GetInstance()->GetPad();				// パッド
 	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
 	if (pCamera == NULL) { assert(false); return MOTION_IDOL; }	// 非使用中
 
-																// PC操作
+	// PC操作
 #if 0
 	if (m_nPadID == 0)
 	{

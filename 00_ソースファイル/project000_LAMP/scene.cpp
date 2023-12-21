@@ -55,7 +55,7 @@ CScene::~CScene()
 HRESULT CScene::Init(void)
 {
 	// ステージの生成
-	m_pStage = CStage::Create();
+	m_pStage = CStage::Create(m_mode);
 	if (m_pStage == NULL)
 	{ // 非使用中の場合
 
@@ -83,8 +83,22 @@ HRESULT CScene::Init(void)
 			if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nCntPlayer))
 			{ // エントリーされている場合
 
-				// プレイヤーオブジェクトの生成
-				m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer, CManager::GetInstance()->GetRetentionManager()->IsAI(nCntPlayer));
+				if (CManager::GetInstance()->GetRetentionManager()->IsEndTutorial())
+				{ // チュートリアルが終了している場合
+
+					// プレイヤーオブジェクトの生成
+					m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer, CManager::GetInstance()->GetRetentionManager()->IsAI(nCntPlayer));
+				}
+				else
+				{ // していない場合
+
+					if (!CManager::GetInstance()->GetRetentionManager()->IsAI(nCntPlayer))
+					{ // AIではない場合
+
+						// プレイヤーオブジェクトの生成
+						m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
+					}
+				}
 			}
 		}
 	}
