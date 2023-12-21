@@ -173,7 +173,7 @@ const char *CResultManager::mc_apTextureFile[] =	// テクスチャ定数
 {
 	"data\\TEXTURE\\Winner_.png",				// 勝った
 	"data\\TEXTURE\\PlayerCount.png",			// 誰が
-	"data\\TEXTURE\\Winner_flame.png",			// 勝者フレーム
+	"data\\TEXTURE\\entry_flame.png",			// 勝者フレーム
 	"data\\TEXTURE\\ranking_flame.png",			// フレーム
 	"data\\TEXTURE\\YES.png",					// 再戦
 	"data\\TEXTURE\\NO.png",					// 戻る
@@ -269,9 +269,8 @@ HRESULT CResultManager::Init(void)
 	//単体の初期化
 	//<************************************************
 	m_pBigFrame		= nullptr;		// 巨大フレーム		
-	m_pFade			= nullptr;		// フェードの情報
 	m_pCover		= nullptr;		// フェードの情報
-	m_state			= STATE_FADEIN;	// 状態
+	m_state			= STATE_WIN;	// 状態
 	m_nCounterState	= 0;			// 状態管理カウンター
 	m_nPattern		= 0;
 	m_nSelect		= SELECT_YES;	// 現在の選択
@@ -289,30 +288,6 @@ HRESULT CResultManager::Init(void)
 	m_rPos[2] = D3DXVECTOR3(Icon::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
 	m_rPos[3] = D3DXVECTOR3(Winner::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
 	m_rPos[4] = D3DXVECTOR3(Player::POS.x,	Frame::CENT_POSY - fDis, 0.0f);
-
-	//--------------------------------------------------------
-	//	フェードの生成・設定
-	//--------------------------------------------------------
-	{
-		// フェードの生成
-		m_pFade = CObject2D::Create
-		( // 引数
-			SCREEN_CENT,		// 位置
-			Fade::SIZE_FADE,	// 大きさ
-			VEC3_ZERO,			// 向き
-			Fade::INITCOL_FADE	// 色
-		);
-		if (m_pFade == NULL)
-		{ // 生成に失敗した場合
-
-			// 失敗を返す
-			assert(false);
-			return E_FAIL;
-		}
-
-		// 優先順位を設定
-		m_pFade->SetPriority(RESULT_PRIO);
-	}
 
 	//--------------------------------------------------------
 	//	巨大フレーム生成・設定
@@ -705,9 +680,6 @@ HRESULT CResultManager::Uninit(void)
 		}
 	}
 
-	// フェードの終了
-	m_pFade->Uninit();
-
 	m_pCover->Uninit();
 
 	// 成功を返す
@@ -767,13 +739,6 @@ void CResultManager::Update(void)
 	case STATE_NONE:	// 何もしない状態
 
 		// 無し
-
-		break;
-
-	case STATE_FADEIN:	// フェードイン状態
-
-		// フェードインの更新
-		UpdateFade();
 
 		break;
 
@@ -847,9 +812,6 @@ void CResultManager::Update(void)
 		assert(false);
 		break;
 	}
-
-	// フェードの更新
-	m_pFade->Update();
 
 	m_pCover->Update();
 
@@ -1309,33 +1271,6 @@ void CResultManager::UpdateNumber(void)
 		}
 	}
 }
-//============================================================
-//	フェードインの更新処理
-//============================================================
-void CResultManager::UpdateFade(void)
-{
-	// 変数を宣言
-	D3DXCOLOR colFade = m_pFade->GetColor();	// フェードの色
-
-	if (colFade.a < Fade::SETCOL_FADE.a)
-	{ // 透明量が設定値未満の場合
-
-		// 透明度を加算
-		colFade.a += Fade::ADD_ALPHA;
-	}
-	else
-	{ // 透明量が設定値以上の場合
-
-		// 透明度を補正
-		colFade.a = Fade::SETCOL_FADE.a;
-
-		// 状態を変更
-		m_state = STATE_WIN;	// 待機状態
-	}
-
-	// 透明度を反映
-	m_pFade->SetColor(colFade);
-}
 
 //============================================================
 //	選択の更新処理
@@ -1494,9 +1429,6 @@ void CResultManager::UpdateTransition(void)
 //============================================================
 void CResultManager::SkipStaging(void)
 {
-	// フェードの透明度を設定
-	m_pFade->SetColor(Fade::SETCOL_FADE);
-
 	//勝利ロゴの数だけ回す
 	for (int nCnt = 0; nCnt < NUM_WIN; nCnt++)
 	{

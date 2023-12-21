@@ -30,6 +30,7 @@ public:
 		TYPE_BOX,		// 箱テクスチャ
 		TYPE_BRICK,		// レンガ
 		TYPE_CONCRETE,	// コンクリート
+		TYPE_ICE,		// 氷
 		TYPE_MAX		// この列挙型の総数
 	};
 

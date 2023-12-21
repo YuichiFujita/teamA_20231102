@@ -18,7 +18,7 @@
 //************************************************************
 //	マクロ定義
 //************************************************************
-#define	RESULT_PRIO	(14)	// リザルトの優先順位
+#define	RESULT_PRIO	(13)	// リザルトの優先順位
 #define	NUM_WIN		(2)		// 勝利ロゴの数
 #define	NUM_FRAME	(4)		// フレームの数
 
@@ -63,7 +63,6 @@ public:
 	enum EState
 	{
 		STATE_NONE = 0,			// 何もしない状態
-		STATE_FADEIN,			// フェードイン状態
 		STATE_WIN,
 		STATE_BIG_FRAME,
 		STATE_FRAME,
@@ -125,7 +124,6 @@ public:
 private:
 
 	// メンバ関数
-	void UpdateFade(void);			// フェードイン
 	void UpdateSelect(void);		// 選択更新
 	void UpdateTransition(void);	// 遷移決定
 	void SkipStaging(void);			// 演出スキップ
@@ -144,7 +142,6 @@ private:
 	CObject2D *m_apFrame[NUM_FRAME];	// フレーム
 	CAnim2D *m_apNumber[NUM_FRAME];		// フレーム
 	CObject2D *m_apSelect[SELECT_MAX];	// 選択肢
-	CObject2D *m_pFade;					// フェードの情報
 	CObject2D *m_pCover;				//カバー
 	CObject2D *m_apIcon[NUM_FRAME];		//プレイヤーのアイコン
 	CAnim2D *m_apWinNum[NUM_FRAME];

@@ -73,6 +73,15 @@ const char *CBlock::mc_apTextureFile[][6] =	// テクスチャ定数
 		"data\\TEXTURE\\Concrete000.png",	// 前テクスチャ
 		"data\\TEXTURE\\Concrete000.png",	// 後テクスチャ
 	},
+
+	{ // 氷テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 左テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 右テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 下テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 上テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 前テクスチャ
+		"data\\TEXTURE\\iceblock.png",	// 後テクスチャ
+	},
 };
 
 //************************************************************

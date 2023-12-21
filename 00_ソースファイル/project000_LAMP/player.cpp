@@ -280,7 +280,7 @@ void CPlayer::Uninit(void)
 		assert(false);
 	}	// 破棄失敗
 
-		// フレイルの終了
+	// フレイルの終了
 	m_pFlail->Uninit();
 
 	if (m_pAI != NULL)

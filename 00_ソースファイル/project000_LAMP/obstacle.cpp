@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "texture.h"
 #include "sound.h"
+#include "ModelParticle.h"
 
 //************************************************************
 //	定数宣言
@@ -323,6 +324,7 @@ void CObstacle::Hit(void)
 	//破壊できるブロックだったら
 	if (m_status.state == EBreak::BREAK_TRUE)
 	{
+		CModParticle::Create(GetVec3Position(), GetMaterial(0).MatD3D.Diffuse, CManager::GetInstance()->GetTexture()->Regist(GetMaterial(0).pTextureFilename));
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// ヒット音
 		//終了処理を行う
 		Uninit();
