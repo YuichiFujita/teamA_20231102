@@ -40,11 +40,12 @@ public:
 	// レッスン列挙
 	enum ELesson
 	{
-		LESSON_YOBIKOMI = 0,	// 呼び込みテクスチャ
-		LESSON_01,				// テクスチャ
-		LESSON_02,				// テクスチャ
-		LESSON_03,				// テクスチャ
-		LESSON_MAX				// この列挙型の総数
+		LESSON_00 = 0,	// 移動テクスチャ
+		LESSON_01,		// ダッシュテクスチャ
+		LESSON_02,		// 攻撃テクスチャ
+		LESSON_03,		// 攻撃種類テクスチャ
+		LESSON_04,		// フックショットテクスチャ
+		LESSON_MAX		// この列挙型の総数
 	};
 
 	// コンストラクタ

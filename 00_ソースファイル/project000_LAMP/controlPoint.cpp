@@ -30,11 +30,11 @@ namespace
 	{
 		const int	PRIORITY	= 9;		// レッスン表示の優先順位
 		const float	MIN_SCALE	= 1.0f;		// 最小の拡大率
-		const float	MAX_SCALE	= 2.0f;		// 最大の拡大率
+		const float	MAX_SCALE	= 1.9f;		// 最大の拡大率
 		const float	REV_SCALE	= 0.45f;	// 拡大率の補正係数
 
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(800.0f, 500.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 500.0f, 0.0f);		// 空白
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 300.0f, 0.0f);		// 空白
 
 		const D3DXCOLOR	COL_NORMAL	= D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);	// 通常カラー
 		const D3DXCOLOR	COL_LAST	= D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);	// 最終カラー
@@ -46,17 +46,18 @@ namespace
 //************************************************************
 const char *CControlPoint::mc_apTextureFile[] =	// テクスチャ定数
 {
-	NULL,	// 地面テクスチャ
+	"data\\TEXTURE\\field_font001.png",	// 地面テクスチャ
 	"data\\TEXTURE\\tutorial_next.png",	// 次テクスチャ
 	"data\\TEXTURE\\tutorial_prev.png",	// 前テクスチャ
 };
 
 const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 {
-	"data\\TEXTURE\\lesson000.png",	// 呼び込みテクスチャ
-	"data\\TEXTURE\\lesson001.png",	// テクスチャ
-	"data\\TEXTURE\\lesson002.png",	// テクスチャ
-	"data\\TEXTURE\\lesson003.png",	// テクスチャ
+	"data\\TEXTURE\\lesson000.png",	// 移動テクスチャ
+	"data\\TEXTURE\\lesson001.png",	// ダッシュテクスチャ
+	"data\\TEXTURE\\lesson002.png",	// 攻撃テクスチャ
+	"data\\TEXTURE\\lesson003.png",	// 攻撃種類テクスチャ
+	"data\\TEXTURE\\lesson004.png",	// フックショットテクスチャ
 };
 
 //************************************************************
@@ -68,12 +69,12 @@ const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 CControlPoint::CControlPoint() : CObject3D(CObject::LABEL_NEXT, PRIORITY)
 {
 	// メンバ変数をクリア
-	m_pTutorial = NULL;				// チュートリアル表示情報
-	m_pNext = NULL;					// 次操作の表示情報
-	m_pPrev = NULL;					// 前操作の表示情報
-	m_nLesson = LESSON_YOBIKOMI;	// レッスン
-	m_fScale = 0.0f;				// 拡大率
-	m_fDestScale = 0.0f;			// 目標拡大率
+	m_pTutorial = NULL;		// チュートリアル表示情報
+	m_pNext = NULL;			// 次操作の表示情報
+	m_pPrev = NULL;			// 前操作の表示情報
+	m_nLesson = LESSON_00;	// レッスン
+	m_fScale = 0.0f;		// 拡大率
+	m_fDestScale = 0.0f;	// 目標拡大率
 }
 
 //============================================================
@@ -90,12 +91,12 @@ CControlPoint::~CControlPoint()
 HRESULT CControlPoint::Init(void)
 {
 	// メンバ変数を初期化
-	m_pTutorial = NULL;				// チュートリアル表示情報
-	m_pNext = NULL;					// 次操作の表示情報
-	m_pPrev = NULL;					// 前操作の表示情報
-	m_nLesson = LESSON_YOBIKOMI;	// レッスン
-	m_fScale = 1.0f;				// 拡大率
-	m_fDestScale = 1.0f;			// 目標拡大率
+	m_pTutorial = NULL;		// チュートリアル表示情報
+	m_pNext = NULL;			// 次操作の表示情報
+	m_pPrev = NULL;			// 前操作の表示情報
+	m_nLesson = LESSON_00;	// レッスン
+	m_fScale = 1.0f;		// 拡大率
+	m_fDestScale = 1.0f;	// 目標拡大率
 
 	// オブジェクト3Dの初期化
 	if (FAILED(CObject3D::Init()))
