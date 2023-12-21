@@ -20,6 +20,7 @@
 //	インクルードファイル
 //************************************************************
 class CObjectGauge3D;	// オブジェクトゲージ3Dクラス
+class CControlPoint;	// 操作位置クラス
 
 //************************************************************
 //	クラス定義
@@ -28,6 +29,13 @@ class CObjectGauge3D;	// オブジェクトゲージ3Dクラス
 class CNextPoint : public CObject3D
 {
 public:
+	// テクスチャ列挙
+	enum ETexture
+	{
+		TEXTURE_NORMAL = 0,	// 通常テクスチャ
+		TEXTURE_MAX			// この列挙型の総数
+	};
+
 	// コンストラクタ
 	CNextPoint();
 
@@ -39,6 +47,7 @@ public:
 	void Uninit(void) override;		// 終了
 	void Update(void) override;		// 更新
 	void Draw(void) override;		// 描画
+	void SetVec3Position(const D3DXVECTOR3& rPos) override;	// 位置設定
 
 	// 静的メンバ関数
 	static CNextPoint *Create	// 生成
@@ -51,8 +60,12 @@ private:
 	// メンバ関数
 	bool Collision(void);	// プレイヤー全員との当たり判定
 
+	// 静的メンバ変数
+	static const char *mc_apTextureFile[];	// テクスチャ定数
+
 	// メンバ変数
 	CObjectGauge3D *m_pGauge;	// 待機ゲージ情報
+	CControlPoint *m_pControl;	// 操作表示の情報
 };
 
 #endif	// _NEXTPOINT_H_

@@ -158,6 +158,7 @@
     <ClCompile Include="block.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="collision.cpp" />
+    <ClCompile Include="controlPoint.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="debugproc.cpp" />
     <ClCompile Include="DepthShadow.cpp" />
@@ -262,6 +263,7 @@
     <ClInclude Include="block.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="collision.h" />
+    <ClInclude Include="controlPoint.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="debugproc.h" />
     <ClInclude Include="DepthShadow.h" />

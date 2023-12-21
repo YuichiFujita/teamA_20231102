@@ -322,7 +322,19 @@ HRESULT CMiddleResultManager::Init(void)
 		CPlayer *pPlayer = CScene::GetPlayer(nCntEntry);	// プレイヤー情報
 
 		// 変数を宣言
-		D3DXCOLOR colPolygon = (pPlayer == NULL) ? number::COL_NOTJOIN : XCOL_WHITE;	// ポリゴン色
+		D3DXCOLOR colPolygonFrame;	// ポリゴン色
+		D3DXCOLOR colPolygonPlayer;	// ポリゴン色
+
+		if (pPlayer != NULL)
+		{
+			colPolygonFrame = XCOL_WHITE;
+			colPolygonPlayer = XCOL_WHITE;
+		}
+		else
+		{
+			colPolygonFrame = number::COL_NOTJOIN;
+			colPolygonPlayer = number::COL_NOTJOIN;
+		}
 
 		// プレイヤーフレームの生成
 		m_apFrame[nCntEntry] = CObject2D::Create
@@ -330,7 +342,7 @@ HRESULT CMiddleResultManager::Init(void)
 			frame::POS + (frame::SPACE * (float)nCntEntry),	// 位置
 			frame::SIZE * frame::INIT_SCALE,				// 大きさ
 			VEC3_ZERO,		// 向き
-			colPolygon		// 色
+			colPolygonFrame		// 色
 		);
 		if (m_apFrame[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -362,8 +374,8 @@ HRESULT CMiddleResultManager::Init(void)
 			playerPoint::SIZE_VALUE * playerPoint::INIT_SCALE,	// 数字大きさ
 			VEC3_ZERO,	// タイトル向き
 			VEC3_ZERO,	// 数字向き
-			colPolygon,	// タイトル色
-			colPolygon	// 数字色
+			colPolygonPlayer,	// タイトル色
+			colPolygonPlayer	// 数字色
 		);
 		if (m_apPlayerWinPoint[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -392,8 +404,8 @@ HRESULT CMiddleResultManager::Init(void)
 			number::SIZE_VALUE * playerPoint::INIT_SCALE,	// 数字大きさ
 			VEC3_ZERO,	// タイトル向き
 			VEC3_ZERO,	// 数字向き
-			colPolygon,	// タイトル色
-			colPolygon	// 数字色
+			colPolygonFrame,	// タイトル色
+			colPolygonFrame	// 数字色
 		);
 		if (m_apNumber[nCntEntry] == NULL)
 		{ // 生成に失敗した場合
@@ -641,6 +653,20 @@ void CMiddleResultManager::Update(void)
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
+
+		if (nCntEntry == CManager::GetInstance()->GetRetentionManager()->GetWinPlayerID())
+		{
+			m_apPlayerWinPoint[nCntEntry]->SetColorTitle(D3DXCOLOR(1.0f, 0.8f, 0.2f, 1.0f));
+
+			m_apFrame[nCntEntry]->SetColor(D3DXCOLOR(1.0f, 0.8f, 0.2f, 1.0f));
+		}
+
+		if (CManager::GetInstance()->GetRetentionManager()->GetPlayerWin(nCntEntry) >= CManager::GetInstance()->GetRetentionManager()->GetWinPoint())
+		{
+			m_apPlayerWinPoint[nCntEntry]->SetColorTitle(D3DXCOLOR(1.0f, 0.3f, 0.1f, 1.0f));
+
+			m_apFrame[nCntEntry]->SetColor(D3DXCOLOR(1.0f, 0.3f, 0.1f, 1.0f));
+		}
 
 		// プレイヤーナンバーの更新
 		m_apNumber[nCntEntry]->Update();

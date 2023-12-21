@@ -30,12 +30,15 @@ CRetentionManager::CRetentionManager()
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aFlail[0], 0, sizeof(m_aFlail));					// フレイルの種類
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
+	memset(&m_aPlayerWinOld[0], 0, sizeof(m_aPlayerWinOld));		// 過去プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;	// 討伐条件
 	m_stateWin		= WIN_SURVIVE;	// 勝利条件
 	m_nNumPlayer	= 0;			// プレイヤー数
 	m_nNumSurvival	= 0;			// 生存プレイヤー数
 	m_nWinPoint		= 0;			// 勝利ポイント数
+	m_nWinPlayerID	= 0;
+	m_bEndTutorial	= false;		// チュートリアル終了状況
 }
 
 //============================================================
@@ -56,12 +59,15 @@ HRESULT CRetentionManager::Init(void)
 	memset(&m_aWinRank[0], 0, sizeof(m_aWinRank));				// 降順の勝利ランキング
 	memset(&m_aFlail[0], 0, sizeof(m_aFlail));					// フレイルの種類
 	memset(&m_aPlayerWin[0], 0, sizeof(m_aPlayerWin));			// プレイヤーポイント数
+	memset(&m_aPlayerWinOld[0], 0, sizeof(m_aPlayerWinOld));		// 過去プレイヤーポイント数
 	memset(&m_aEntry[0], 0, sizeof(m_aEntry));					// エントリー状況
 	m_stateKill		= KILL_LIFE;		// 討伐条件
 	m_stateWin		= WIN_SURVIVE;		// 勝利条件
 	m_nNumPlayer	= 0;				// プレイヤー数
 	m_nNumSurvival	= 0;				// 生存プレイヤー数
 	m_nWinPoint		= INIT_WINPOINT;	// 勝利ポイント数
+	m_nWinPlayerID = -1;
+	m_bEndTutorial	= false;			// チュートリアル終了状況
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -241,10 +247,31 @@ int CRetentionManager::GetWinPoint(void) const
 }
 
 //============================================================
+//	勝利プレイヤーIDの設定処理
+//============================================================
+void CRetentionManager::SetWinPlayerID(const int nWinID)
+{
+	// 引数の勝利ポイントを設定
+	m_nWinPlayerID = nWinID;
+}
+
+//============================================================
+//	勝利プレイヤーID取得処理
+//============================================================
+int CRetentionManager::GetWinPlayerID(void) const
+{
+	// 勝利ポイントを返す
+	return m_nWinPlayerID;
+}
+
+//============================================================
 //	ゲーム開始時の初期化処理
 //============================================================
 void CRetentionManager::InitGame(void)
 {
+	// チュートリアルをしていない状態にする
+	m_bEndTutorial = false;
+
 	// 生存ランキングを初期化
 	InitSurvivalRank();
 
@@ -330,6 +357,22 @@ bool CRetentionManager::IsAI(const int nID) const
 {
 	// 引数インデックスのAI状況を返す
 	return m_aAI[nID];
+}
+
+//============================================================
+//	チュートリアルの終了設定処理
+//============================================================
+void CRetentionManager::EndTutorial(void)
+{
+	m_bEndTutorial = true;
+}
+
+//============================================================
+//	チュートリアルの終了状況の取得処理
+//============================================================
+bool CRetentionManager::IsEndTutorial(void) const
+{
+	return m_bEndTutorial;
 }
 
 //============================================================
@@ -479,7 +522,6 @@ int CRetentionManager::GetWinRank1st(void) const
 	}
 
 	// ランキング1位が存在しない
-	assert(false);
 	return NONE_IDX;	// 例外を返す
 }
 
@@ -611,4 +653,32 @@ int CRetentionManager::GetPlayerWin(const int nID) const
 		return m_aPlayerWin[nID];
 	}
 	else { assert(false); return NONE_IDX; }	// 範囲外
+}
+
+//============================================================
+//	過去プレイヤーポイント数取得処理
+//============================================================
+int CRetentionManager::GetPlayerWinOld(const int nID) const
+{
+	if (nID > NONE_IDX && nID < MAX_PLAYER)
+	{ // インデックスが範囲内の場合
+
+	  // 引数プレイヤーのポイントを返す
+		return m_aPlayerWinOld[nID];
+	}
+	else { assert(false); return NONE_IDX; }	// 範囲外
+}
+
+//============================================================
+//	過去プレイヤーポイント数取得処理
+//============================================================
+void CRetentionManager::SetPlayerWinOld(const int nID)
+{
+	if (nID > NONE_IDX && nID < MAX_PLAYER)
+	{ // インデックスが範囲内の場合
+
+	  // 引数プレイヤーのポイントを返す
+		m_aPlayerWinOld[nID] = m_aPlayerWin[nID];
+	}
+	else { assert(false); }	// 範囲外
 }
