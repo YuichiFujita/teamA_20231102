@@ -27,8 +27,12 @@ namespace
 
 	namespace tutorial
 	{
+		const int	PRIORITY	= 9;		// レッスン表示の優先順位
+		const float	MIN_SCALE	= 1.0f;		// 最小の拡大率
+		const float	MAX_SCALE	= 2.0f;		// 最大の拡大率
+		const float	REV_SCALE	= 0.45f;	// 拡大率の補正係数
 		const D3DXVECTOR3 SIZE	= D3DXVECTOR3(800.0f, 500.0f, 0.0f);	// 大きさ
-		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 800.0f, 0.0f);		// 空白
+		const D3DXVECTOR3 SPACE	= D3DXVECTOR3(0.0f, 500.0f, 0.0f);		// 空白
 	}
 }
 
@@ -37,7 +41,8 @@ namespace
 //************************************************************
 const char *CControlPoint::mc_apTextureFile[] =	// テクスチャ定数
 {
-	NULL,	// 通常テクスチャ
+	NULL,	// 地面テクスチャ
+	"data\\TEXTURE\\tutorial_control.png",	// 操作テクスチャ
 };
 
 const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
@@ -54,7 +59,10 @@ const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 CControlPoint::CControlPoint() : CObject3D(CObject::LABEL_NEXT, PRIORITY)
 {
 	// メンバ変数をクリア
-	m_pTutorial = NULL;	// チュートリアル表示情報
+	m_pTutorial = NULL;		// チュートリアル表示情報
+	m_pControl = NULL;		// 操作表示情報
+	m_fScale = 0.0f;		// 拡大率
+	m_fDestScale = 0.0f;	// 目標拡大率
 }
 
 //============================================================
@@ -71,7 +79,10 @@ CControlPoint::~CControlPoint()
 HRESULT CControlPoint::Init(void)
 {
 	// メンバ変数を初期化
-	m_pTutorial = NULL;	// チュートリアル表示情報
+	m_pTutorial = NULL;		// チュートリアル表示情報
+	m_pControl = NULL;		// 操作表示情報
+	m_fScale = 1.0f;		// 拡大率
+	m_fDestScale = 1.0f;	// 目標拡大率
 
 	// オブジェクト3Dの初期化
 	if (FAILED(CObject3D::Init()))
@@ -83,7 +94,7 @@ HRESULT CControlPoint::Init(void)
 	}
 
 	// テクスチャを登録・割当
-	BindTexture(mc_apTextureFile[TEXTURE_NORMAL]);
+	BindTexture(mc_apTextureFile[TEXTURE_FIELD]);
 
 	// チュートリアル表示の生成
 	m_pTutorial = CObjectBillboard::Create
@@ -97,6 +108,25 @@ HRESULT CControlPoint::Init(void)
 
 	// ラベルを設定
 	m_pTutorial->SetLabel(LABEL_UI);
+
+	// 優先順位を設定
+	m_pTutorial->SetPriority(tutorial::PRIORITY);
+
+	// 操作表示の生成
+	m_pControl = CObjectBillboard::Create
+	( // 引数
+		VEC3_ZERO,		// 位置
+		tutorial::SIZE	// 大きさ
+	);
+
+	// テクスチャを登録・割当
+	m_pControl->BindTexture(mc_apTextureFile[TEXTURE_CONTROL]);
+
+	// ラベルを設定
+	m_pControl->SetLabel(LABEL_UI);
+
+	// 優先順位を設定
+	m_pControl->SetPriority(tutorial::PRIORITY);
 
 	// 自身の影の描画をOFF・影の映り込みをONにする
 	SetEnableDepthShadow(true);
@@ -127,7 +157,27 @@ void CControlPoint::Update(void)
 	}
 
 	// チュートリアルの操作判定
-	Collision();
+	if (Collision())
+	{ // 誰かが操作の範囲内にいた場合
+
+		// 表示を拡大
+		m_fDestScale = tutorial::MAX_SCALE;
+
+		// 操作の描画をONにする
+		m_pControl->SetEnableDraw(true);
+	}
+	else
+	{ // 誰もいなかった場合
+
+		// 表示を縮小
+		m_fDestScale = tutorial::MIN_SCALE;
+
+		// 操作の描画をOFFにする
+		m_pControl->SetEnableDraw(false);
+	}
+
+	// レッスンの更新
+	UpdateLesson();
 
 	// オブジェクト3Dの更新
 	CObject3D::Update();
@@ -152,6 +202,7 @@ void CControlPoint::SetVec3Position(const D3DXVECTOR3 & rPos)
 
 	// チュートリアル表示の位置を設定
 	m_pTutorial->SetVec3Position(rPos + tutorial::SPACE);
+	m_pControl->SetVec3Position(rPos + tutorial::SPACE);
 }
 
 //============================================================
@@ -204,8 +255,11 @@ CControlPoint *CControlPoint::Create
 //============================================================
 //	プレイヤー全員との当たり判定
 //============================================================
-void CControlPoint::Collision(void)
+bool CControlPoint::Collision(void)
 {
+	// 変数を宣言
+	bool bColl = false;	// 判定状況
+
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
 	{ // プレイヤーの最大数分繰り返す
 
@@ -236,9 +290,15 @@ void CControlPoint::Collision(void)
 
 				// チュートリアルの操作
 				UpdateTutorial(nCntPlayer);
+
+				// 判定があった状態にする
+				bColl = true;
 			}
 		}
 	}
+
+	// 判定状況を返す
+	return bColl;
 }
 
 //============================================================
@@ -247,4 +307,23 @@ void CControlPoint::Collision(void)
 void CControlPoint::UpdateTutorial(const int nID)
 {
 
+}
+
+//============================================================
+//	レッスンの更新処理
+//============================================================
+void CControlPoint::UpdateLesson(void)
+{
+	// 変数を宣言
+	float fDiffScale = 0.0f;	// 差分の拡大率
+
+	// 拡大率の差分を計算
+	fDiffScale = m_fDestScale - m_fScale;
+
+	// 拡大率を計算
+	m_fScale += fDiffScale * tutorial::REV_SCALE;
+
+	// チュートリアル表示の大きさを設定
+	m_pTutorial->SetVec3Sizing(tutorial::SIZE * m_fScale);
+	m_pControl->SetVec3Sizing(tutorial::SIZE * m_fScale);
 }

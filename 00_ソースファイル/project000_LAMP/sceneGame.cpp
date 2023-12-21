@@ -317,19 +317,6 @@ void CSceneGame::SetEnableDrawUI(const bool bDraw)
 {
 	// 引数のUIの描画状況を設定
 	m_bDrawUI = bDraw;
-
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤー数分繰り返す
-
-		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
-
-		if (pPlayer != NULL)
-		{ // プレイヤーが存在する場合
-
-			// プレイヤーの描画状況を設定
-			pPlayer->SetEnableDrawUI(bDraw);
-		}
-	}
 }
 
 //============================================================

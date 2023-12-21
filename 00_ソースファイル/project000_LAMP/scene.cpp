@@ -97,6 +97,9 @@ HRESULT CScene::Init(void)
 
 						// プレイヤーオブジェクトの生成
 						m_apPlayer[nCntPlayer] = CPlayer::Create(m_mode, nCntPlayer);
+
+						// プレイヤーのUIを非表示にする
+						m_apPlayer[nCntPlayer]->SetEnableDrawUI(false);
 					}
 				}
 			}

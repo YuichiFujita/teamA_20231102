@@ -767,8 +767,10 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 	// 変数を宣言
 	bool bDeath = false;	// 死亡状況
 
-							// 死亡状況の設定
-	{
+	// 死亡状況の設定
+	if (CManager::GetInstance()->GetRetentionManager()->IsEndTutorial())
+	{ // チュートリアルが終了している場合
+
 		// ポインタを宣言
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
@@ -788,7 +790,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 			if (m_pStatus->GetNumLife() <= 0)
 			{ // 体力がなくなった場合
 
-			  // 死亡状態にする
+				// 死亡状態にする
 				bDeath = true;
 			}
 
@@ -809,11 +811,11 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 		D3DXVECTOR3 rotPlayer = GetVec3Rotation();	// プレイヤー向き
 
-													// 攻撃者の情報を保存
+		// 攻撃者の情報を保存
 		m_pFinalAttack = pAttack;
 		m_nCounterAttack = 0;	// 最終攻撃カウンター
 
-								// カウンターを初期化
+		// カウンターを初期化
 		m_nCounterState = 0;
 
 		// フレイルを強制的に所持
@@ -833,8 +835,8 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		else
 		{ // 死亡していない場合
 
-		  // NAKAMURA：吹っ飛び率の決め方は任せます
-		  // 吹っ飛び率を加算
+			// NAKAMURA：吹っ飛び率の決め方は任せます
+			// 吹っ飛び率を加算
 			CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
 
 			if (pRetention->GetKillState() == CRetentionManager::KILL_LIFE)
@@ -845,8 +847,9 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 			{
 				m_pStatus->AddNumRate(nDmg);
 			}
-		  // NAKAMURA：ふっとび量の決め方きもければ変えて
-		  // 変数を宣言
+
+			// NAKAMURA：ふっとび量の決め方きもければ変えて
+			// 変数を宣言
 			if (m_SItemTemporary.type != ITEM_SUPERARMOR)
 			{
 				float fKnockRate = m_pStatus->GetNumRate();	// 吹っ飛ばし率
@@ -896,8 +899,8 @@ void CPlayer::HitKillY(const int nDmg)
 	}
 
 	if (m_state != STATE_NORMAL
-		&&  m_state != STATE_KNOCK
-		&&  m_state != STATE_INVULN)
+	&&  m_state != STATE_KNOCK
+	&&  m_state != STATE_INVULN)
 	{ // 通常・ノック・無敵状態ではない場合
 
 		return;
@@ -906,7 +909,7 @@ void CPlayer::HitKillY(const int nDmg)
 	// 変数を宣言
 	bool bDeath = false;	// 死亡状況
 
-							// 死亡状況の設定
+	// 死亡状況の設定
 	{
 		// ポインタを宣言
 		CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
@@ -921,43 +924,50 @@ void CPlayer::HitKillY(const int nDmg)
 		case CLiquid::TYPE_ICESEA:
 			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.8f, 1.0f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 60, 150, 0.2f, 0.99f);
 			break;
-		default:
+		case CLiquid::TYPE_MUDDYWATER:
+			CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(15.0f, 0.0f, 0.0f), D3DXCOLOR(0.35f, 0.25f, 0.18f, 1.0f), D3DXVECTOR3(100.0f, 100.0f, 0.0f), VEC3_ZERO, D3DXVECTOR3(0.0f, -5.0f, 0.0f), 12, 600, 60, 60, 150, 0.2f, 0.99f);
 			break;
-		}
-	
-
-		switch (pRetention->GetKillState())
-		{ // 討伐条件ごとの処理
-		case CRetentionManager::KILL_LIFE:	// 体力制
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がすでにない場合
-
-				return;
-			}
-
-			// 体力にダメージを与える
-			m_pStatus->AddNumLife(-nDmg);
-
-			if (m_pStatus->GetNumLife() <= 0)
-			{ // 体力がなくなった場合
-
-			  // 死亡状態にする
-				bDeath = true;
-			}
-
-			break;
-
-		case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
-
-											// 死亡状態にする
-			bDeath = true;
-
-			break;
-
 		default:
 			assert(false);
 			break;
+		}
+	
+		if (CManager::GetInstance()->GetRetentionManager()->IsEndTutorial())
+		{ // チュートリアルが終了している場合
+
+			switch (pRetention->GetKillState())
+			{ // 討伐条件ごとの処理
+			case CRetentionManager::KILL_LIFE:	// 体力制
+
+				if (m_pStatus->GetNumLife() <= 0)
+				{ // 体力がすでにない場合
+
+					return;
+				}
+
+				// 体力にダメージを与える
+				m_pStatus->AddNumLife(-nDmg);
+
+				if (m_pStatus->GetNumLife() <= 0)
+				{ // 体力がなくなった場合
+
+					// 死亡状態にする
+					bDeath = true;
+				}
+
+				break;
+
+			case CRetentionManager::KILL_KNOCK:	// 吹っ飛ばし制
+
+				// 死亡状態にする
+				bDeath = true;
+
+				break;
+
+			default:
+				assert(false);
+				break;
+			}
 		}
 	}
 
@@ -966,7 +976,7 @@ void CPlayer::HitKillY(const int nDmg)
 		// 変数を宣言
 		D3DXVECTOR3 posPlayer = GetVec3Position();	// プレイヤー位置
 
-													// カウンターを初期化
+		// カウンターを初期化
 		m_nCounterState = 0;
 
 		// フレイルを強制的に所持
@@ -975,7 +985,7 @@ void CPlayer::HitKillY(const int nDmg)
 		if (bDeath)
 		{ // 死亡している場合
 
-		  // 死亡状態を設定
+			// 死亡状態を設定
 			SetState(STATE_DEATH);
 
 			// 死亡モーションを設定
@@ -985,13 +995,11 @@ void CPlayer::HitKillY(const int nDmg)
 		else
 		{ // 死亡していない場合
 
-		  // 溺れ状態を設定
+			// 溺れ状態を設定
 			SetState(STATE_DROWN);
 
 			// 溺れモーションを設定
 			SetMotion(MOTION_DROWN);
-
-
 		}
 
 		// サウンドの再生
@@ -1009,7 +1017,7 @@ void CPlayer::SetSpawn(void)
 	if (pSpawnPoint != NULL)
 	{ // スポーンポイントがある場合
 
-	  // 位置を設定
+		// 位置を設定
 		SetVec3Position(pSpawnPoint->GetVec3Position());
 
 		// 向きを設定
@@ -1021,7 +1029,7 @@ void CPlayer::SetSpawn(void)
 	else
 	{ // スポーンポイントがない場合
 
-	  // 位置を設定
+		// 位置を設定
 		SetVec3Position(VEC3_ZERO);
 
 		// 向きを設定
@@ -1033,10 +1041,10 @@ void CPlayer::SetSpawn(void)
 	SetState(STATE_SPAWN);	// スポーン状態の設定
 	SetMotion(MOTION_IDOL);	// 待機モーションを設定
 
-							// カウンターを初期化
+	// カウンターを初期化
 	m_nCounterState = 0;	// 状態管理カウンター
 
-							// 移動量を初期化
+	// 移動量を初期化
 	m_move = VEC3_ZERO;
 
 	// フレイルを強制的に所持
@@ -1100,7 +1108,7 @@ void CPlayer::SetEnableDrawUI(const bool bDraw)
 	m_pStatus->SetEnableDrawLife(bDraw);	// 体力
 	m_pStatus->SetEnableDrawRate(bDraw);	// 吹っ飛び率
 
-											// UIの描画状況を設定
+	// UIの描画状況を設定
 	m_pStatus->SetEnableDrawUI(bDraw);
 }
 
@@ -2130,7 +2138,7 @@ void CPlayer::UpdateRotation(D3DXVECTOR3& rRot)
 	// 変数を宣言
 	float fDiffRot = 0.0f;	// 差分向き
 
-							// 目標向きの正規化
+	// 目標向きの正規化
 	useful::NormalizeRot(m_destRot.y);
 
 	// 目標向きまでの差分を計算

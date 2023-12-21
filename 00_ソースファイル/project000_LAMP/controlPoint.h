@@ -31,7 +31,8 @@ public:
 	// テクスチャ列挙
 	enum ETexture
 	{
-		TEXTURE_NORMAL = 0,	// 通常テクスチャ
+		TEXTURE_FIELD = 0,	// 地面テクスチャ
+		TEXTURE_CONTROL,	// 操作テクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
@@ -64,8 +65,9 @@ public:
 
 private:
 	// メンバ関数
-	void Collision(void);	// プレイヤー全員との当たり判定
+	bool Collision(void);				// プレイヤー全員との当たり判定
 	void UpdateTutorial(const int nID);	// チュートリアル操作
+	void UpdateLesson(void);			// レッスン更新
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
@@ -73,6 +75,9 @@ private:
 
 	// メンバ変数
 	CObjectBillboard *m_pTutorial;	// チュートリアル表示情報
+	CObjectBillboard *m_pControl;	// 操作表示情報
+	float m_fScale;		// 拡大率
+	float m_fDestScale;	// 目標拡大率
 };
 
 #endif	// _CONTROL_POINT_H_
