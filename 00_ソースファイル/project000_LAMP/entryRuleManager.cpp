@@ -998,6 +998,9 @@ void CEntryRuleManager::Decide(void)
 
 		// フェードアウト状態にする
 		m_state = STATE_FADEOUT;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 	}
 }
 

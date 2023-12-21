@@ -564,6 +564,9 @@ void CPlayer::Hit(void)
 	default:
 		break;
 	}
+
+	// ƒTƒEƒ“ƒh‚ÌÄ¶
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SAVE);	// Žæ“¾‰¹
 }
 
 //============================================================
