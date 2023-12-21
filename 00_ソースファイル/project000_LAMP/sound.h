@@ -55,8 +55,9 @@ public:
 		LABEL_SE_JUMPPAD,		// ジャンプパッド
 		LABEL_SE_STICK,			// くっつき音
 		LABEL_SE_HIT,			// ぶつかり音
-		LABEL_SE_HIT2,
-		LABEL_SE_SWING,
+		LABEL_SE_HIT2,			// ぶつかり音2
+		LABEL_SE_SWING,			// 振る音
+		LABEL_SE_DIVE,			// ダイブ音
 		LABEL_MAX,				// この列挙型の総数
 	};
 

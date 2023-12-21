@@ -76,12 +76,35 @@ HRESULT CSceneGame::Init(void)
 	// 障害物のセットアップ
 	CObstacle::LoadSetup();
 
-	//--------------------------------------------------------
-	//	初期生成
-	//--------------------------------------------------------
 	// シーンの初期化
 	CScene::Init();		// ステージ・プレイヤーの生成
 
+	//--------------------------------------------------------
+	//	初期設定
+	//--------------------------------------------------------
+	// カメラを設定
+	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
+
+	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+	{ // プレイヤー数分繰り返す
+
+		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+		if (pPlayer != NULL)
+		{ // プレイヤーが存在する場合
+
+			// プレイヤーを出現
+			pPlayer->SetSpawn();
+			pPlayer->SetState(CPlayer::STATE_NONE);
+		}
+	}
+
+	// 見下ろしカメラの目標位置の設定
+	CManager::GetInstance()->GetCamera()->SetDestLookDown();
+
+	//--------------------------------------------------------
+	//	初期生成
+	//--------------------------------------------------------
 	// ゲームマネージャーの生成
 	m_pGameManager = CGameManager::Create();
 	if (m_pGameManager == NULL)
@@ -109,36 +132,15 @@ HRESULT CSceneGame::Init(void)
 
 #endif	// ON_STENCIL_PLAYER
 
-	//--------------------------------------------------------
-	//	初期設定
-	//--------------------------------------------------------
-	// カメラを設定
-	CManager::GetInstance()->GetCamera()->SetState(CCamera::STATE_LOOKDOWN);	// カメラを見下ろし状態に設定
-
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤー数分繰り返す
-
-		CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
-
-		if (pPlayer != NULL)
-		{ // プレイヤーが存在する場合
-
-			// プレイヤーを出現
-			pPlayer->SetSpawn();
-			pPlayer->SetState(CPlayer::STATE_NONE);
-		}
-	}
-
-	// 見下ろしカメラの目標位置の設定
-	CManager::GetInstance()->GetCamera()->SetDestLookDown();
-
 	// UIの描画状況を設定
 	SetEnableDrawUI(m_bDrawUI);
 
 	// ポーズの描画状況を設定
 	SetEnableDrawPause(m_bDrawPause);
 
-	// BGMの再生
+	//--------------------------------------------------------
+	//	BGMの再生
+	//--------------------------------------------------------
 	int nRand = rand() % 3;
 
 	switch (nRand)
@@ -156,6 +158,7 @@ HRESULT CSceneGame::Init(void)
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_BGM_GAME);
 		break;
 	}
+
 	// 成功を返す
 	return S_OK;
 }
