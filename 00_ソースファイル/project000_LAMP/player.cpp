@@ -1140,6 +1140,14 @@ CPlayer *CPlayer::GetLastAttackPlayer(void) const
 }
 
 //============================================================
+//	プレイヤーガイドの取得処理
+//============================================================
+CObjectBillboard* CPlayer::GetPlayerGuide(void) const
+{
+	return m_pPlayerGuide;
+}
+
+//============================================================
 //	フレイルカウンター取得処理
 //============================================================
 int CPlayer::GetCounterFlail(void) const
@@ -1226,11 +1234,32 @@ void CPlayer::UpdateMotion(int nMotion)
 		if (IsMotionLoop(nAnimMotion))
 		{ // ループするモーションだった場合
 
-			if (nAnimMotion != nMotion)
-			{ // 現在のモーションが再生中のモーションと一致しない場合
+			switch (GetMotionType())
+			{ // モーションごとの処理
 
-			  // 現在のモーションの設定
-				SetMotion(nMotion);
+			case MOTION_EMOTE_ODOLOOP:	// オドループエモートモーション：ループON
+			case MOTION_EMOTE_OD:	// インターネットオーバードーズエモートモーション：ループON
+			case MOTION_EMOTE_SPIN:	// スピンエモートモーション：ループON
+
+				if (nMotion != MOTION_IDOL)
+				{ // 待機モーションではない場合
+
+				  // 現在のモーションの設定
+					SetMotion(nMotion);
+				}
+
+				break;
+
+			default:	// 例外処理
+
+				if (nAnimMotion != nMotion)
+				{ // 現在のモーションが再生中のモーションと一致しない場合
+
+				  // 現在のモーションの設定
+					SetMotion(nMotion);
+				}
+
+				break;
 			}
 		}
 		else
@@ -1249,6 +1278,7 @@ void CPlayer::UpdateMotion(int nMotion)
 			case MOTION_EMOTE_PROUD:	// 胸張りエモートモーション：ループOFF
 			case MOTION_EMOTE_SLEEP:	// 寝るエモートモーション：ループOFF
 			case MOTION_EMOTE_RORI:	// 粛清ロリ神レクイエムエモートモーション：ループOFF
+			case MOTION_EMOTE_ODOLOOP:	// オドループエモートモーション：ループON
 
 				if (nMotion != MOTION_IDOL)
 				{ // 待機モーションではない場合
@@ -1276,6 +1306,9 @@ void CPlayer::UpdateMotion(int nMotion)
 	case MOTION_PULL:	// 引きずりモーション：ループON
 	case MOTION_MOVE:	// 移動モーション：ループON
 	case MOTION_DROWN:	// 溺れモーション：ループON
+	case MOTION_EMOTE_ODOLOOP:	// オドループエモートモーション：ループON
+	case MOTION_EMOTE_OD:	// インターネットオーバードーズエモートモーション：ループON
+	case MOTION_EMOTE_SPIN:	// スピンエモートモーション：ループON
 
 		break;
 
@@ -1936,9 +1969,9 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						rotFlail = m_pFlail->GetChainRot();
 
 						// 移動量を更新
-						m_move.x += sinf(rotFlail + (D3DX_PI * 0.5f)) * 10.0f;
+						m_move.x += sinf(rotFlail + (D3DX_PI * 0.5f)) * 11.0f;
 						m_move.y = 1.0f;
-						m_move.z += cosf(rotFlail + (D3DX_PI * 0.5f)) * 10.0f;
+						m_move.z += cosf(rotFlail + (D3DX_PI * 0.5f)) * 11.0f;
 
 						m_destRot.y = rotFlail - (D3DX_PI * 0.5f);
 
@@ -2085,11 +2118,11 @@ void CPlayer::PlayEmote(EMotion& rAnim)
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_RORI;
+		rAnim = MOTION_EMOTE_SPIN;
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_PROUD;
+		rAnim = MOTION_EMOTE_OD;
 	}
 }
 

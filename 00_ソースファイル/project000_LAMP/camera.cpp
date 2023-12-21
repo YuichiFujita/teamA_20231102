@@ -83,11 +83,11 @@ namespace
 	namespace Result
 	{
 		const D3DXVECTOR3 INIT_VECU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 上方向ベクトルの初期値
-		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(335.0f, 230.0f, -1200.0f);	// 視点の初期値
-		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(335.0f, 230.0f, 0.0f);		// 注視点の初期値
+		const D3DXVECTOR3 INIT_POSV = D3DXVECTOR3(240.0f, 140.0f, -1000.0f);	// 視点の初期値
+		const D3DXVECTOR3 INIT_POSR = D3DXVECTOR3(240.0f, 140.0f, 0.0f);		// 注視点の初期値
 
-		const float VIEW_WIDTH = SCREEN_WIDTH * 0.90f;		// 画面の横幅
-		const float VIEW_HEIGHT = SCREEN_HEIGHT * 0.90f;	// 画面の縦幅
+		const float VIEW_WIDTH = SCREEN_WIDTH * 0.65f;		// 画面の横幅
+		const float VIEW_HEIGHT = SCREEN_HEIGHT * 0.65f;	// 画面の縦幅
 	}
 }
 

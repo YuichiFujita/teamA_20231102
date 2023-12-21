@@ -161,6 +161,7 @@ private:
 	int m_anWaitTime[OBJ_MAX];			//待機時間
 	int m_anRank[RANK::RANK_MAX];		//順位順に並べるための変数
 	int m_anSaveRank[RANK::RANK_MAX];	//順位順の値を保存
+	int playerMotion;
 	bool m_bSkiped;						//スキップされているかどうか
 	bool m_abSizeFinish[OBJ_MAX];		//サイズ拡大・縮小が終了しているか
 	bool m_abool[OBJ_MAX];				// 判定用

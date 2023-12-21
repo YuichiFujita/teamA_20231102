@@ -469,16 +469,9 @@ void CFlail::UpdateChain(void)
 			{
 				if (nCntChain < flail::FLAIL_NUM_MAX -1)
 				{
-					if (m_chain[nCntChain + 1].multiModel->GetVec3Position().x <= 0.0f)
+					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
-						float speed = -0.5f * player->GetCounterFlail();
-
-						if (speed > 20.0f)
-						{
-							speed = 20.0f;
-						}
-
-						pos.x -= speed;
+						pos.x -= 0.3f;
 
 						if (pos.x < 0.0f)
 						{
@@ -488,16 +481,9 @@ void CFlail::UpdateChain(void)
 				}
 				else
 				{
-					if (m_chain[0].multiModel->GetVec3Position().x <= 0.0f)
+					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
-						float speed = -0.5f * player->GetCounterFlail();
-
-						if (speed > 20.0f)
-						{
-							speed = 20.0f;
-						}
-
-						pos.x -= speed;
+						pos.x -= 0.3f;
 
 						if (pos.x < 0.0f)
 						{

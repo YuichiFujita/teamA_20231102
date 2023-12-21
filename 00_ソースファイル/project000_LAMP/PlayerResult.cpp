@@ -93,7 +93,7 @@ void CPlayerResult::Draw(void)
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
 	CCamera *pCamera = CManager::GetInstance()->GetCamera();	// カメラのポインタ
 
-																// カメラのビューポートの位置を設定
+	// カメラのビューポートの位置を設定
 	currentViewport = pCamera->GetViewport(CCamera::TYPE_RESULT);	// ビューポート取得
 	currentViewport.X = (nPadID);						// 左上位置を設定
 	pCamera->SetViewport(CCamera::TYPE_RESULT, currentViewport);		// ビューポート設定

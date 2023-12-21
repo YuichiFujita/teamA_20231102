@@ -16,9 +16,11 @@
 #include "texture.h"
 #include "model.h"
 #include "object2D.h"
+#include "objectBillboard.h"
 #include "timerManager.h"
 #include "retentionManager.h"
 #include "anim2D.h"
+#include "player.h"
 
 //************************************************************
 //	マクロ定義
@@ -239,6 +241,7 @@ HRESULT CResultManager::Init(void)
 		m_anWaitTime[nCnt] = 0;			// 待機時間
 		m_abool[nCnt] = false;			// 判定用
 		m_abSizeFinish[nCnt] = false;	// サイズ変更判定用
+		playerMotion = -1;
 
 		//二次元配列の初期化
 		for (int nCntFrame = 0; nCntFrame < NUM_FRAME; nCntFrame++)
@@ -779,6 +782,14 @@ void CResultManager::Update(void)
 		//キー入力待機状態
 	case STATE_HOLD:
 
+		if (playerMotion == -1)
+		{
+			playerMotion = rand() % 4;
+
+			CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_anSaveRank[0]);
+			player->SetMotion(CPlayer::MOTION_EMOTE_RORI + playerMotion);
+		}
+
 		//何かのキーが押されていたら
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_RETURN)
 			|| CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE)
@@ -1088,6 +1099,11 @@ void CResultManager::UpdateBigFrame(void)
 			//最大待機時間になっていたら
 			if (m_anWaitTime[EObj::OBJ_BIGFRAME] == BigFrame::MAX_WAIT)
 			{
+				CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_anSaveRank[0]);
+
+				player->SetEnableDraw(true);
+				player->GetPlayerGuide()->SetEnableDraw(false);
+
 				m_anWaitTime[EObj::OBJ_BIGFRAME] = 0;
 				m_state = STATE_FRAME;
 			}
@@ -1509,4 +1525,7 @@ void CResultManager::SkipStaging(void)
 	}
 	m_state = STATE_FRAME;
 
+	CPlayer *player = CManager::GetInstance()->GetScene()->GetPlayer(m_anSaveRank[0]);
+	player->SetEnableDraw(true);
+	player->GetPlayerGuide()->SetEnableDraw(false);
 }

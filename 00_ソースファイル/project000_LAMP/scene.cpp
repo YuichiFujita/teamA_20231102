@@ -112,6 +112,8 @@ HRESULT CScene::Init(void)
 
 		// プレイヤーオブジェクトの生成
 		m_apPlayer[nWin1st] = CPlayer::Create(m_mode, nWin1st);
+
+		m_apPlayer[nWin1st]->SetEnableDraw(false);
 	}
 
 	// 成功を返す
