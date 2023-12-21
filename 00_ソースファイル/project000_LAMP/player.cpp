@@ -861,7 +861,7 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 				m_destRot.y = rotPlayer.y;	// 目標向きを設定
 				SetVec3Rotation(rotPlayer);	// 向きを設定
 
-											// 空中状態にする
+				// 空中状態にする
 				m_bJump = true;
 
 				// ノック状態を設定
@@ -882,9 +882,6 @@ void CPlayer::HitKnockBack(const int nDmg, const D3DXVECTOR3& vecKnock, CPlayer 
 		// サウンドの再生
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
 	}
-
-	
-
 }
 
 //============================================================
