@@ -11,6 +11,7 @@
 #include "manager.h"
 #include "texture.h"
 #include "collision.h"
+#include "retentionManager.h"
 
 #include "field.h"
 #include "wall.h"
@@ -30,11 +31,10 @@
 //************************************************************
 namespace
 {
+	const char* SETUP_TUTORIAL_TXT = "data\\TXT\\Stages\\stage0.txt";	// チュートリアルステージセットアップテキスト
+
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
-#if 0
-		"data\\TXT\\Stages\\stage0.txt",
-#else
 		"data\\TXT\\Stages\\stage1.txt",
 		"data\\TXT\\Stages\\stage2.txt",
 		"data\\TXT\\Stages\\stage3.txt",
@@ -61,7 +61,6 @@ namespace
 		"data\\TXT\\Stages\\stage24.txt",
 		"data\\TXT\\Stage_morikawa\\stage001.txt",
 		"data\\TXT\\Stage_morikawa\\stage002.txt",
-#endif
 	};
 }
 
@@ -391,7 +390,7 @@ CLiquid *CStage::GetLiquid(void)
 //============================================================
 //	生成処理
 //============================================================
-CStage *CStage::Create(void)
+CStage *CStage::Create(const CScene::EMode mode)
 {
 	// ポインタを宣言
 	CStage *pStage = NULL;		// ステージ生成用
@@ -421,7 +420,7 @@ CStage *CStage::Create(void)
 		}
 
 		// セットアップの読込
-		if (FAILED(LoadSetup(pStage)))
+		if (FAILED(LoadSetup(mode, pStage)))
 		{ // 読み込みに失敗した場合
 
 			// メモリ開放
@@ -463,11 +462,11 @@ HRESULT CStage::Release(CStage *&prStage)
 //============================================================
 //	セットアップ処理
 //============================================================
-HRESULT CStage::LoadSetup(CStage *pStage)
+HRESULT CStage::LoadSetup(const CScene::EMode mode, CStage *pStage)
 {
 	// 変数を宣言
-	int nLoadID = rand() % (sizeof(SETUP_TXT) / sizeof(SETUP_TXT[0]));	// 読込ステージインデックス
 	int nEnd = 0;	// テキスト読み込み終了の確認用
+	bool bRandStage = false;	// ステージランダム化
 
 	// 変数配列を宣言
 	char aString[MAX_STRING];	// テキストの文字列の代入用
@@ -475,8 +474,41 @@ HRESULT CStage::LoadSetup(CStage *pStage)
 	// ポインタを宣言
 	FILE *pFile;	// ファイルポインタ
 
-	// ファイルを読み込み形式で開く
-	pFile = fopen(SETUP_TXT[nLoadID], "r");
+	if (mode == CScene::MODE_GAME)
+	{ // シーンがゲームモード
+
+		if (CManager::GetInstance()->GetRetentionManager()->IsEndTutorial())
+		{ // チュートリアルが終了済み
+
+			bRandStage = true;
+		}
+		else
+		{ // チュートリアル未完了
+
+			bRandStage = false;
+		}
+	}
+	else
+	{ // ゲームシーン以外はランダムステージ
+
+		bRandStage = true;
+	}
+
+	if (bRandStage)
+	{ // チュートリアル終了済み、またはゲーム以外のシーン
+
+		// 読込ステージインデックスを設定
+		int nLoadID = rand() % (sizeof(SETUP_TXT) / sizeof(SETUP_TXT[0]));
+
+		// ランダムにファイルを読み込み形式で開く
+		pFile = fopen(SETUP_TXT[nLoadID], "r");
+	}
+	else
+	{ // チュートリアルがまだ
+
+		// チュートリアルファイルを読み込み形式で開く
+		pFile = fopen(SETUP_TUTORIAL_TXT, "r");
+	}
 
 	if (pFile != NULL)
 	{ // ファイルが開けた場合

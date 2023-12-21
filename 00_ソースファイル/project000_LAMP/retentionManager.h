@@ -90,7 +90,8 @@ public:
 	void SetEntry(const int nID, const bool bEntry, const bool bAI);	// エントリー設定
 	bool IsEntry(const int nID) const;	// エントリー状況取得
 	bool IsAI(const int nID) const;		// AI状況取得
-
+	void EndTutorial(void);				// チュートリアルの終了設定
+	bool IsEndTutorial(void) const;		// チュートリアルの終了状況取得
 	void SetFlail(const int nID, const int nFlail);	// フレイルの種類設定
 	int GetFlail(const int nID) const;				// フレイルの種類取得
 
@@ -117,6 +118,7 @@ private:
 	int		m_nNumSurvival;	// 生存プレイヤー数
 	int		m_nWinPoint;	// 勝利ポイント数
 	int		m_nWinPlayerID;	// 勝利プレイヤーID
+	bool	m_bEndTutorial;	// チュートリアル終了状況
 
 	int		m_aSurvivalRank[MAX_PLAYER];	// 降順の生存ランキング
 	int		m_aWinRank[MAX_PLAYER];			// 降順の勝利ランキング

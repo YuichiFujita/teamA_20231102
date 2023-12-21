@@ -85,7 +85,7 @@ HRESULT CStatusManager::Init(void)
 	m_pLife = NULL;			// 体力の情報
 	m_pKnockRate = NULL;	// 吹っ飛び率の情報
 
-							// 体力の情報の生成
+	// 体力の情報の生成
 	m_pLife = CMultiValue::Create
 	( // 引数
 		CValue::TEXTURE_UI,	// テクスチャ
@@ -101,8 +101,12 @@ HRESULT CStatusManager::Init(void)
 	  // 失敗を返す
 		return E_FAIL;
 	}
+
 	// 優先順位を設定
 	m_pLife->SetPriority(PRIORITY);
+
+	// 最大値を設定
+	m_pLife->SetMax(life::MAX_LIFE);
 
 	// 吹っ飛び率の情報の設定
 	m_pKnockRate = CMultiValue::Create

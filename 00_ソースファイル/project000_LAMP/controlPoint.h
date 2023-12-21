@@ -1,14 +1,14 @@
 //============================================================
 //
-//	遷移位置ヘッダー [nextPoint.h]
+//	操作位置ヘッダー [controlPoint.h]
 //	Author：藤田勇一
 //
 //============================================================
 //************************************************************
 //	二重インクルード防止
 //************************************************************
-#ifndef _NEXTPOINT_H_
-#define _NEXTPOINT_H_
+#ifndef _CONTROL_POINT_H_
+#define _CONTROL_POINT_H_
 
 //************************************************************
 //	インクルードファイル
@@ -19,14 +19,13 @@
 //************************************************************
 //	インクルードファイル
 //************************************************************
-class CObjectGauge3D;	// オブジェクトゲージ3Dクラス
-class CControlPoint;	// 操作位置クラス
+class CObjectBillboard;	// オブジェクトビルボードクラス
 
 //************************************************************
 //	クラス定義
 //************************************************************
-// 遷移位置クラス
-class CNextPoint : public CObject3D
+// 操作位置クラス
+class CControlPoint : public CObject3D
 {
 public:
 	// テクスチャ列挙
@@ -36,11 +35,18 @@ public:
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
+	// レッスン列挙
+	enum ELesson
+	{
+		LESSON_YOBIKOMI = 0,	// 呼び込みテクスチャ
+		LESSON_MAX				// この列挙型の総数
+	};
+
 	// コンストラクタ
-	CNextPoint();
+	CControlPoint();
 
 	// デストラクタ
-	~CNextPoint();
+	~CControlPoint();
 
 	// オーバーライド関数
 	HRESULT Init(void) override;	// 初期化
@@ -50,7 +56,7 @@ public:
 	void SetVec3Position(const D3DXVECTOR3& rPos) override;	// 位置設定
 
 	// 静的メンバ関数
-	static CNextPoint *Create	// 生成
+	static CControlPoint *Create	// 生成
 	( // 引数
 		const D3DXVECTOR3& rPos,	// 位置
 		const D3DXVECTOR3& rSize	// 大きさ
@@ -58,14 +64,15 @@ public:
 
 private:
 	// メンバ関数
-	bool Collision(void);	// プレイヤー全員との当たり判定
+	void Collision(void);	// プレイヤー全員との当たり判定
+	void UpdateTutorial(const int nID);	// チュートリアル操作
 
 	// 静的メンバ変数
 	static const char *mc_apTextureFile[];	// テクスチャ定数
+	static const char *mc_apLessonFile[];	// レッスンテクスチャ定数
 
 	// メンバ変数
-	CObjectGauge3D *m_pGauge;	// 待機ゲージ情報
-	CControlPoint *m_pControl;	// 操作表示の情報
+	CObjectBillboard *m_pTutorial;	// チュートリアル表示情報
 };
 
-#endif	// _NEXTPOINT_H_
+#endif	// _CONTROL_POINT_H_
