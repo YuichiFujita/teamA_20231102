@@ -32,7 +32,8 @@ public:
 	enum ETexture
 	{
 		TEXTURE_FIELD = 0,	// 地面テクスチャ
-		TEXTURE_CONTROL,	// 操作テクスチャ
+		TEXTURE_NEXT,		// 次テクスチャ
+		TEXTURE_PREV,		// 前テクスチャ
 		TEXTURE_MAX			// この列挙型の総数
 	};
 
@@ -78,7 +79,8 @@ private:
 
 	// メンバ変数
 	CObjectBillboard *m_pTutorial;	// チュートリアル表示情報
-	CObjectBillboard *m_pControl;	// 操作表示情報
+	CObjectBillboard *m_pNext;		// 次操作の表示情報
+	CObjectBillboard *m_pPrev;		// 前操作の表示情報
 	int m_nLesson;		// レッスン
 	float m_fScale;		// 拡大率
 	float m_fDestScale;	// 目標拡大率
