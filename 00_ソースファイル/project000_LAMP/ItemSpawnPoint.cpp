@@ -25,7 +25,7 @@ CGameManager *CItemSpawnPoint::m_pGameMane = nullptr;
 //<**************************************
 namespace ItemSpawn
 {
-	const int MAX_TIME = 250;	//クールタイムの最大値
+	const int MAX_TIME = 1250;	//クールタイムの最大値
 }
 
 //<==================================
