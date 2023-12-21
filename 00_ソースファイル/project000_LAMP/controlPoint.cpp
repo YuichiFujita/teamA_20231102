@@ -16,6 +16,7 @@
 #include "sceneGame.h"
 #include "gameManager.h"
 #include "retentionManager.h"
+#include "sound.h"
 
 //************************************************************
 //	定数宣言
@@ -48,6 +49,9 @@ const char *CControlPoint::mc_apTextureFile[] =	// テクスチャ定数
 const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 {
 	"data\\TEXTURE\\lesson000.png",	// 呼び込みテクスチャ
+	"data\\TEXTURE\\lesson001.png",	// テクスチャ
+	"data\\TEXTURE\\lesson002.png",	// テクスチャ
+	"data\\TEXTURE\\lesson003.png",	// テクスチャ
 };
 
 //************************************************************
@@ -59,10 +63,11 @@ const char *CControlPoint::mc_apLessonFile[] =	// レッスンテクスチャ定数
 CControlPoint::CControlPoint() : CObject3D(CObject::LABEL_NEXT, PRIORITY)
 {
 	// メンバ変数をクリア
-	m_pTutorial = NULL;		// チュートリアル表示情報
-	m_pControl = NULL;		// 操作表示情報
-	m_fScale = 0.0f;		// 拡大率
-	m_fDestScale = 0.0f;	// 目標拡大率
+	m_pTutorial = NULL;				// チュートリアル表示情報
+	m_pControl = NULL;				// 操作表示情報
+	m_nLesson = LESSON_YOBIKOMI;	// レッスン
+	m_fScale = 0.0f;				// 拡大率
+	m_fDestScale = 0.0f;			// 目標拡大率
 }
 
 //============================================================
@@ -79,10 +84,11 @@ CControlPoint::~CControlPoint()
 HRESULT CControlPoint::Init(void)
 {
 	// メンバ変数を初期化
-	m_pTutorial = NULL;		// チュートリアル表示情報
-	m_pControl = NULL;		// 操作表示情報
-	m_fScale = 1.0f;		// 拡大率
-	m_fDestScale = 1.0f;	// 目標拡大率
+	m_pTutorial = NULL;				// チュートリアル表示情報
+	m_pControl = NULL;				// 操作表示情報
+	m_nLesson = LESSON_YOBIKOMI;	// レッスン
+	m_fScale = 1.0f;				// 拡大率
+	m_fDestScale = 1.0f;			// 目標拡大率
 
 	// オブジェクト3Dの初期化
 	if (FAILED(CObject3D::Init()))
@@ -104,7 +110,7 @@ HRESULT CControlPoint::Init(void)
 	);
 
 	// テクスチャを登録・割当
-	m_pTutorial->BindTexture(mc_apLessonFile[LESSON_YOBIKOMI]);
+	m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
 
 	// ラベルを設定
 	m_pTutorial->SetLabel(LABEL_UI);
@@ -306,7 +312,54 @@ bool CControlPoint::Collision(void)
 //============================================================
 void CControlPoint::UpdateTutorial(const int nID)
 {
+	// ポインタを宣言
+	CRetentionManager *pRetention = CManager::GetInstance()->GetRetentionManager();	// データ保存情報
+	CInputPad *pPad = CManager::GetInstance()->GetPad();	// パッド
 
+	if (pPad->IsTrigger(CInputPad::KEY_A, nID))
+	{ // 右移動の操作が行われた場合
+
+		// レッスンを進める
+		m_nLesson++;
+
+		if (m_nLesson >= LESSON_MAX)
+		{ // レッスンが最大値を超えた場合
+
+			// レッスンを補正 (戻す)
+			m_nLesson--;
+		}
+		else
+		{ // レッスンが超えていない場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+
+		// テクスチャを登録・割当
+		m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
+	}
+	if (pPad->IsTrigger(CInputPad::KEY_B, nID))
+	{ // 左移動の操作が行われた場合
+
+		// レッスンを戻す
+		m_nLesson--;
+
+		if (m_nLesson <= NONE_IDX)
+		{ // レッスンが最小値を下回った場合
+
+			// レッスンを補正 (進める)
+			m_nLesson++;
+		}
+		else
+		{ // レッスンが下回っていない場合
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+		}
+
+		// テクスチャを登録・割当
+		m_pTutorial->BindTexture(mc_apLessonFile[m_nLesson]);
+	}
 }
 
 //============================================================

@@ -40,6 +40,9 @@ public:
 	enum ELesson
 	{
 		LESSON_YOBIKOMI = 0,	// 呼び込みテクスチャ
+		LESSON_01,				// テクスチャ
+		LESSON_02,				// テクスチャ
+		LESSON_03,				// テクスチャ
 		LESSON_MAX				// この列挙型の総数
 	};
 
@@ -76,6 +79,7 @@ private:
 	// メンバ変数
 	CObjectBillboard *m_pTutorial;	// チュートリアル表示情報
 	CObjectBillboard *m_pControl;	// 操作表示情報
+	int m_nLesson;		// レッスン
 	float m_fScale;		// 拡大率
 	float m_fDestScale;	// 目標拡大率
 };
