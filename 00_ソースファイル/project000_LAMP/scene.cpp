@@ -55,7 +55,7 @@ CScene::~CScene()
 HRESULT CScene::Init(void)
 {
 	// ステージの生成
-	m_pStage = CStage::Create();
+	m_pStage = CStage::Create(m_mode);
 	if (m_pStage == NULL)
 	{ // 非使用中の場合
 
