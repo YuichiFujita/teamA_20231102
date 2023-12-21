@@ -54,7 +54,7 @@ HRESULT CPlayerResult::Init(void)
 	SetEnableDepthShadow(false);
 	SetEnableZTex(false);
 
-	SetPriority(14);
+	//SetPriority(14);
 
 	// 成功を返す
 	return S_OK;
@@ -98,7 +98,7 @@ void CPlayerResult::Draw(void)
 	currentViewport.X = (nPadID);						// 左上位置を設定
 	pCamera->SetViewport(CCamera::TYPE_RESULT, currentViewport);		// ビューポート設定
 
-	if (CManager::GetInstance()->GetRetentionManager()->IsEntry(nPadID))
+	if (true)
 	{ // 現在のプレイヤーがエントリーしている場合
 
 	  // 現在のビューポートを取得

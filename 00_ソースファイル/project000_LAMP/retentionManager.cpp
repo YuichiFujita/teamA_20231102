@@ -270,7 +270,7 @@ int CRetentionManager::GetWinPlayerID(void) const
 void CRetentionManager::InitGame(void)
 {
 	// チュートリアルをしていない状態にする
-	m_bEndTutorial = false;
+	m_bEndTutorial = true;
 
 	// 生存ランキングを初期化
 	InitSurvivalRank();

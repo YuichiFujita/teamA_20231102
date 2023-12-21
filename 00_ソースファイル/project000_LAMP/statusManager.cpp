@@ -91,7 +91,7 @@ HRESULT CStatusManager::Init(void)
 		CValue::TEXTURE_UI,	// テクスチャ
 		life::MAX_LIFE,		// 数字
 		life::MAX_DIG,		// 桁数
-		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) - 20.0f, life::POS.y, life::POS.x),			// 位置
+		D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f), life::POS.y, life::POS.x),			// 位置
 		life::SIZE,			// 大きさ
 		life::SPACE			// 行間
 	);
@@ -127,21 +127,23 @@ HRESULT CStatusManager::Init(void)
 	// 優先順位を設定
 	m_pKnockRate->SetPriority(PRIORITY);
 
-
 	if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_LIFE)
 	{
 		m_pKnockRate->SetEnableDraw(false);
 		 m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) , life::POS.y + 10.0f, life::POS.x), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 		 m_pUI->BindTexture("data\\TEXTURE\\Life_Only_UI.png");
+
+		 m_pItemUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 130.0f, life::POS.y - 0.0f, life::POS.x), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 	}
 	else if (CManager::GetInstance()->GetRetentionManager()->GetKillState() == CRetentionManager::KILL_KNOCK)
 	{
 		m_pLife->SetEnableDraw(false);
 		m_pUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) , life::POS.y + 10.0f, life::POS.x), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 		m_pUI->BindTexture("data\\TEXTURE\\Damage_Only_UI.png");
+
+		m_pItemUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 130.0f, life::POS.y - 30.0f, life::POS.x), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 	}
 
-	m_pItemUI = CObject2D::Create(D3DXVECTOR3(life::POS.x + (m_nPadID * 300.0f) + 110.0f, life::POS.y + 5.0f, life::POS.x), D3DXVECTOR3(50.0f, 50.0f, 0.0f));
 	if (m_pKnockRate == NULL)
 	{ // 生成に失敗した場合
 
