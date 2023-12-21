@@ -36,7 +36,6 @@ CRetentionManager::CRetentionManager()
 	m_nNumPlayer	= 0;			// プレイヤー数
 	m_nNumSurvival	= 0;			// 生存プレイヤー数
 	m_nWinPoint		= 0;			// 勝利ポイント数
-	m_bEndTutorial	= false;		// チュートリアル終了状況
 }
 
 //============================================================
@@ -63,7 +62,6 @@ HRESULT CRetentionManager::Init(void)
 	m_nNumPlayer	= 0;				// プレイヤー数
 	m_nNumSurvival	= 0;				// 生存プレイヤー数
 	m_nWinPoint		= INIT_WINPOINT;	// 勝利ポイント数
-	m_bEndTutorial	= false;			// チュートリアル終了状況
 
 	for (int nCntEntry = 0; nCntEntry < MAX_PLAYER; nCntEntry++)
 	{ // プレイヤーの最大数分繰り返す
@@ -247,9 +245,6 @@ int CRetentionManager::GetWinPoint(void) const
 //============================================================
 void CRetentionManager::InitGame(void)
 {
-	// チュートリアルをしていない状態にする
-	m_bEndTutorial = false;
-
 	// 生存ランキングを初期化
 	InitSurvivalRank();
 
@@ -335,22 +330,6 @@ bool CRetentionManager::IsAI(const int nID) const
 {
 	// 引数インデックスのAI状況を返す
 	return m_aAI[nID];
-}
-
-//============================================================
-//	チュートリアルの終了設定処理
-//============================================================
-void CRetentionManager::EndTutorial(void)
-{
-	m_bEndTutorial = true;
-}
-
-//============================================================
-//	チュートリアルの終了状況の取得処理
-//============================================================
-bool CRetentionManager::IsEndTutorial(void) const
-{
-	return m_bEndTutorial;
 }
 
 //============================================================
@@ -500,6 +479,7 @@ int CRetentionManager::GetWinRank1st(void) const
 	}
 
 	// ランキング1位が存在しない
+	assert(false);
 	return NONE_IDX;	// 例外を返す
 }
 

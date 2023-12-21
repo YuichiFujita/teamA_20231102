@@ -1612,14 +1612,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	// 変数を宣言
 	EMotion currentMotion = MOTION_IDOL;		// 現在のモーション
 
-	// ポインタを宣言
+												// ポインタを宣言
 	CInputKeyboard	*pKeyboard = CManager::GetInstance()->GetKeyboard();	// キーボード
-	CInputPad		*pPad = CManager::GetInstance()->GetPad();				// パッド
+	CInputPad		*pPad = CManager::GetInstance()->GetPad();		// パッド
 	CCamera			*pCamera = CManager::GetInstance()->GetCamera();		// カメラ
 
 	if (pCamera == NULL) { assert(false); return MOTION_IDOL; }	// 非使用中
 
-	// PC操作
+																// PC操作
 #if 0
 	if (m_nPadID == 0)
 	{

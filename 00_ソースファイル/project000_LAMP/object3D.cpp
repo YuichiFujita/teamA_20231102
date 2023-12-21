@@ -366,12 +366,7 @@ void CObject3D::BindTexture(const char *pTexturePass)
 		// テクスチャインデックスを代入
 		m_nTextureID = pTexture->Regist(pTexturePass);
 	}
-	else
-	{ // テクスチャパスが無い場合
-	
-		// テクスチャなしのインデックスを設定
-		m_nTextureID = NONE_IDX;
-	}
+	else { assert(false); }	// テクスチャパス無し
 }
 
 //============================================================

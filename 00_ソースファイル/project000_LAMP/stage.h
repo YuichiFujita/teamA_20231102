@@ -14,7 +14,6 @@
 //	インクルードファイル
 //************************************************************
 #include "main.h"
-#include "scene.h"
 
 //************************************************************
 //	前方宣言
@@ -112,12 +111,12 @@ public:
 	CLiquid *GetLiquid(void);	// 液体取得
 
 	// 静的メンバ関数
-	static CStage *Create(const CScene::EMode mode);	// 生成
-	static HRESULT Release(CStage *&prStage);			// 破棄
+	static CStage *Create(void);	// 生成
+	static HRESULT Release(CStage *&prStage);	// 破棄
 
 private:
 	// 静的メンバ関数
-	static HRESULT LoadSetup(const CScene::EMode mode, CStage *pStage);					// セットアップ
+	static HRESULT LoadSetup(CStage *pStage);	// セットアップ
 	static HRESULT LoadLimit(const char* pString, FILE *pFile, CStage *pStage);			// 範囲情報の読込
 	static HRESULT LoadField(const char* pString, FILE *pFile, CStage *pStage);			// 地面情報の読込
 	static HRESULT LoadWall(const char* pString, FILE *pFile, CStage *pStage);			// 壁情報の読込

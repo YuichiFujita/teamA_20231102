@@ -35,32 +35,35 @@ namespace
 
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
+#if 0
+		//"data\\TXT\\Stages\\stage0.txt",
+		//"data\\TXT\\Stages\\Ground_Stage.txt",
+#else	
 		"data\\TXT\\Stages\\stage1.txt",
 		"data\\TXT\\Stages\\stage2.txt",
 		"data\\TXT\\Stages\\stage3.txt",
 		"data\\TXT\\Stages\\stage4.txt",
 		"data\\TXT\\Stages\\stage5.txt",
-		"data\\TXT\\Stages\\stage6.txt",
 		"data\\TXT\\Stages\\stage7.txt",
 		"data\\TXT\\Stages\\stage8.txt",
-		"data\\TXT\\Stages\\stage9.txt",
-		"data\\TXT\\Stages\\stage10.txt",
-		"data\\TXT\\Stages\\stage11.txt",
-		"data\\TXT\\Stages\\stage12.txt",
 		"data\\TXT\\Stages\\stage13.txt",
-		"data\\TXT\\Stages\\stage14.txt",
 		"data\\TXT\\Stages\\stage15.txt",
-		"data\\TXT\\Stages\\stage16.txt",
 		"data\\TXT\\Stages\\stage17.txt",
 		"data\\TXT\\Stages\\stage18.txt",
-		"data\\TXT\\Stages\\stage19.txt",
-		"data\\TXT\\Stages\\stage20.txt",
 		"data\\TXT\\Stages\\stage21.txt",
 		"data\\TXT\\Stages\\stage22.txt",
 		"data\\TXT\\Stages\\stage23.txt",
 		"data\\TXT\\Stages\\stage24.txt",
+		"data\\TXT\\Stages\\stage25.txt",
+		"data\\TXT\\Stages\\stage26.txt",
+		"data\\TXT\\Stages\\stage27.txt",
+		"data\\TXT\\Stages\\stage28.txt",
+		"data\\TXT\\Stages\\stage29.txt",
+		"data\\TXT\\Stages\\stage30.txt",
+		"data\\TXT\\Stages\\stage31.txt",
 		"data\\TXT\\Stage_morikawa\\stage001.txt",
 		"data\\TXT\\Stage_morikawa\\stage002.txt",
+#endif
 	};
 }
 
