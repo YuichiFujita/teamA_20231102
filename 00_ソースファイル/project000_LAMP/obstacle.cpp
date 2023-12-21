@@ -324,7 +324,8 @@ void CObstacle::Hit(void)
 	//破壊できるブロックだったら
 	if (m_status.state == EBreak::BREAK_TRUE)
 	{
-		CModParticle::Create(GetVec3Position(), GetMaterial(0).MatD3D.Diffuse, CManager::GetInstance()->GetTexture()->Regist(GetMaterial(0).pTextureFilename));
+		CModParticle::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 50.0f,
+			GetVec3Position().z), GetMaterial(0).MatD3D.Diffuse, CManager::GetInstance()->GetTexture()->Regist(GetMaterial(0).pTextureFilename));
 		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// ヒット音
 		//終了処理を行う
 		Uninit();

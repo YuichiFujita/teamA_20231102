@@ -68,6 +68,9 @@ public:
 		MOTION_EMOTE_PROUD,	// 胸を張るエモートモーション
 		MOTION_EMOTE_SLEEP,	// 寝るエモートモーション
 		MOTION_EMOTE_RORI,	// 粛清ロリ神レクイエムエモートモーション
+		MOTION_EMOTE_ODOLOOP,	// オドループエモートモーション
+		MOTION_EMOTE_OD,	// インターネットオーバードーズエモートモーション
+		MOTION_EMOTE_SPIN,	// スピンエモートモーション
 		MOTION_MAX			// この列挙型の総数
 	};
 
@@ -153,6 +156,8 @@ public:
 	void HitKillY(const int nDmg);	// キルY座標ヒット
 	void SetSpawn(void);	// 出現設定
 	void SetInvuln(void);	// 無敵設定
+
+	CObjectBillboard* GetPlayerGuide(void) const;			// プレイヤーガイド取得
 
 	void SetEnableDrawUI(const bool bDraw);		// UI描画状況設定
 	int GetPadID(void) const;					// パッドインデックス取得
