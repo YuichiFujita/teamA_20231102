@@ -44,6 +44,10 @@ const char *CFlail::mc_apModelFileFlail[] =	// ƒ‚ƒfƒ‹’è”(ƒtƒŒƒCƒ‹)
 	"data\\MODEL\\FLAIL\\ironBall.x",	// “S‹…
 	"data\\MODEL\\FLAIL\\head.x",		// “ª
 	"data\\MODEL\\FLAIL\\escapekun.x",	// ƒGƒXƒP[ƒvŒN
+	"data\\MODEL\\FLAIL\\apple.x",		// ƒŠƒ“ƒS
+	"data\\MODEL\\FLAIL\\green_apple.x",// ÂƒŠƒ“ƒS
+	"data\\MODEL\\FLAIL\\Duck.x",		// ƒAƒqƒ‹
+	"data\\MODEL\\FLAIL\\bomb.x",		// ”š’e
 };
 
 const char *CFlail::mc_apModelFileChain[] =	// ƒ‚ƒfƒ‹’è”(½)
@@ -221,6 +225,7 @@ void CFlail::UpdateFlailPos(void)
 
 	// Šp“x‚Æ’·‚³‚©‚ç“S‹…‚ÌˆÊ’uŒˆ’è
 	D3DXVECTOR3 pos = GetVec3Position();
+	D3DXVECTOR3 rot = GetVec3Rotation();
 
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
@@ -279,11 +284,32 @@ void CFlail::UpdateFlailPos(void)
 			pos.z = m_posOrg.z + (cosf(m_fChainRot) * 1.0f);
 		}
 	}
-	
+
+	if (player->GetCounterFlail() != flail::FLAIL_DEF)
+	{
+		D3DXVECTOR3 stickPos;
+
+		stickPos.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._41;
+		stickPos.y = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._42;
+		stickPos.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._43;
+
+		rot.y = atan2f(pos.x - stickPos.x, pos.z - stickPos.z);
+	}
+	else
+	{
+		D3DXVECTOR3 stickPos;
+
+		stickPos.x = player->GetMtxWorld()._41;
+		stickPos.y = player->GetMtxWorld()._42;
+		stickPos.z = player->GetMtxWorld()._43;
+
+		rot.y = atan2f(pos.x - stickPos.x, pos.z - stickPos.z);
+	}
 	// “–‚½‚è”»’è
 	Collision(pos);
 	
 	SetVec3Position(pos);
+	SetVec3Rotation(rot);
 }
 
 //============================================================

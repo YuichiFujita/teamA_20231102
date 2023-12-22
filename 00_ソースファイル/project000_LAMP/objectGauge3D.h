@@ -44,8 +44,7 @@ public:
 	enum EType
 	{
 		TYPE_NONE = 0,	// フレーム無し
-		TYPE_PLAYER,	// プレイヤーフレーム
-		TYPE_TARGET,	// ターゲットフレーム
+		TYPE_TUTORIAL,	// ちゅーとりあるフレーム
 		TYPE_MAX		// この列挙型の総数
 	};
 
