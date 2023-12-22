@@ -10,6 +10,7 @@
 #include "Ready.h"
 #include "manager.h"
 #include "fade.h"
+#include "sound.h"
 #include "sceneGame.h"
 #include "gameManager.h"
 #include "retentionManager.h"
@@ -77,6 +78,9 @@ HRESULT CReady::Init(void)
 	m_pTexFight->SetPriority(PRIORITY);
 	m_pFlare->SetPriority(PRIORITY);
 
+	// サウンドの再生
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_NOISE);	// ノイズ音
+
 	// 成功を返す
 	return S_OK;
 }
@@ -120,13 +124,14 @@ void CReady::Update(void)
 			if (m_nStateCount == 0)
 			{
 				m_pFlare->SetEnableStop(false);
-			
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_FIGHT);	// 戦闘音
 			}
 			m_pTexReady->SetEnableDraw(false);
 			m_pTexFight->SetEnableDraw(true);
 			if (m_pFlare->GetLoopAnimation() > 0)
-			{
-				
+			{ 
 				CSceneGame::GetGameManager()->SetState(CGameManager::STATE_NORMAL);
 
 				for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)

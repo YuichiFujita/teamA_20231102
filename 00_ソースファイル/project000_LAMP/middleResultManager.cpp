@@ -814,6 +814,9 @@ void CMiddleResultManager::UpdateFadeInWait(void)
 
 		// フェードイン加速状態にする
 		m_state = STATE_FADEIN_ACCEL;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_WIND_000);	// 風音00
 	}
 }
 
@@ -958,6 +961,9 @@ void CMiddleResultManager::UpdateRankTitle(void)
 
 		// プレイヤーフレーム待機状態にする
 		m_state = STATE_FRAME_WAIT;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 	}
 }
 
@@ -1023,6 +1029,9 @@ void CMiddleResultManager::UpdateFrame(void)
 
 		// プレイヤー勝利ポイント待機状態にする
 		m_state = STATE_PLAYERPOINT_WAIT;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 	}
 }
 
@@ -1201,6 +1210,9 @@ void CMiddleResultManager::UpdateFadeOutWait(void)
 
 		// フェードアウト加速状態にする
 		m_state = STATE_FADEOUT_ACCEL;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_WIND_000);	// 風音00
 	}
 }
 
@@ -1285,6 +1297,9 @@ void CMiddleResultManager::UpdateTransition(void)
 
 			// フェードアウト状態にする
 			m_state = STATE_FADEOUT;
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_WIND_001);	// 風音01
 		}
 	}
 }
