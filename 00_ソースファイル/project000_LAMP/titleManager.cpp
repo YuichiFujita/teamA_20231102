@@ -466,20 +466,13 @@ void CTitleManager::UpdateStart(void)
 
 					break;
 
-				//case SELECT_TUTORIAL:
-
-				//	// シーンの設定
-				//	CManager::GetInstance()->SetScene(CScene::MODE_TUTORIAL);	// チュートリアル画面
-
-				//	break;
-
 				default:
 					assert(false);
 					break;
 				}
 
 				// サウンドの再生
-				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT2);	// 決定音00
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 			}
 		}
 	}

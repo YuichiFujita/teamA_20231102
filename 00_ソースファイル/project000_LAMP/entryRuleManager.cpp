@@ -982,6 +982,9 @@ void CEntryRuleManager::Decide(void)
 			// 終了状態にする
 			CSceneEntry::GetEntryManager()->SetState(CEntryManager::STATE_END);	// ゲームに遷移
 
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定操作音01
+
 			break;
 
 		default:
@@ -995,6 +998,9 @@ void CEntryRuleManager::Decide(void)
 
 		// フェードアウト状態にする
 		m_state = STATE_FADEOUT;
+
+		// サウンドの再生
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 	}
 }
 
@@ -1020,8 +1026,20 @@ void CEntryRuleManager::ChangeRule(void)
 		{ // 選択ごとの処理
 		case RULE_WINPOINT:
 
-			// 勝利ポイントを減算
-			m_pWinPoint->AddNum(-1);
+			{
+				// 現在の勝利ポイント
+				int nWinNum = m_pWinPoint->GetNum();
+
+				// 勝利ポイントを減算
+				m_pWinPoint->AddNum(-1);
+
+				if (m_pWinPoint->GetNum() != nWinNum)
+				{ // 値が変動した場合
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+				}
+			}
 
 			break;
 
@@ -1030,12 +1048,18 @@ void CEntryRuleManager::ChangeRule(void)
 			// 左に選択をずらす
 			nKill = (nKill + (CRetentionManager::KILL_MAX - 1)) % CRetentionManager::KILL_MAX;
 
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+
 			break;
 
 		case RULE_WIN:
 
 			// 左に選択をずらす
 			nWin = (nWin + (CRetentionManager::WIN_MAX - 1)) % CRetentionManager::WIN_MAX;
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 
 			break;
 
@@ -1046,9 +1070,6 @@ void CEntryRuleManager::ChangeRule(void)
 			assert(false);
 			break;
 		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 	}
 	if (pKeyboard->IsTrigger(DIK_D)
 	||  pKeyboard->IsTrigger(DIK_RIGHT)
@@ -1059,8 +1080,20 @@ void CEntryRuleManager::ChangeRule(void)
 		{ // 選択ごとの処理
 		case RULE_WINPOINT:
 
-			// 勝利ポイントを加算
-			m_pWinPoint->AddNum(1);
+			{
+				// 現在の勝利ポイント
+				int nWinNum = m_pWinPoint->GetNum();
+
+				// 勝利ポイントを加算
+				m_pWinPoint->AddNum(1);
+
+				if (m_pWinPoint->GetNum() != nWinNum)
+				{ // 値が変動した場合
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+				}
+			}
 
 			break;
 
@@ -1069,12 +1102,18 @@ void CEntryRuleManager::ChangeRule(void)
 			// 右に選択をずらす
 			nKill = (nKill + 1) % CRetentionManager::KILL_MAX;
 
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+
 			break;
 
 		case RULE_WIN:
 
 			// 右に選択をずらす
 			nWin = (nWin + 1) % CRetentionManager::WIN_MAX;
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 
 			break;
 
@@ -1085,9 +1124,6 @@ void CEntryRuleManager::ChangeRule(void)
 			assert(false);
 			break;
 		}
-
-		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 	}
 
 	// 撃破条件を反映

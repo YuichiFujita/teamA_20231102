@@ -623,22 +623,15 @@ void CRetentionManager::SetSurvivalRank(const int nPlayerID)
 //============================================================
 //	生存ランキング取得処理
 //============================================================
-CRetentionManager::ERank CRetentionManager::GetSurvivalRank(const int nID) const
+int CRetentionManager::GetSurvivalRank(const int nRank) const
 {
-	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
-	{ // プレイヤーの最大数分繰り返す
+	if (nRank > NONE_IDX && nRank < RANK_MAX)
+	{ // 順位が正規の場合
 
-		if (m_aSurvivalRank[nCntPlayer] == nID)
-		{ // ランキングが設定されていない場合
-
-			// 引数のプレイヤーインデックスを設定
-			return (ERank)nCntPlayer;
-		}
+		// 引数の順位の生存プレイヤーインデックス取得
+		return m_aSurvivalRank[nRank];
 	}
-
-	// 4位を返す (例外)
-	assert(false);
-	return RANK_4TH;
+	else { assert(false); return NONE_IDX; }	// 順位範囲外
 }
 
 //============================================================

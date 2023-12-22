@@ -59,8 +59,6 @@ CGameManager::~CGameManager()
 //============================================================
 HRESULT CGameManager::Init(void)
 {
-	m_pReady = CReady::Create();
-
 	// メンバ変数を初期化
 	m_state = STATE_READY;	// 状態
 	m_nCounterState = 0;	// 状態管理カウンター
@@ -70,6 +68,33 @@ HRESULT CGameManager::Init(void)
 
 	// 生存ランキングを初期化
 	CManager::GetInstance()->GetRetentionManager()->InitSurvivalRank();
+
+	if (CManager::GetInstance()->GetRetentionManager()->IsEndTutorial())
+	{
+		// 開始状態にする
+		m_state = STATE_READY;
+
+		// 開始演出の生成
+		m_pReady = CReady::Create();
+	}
+	else
+	{
+		// 開始演出を飛ばす
+		m_state = STATE_NORMAL;
+
+		for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
+		{ // プレイヤー数分繰り返す
+
+			CPlayer *pPlayer = CScene::GetPlayer(nCntPlayer);	// プレイヤー情報
+
+			if (pPlayer != NULL)
+			{ // プレイヤーが存在する場合
+
+				// プレイヤーを出現
+				pPlayer->SetSpawn();
+			}
+		}
+	}
 
 	if (m_pMiddleResult == NULL)
 	{ // 中間リザルトが使用されていない場合
@@ -161,7 +186,7 @@ void CGameManager::Update(void)
 					}
 					else if (CManager::GetInstance()->GetRetentionManager()->GetWinState() == CRetentionManager::WIN_KILL)
 					{
-						//比較用変数追加
+						// 比較用変数追加
 						int winPlayer = -1;
 						int playerpoint = 0;
 						int MaxPoint = 0;

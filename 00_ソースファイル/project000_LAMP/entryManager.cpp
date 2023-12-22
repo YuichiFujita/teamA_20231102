@@ -854,6 +854,9 @@ void CEntryManager::UpdateEntry(void)
 					// フレイル矢印の自動描画をONにする
 					m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(true);
 				}
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_000);	// 選択操作音00
 			}
 		}
 		else
@@ -874,6 +877,9 @@ void CEntryManager::UpdateEntry(void)
 						// フレイル矢印の自動描画をOFFにする
 						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(false);
 					}
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 選択操作音01
 				}
 				else if (pPad->IsTrigger(CInputPad::KEY_B, nCntEntry))
 				{
@@ -891,6 +897,9 @@ void CEntryManager::UpdateEntry(void)
 						// フレイル矢印の自動描画をOFFにする
 						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(false);
 					}
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 				}
 
 				break;
@@ -908,6 +917,9 @@ void CEntryManager::UpdateEntry(void)
 						// フレイル矢印の自動描画をONにする
 						m_apFlailArrow[nCntEntry][nCntArrow]->SetEnableDraw(true);
 					}
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 				}
 
 				break;
@@ -1075,6 +1087,9 @@ void CEntryManager::UpdateAddCpu(void)
 				m_apNumber[nCntEntry]->SetColorTitle(COL_ENTRY);
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_ENTRY);
 
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
+
 				// 処理を抜ける
 				break;
 			}
@@ -1100,6 +1115,9 @@ void CEntryManager::UpdateAddCpu(void)
 				m_apFrame[nCntEntry]->SetColor(COL_UNENTRY);
 				m_apNumber[nCntEntry]->SetColorTitle(COL_UNENTRY);
 				m_apNumber[nCntEntry]->GetMultiValue()->SetColor(COL_UNENTRY);
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 
 				// 処理を抜ける
 				break;
@@ -1272,6 +1290,9 @@ void CEntryManager::UpdateStart(void)
 			{
 				// ルール設定状態にする
 				SetState(STATE_RULE);
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 選択操作音01
 			}
 		}
 

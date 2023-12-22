@@ -564,6 +564,9 @@ void CPlayer::Hit(void)
 	default:
 		break;
 	}
+
+	// サウンドの再生
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SAVE);	// 取得音
 }
 
 //============================================================
@@ -1012,7 +1015,7 @@ void CPlayer::HitKillY(const int nDmg)
 		}
 
 		// サウンドの再生
-		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_HIT);	// ヒット音
+		CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DIVE);	// ダイブ音
 	}
 }
 
@@ -1996,7 +1999,6 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						{
 							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SWING);
 							CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);
-
 						}
 						m_bHook = true;
 					}
@@ -2066,7 +2068,7 @@ void CPlayer::UpdateDash(void)
 
 	if (pCamera == NULL) { assert(false); }	// 非使用中
 
-											// 変数を宣言
+	// 変数を宣言
 	D3DXVECTOR3 vecStick = D3DXVECTOR3((float)pPad->GetPressLStickX(m_nPadID), (float)pPad->GetPressLStickY(m_nPadID), 0.0f);	// スティック各軸の倒し量
 	float fStick = sqrtf(vecStick.x * vecStick.x + vecStick.y * vecStick.y) * 0.5f;	// スティックの倒し量
 
