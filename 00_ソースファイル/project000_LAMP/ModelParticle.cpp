@@ -23,6 +23,7 @@ CModParticle::CModParticle() : CObject(CObject::LABEL_PARTICLE, 1)
 	m_col = XCOL_WHITE;	// 色
 	m_nLife = 0;		// 寿命
 }
+
 //<=============================================================
 //モデルパーティクルの生成処理
 //<=============================================================
@@ -66,6 +67,7 @@ HRESULT CModParticle::Init(void)
 	m_move = VEC3_ZERO;	// 移動値
 	m_rot = VEC3_ZERO;	// 向き
 	m_nLife = 5;		// 寿命
+	m_pTexID = -1;		// テクスチャID
 
 	return S_OK;
 }
@@ -80,9 +82,8 @@ void CModParticle::Update(void)
 		//寿命を減らす
 		m_nLife--;
 	}
-	//なければ
 	else
-	{
+	{//なければ
 		//終了をする
 		Uninit();
 

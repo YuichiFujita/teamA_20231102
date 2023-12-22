@@ -48,6 +48,10 @@ public:
 		FLAIL_NORMAL = 0,	// 鉄球
 		FLAIL_HEAD,			// 頭
 		FLAIL_ESCAPEKUN,	// エスケープ君
+		FLAIL_APPLE,		// リンゴ
+		FLAIL_GREENAPPLE,	// 青リンゴ
+		FLAIL_DUCK,			// アヒル
+		FLAIL_BOMB,			// 爆弾
 		FLAIL_MAX			// この列挙型の総数
 	};
 

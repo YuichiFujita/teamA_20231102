@@ -35,17 +35,40 @@ namespace
 CModEffect::CModEffect() : CObjectModel(CObject::LABEL_EFFECT,1)
 {
 	//値のクリア
+	m_rPos = VEC3_ZERO;
 	m_rMove = VEC3_ZERO;
 	m_rot = VEC3_ZERO;
 	m_rotMove = VEC3_ZERO;
 	m_rSize = VEC3_ZERO;
-	m_rPos = VEC3_ZERO;
 	m_nLife = 0;
 	m_nNumLand = 0;
 	m_Col = XCOL_WHITE;
 
 	m_bGravity = false;
 }
+
+//============================================================
+//	初期化処理
+//============================================================
+HRESULT CModEffect::Init(void)
+{
+	//値のクリア
+	m_rPos = VEC3_ZERO;
+	m_rMove = VEC3_ZERO;
+	m_rot = VEC3_ZERO;
+	m_rotMove = VEC3_ZERO;
+	m_rSize = VEC3_ZERO;
+	m_nLife = 0;
+	m_nNumLand = 0;
+	m_Col = XCOL_WHITE;
+
+	m_bGravity = false;
+
+	CObjectModel::Init();
+
+	return S_OK;
+}
+
 //<=============================================================
 //モデルエフェクトの生成処理
 //<=============================================================

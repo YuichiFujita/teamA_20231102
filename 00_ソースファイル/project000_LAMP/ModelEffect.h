@@ -28,13 +28,7 @@ public:
 
 	//オーバーライド関数
 	//初期化
-	HRESULT Init(void) override 
-	{
-		CObjectModel::Init();
-
-		return S_OK;
-
-	}	
+	HRESULT Init(void) override;
 
 	//終了
 	void Uninit(void) override { CObjectModel::Uninit(); }		
