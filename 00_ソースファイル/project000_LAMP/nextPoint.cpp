@@ -29,12 +29,12 @@ namespace
 	namespace gauge
 	{
 		const CObject::ELabel	LABEL	= CObject::LABEL_UI;				// オブジェクトラベル
-		const D3DXVECTOR3	SIZE		= D3DXVECTOR3(320.0f, 40.0f, 0.0f);	// ゲージ大きさ
-		const D3DXCOLOR		COL_FRONT	= XCOL_GREEN;						// 表ゲージ色
-		const D3DXCOLOR		COL_BACK	= XCOL_RED;							// 裏ゲージ色
+		const D3DXVECTOR3	SIZE		= D3DXVECTOR3(650.0f, 50.0f, 0.0f);	// ゲージ大きさ
+		const D3DXCOLOR		COL_FRONT	= XCOL_WHITE;						// 表ゲージ色
+		const D3DXCOLOR		COL_BACK	= D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f);// 裏ゲージ色
 		const int	MAX_NUM			= 120;		// 最大表示値
 		const int	CHANGE_FRAME	= 2;		// 表示値変動フレーム
-		const float	POSY_UP			= 350.0f;	// 表示Y位置の加算量
+		const float	POSY_UP			= 1.0f;	// 表示Y位置の加算量
 	}
 
 	namespace control
@@ -104,7 +104,8 @@ HRESULT CNextPoint::Init(void)
 		gauge::POSY_UP,			// 表示Y位置の加算量
 		gauge::SIZE,			// ゲージ大きさ
 		gauge::COL_FRONT,		// 表ゲージ色
-		gauge::COL_BACK			// 裏ゲージ色
+		gauge::COL_BACK,		// 裏ゲージ色
+		true					//枠表示
 	);
 
 	// 値を設定

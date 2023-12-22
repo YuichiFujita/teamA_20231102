@@ -185,6 +185,7 @@ void CFlail::Update(void)
 	// 鎖の更新
 	UpdateChain();
 
+	// フレイル同士の当たり判定カウント
 	if (m_bHit)
 	{
 		m_nHitCount++;
@@ -199,6 +200,7 @@ void CFlail::Update(void)
 		m_nHitCount = 0;
 	}
 
+	// 回転速度の慣性軽減
 	if (player->GetCounterFlail() == flail::FLAIL_DROP)
 	{
 		m_fChainRotMove += (0.0f - m_fChainRotMove) * 0.1f;
@@ -222,6 +224,7 @@ void CFlail::UpdateFlailPos(void)
 
 	if (D3DXVec3Length(&m_move) == 0.0f)
 	{
+		// フレイルの状態によって高さを変更
 		if (player->GetCounterFlail() == flail::FLAIL_DROP)
 		{
 			if (pos.y > -64.0f)
@@ -262,6 +265,7 @@ void CFlail::UpdateFlailPos(void)
 		m_move.z += (0.0f - m_move.z) * 0.15f;
 	}
 
+	// 落下状態じゃなければフレイルの先端にフレイルを移動
 	if (player->GetCounterFlail() != flail::FLAIL_DROP)
 	{
 		pos.x = m_posOrg.x + (sinf(m_fChainRot) * 1.0f);
@@ -276,11 +280,15 @@ void CFlail::UpdateFlailPos(void)
 		}
 	}
 	
+	// 当たり判定
 	Collision(pos);
 	
 	SetVec3Position(pos);
 }
 
+//============================================================
+//	落下フレイル位置の更新処理
+//============================================================
 void CFlail::UpdateDropFlailPos(float& rRot)
 {
 	D3DXVECTOR3 vecPtoF = VEC3_ZERO;
@@ -289,6 +297,7 @@ void CFlail::UpdateDropFlailPos(float& rRot)
 	float lengthPtoF = 0.0f;
 	float lengthPtoFTarget = 0.0f;
 
+	// フレイルとプレイヤー間のベクトルを計算
 	vecPtoFTarget.x = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_41 - GetVec3Position().x;
 	vecPtoFTarget.y = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_42 - GetVec3Position().y;
 	vecPtoFTarget.z = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_43 - GetVec3Position().z;
@@ -296,11 +305,13 @@ void CFlail::UpdateDropFlailPos(float& rRot)
 	vecPtoF.x = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_41 - GetVec3Position().x;
 	vecPtoF.z = m_chain[m_nfulChainF].multiModel->GetPtrMtxWorld()->_43 - GetVec3Position().z;
 
+	// フレイルとプレイヤー間のベクトルから角度計算
 	rRot = atan2f(vecPtoFTarget.x, vecPtoFTarget.z) + D3DX_PI * 0.5f;
 
 	lengthPtoF = D3DXVec3Length(&vecPtoF);
 	lengthPtoFTarget = D3DXVec3Length(&vecPtoFTarget);
 
+	// フレイルとプレイヤー間の距離が最大値を超えてたら補正
 	if (lengthPtoF > flail::FLAIL_RADIUS * (m_nNumChain - 1))
 	{
 		lengthPtoF = flail::FLAIL_RADIUS * (m_nNumChain - 1);
@@ -317,6 +328,7 @@ void CFlail::UpdateDropFlailPos(float& rRot)
 
 	m_fLengthTarget = lengthPtoFTarget;
 
+	// フレイルの位置を設定
 	if (lengthPtoFTarget >= flail::FLAIL_RADIUS * (m_nNumChain - m_nfulChainF - 1))
 	{
 		flailPos = GetVec3Position();
@@ -343,6 +355,7 @@ void CFlail::UpdateChain(void)
 		m_chain[nCntChain].posOld = m_chain[nCntChain].multiModel->GetVec3Position();
 		rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 
+		// 現在のフレイルの端を超えている鎖の設定
 		if (m_nNumChain < nCntChain)
 		{
 			rot.x = 0.0f;
@@ -362,21 +375,10 @@ void CFlail::UpdateChain(void)
 			continue;
 		}
 
+		// 鎖によって処理を変える
 		if (nCntChain == 0)
 		{
-			if (nCntChain == m_nfulChainF)
-			{
-			
-			}
-			else if (nCntChain == m_nfulChainP)
-			{
-
-			}
-			else
-			{
-
-			}
-
+			// 回転させる
 			rot.x = 0.0f;
 			rot.y = m_fChainRot;
 			rot.z = 0.0f;
@@ -389,32 +391,26 @@ void CFlail::UpdateChain(void)
 		{
 			int IDParent = nCntChain - 1;
 
-			if (nCntChain == m_nfulChainF)
+			// 前の鎖の角度に追従させる
+			if (nCntChain == 1)
 			{
-				rot.y += m_fChainRotMove;
-			}
-			else if (nCntChain == m_nfulChainP)
-			{
-
+				rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
 			}
 			else
 			{
-				if (nCntChain == 1)
-				{
-					rot.y = m_chain[IDParent].rotOld.y - m_chain[IDParent].multiModel->GetVec3Rotation().y;
-				}
-				else
-				{
-					rot.y = m_chain[IDParent].rotOld.y * 0.7f;
-				}
+				rot.y = m_chain[IDParent].rotOld.y * 0.7f;
 			}
 
+			// チャージ中
 			if (player->GetCounterFlail() <= flail::FLAIL_CHARGE && player->GetCounterFlail() > flail::FLAIL_DEF)
 			{
+				// ひとつ前の鎖が伸びきっていたら
 				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 				{
+					//フレイルを伸ばす
 					pos.x += 10.0f;
 
+					// 距離補正
 					if (pos.x > flail::FLAIL_RADIUS)
 					{
 						pos.x = flail::FLAIL_RADIUS;
@@ -422,10 +418,13 @@ void CFlail::UpdateChain(void)
 				}
 			}
 
+			// 投擲中
 			if (player->GetCounterFlail() == flail::FLAIL_THROW)
 			{
+				// 回転速度によって挙動変更
 				if (m_fChainRotMove == 0.0f)
 				{
+					// 回転していないなら鎖を同時に伸ばす
 					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
 						pos.x += 0.4f + ((m_fLengthTarget - 700.0f) * 0.0006f);
@@ -438,6 +437,7 @@ void CFlail::UpdateChain(void)
 				}
 				else
 				{
+					// 回転してるなら順番に伸ばす
 					if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
 						pos.x += 10.0f;
@@ -450,10 +450,13 @@ void CFlail::UpdateChain(void)
 				}
 			}
 
+			// 落下状態
 			if (player->GetCounterFlail() == flail::FLAIL_DROP)
 			{
+				// 一時的にひっこめる
 				pos.x = 0.0f;
 
+				// 目標距離に届いていなければそこまで伸ばす
 				if ((m_chain[IDParent].multiModel->GetVec3Position().x >= flail::FLAIL_RADIUS && m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 				{
 					pos.x = 20.0f;
@@ -465,9 +468,11 @@ void CFlail::UpdateChain(void)
 				}
 			}
 
+			// 引き戻し中
 			if (player->GetCounterFlail() < flail::FLAIL_DROP)
 			{
-				if (nCntChain < flail::FLAIL_NUM_MAX -1)
+				// 先端から引き戻す
+				if (nCntChain < flail::FLAIL_NUM_MAX - 1)
 				{
 					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
 					{
@@ -572,6 +577,7 @@ void CFlail::Draw(void)
 
 		if (nCntChain != 0)
 		{
+			// 鎖を互い違いにする
 			if (nCntChain % 2 == 0)
 			{
 				rotNow.x = -D3DX_PI * 0.5f;
@@ -591,6 +597,7 @@ void CFlail::Draw(void)
 		{
 			if (m_fLengthChain != 0)
 			{
+				// フレイルの高さに合わせて鎖の先端を下げる
 				float cosRot1, cosRot2, acosRot;
 
 				cosRot1 = m_chain[nCntChain].multiModel->GetMtxWorld()._42 - GetVec3Position().y;
@@ -608,6 +615,7 @@ void CFlail::Draw(void)
 			m_chain[nCntChain].multiModel->SetVec3Rotation(rotNow);
 		}
 
+		// 鎖が縮みきっているなら描画しない
 		if (m_chain[nCntChain].multiModel->GetVec3Position().x == 0.0f)
 		{
 			pos = m_chain[nCntChain].multiModel->GetVec3Position();
@@ -659,11 +667,13 @@ void CFlail::Draw(void)
 		m_chain[nCntChain].multiModel->SetVec3Rotation(rotOld);
 	}
 
+	// 落下状態フレイルの位置更新
 	if (player->GetCounterFlail() == flail::FLAIL_DROP && m_fChainRotMove > -0.01f && m_fChainRotMove < 0.01f)
 	{
 		UpdateDropFlailPos(m_fChainRot);
 	}
 
+	// フレイルの位置更新
 	UpdateFlailPos();
 
 	// オブジェクトモデルの描画
@@ -822,6 +832,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				// 吹っ飛びベクトルを正規化
 				D3DXVec3Normalize(&vec, &vec);
 
+				// 距離で判定
 				if (length < colLength)
 				{
 					float length = D3DXVec3Length(&(rPos - m_oldPos)) + 1.0f;
@@ -881,6 +892,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 						CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(2.5f, 0.0f, 0.0f), D3DXCOLOR(0.5f, 0.5f, 1.0f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 600, 20, 20, 300, 1.0f, 0.99f);
 					}
 
+					// 回転を移し替える
 					float rotMove1, rotMove2;
 					rotMove1 = GetChainRotMove();
 					rotMove2 = player->GetFlail()->GetChainRotMove();
@@ -888,6 +900,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 					SetChainRotMove(rotMove2 * 0.8f);
 					player->GetFlail()->SetChainRotMove(rotMove1 * 0.8f);
 
+					// 投擲状態なら落下状態にする
 					if (player->GetCounterFlail() == flail::FLAIL_THROW)
 					{
 						player->SetCounterFlail(flail::FLAIL_DROP);
@@ -916,6 +929,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				int IDParent = nCntChain - 1;
 				D3DXVECTOR3 rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 
+				// 衝突したら角度をまっすぐに調整
 				if (nCntChain == 0)
 				{
 					
@@ -932,25 +946,30 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				m_chain[nCntChain].multiModel->SetVec3Rotation(rot);
 			}
 
+			// ブロックに引っ掛かっているなら少しずつ高さをあげる
 			if (m_fLengthTarget > flail::FLAIL_RADIUS * (m_nNumChain - 1) && m_fLengthChain == flail::FLAIL_RADIUS * (m_nNumChain - 1))
 			{
 				rPos.y += 10.0f;
 			}
 		}
 
+		// 地面のYでの当たり判定
 		if (CollisionGround(CPlayer::AXIS_Y, rPos))
 		{
 			
 		}
 
+		// 地面の側面との当たり判定
 		if (CollisionGround(CPlayer::AXIS_X, rPos) ||
 			CollisionGround(CPlayer::AXIS_Z, rPos))
 		{
+			// ブロックに引っ掛かっているなら少しずつ高さをあげる
 			if (m_fLengthTarget > flail::FLAIL_RADIUS * (m_nNumChain - 1) && m_fLengthChain == flail::FLAIL_RADIUS * (m_nNumChain - 1))
 			{
 				rPos.y += 10.0f;
 			}
 
+			// 回転を止める
 			m_fChainRotMove *= 0.0f;
 
 			for (int nCntChain = 0; nCntChain < flail::FLAIL_NUM_MAX; nCntChain++)
@@ -958,6 +977,7 @@ void CFlail::Collision(D3DXVECTOR3& rPos)
 				int IDParent = nCntChain - 1;
 				D3DXVECTOR3 rot = m_chain[nCntChain].multiModel->GetVec3Rotation();
 
+				// 衝突したら角度をまっすぐに調整
 				if (nCntChain == 0)
 				{
 

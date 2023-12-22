@@ -2139,7 +2139,7 @@ void CPlayer::PlayEmote(EMotion& rAnim)
 	}
 	else if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT, m_nPadID) == TRUE)
 	{
-		rAnim = MOTION_EMOTE_OD;
+		rAnim = MOTION_EMOTE_RORI;
 	}
 }
 
