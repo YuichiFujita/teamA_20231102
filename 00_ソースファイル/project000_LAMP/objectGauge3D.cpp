@@ -23,7 +23,7 @@
 //************************************************************
 const char *CObjectGauge3D::mc_apTextureFile[] =	// テクスチャ定数
 {
-	NULL,	// フレーム無し
+	"data\\TEXTURE\\tutorial_frame.png",		// 黒フレーム
 	"data\\TEXTURE\\lifeGauge3D000.png",	// プレイヤーフレーム
 	"data\\TEXTURE\\lifeGauge3D001.png",	// ターゲットフレーム
 };
@@ -224,7 +224,7 @@ void CObjectGauge3D::Update(void)
 			mtxGauge = m_pGauge->GetMtxWorld();
 
 			// 位置を設定
-			m_pos = D3DXVECTOR3(mtxGauge._41, mtxGauge._42 + m_fPosUp, mtxGauge._43);
+			m_pos = D3DXVECTOR3(mtxGauge._41, mtxGauge._42 + m_fPosUp, mtxGauge._43 - 450.0f);
 		}
 		else
 		{ // ゲージ表示対象が使用されていなかった場合
@@ -257,23 +257,8 @@ void CObjectGauge3D::Draw(void)
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	// Zテストを無効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// Zテストの設定
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);		// Zバッファ更新の有効 / 無効の設定
-
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
-
-	// ビューマトリックスを取得
-	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
-
-	// ポリゴンをカメラに対して正面に向ける
-	D3DXMatrixInverse(&m_mtxWorld, NULL, &mtxView);	// 逆行列を求める
-
-	// マトリックスのワールド座標を原点にする
-	m_mtxWorld._41 = 0.0f;
-	m_mtxWorld._42 = 0.0f;
-	m_mtxWorld._43 = 0.0f;
 
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
@@ -317,10 +302,6 @@ void CObjectGauge3D::Draw(void)
 
 	// ライティングを有効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	// Zテストを有効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);	// Zテストの設定
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);		// Zバッファ更新の有効 / 無効の設定
 }
 
 //============================================================
@@ -721,10 +702,10 @@ void CObjectGauge3D::SetVtx(void)
 			case POLYGON_BACK:	// 背景
 
 				// 頂点座標を設定
-				pVtx[0].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f,  m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[1].pos = D3DXVECTOR3( m_sizeGauge.x * 0.5f,  m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[2].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, -m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[3].pos = D3DXVECTOR3( m_sizeGauge.x * 0.5f, -m_sizeGauge.y * 0.5f, 0.0f);
+				pVtx[0].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, 0.0f,  m_sizeGauge.y * 0.5f);
+				pVtx[1].pos = D3DXVECTOR3( m_sizeGauge.x * 0.5f, 0.0f,  m_sizeGauge.y * 0.5f);
+				pVtx[2].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, 0.0f, -m_sizeGauge.y * 0.5f);
+				pVtx[3].pos = D3DXVECTOR3( m_sizeGauge.x * 0.5f, 0.0f, -m_sizeGauge.y * 0.5f);
 
 				// 頂点カラーの設定
 				pVtx[0].col = m_colBack;
@@ -737,10 +718,10 @@ void CObjectGauge3D::SetVtx(void)
 			case POLYGON_FRONT:	// ゲージ
 
 				// 頂点座標を設定
-				pVtx[0].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f,  m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[1].pos = D3DXVECTOR3( m_fAddRight   * 0.5f,  m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[2].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, -m_sizeGauge.y * 0.5f, 0.0f);
-				pVtx[3].pos = D3DXVECTOR3( m_fAddRight   * 0.5f, -m_sizeGauge.y * 0.5f, 0.0f);
+				pVtx[0].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, 0.0f,  m_sizeGauge.y * 0.5f);
+				pVtx[1].pos = D3DXVECTOR3( m_fAddRight   * 0.5f, 0.0f,  m_sizeGauge.y * 0.5f);
+				pVtx[2].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f, 0.0f, -m_sizeGauge.y * 0.5f);
+				pVtx[3].pos = D3DXVECTOR3( m_fAddRight   * 0.5f, 0.0f, -m_sizeGauge.y * 0.5f);
 
 				// 頂点カラーの設定
 				pVtx[0].col = m_colFront;
@@ -753,10 +734,10 @@ void CObjectGauge3D::SetVtx(void)
 			case POLYGON_FRAME:	// 枠
 
 				// 頂点座標を設定
-				pVtx[0].pos = D3DXVECTOR3(-m_sizeFrame.x * 0.5f,  m_sizeFrame.y * 0.5f, 0.0f);
-				pVtx[1].pos = D3DXVECTOR3( m_sizeFrame.x * 0.5f,  m_sizeFrame.y * 0.5f, 0.0f);
-				pVtx[2].pos = D3DXVECTOR3(-m_sizeFrame.x * 0.5f, -m_sizeFrame.y * 0.5f, 0.0f);
-				pVtx[3].pos = D3DXVECTOR3( m_sizeFrame.x * 0.5f, -m_sizeFrame.y * 0.5f, 0.0f);
+				pVtx[0].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f - 5.0f, 0.0f, m_sizeGauge.y * 0.5f + 5.0f);
+				pVtx[1].pos = D3DXVECTOR3(m_sizeGauge.x * 0.5f + 5.0f, 0.0f, m_sizeGauge.y * 0.5f + 5.0f);
+				pVtx[2].pos = D3DXVECTOR3(-m_sizeGauge.x * 0.5f - 5.0f, 0.0f, -m_sizeGauge.y * 0.5f - 5.0f);
+				pVtx[3].pos = D3DXVECTOR3(m_sizeGauge.x * 0.5f + 5.0f, 0.0f, -m_sizeGauge.y * 0.5f - 5.0f);
 
 				// 頂点カラーの設定
 				pVtx[0].col = XCOL_WHITE;

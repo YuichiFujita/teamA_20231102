@@ -608,6 +608,9 @@ HRESULT CResultManager::Init(void)
 	// TODO：順位表示のテクスチャ割り当て
 #endif
 
+	// サウンドの再生
+	CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_FIGHT);	// 戦闘音
+
 	// 成功を返す
 	return S_OK;
 }
@@ -1043,6 +1046,9 @@ void CResultManager::UpdateWin(void)
 	
 					//巨大フレームのステートに移行
 					m_state = STATE_BIG_FRAME;
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 				}
 			}
 		}
@@ -1091,10 +1097,17 @@ void CResultManager::UpdateBigFrame(void)
 
 		//目的のサイズになっていたら
 		if (m_arSize[EObj::OBJ_BIGFRAME].x == BigFrame::DESTSIZE.x
-			&&m_arSize[EObj::OBJ_BIGFRAME].y == BigFrame::DESTSIZE.y)
+		&&  m_arSize[EObj::OBJ_BIGFRAME].y == BigFrame::DESTSIZE.y)
 		{
 			//待機時間を増やす
 			m_anWaitTime[EObj::OBJ_BIGFRAME]++;
+			
+			if (m_anWaitTime[EObj::OBJ_BIGFRAME] == 1)
+			{ // 目的サイズなったばかりの場合
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
+			}
 
 			//最大待機時間になっていたら
 			if (m_anWaitTime[EObj::OBJ_BIGFRAME] == BigFrame::MAX_WAIT)
@@ -1106,6 +1119,9 @@ void CResultManager::UpdateBigFrame(void)
 
 				m_anWaitTime[EObj::OBJ_BIGFRAME] = 0;
 				m_state = STATE_FRAME;
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_JUMP);	// 戦闘音
 			}
 		}
 	}
@@ -1159,6 +1175,7 @@ void CResultManager::UpdateFrame(void)
 					//フレーム
 					m_anNum[EObj::OBJ_FRAME] = m_nNumPlay - 1;
 					m_abSizeFinish[EObj::OBJ_FRAME] = true;
+					
 
 				}
 				//範囲外にいっていなければ
@@ -1235,6 +1252,10 @@ void CResultManager::UpdateNumber(void)
 			if (m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().x == Number::DESTSIZE.x
 				&&m_apNumber[m_anNum[EObj::OBJ_NUMBER]]->GetVec3Sizing().y == Number::DESTSIZE.y)
 			{
+
+				// サウンドの再生
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 戦闘音
+
 				//もしアイコン・勝利者番号・プレイヤー番号の中身があれば
 				if (m_apIcon[m_anSaveRank[m_anNum[EObj::OBJ_NUMBER]]] != nullptr&&
 					m_apWinNum[m_anNum[EObj::OBJ_NUMBER]] != nullptr&&
@@ -1272,7 +1293,6 @@ void CResultManager::UpdateNumber(void)
 						m_anNum[EObj::OBJ_NUMBER]++;
 						m_arSize[EObj::OBJ_NUMBER].x = Number::INIT_SIZE.x;
 						m_arSize[EObj::OBJ_NUMBER].y = Number::INIT_SIZE.y;
-
 					}
 				}
 			}
@@ -1376,6 +1396,9 @@ void CResultManager::UpdateCover(void)
 			}
 			m_bSkiped = false;
 			m_state = STATE_WAIT;
+
+			// サウンドの再生
+			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 		}
 
 	}
@@ -1432,7 +1455,7 @@ void CResultManager::UpdateTransition(void)
 					}
 
 					// サウンドの再生
-					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_000);	// 決定音00
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_DECISION_001);	// 決定音01
 				}
 			}
 			m_bSkiped = true;

@@ -161,7 +161,7 @@ void CObjectBillboard::Draw(void)
 
 	// ポインタを宣言
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();	// デバイスのポインタ
-	CTexture *pTexture = CManager::GetInstance()->GetTexture();						// テクスチャへのポインタ
+	CTexture *pTexture = CManager::GetInstance()->GetTexture();							// テクスチャへのポインタ
 
 	// ライティングを無効にする
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);

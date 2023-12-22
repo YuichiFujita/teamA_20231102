@@ -22,7 +22,6 @@ const CSound::SSoundInfo CSound::mc_aSoundInfo[LABEL_MAX] =	// サウンド情報
 	{ "data\\BGM\\Soldiers_Tears.wav", -1 },		// BGM (ゲーム)
 	{ "data\\BGM\\Result.wav", -1 },		// BGM (リザルト)
 
-
 	{ "data\\SE\\typewriter.wav",  0 },		// 選択操作音00
 	{ "data\\SE\\select001.wav",  0 },		// 選択操作音01
 	{ "data\\SE\\decision000.wav",  0 },	// 決定音00
@@ -44,6 +43,8 @@ const CSound::SSoundInfo CSound::mc_aSoundInfo[LABEL_MAX] =	// サウンド情報
 	{ "data\\SE\\dive000.wav",  0 },		// ダイブ音
 	{ "data\\SE\\noise.wav",  0 },			// ノイズ音
 	{ "data\\SE\\fight000.wav",  0 },		// 戦闘音
+	{ "data\\SE\\wind000.wav",  0 },		// 風切り音00
+	{ "data\\SE\\wind001.wav",  0 },		// 風切り音01
 };
 
 //************************************************************

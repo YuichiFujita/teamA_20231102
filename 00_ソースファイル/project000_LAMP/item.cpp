@@ -11,6 +11,8 @@
 #include "player.h"
 #include "input.h"
 #include "scene.h"
+#include "manager.h"
+#include "sound.h"
 #include "collision.h"
 #include "orbitalParticle.h"
 #include "ItemSpawnPoint.h"
@@ -124,6 +126,7 @@ bool CItem::Collision()
 				pPlayer->Hit();
 				CorbitalParticle::Create(GetVec3Position(), D3DXVECTOR3(5.0f, 0.0f, 0.0f), D3DXCOLOR(0.2f, 1.0f, 0.2f, 1.0f), VEC3_ZERO, VEC3_ZERO, VEC3_ZERO, 6, 800, 60, 60, 150, 1.0f, 0.85f);
 				bHit = true;
+				CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SAVE);	// í“¬‰¹
 				break;
 			}
 		}

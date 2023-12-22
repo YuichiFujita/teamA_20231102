@@ -9,6 +9,7 @@
 //************************************************************
 #include "gameManager.h"
 #include "manager.h"
+#include "sound.h"
 #include "scene.h"
 #include "sceneGame.h"
 #include "camera.h"
@@ -216,6 +217,9 @@ void CGameManager::Update(void)
 
 					// リザルトに移行
 					m_state = STATE_RESULT;
+
+					// サウンドの再生
+					CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_WIND_001);	// 風音01
 				}
 			}
 		}
