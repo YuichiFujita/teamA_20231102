@@ -42,6 +42,8 @@ const CSound::SSoundInfo CSound::mc_aSoundInfo[LABEL_MAX] =	// サウンド情報
 	{ "data\\SE\\destruct2.wav",  0 },		// ぶつかり音2
 	{ "data\\SE\\chain2.wav",  0 },			// 振る音
 	{ "data\\SE\\dive000.wav",  0 },		// ダイブ音
+	{ "data\\SE\\noise.wav",  0 },			// ノイズ音
+	{ "data\\SE\\fight000.wav",  0 },		// 戦闘音
 };
 
 //************************************************************
