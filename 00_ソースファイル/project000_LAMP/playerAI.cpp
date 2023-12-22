@@ -910,7 +910,7 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 {
 	if (m_bEmote)
 	{
-		int nProb = rand() % 2;
+		int nProb = rand() % 3;
 
 		if (nProb == 0)
 		{
@@ -919,6 +919,10 @@ CPlayer::EMotion CPlayerAI::AIemote(D3DXVECTOR3& rDestRot)
 		else if (nProb == 1)
 		{
 			m_currentMotion = CPlayer::MOTION_EMOTE_SLEEP;
+		}
+		else if (nProb == 2)
+		{
+			m_currentMotion = CPlayer::MOTION_EMOTE_SPIN;
 		}
 
 		rDestRot.y = 0.0f;
