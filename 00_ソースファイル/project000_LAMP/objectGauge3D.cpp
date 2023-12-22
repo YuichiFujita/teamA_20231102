@@ -23,9 +23,7 @@
 //************************************************************
 const char *CObjectGauge3D::mc_apTextureFile[] =	// テクスチャ定数
 {
-	"data\\TEXTURE\\tutorial_frame.png",		// 黒フレーム
-	"data\\TEXTURE\\lifeGauge3D000.png",	// プレイヤーフレーム
-	"data\\TEXTURE\\lifeGauge3D001.png",	// ターゲットフレーム
+	"data\\TEXTURE\\tutorial_frame.png",	// 黒フレーム
 };
 
 //************************************************************

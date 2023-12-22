@@ -47,7 +47,6 @@ namespace
 		"data\\TXT\\Stages\\stage17.txt",
 		"data\\TXT\\Stages\\stage18.txt",
 		"data\\TXT\\Stages\\stage21.txt",
-		"data\\TXT\\Stages\\stage22.txt",
 		"data\\TXT\\Stages\\stage23.txt",
 		"data\\TXT\\Stages\\stage24.txt",
 		"data\\TXT\\Stages\\stage25.txt",
@@ -58,6 +57,8 @@ namespace
 		"data\\TXT\\Stages\\stage30.txt",
 		"data\\TXT\\Stages\\stage31.txt",
 		"data\\TXT\\Stages\\stage32.txt",
+		"data\\TXT\\Stages\\stage33.txt",
+		"data\\TXT\\Stages\\stage34.txt",
 	};
 }
 

@@ -28,12 +28,14 @@ namespace
 
 	namespace gauge
 	{
+		const CObjectGauge3D::EType	FRAMEVISUAL = CObjectGauge3D::TYPE_TUTORIAL;	// フレーム見た目
 		const CObject::ELabel	LABEL	= CObject::LABEL_UI;				// オブジェクトラベル
 		const D3DXVECTOR3	SIZE		= D3DXVECTOR3(650.0f, 50.0f, 0.0f);	// ゲージ大きさ
+		const D3DXVECTOR3	SIZE_FRAME	= D3DXVECTOR3(680.0f, 80.0f, 0.0f);	// フレーム大きさ
 		const D3DXCOLOR		COL_FRONT	= XCOL_WHITE;						// 表ゲージ色
 		const D3DXCOLOR		COL_BACK	= D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f);// 裏ゲージ色
-		const int	MAX_NUM			= 120;		// 最大表示値
-		const int	CHANGE_FRAME	= 2;		// 表示値変動フレーム
+		const int	MAX_NUM			= 120;	// 最大表示値
+		const int	CHANGE_FRAME	= 2;	// 表示値変動フレーム
 		const float	POSY_UP			= 1.0f;	// 表示Y位置の加算量
 	}
 
@@ -104,9 +106,11 @@ HRESULT CNextPoint::Init(void)
 		gauge::POSY_UP,			// 表示Y位置の加算量
 		gauge::SIZE,			// ゲージ大きさ
 		gauge::COL_FRONT,		// 表ゲージ色
-		gauge::COL_BACK,		// 裏ゲージ色
-		true					//枠表示
+		gauge::COL_BACK			// 裏ゲージ色
 	);
+
+	// 優先順位を設定
+	m_pGauge->SetPriority(2);
 
 	// 値を設定
 	m_pGauge->SetNum(0);
