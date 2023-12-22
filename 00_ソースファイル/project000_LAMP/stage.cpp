@@ -35,10 +35,6 @@ namespace
 
 	const char* SETUP_TXT[] =	// ステージセットアップテキスト
 	{
-#if 0
-		//"data\\TXT\\Stages\\stage0.txt",
-		//"data\\TXT\\Stages\\Ground_Stage.txt",
-#else	
 		"data\\TXT\\Stages\\stage1.txt",
 		"data\\TXT\\Stages\\stage2.txt",
 		"data\\TXT\\Stages\\stage3.txt",
@@ -61,9 +57,7 @@ namespace
 		"data\\TXT\\Stages\\stage29.txt",
 		"data\\TXT\\Stages\\stage30.txt",
 		"data\\TXT\\Stages\\stage31.txt",
-		"data\\TXT\\Stage_morikawa\\stage001.txt",
-		"data\\TXT\\Stage_morikawa\\stage002.txt",
-#endif
+		"data\\TXT\\Stages\\stage32.txt",
 	};
 }
 
