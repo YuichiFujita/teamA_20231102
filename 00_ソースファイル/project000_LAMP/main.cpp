@@ -112,7 +112,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hInstancePrev*/, LPSTR /*lpC
 	UpdateWindow(hWnd);				// クライアント領域を更新
 
 	// マネージャーの生成
-	pManager = CManager::Create(hInstance, hWnd, TRUE);
+	pManager = CManager::Create(hInstance, hWnd, FALSE);
 	if (pManager == NULL)
 	{ // 非使用中の場合
 
