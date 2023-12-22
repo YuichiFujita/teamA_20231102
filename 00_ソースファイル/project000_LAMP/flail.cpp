@@ -285,7 +285,17 @@ void CFlail::UpdateFlailPos(void)
 		}
 	}
 
-	if (player->GetCounterFlail() != flail::FLAIL_DEF)
+	if (player->GetCounterFlail() > flail::FLAIL_DEF)
+	{
+		D3DXVECTOR3 stickPos;
+
+		stickPos.x = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._41;
+		stickPos.y = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._42;
+		stickPos.z = player->GetMultiModel(CPlayer::MODEL_STICK)->GetMtxWorld()._43;
+
+		rot.y = atan2f(stickPos.x - pos.x, stickPos.z - pos.z);
+	}
+	else if (player->GetCounterFlail() <= flail::FLAIL_DROP)
 	{
 		D3DXVECTOR3 stickPos;
 
@@ -303,7 +313,7 @@ void CFlail::UpdateFlailPos(void)
 		stickPos.y = player->GetMtxWorld()._42;
 		stickPos.z = player->GetMtxWorld()._43;
 
-		rot.y = atan2f(pos.x - stickPos.x, pos.z - stickPos.z);
+		rot.y = atan2f(stickPos.x - pos.x, stickPos.z - pos.z);
 	}
 	// “–‚½‚è”»’è
 	Collision(pos);
@@ -498,11 +508,18 @@ void CFlail::UpdateChain(void)
 			if (player->GetCounterFlail() < flail::FLAIL_DROP)
 			{
 				// æ’[‚©‚çˆø‚«–ß‚·
-				if (nCntChain < flail::FLAIL_NUM_MAX - 1)
+				if (nCntChain < flail::FLAIL_NUM_MAX - 2)
 				{
-					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
+					if (m_chain[nCntChain + 1].multiModel->GetVec3Position().x <= 0.0f || m_chain[nCntChain + 2].multiModel->GetVec3Position().x <= 0.0f)
 					{
-						pos.x -= 0.3f;
+						float speed = 10.0f;
+
+						if (speed > 20.0f)
+						{
+							speed = 20.0f;
+						}
+
+						pos.x -= speed;
 
 						if (pos.x < 0.0f)
 						{
@@ -512,9 +529,16 @@ void CFlail::UpdateChain(void)
 				}
 				else
 				{
-					if ((m_fLengthChain < m_fLengthTarget) || nCntChain == 1)
+					if (m_chain[0].multiModel->GetVec3Position().x <= 0.0f)
 					{
-						pos.x -= 0.3f;
+						float speed = 10.0f;
+
+						if (speed > 20.0f)
+						{
+							speed = 20.0f;
+						}
+
+						pos.x -= speed;
 
 						if (pos.x < 0.0f)
 						{
