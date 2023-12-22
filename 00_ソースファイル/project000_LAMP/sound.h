@@ -58,6 +58,8 @@ public:
 		LABEL_SE_HIT2,			// ぶつかり音2
 		LABEL_SE_SWING,			// 振る音
 		LABEL_SE_DIVE,			// ダイブ音
+		LABEL_SE_NOISE,			// ノイズ音
+		LABEL_SE_FIGHT,			// 戦闘音
 		LABEL_MAX,				// この列挙型の総数
 	};
 
