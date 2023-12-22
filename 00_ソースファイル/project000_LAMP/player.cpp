@@ -1400,6 +1400,7 @@ CPlayer::EMotion CPlayer::UpdateNormal(void)
 
 	if (m_bAI)
 	{
+		// CPUのダッシュ動作
 		m_pAI->AIDash
 		(
 			GetVec3Position(),
@@ -1727,17 +1728,22 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			m_move.x *= 0.7f;
 			m_move.z *= 0.7f;
 
+			// 変数を宣言
 			D3DXVECTOR3 vecFlail;
 			float rotMove, rotFlail, rotDiff;
 
+			// フレイルとプレイヤー間のベクトルを計算
 			vecFlail = m_pFlail->GetVec3Position() - GetVec3Position();
 
+			// 移動量と上のベクトルから角度を計算
 			rotMove = atan2f(m_move.x, m_move.z);
 			rotFlail = atan2f(vecFlail.x, vecFlail.z);
 
+			// 角度の差分を計算
 			rotDiff = rotMove - rotFlail;
 			useful::NormalizeRot(rotDiff);
 
+			// 差分が一定値内なら引きずりモーションに変更
 			if (rotDiff > D3DX_PI * 0.5f || rotDiff < D3DX_PI * -0.5f)
 			{
 				// 引きずりモーションを設定
@@ -1781,16 +1787,19 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				m_nCounterFlail = flail::FLAIL_CHARGE;
 
+				// 最大溜めを示すバイブレーションを設定する
 				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_FULL, m_nPadID);
 			}
 			else
 			{
+				// 溜め状態を示すバイブレーションを設定する
 				CManager::GetInstance()->GetPad()->SetVibration(CInputPad::TYPE_FLAIL_CHAGE, m_nPadID);
 			}
 
 			// 溜めてる間鉄球を振り回す
 			m_pFlail->SetChainRotMove((-0.002f * m_nCounterFlail) - 0.12f);
 
+			// すこしだけ鎖をのばす
 			m_pFlail->SetLengthTarget(flail::FLAIL_RADIUS * 5.0f);
 
 			// 移動量を更新
@@ -1825,7 +1834,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			}
 
 			if (DEAD_ZONE < fStickR)
-			{
+			{// スティック入力があるなら直線投げ
 				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1));
 
 				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN)
@@ -1838,7 +1847,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				m_pFlail->SetChainRotMove(0.0f);
 			}
 			else
-			{
+			{// スティック入力がないなら回転投げ
 				lengthTarget = flail::FLAIL_RADIUS * (float)(((float)m_nCounterFlail / (float)flail::FLAIL_CHARGE) * (m_pFlail->GetNumChain() - 1)) * 0.6f;
 
 				if (lengthTarget < flail::FLAIL_RADIUS * flail::FLAIL_NUM_MIN * 0.5f)
@@ -1847,6 +1856,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				}
 			}
 
+			// 目標距離設定
 			m_pFlail->SetLengthTarget(lengthTarget);
 
 			// カウンターの設定
@@ -1888,7 +1898,8 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		{
 			m_nCounterFlail++;
 		}
-
+		
+		// エモート用関数
 		PlayEmote(currentMotion);
 	}
 	else
@@ -1896,10 +1907,14 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 		// 鉄球とプレイヤーの距離が一定未満の時プレイヤー位置に鉄球固定
 		if (m_pFlail->GetLengthChain() <= flail::FLAIL_RADIUS * 2.0f || m_pFlail->GetLengthTarget() <= flail::FLAIL_RADIUS * 5.0f)
 		{
+			// フレイルのカウンターをリセットする
 			m_nCounterFlail = flail::FLAIL_DEF;
 			m_pFlail->SetMove(VEC3_ZERO);
+
+			// フレイルをキャッチする
 			m_pFlail->CatchFlail();
 		}
+		else
 		{
 			// カウンターダウン開始
 			if (CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_R1, m_nPadID) == TRUE)
@@ -1919,6 +1934,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 						m_nCounterFlail = -60;
 					}
 
+					// 引き戻しはじめにスティック入力があるなら
 					if (m_nCounterFlail == -3)
 					{
 						float rot1 = CManager::GetInstance()->GetPad()->GetPressRStickRot(m_nPadID);
@@ -1932,18 +1948,18 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 
 							if (rot3 < 0.0f)
 							{
-								// 溜めてる間鉄球を振り回す
+								// 引き戻してる間鉄球を振り回す
 								m_pFlail->SetChainRotMove(0.03f);
 							}
 							else
 							{
-								// 溜めてる間鉄球を振り回す
+								// 引き戻してる間鉄球を振り回す
 								m_pFlail->SetChainRotMove(-0.03f);
 							}
 						}
 						else
 						{
-							// 溜めてる間鉄球を振り回す
+							// まっすぐ引き戻し
 							m_pFlail->SetChainRotMove(0.0f);
 						}
 					}
@@ -1959,6 +1975,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 			{
 				if (m_nCounterFlail == flail::FLAIL_DROP)
 				{
+					// フレイルと自分たちの間のベクトルを計算
 					D3DXVECTOR3 vecFlail = GetVec3Position() - m_pFlail->GetVec3Position();
 					vecFlail.y = 0.0f;
 
@@ -2004,6 +2021,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				D3DXVECTOR3 vecPtoFTarget = VEC3_ZERO;
 				float lengthPtoFTarget = 0.0f;
 
+				// 引き戻しをやめたときフレイルを落下状態にする
 				m_nCounterFlail = flail::FLAIL_DROP;
 
 				vecPtoFTarget.x = GetMultiModel(CPlayer::MODEL_STICK)->GetPtrMtxWorld()->_41 - m_pFlail->GetVec3Position().x;
@@ -2015,6 +2033,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 				m_pFlail->SetLengthTarget(lengthPtoFTarget);
 			}
 
+			// エモート用関数
 			PlayEmote(currentMotion);
 		}
 	}
