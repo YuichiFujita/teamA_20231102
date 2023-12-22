@@ -1319,7 +1319,7 @@ void CResultManager::UpdateSelect(void)
 
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_A)
 	||  CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_LEFT)
-	|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_LEFT))
+	|| CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_LEFT))
 	{ // 左移動の操作が行われた場合
 
 		// 左に選択をずらす
@@ -1330,7 +1330,7 @@ void CResultManager::UpdateSelect(void)
 	}
 	if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_D)
 	||  CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_RIGHT)
-	|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_RIGHT))
+	|| CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_RIGHT))
 	{ // 右移動の操作が行われた場合
 
 		// 右に選択をずらす
@@ -1411,17 +1411,17 @@ void CResultManager::UpdateTransition(void)
 	if (m_bSkiped == false)
 	{
 		if (CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_RETURN)
-			|| CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE)
-			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_A)
-			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_B)
-			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_X)
-			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_Y)
-			|| CManager::GetInstance()->GetPad()->IsTrigger(CInputPad::KEY_START))
+		||  CManager::GetInstance()->GetKeyboard()->IsTrigger(DIK_SPACE)
+		||  CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_A)
+		||  CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_B)
+		||  CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_X)
+		||  CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_Y)
+		||  CManager::GetInstance()->GetPad()->IsTriggerAll(CInputPad::KEY_START))
 		{
 			if (m_state != STATE_WAIT)
 			{ // 遷移待機状態ではない場合
 
-			  //フレームステートではなければ
+				// フレームステートではなければ
 				if (m_state != STATE_FRAME)
 				{
 					//演出スキップ
