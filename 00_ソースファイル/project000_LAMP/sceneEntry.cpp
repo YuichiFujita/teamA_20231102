@@ -110,7 +110,7 @@ void CSceneEntry::Update(void)
 	{
 #if 1
 		// プレイヤーを全参加させる
-		CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true, false);
+		CManager::GetInstance()->GetRetentionManager()->AllSetEnableEntry(true, true);
 		CManager::GetInstance()->GetRetentionManager()->SetNumPlayer(4);
 #else
 		// 一部プレイヤーを参加させる

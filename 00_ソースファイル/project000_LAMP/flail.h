@@ -52,6 +52,7 @@ public:
 		FLAIL_GREENAPPLE,	// 青リンゴ
 		FLAIL_DUCK,			// アヒル
 		FLAIL_BOMB,			// 爆弾
+		FLAIL_TOMATO,		// トマト
 		FLAIL_MAX			// この列挙型の総数
 	};
 

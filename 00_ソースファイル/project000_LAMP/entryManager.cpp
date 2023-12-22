@@ -958,13 +958,13 @@ void CEntryManager::UpdateFlail(void)
 		if (!pRetention->IsEntry(nCntEntry))
 		{ // エントリーしていない場合
 
-			break;
+			continue;
 		}
 
 		if (m_apJoin[nCntEntry]->GetPattern() != JOIN_OFF)
 		{ // 準備が出来ている場合
 
-			break;
+			continue;
 		}
 
 		// ポインタを宣言
@@ -974,7 +974,7 @@ void CEntryManager::UpdateFlail(void)
 		// 変数を宣言
 		int nType = pFlail->GetType();	// フレイル種類
 
-		if (pPad->IsTrigger(CInputPad::KEY_RIGHT))
+		if (pPad->IsTrigger(CInputPad::KEY_RIGHT, nCntEntry))
 		{ // 右移動の操作が行われた場合
 
 			// 右に選択をずらす
@@ -987,7 +987,7 @@ void CEntryManager::UpdateFlail(void)
 			// サウンドの再生
 			CManager::GetInstance()->GetSound()->Play(CSound::LABEL_SE_SELECT_000);	// 選択操作音00
 		}
-		if (pPad->IsTrigger(CInputPad::KEY_LEFT))
+		if (pPad->IsTrigger(CInputPad::KEY_LEFT, nCntEntry))
 		{ // 左移動の操作が行われた場合
 
 			// 左に選択をずらす
