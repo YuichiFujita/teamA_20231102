@@ -20,6 +20,7 @@
 #include "collision.h"
 #include "fade.h"
 #include "playerAI.h"
+#include "guide.h"
 
 #include "multiModel.h"
 #include "objectOrbit.h"
@@ -236,12 +237,7 @@ HRESULT CPlayer::Init(void)
 	SetEnableDepthShadow(true);
 	SetEnableZTex(true);
 
-	m_pGuide = CObject3D::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
-	m_pGuide->SetEnableDraw(false);
-	m_pGuide->SetEnableDepthShadow(false);
-	m_pGuide->SetEnableZTex(false);
-	m_pGuide->SetLabel(ELabel::LABEL_UI);
-	m_pGuide->BindTexture("data\\TEXTURE\\Guide.png");
+	m_pGuide = CGuide::Create(GetVec3Position(), D3DXVECTOR3(100.0f, 0.0f, 100.0f));
 
 	m_pPlayerGuide = CObjectBillboard::Create(D3DXVECTOR3(GetVec3Position().x, GetVec3Position().y + 100.0f, GetVec3Position().z), D3DXVECTOR3(300.0f, 100.0f, 0.0f));
 	switch (m_nPadID)
@@ -1762,7 +1758,7 @@ CPlayer::EMotion CPlayer::UpdateMove(D3DXVECTOR3& rPos)
 	D3DXVECTOR3 vec;
 	//ƒKƒCƒh•\Ž¦ŒvŽZ
 	D3DXVec3Normalize(&vec, &D3DXVECTOR3(vecStickR.x, 100.0f, -vecStickR.y));
-	m_pGuide->SetVec3Position(GetVec3Position() + (vec * 300.0f));
+	m_pGuide->SetVec3Position(GetVec3Position() + (vec * 300.0f) + D3DXVECTOR3(0.0f, 2.0f, 0.0f));
 	m_pGuide->SetVec3Rotation(D3DXVECTOR3(0.0f, atan2f(vecStickR.x, -vecStickR.y), 0.0f));
 	if (vecStickR != VEC3_ZERO)
 	{

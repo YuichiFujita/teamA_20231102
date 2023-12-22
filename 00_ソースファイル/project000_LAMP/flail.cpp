@@ -44,6 +44,10 @@ const char *CFlail::mc_apModelFileFlail[] =	// モデル定数(フレイル)
 	"data\\MODEL\\FLAIL\\ironBall.x",	// 鉄球
 	"data\\MODEL\\FLAIL\\head.x",		// 頭
 	"data\\MODEL\\FLAIL\\escapekun.x",	// エスケープ君
+	"data\\MODEL\\FLAIL\\apple.x",		// リンゴ
+	"data\\MODEL\\FLAIL\\green_apple.x",// 青リンゴ
+	"data\\MODEL\\FLAIL\\Duck.x",		// アヒル
+	"data\\MODEL\\FLAIL\\bomb.x",		// 爆弾
 };
 
 const char *CFlail::mc_apModelFileChain[] =	// モデル定数(鎖)
