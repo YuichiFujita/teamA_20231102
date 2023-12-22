@@ -60,6 +60,8 @@ public:
 		LABEL_SE_DIVE,			// ダイブ音
 		LABEL_SE_NOISE,			// ノイズ音
 		LABEL_SE_FIGHT,			// 戦闘音
+		LABEL_SE_WIND_000,		// 風切り音00
+		LABEL_SE_WIND_001,		// 風切り音01
 		LABEL_MAX,				// この列挙型の総数
 	};
 
