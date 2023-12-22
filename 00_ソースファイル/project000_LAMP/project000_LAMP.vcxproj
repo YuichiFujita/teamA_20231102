@@ -167,6 +167,7 @@
     <ClCompile Include="editItemPoint.cpp" />
     <ClCompile Include="flailEntry.cpp" />
     <ClCompile Include="frailResult.cpp" />
+    <ClCompile Include="guide.cpp" />
     <ClCompile Include="ItemSpawnPoint.cpp" />
     <ClCompile Include="editObstacle.cpp" />
     <ClCompile Include="editSpawnPoint.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="editItemPoint.h" />
     <ClInclude Include="flailEntry.h" />
     <ClInclude Include="frailResult.h" />
+    <ClInclude Include="guide.h" />
     <ClInclude Include="ItemSpawnPoint.h" />
     <ClInclude Include="editObstacle.h" />
     <ClInclude Include="editSpawnPoint.h" />
